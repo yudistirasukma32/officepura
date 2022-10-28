@@ -1,0 +1,44 @@
+<table class="row-view">
+    <tr>
+        <th width="50">BKK</th>
+        <th>Keterangan</th>
+        <th width="40">Ktr</th>
+        <th width="80">No Pol</th>
+        <th width="100" class="right">Total</th>
+        <th width="60"></th>
+    </tr>
+    <tr class="subheading">
+        <th colspan="6" style="color:#000;">Bukti Kas Masuk <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%=@invoicereturns.count%>)</span></th>
+    </tr>
+    
+    <% @invoicereturns.each do |invoicereturn| %>
+    <% if !invoicereturn.invoice.invoicetrain %>
+        <% if invoicereturn.deleted %>
+            <% if current_user.adminrole%>
+            <tr class="deleted">
+                <td><%=zeropad(invoicereturn.invoice.id)%></td>
+                <td><%=invoicereturn.quantity%> Rit: <%=invoicereturn.invoice.route.name%> (<%=invoicereturn.invoice.driver.name%>) <%= invoicereturn.invoice.invoicetrain ? '= Kereta = ': '' %></td>
+                <td><%=invoicereturn.office.abbr%></td>
+                <td><%=invoicereturn.invoice.vehicle.current_id%></td>
+                <td align="right"><%=to_currency(invoicereturn.total)%></td>
+                <td>DIHAPUS</td>
+            </tr>
+            <% end %>
+        <% else %>
+            <tr>
+                <td><%=zeropad(invoicereturn.invoice.id)%></td>
+                <td><%=invoicereturn.quantity%> Rit: <%=invoicereturn.invoice.route.name%> (<%=invoicereturn.invoice.driver.name%>) <%= invoicereturn.invoice.invoicetrain ? '= Kereta = ': '' %></td>
+                <td><%=invoicereturn.office.abbr%></td>
+                <td><%=invoicereturn.invoice.vehicle.current_id%></td>
+                <td align="right"><%=to_currency(invoicereturn.total)%></td>
+                <td class="right">
+                    <%= link_to '&#xf00d;'.html_safe, invoicereturn, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+                </td>
+            </tr>
+        <% end %>   
+    <% end %>
+    <% end %>
+
+
+
+</table>

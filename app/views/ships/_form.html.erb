@@ -1,0 +1,48 @@
+<%= form_for(@ship) do |f| %>
+	<% if @ship.errors.any? %>
+	<div id="error_explanation">
+		<h2><%= pluralize(@ship.errors.count, "error") %> prohibited this ship from being saved:</h2>
+
+		<ul>
+			<% @ship.errors.full_messages.each do |msg| %>
+			<li><%= msg %></li>
+			<% end %>
+		</ul>
+	</div>
+	<% end %>
+
+	<div class="field-row first">
+		<%= f.label :name, "Nama" %>
+		<%= f.text_field :name, :class => 'half' %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :number, "Nomor" %>
+		<%= f.text_field :number %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :imo, "Nomor IMO" %>
+		<%= f.text_field :imo %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :builder, "Builder" %>
+		<%= f.text_field :builder %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :year_of_build, "Tahun Pembuatan" %>
+		<%= f.text_field :year_of_build %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :description, "Deskripsi" %>
+		<%= f.text_area :description, :class => 'half' %>
+	</div>
+
+	<div class="actions">
+	<%= f.submit %>
+	</div>
+
+<% end %>

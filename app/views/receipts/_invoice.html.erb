@@ -1,0 +1,29 @@
+  <div class="info-box">  
+    <h3 class="zone" >Estimasi Ongkos</h3>
+    <div class="field-row continue">
+      <%= f.label :driver_allowance, "Sangu" %>
+      <%= f.text_field :driver_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.driver_allowance), :disabled => 'disabled' %>
+    </div>
+
+    <div class="field-row continue">
+      <%= f.label :gas_allowance, "Solar" %>
+      <%= f.text_field :gas_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.gas_allowance), :disabled => 'disabled' %>
+      <span id="invoice_gas_detail">(<%=@invoice.gas_allowance_litre%> liter @ <%=@gascost%>)</span>
+    </div>
+
+    <div class="field-row continue">
+      <%= f.label :ferry_fee, "Penyebrangan" %>
+      <%= f.text_field :ferry_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.ferry_fee), :disabled => 'disabled' %>
+    </div>
+
+    <div class="field-row continue">
+      <%= f.label :tol_fee, "Tol" %>
+      <%= f.text_field :tol_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.tol_fee), :disabled => 'disabled' %>
+    </div>
+    
+    <div class="field-row continue total-row">
+      <%= f.label :total, "Total" %>
+      <%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.total), :disabled => 'disabled' %>
+      <strong>Rupiah</strong>
+    </div>  
+  </div>

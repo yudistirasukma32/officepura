@@ -1,0 +1,84 @@
+<table class="row-view">
+	<tr>
+		<th width="30">No.</th>
+		<th width="50">Order</th>
+		<th>Keterangan</th>
+		<th width="80">Tunai/Bon</th>
+		<th width="80">No Pol</th>
+		<th width="100" class="right">Total</th>
+		<th width="100"></th>
+	</tr>
+	
+	<% i, count_tunai, count_bon, total_tunai, total_bon = 0, 0, 0, 0, 0 %>
+	
+	<% @productorders.each do |productorder| %>
+		<% if productorder.productorderitems.where("productorder_id is null").count == 0 %>
+			<% items = "" 
+				productorder.productorderitems.each do |productorderitem| 
+					items += productorderitem.quantity.to_s + " " + (productorderitem.product.unit_name rescue '[N/A]') + ": " + (productorderitem.product.name rescue '[N/A]') + ", "
+				end
+				items = items[0...-2]	
+			%>
+			
+			<% tunai = productorder.productorderitems.where(:bon => false).count || 0 %>
+			<% bon = productorder.productorderitems.where(:bon => true).count || 0 %>
+
+			<% if productorder.deleted %>
+
+				<% if current_user.adminrole %>
+					<tr class="deleted">
+						<td><%= i+=1 %>.</td>
+						<td><%= zeropad(productorder.id) %></td>
+						<td><%= items %></td>
+						<td style="text-align:center;"><%= tunai %> / <%= bon %></td>
+						<td><%= productorder.productrequest.vehicle.current_id if  !productorder.productrequest.nil? and !productorder.productrequest.vehicle_id.nil? %></td>
+						<td class="red" align="right"><%=to_currency(productorder.total)%></td>
+						<td class="right">DIHAPUS</td>
+					</tr>
+				<% end %>
+
+			<% else %>
+
+				<% count_tunai += tunai %>
+				<% count_bon += bon %>
+				<% total_tunai += productorder.productorderitems.where(:bon => false).sum(:total) %>
+				<% total_bon += productorder.productorderitems.where(:bon => true).sum(:total) %>
+
+				<tr>
+					<td><%= i+=1 %>.</td>
+					<td><%= link_to zeropad(productorder.id), edit_productorder_path(productorder) %></td>
+					<td><%= link_to items, edit_productorder_path(productorder)%></td>
+					<td style="text-align:center;"><%= tunai %> / <%= bon %></td>
+					<td><%= productorder.productrequest.vehicle.current_id if  !productorder.productrequest.nil? and !productorder.productrequest.vehicle_id.nil? %></td>
+					<td class="red" align="right"><%= to_currency(productorder.total) %></td>
+					<td class="right">
+						
+						<% if productorder.receiptorders.active.count == 0 %>
+							<%= link_to '&#xf044;'.html_safe, edit_productorder_path(productorder), :class => "edit tipsy", :title => 'Edit' %> 
+						<% end %>
+						
+						<a href="<%= confirmation_productorder_path(productorder)%>" class="delete tipsy" title="Print Pembelian"><i class="icon-print"></i></a>
+						
+						<% if current_user.adminrole || current_user.owner %>
+						
+						<%= link_to '&#xf00d;'.html_safe, productorder, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+						
+						<% end %>
+						
+						<a href="<%= return_productorder_path(productorder)%>" class="edit tipsy" title="Retur Pembelian"><i class="icon-refresh"></i></a>
+					</td>
+				</tr>
+			<% end %>
+		<% end %>
+	<% end %>
+		<tr class="footer">
+			<td colspan="3" ></td>
+			<td class="total" align="center">
+				<%= count_tunai %> /
+				<%= count_bon %>
+			</td>
+			<td colspan="2" align="right" class="total red"><%= to_currency(total_tunai) %> / <%= to_currency(total_bon) %></td>
+			<td></td>
+			<td></td>
+		</tr>
+</table>

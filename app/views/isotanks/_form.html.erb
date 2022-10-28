@@ -1,0 +1,12 @@
+<%= form_for(@isotank) do |f| %>
+	<div class="field-row first">
+    <%= f.label :isotanknumber, "Nomor Isotank" %>
+    <%= f.text_field :isotanknumber %>
+	</div>
+
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Kendaraan' %>
+    <a class="back left" href="<%=isotanks_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

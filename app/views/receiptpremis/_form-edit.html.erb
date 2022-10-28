@@ -1,0 +1,69 @@
+<% if @receiptpremi %>
+
+	<%= form_for(@receiptpremi) do |f| %>
+		<% if @errors.include?'receiptpremi' %>
+	      <div class="field-row red">
+	        <%=@errors['receiptpremi']%>
+	      </div>
+	    <% end %>
+
+  		<div class="info-box" style="margin-bottom:30px;">  
+  			<h3>Bukti Kas Keluar #<%=zeropad(@receiptpremi.invoice.id)%></h3>
+
+  			<table class="row-view no-border">
+				<tr>
+			        <td width="90">Tanggal</td>
+			        <td><%=@receiptpremi.invoice.date.strftime('%d-%m-%Y')%>&nbsp;(KTR: <%=@receiptpremi.invoice.office.name%>)</td>
+			    </tr>
+			    <tr>
+			        <td>Pelanggan</td>
+			        <td><%=@receiptpremi.invoice.customer.name%></td>
+			    </tr>
+		        <tr>
+			        <td>Jurusan</td>
+			        <td><strong><%=@receiptpremi.bonusreceipt.quantity%></strong> Rit: <%=@receiptpremi.invoice.route.name%></td>
+	     	    </tr>
+	     	    <tr>
+		          <td>Tipe</td>
+		          <td><%=@receiptpremi.invoice.route.routegroup.name%></td>
+		        </tr>
+			    <tr>
+			        <td>Kendaraan</td>
+			        <td><%=@receiptpremi.invoice.vehicle.current_id%>&nbsp;(UP: <%= @receiptpremi.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+			    </tr>
+			    <tr>
+			        <td>Supir</td>
+			        <td><%=@receiptpremi.invoice.driver.name%><% if !@receiptpremi.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@receiptpremi.invoice.driver.helpers.first.name%>)<% end %></td>
+      			</tr>       			   
+  			</table>
+
+  			<table class="row-view">
+  				<tr>
+	  				<th width="90">Keterangan</th>
+			        <th>&nbsp;</th>
+			        <th width="160" class="right" style="padding-right:5px;">Total</th>
+		    	</tr>
+		    	<tr>
+		    		<td>Premi</td>
+		    		<td>&nbsp;</th>
+		    		<td class="half allowance-field"><%= to_currency(@receiptpremi.total)%></td>
+		    	</tr>
+		    	<tr class="total-row">
+			        <td><%= f.label :total, "Total" %></td>
+			        <td>&nbsp;</td>
+			        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@receiptpremi.total), :readOnly => 'true' %></td>
+			    </tr>
+  			</table>
+  		</div>
+
+  		<div class="field-row first" style="margin-bottom:-20px;">
+		    <%= f.label :created_at, "Tgl Konfirmasi" %>
+		    <%= f.text_field :created_at, :class => 'half date-picker', :value => to_currency(@receiptpremi.created_at.strftime('%d-%m-%Y')) %>
+		    <%= f.hidden_field :receiptpremi_id, :value => @receiptpremi.id %>
+		</div>
+	  
+	  	<div class="actions">
+	    	<%= f.submit "Tambah Data", :class => 'submit' %> 
+	  	</div>
+	<% end %>
+<% end %>

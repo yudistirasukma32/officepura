@@ -1,0 +1,54 @@
+<table class="row-view">
+	<tr>
+		<th width="50">BKK</th>
+		<th>Nama</th>
+		<th width="100">Tipe</th>
+		<th width="40">Ktr</th>
+		<th width="80">No Pol</th>
+		<th width="100" class="right">Total</th>
+		<th width="60"></th>
+	</tr>
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">BKM Supir <span class="red"> (<%=@payrollreturns.count%>)</span></th>
+	</tr>
+	
+	<% @payrollreturns.each do |payrollreturn| %>
+	<% if payrollreturn.deleted %>
+	<% if current_user.adminrole%>
+	<tr class="deleted">
+		<td><%=zeropad(payrollreturn.payroll.id)%></td>
+		<% if !payrollreturn.payroll.driver_id.nil? %>
+		<td><%= payrollreturn.payroll.driver.name unless payrollreturn.payroll.driver.nil?%></td>
+		<td>SUPIR</td>
+		<% else %>
+		<td><%= payrollreturn.payroll.helper.name unless payrollreturn.payroll.helper.nil?%></td>
+		<td>KERNET</td>
+		<% end %>
+		<td><%=payrollreturn.payroll.office.abbr unless payrollreturn.payroll.office.nil? %></td>
+		<td><%=payrollreturn.payroll.vehicle.current_id unless payrollreturn.payroll.vehicle.nil? %></td>
+		<td align="right"><%=to_currency(payrollreturn.total)%></td>
+		<td>DIHAPUS</td>
+	</tr>
+	<% end %>
+	<% else %>
+	<tr>
+		<td><%=zeropad(payrollreturn.payroll.id)%></td>
+		<% if !payrollreturn.payroll.driver_id.nil? %>
+		<td><%= payrollreturn.payroll.driver.name unless payrollreturn.payroll.driver.nil?%></td>
+		<td>SUPIR</td>
+		<% else %>
+		<td><%= payrollreturn.payroll.helper.name unless payrollreturn.payroll.helper.nil?%></td>
+		<td>KERNET</td>
+		<% end %>
+		<td><%=payrollreturn.payroll.office.abbr unless payrollreturn.payroll.office.nil? %></td>
+		<td><%=payrollreturn.payroll.vehicle.current_id unless payrollreturn.payroll.vehicle.nil? %></td>
+		<td align="right"><%=to_currency(payrollreturn.total)%></td>
+		<td class="right">
+			<%= link_to '&#xf00d;'.html_safe, payrollreturn, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+		</td>
+	</tr>
+	<% end %>	
+	<% end %>
+
+
+</table>

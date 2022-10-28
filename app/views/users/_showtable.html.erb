@@ -1,0 +1,50 @@
+<table class="row-view tablesorter">
+	<thead>
+		<tr>
+			<th>Nama Akun</th>
+			<th>Last Login</th>
+			<th width="60" class="{sorter: false}">Role</th>
+			<th width="60" class="{sorter: false} hideprint" >Aktif</th>
+			<th width="60" class="{sorter: false} hideprint" ></th>			
+		</tr>
+	</thead>
+	<tbody>
+		<% @users.each do |user| %>
+		<tr>
+			<td>
+			
+				<strong><%= link_to user.username, edit_user_path(user) %></strong>
+				<br/>
+				<% user.userroles.each do |role| %>
+					<span><%= role.role.name %>,</span>
+				<% end %>
+				<% if user.owner %>
+					<span>Owner</span>
+				<% end %>
+			
+			</td>
+			<td><%= user.last_sign_in_at.nil? ? '-' : user.last_sign_in_at.strftime('%d-%m-%Y %H:%M:%S') %></td>
+
+			<td><%= user.userroles.count %></td>
+
+			<% if user.enabled and user.deleted == false %>
+			<td><i class="icon-ok-sign enabled hideprint"></i></td>
+			<% else %>
+			<td><i class="icon-remove-sign disabled hideprint"></i></td>
+			<% end %>
+			
+			<% if user.deleted %>
+			<td class="right hideprint">
+				<a class="cta" href="javascript:void();">Deleted</a>
+			</td>
+			<% else %>
+			<td class="right hideprint" width="60">
+				<%= link_to '&#xf044;'.html_safe, edit_user_path(user), :class => "edit tipsy", :title => 'Edit' %> 
+				<%= link_to '&#xf00d;'.html_safe, user, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+			</td>
+			<% end %>			
+		</tr>
+		<% end %>
+	</tbody>
+	
+</table>

@@ -1,0 +1,126 @@
+<% tab = 0 %>
+
+  <ul class="rounded" id="tabbed">
+    <li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
+    <% if !params[:id].nil? %><li><a id="link_<%=tab+=1%>" href="">Data Sangu + Solar</a></li><% end %>
+  </ul>
+
+<br class="clearfix"/>
+
+<% tab = 0 %>
+  <div id="sliding_window">
+    <div class="sliding_container">
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+<%= form_for(@route) do |f| %>
+
+  	<div class="field-row">
+      <%= f.label :name, "Nama Jurusan" %>
+      <%= f.text_field :name, :disabled => (['edit', 'update'].include?active_node and !current_user.adminrole and !current_user.owner) %>
+      <% if (['edit', 'update'].include?active_node and !current_user.adminrole and !current_user.owner) %>
+      <i class="icon-lock red"></i>
+      <% end %>
+  	</div>
+
+    <!--
+    <div class="field-row">
+      <%= f.label :enabled, "Aktif" %>
+      <%= f.check_box :enabled %>
+    </div>
+    -->
+
+    <div class="field-row">
+      <%= f.label :routegroup_id, "Rute" %>
+      <%= f.select :routegroup_id, options_for_select(Routegroup.active.order(:name).collect {|g| [g.name, g.id]}, @route.routegroup_id), {}, :class => 'half chzn-select' %>
+    </div>
+
+    <div class="field-row">
+      <%= f.label :item_type, "Jenis Muatan" %>
+      <%= f.text_field :item_type, :class => 'half left' %>
+      <%= f.label :distance, "Jarak", :class => 'middle' %>
+      <%= f.text_field :distance, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+    </div>
+
+    <div class="field-row">
+      <%= f.label :price_per, "Tarif Muatan" %>
+      <%= f.text_field :price_per, :class => 'half left', :onkeypress => 'javascript:return isMoneyKey(this);', :value => to_currency_bank(@route.price_per)  %>
+      <%= f.label :price_per_type, "per", :class => 'middle' %>
+      <%= f.select :price_per_type, options_for_select(@price_per_types.collect {|w| [w, w]}, @route.price_per_type), {}, { :class => 'half chzn-select' } %>
+    </div>
+
+    <div class="field-row" style="margin-bottom:30px;">
+      <%= f.label :description, "Keterangan" %>
+      <%= f.text_field :description %>
+    </div>
+
+    <div class="field-row">
+      <%= f.label :ferry_fee, "ASDP" %>
+      <%= f.text_field :ferry_fee, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      <%= f.label :tol_fee, "Tol", :class => 'middle' %>
+      <%= f.text_field :tol_fee, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+    </div>
+
+    <div class="field-row">
+      <%= f.label :bonus, "Premi" %>
+      <%= f.text_field :bonus, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Operasional' %>
+      <a class="back left" href="<%=routes_path%>">Kembali ke index</a>
+    </div>
+
+    <% end %>  
+
+  </div>
+
+  <% if !params[:id].nil? %>
+
+  <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+    <form action="/allowances/updateitems" method="post">
+      <input type="hidden" name="route_id" value="<%=@route.id%>" />
+
+      <div class="field-row">
+        <label style="float:none;">Nama Jurusan</label>
+        <strong><%=@route.name%></strong>
+      </div>
+      <br />
+
+      <table class="row-view">
+        <tr>
+          <th width="110">&nbsp;</th>
+          <th width="150" class="right">UM Supir (Rp.)</th>
+          <th width="150" class="right">UM Kernet (Rp.)</th>
+          <th width="150" class="right">Solar (Liter)</th>
+          <th width="150" class="right">Lain - lain (Rp.)</th>
+          <th></th>
+        </tr>
+
+        <% @route.allowances.order(:vehiclegroup_id).each do |allowance| %>
+        <tr>
+          <td><%=allowance.vehiclegroup.name%></td>
+          <td><input type="text" name="driver_trip[<%=allowance.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=allowance.driver_trip.to_i%>" /></td>
+          <td><input type="text" name="helper_trip[<%=allowance.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=allowance.helper_trip.to_i%>" /></td>
+          <td><input type="text" name="gas_trip[<%=allowance.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=allowance.gas_trip.to_i%>" /></td>
+          <td><input type="text" name="misc_allowance[<%=allowance.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=allowance.misc_allowance.to_i%>" /></td>
+          <td></td>
+        </tr>
+        <% end %>
+
+      </table>
+
+      <div class="actions">
+        <% if checkrole 'Admin Operasional' %>
+        <input type="submit" value="Simpan Sangu + Solar" />
+        <% end %>
+      </div>
+
+    </form>
+
+  </div>
+
+<% end %>
+</div>
+</div>

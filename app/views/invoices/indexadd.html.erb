@@ -1,0 +1,59 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Transaksi / <a href="<%=invoices_path%>">Bukti Kas Keluar</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date">Pilih Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view">
+			<tr>
+				<th width="50">No.</th>
+				<th>Keterangan</th>
+				<th width="40">Ktr</th>
+				<th width="80">No Pol</th>
+				<th width="90" class="right">Total</th>
+				<th width="60"></th>
+			</tr>
+
+			<tr class="subheading">
+				<th colspan="6" style="color:#000;">Bukti Kas Keluar <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%></span></th>
+			</tr>
+
+			<% inv = Invoice.where("invoice_id IS NOT NULL and deleted=false").pluck(:invoice_id) %>
+			<% @invoices.each do |invoice| %>
+			<% if inv.index(invoice.id) == nil %>
+			<tr>
+				<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice) %></td>
+				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+				<td><%=invoice.office.abbr%></td>
+				<td><%=invoice.vehicle.current_id rescue nil%></td>
+				<td align="right"><%=to_currency(invoice.total)%></td>
+				<td class="right" width="60">
+					<a class="cta" href="/invoices/add/<%=invoice.id%>">Tambah</a>
+				</td>
+			</tr>
+			<% end %>
+			<% end %>	
+		
+		</table>
+
+	</div>
+
+</div>

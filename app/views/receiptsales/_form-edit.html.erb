@@ -1,0 +1,57 @@
+<% if @receiptsale %>
+	<%= form_for(@receiptsale) do |f| %>
+	  	<div class="info-box" style="margin-bottom:30px;">  
+
+	    	<h3>Penjualan Barang #<%=zeropad(@receiptsale.sale.id)%></h3>
+
+	    	<table class="row-view no-border">
+	  			<tr>
+					<td width="90">Tanggal</td>
+					<td><%=@receiptsale.sale.date.strftime('%d-%m-%Y')%></td>
+				</tr>
+				<tr>
+					<td width="90">Keterangan</td>
+					<td><%=@receiptsale.sale.description%></td>
+				</tr>
+	  		</table>
+
+	    	<% if @receiptsale.sale.saleitems.any? %>
+			<table class="row-view">
+				<tr>
+					<th width="30">No.</th>
+					<th>Nama Barang</th>
+					<th width="80" class="right">Jumlah</th>
+					<th width="120" class="right">Total<th>
+				</tr>
+				
+				<% @receiptsale.sale.saleitems.each_with_index do |saleitem, i|%>
+				<tr>
+					<td><%=i+1%>.</td>
+					<td><%= saleitem.productsale.name%></td>
+					<td align="right"><%= saleitem.quantity.to_i%> <%= saleitem.productsale.unit_name %> </td>
+					<td align="right"><%= to_currency(saleitem.total.to_i)%></td>
+				</tr>
+				<% end %>
+				<tr>
+					<td></td>
+					<td class="total">TOTAL</td>
+	 				<td></td>
+	 				<td style="text-align:right;"><span id="strTotal"><%=to_currency(@receiptsale.total)%></span></td> 				
+	 			</tr>
+			</table>	
+			<% end %>
+
+    	</div>
+
+    	<div class="field-row first" style="margin-bottom:-20px;">
+	        <%= f.label :created_at, "Tgl Konfirmasi" %>
+	        <%= f.text_field :created_at, :class => 'half date-picker', :value => to_currency(@receiptsale.created_at.strftime('%d-%m-%Y')) %>
+	        <%= f.hidden_field :receiptsale_id, :value => @receiptsale.id %>
+	    </div>
+	    
+	    <div class="actions">
+	      <%= f.submit "Tambah Data", :class => 'submit' %> 
+	    </div>
+
+	<% end %>
+<% end %>

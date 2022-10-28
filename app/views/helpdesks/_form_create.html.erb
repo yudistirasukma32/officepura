@@ -1,0 +1,34 @@
+
+<form accept-charset="UTF-8" action="/helpdesks/create" class="new_helpdesk" id="new_helpdesk" method="post">
+
+	<div class="field-row">
+    <label for="productgroup_name">Nama Admin</label>
+    <input id="helpdesk_name" name="helpdesk[username]" size="30" type="text" value="<%= current_user.username %>" readonly>
+	</div>
+	
+	<div class="field-row">
+    <label for="helpdesk_subject">Subject</label>
+    
+    <select class="half left" name="helpdesk[subject]" id="helpdesk_subject">
+			<option value="Update Data BKK">Update Data BKK</option>
+			<option value="Update Data Kasir">Update Data Kasir</option>
+			<option value="Update Surat Jalan">Update Surat Jalan</option>
+			<option value="Update Data Invoice">Update Data Invoice</option>
+			<option value="Update Data Petty Cash">Update Petty Cash</option>
+			<option value="Update Saldo Kas">Update Saldo Kas</option>
+			<option value="Lainnya">Lainnya</option>
+		</select>
+		
+	</div>
+	
+	<div class="field-row">
+    <label for="helpdesk_description">Deskripsi</label>
+    <textarea cols="40" id="helpdesk_description" name="helpdesk[description]" rows="20"></textarea>
+	</div>
+
+	<div class="actions">
+		<input class="left" name="commit" type="submit" value="Tambah Data">
+		<a class="back left" href="/helpdesks">Kembali ke Index</a>
+	</div>
+
+</form>

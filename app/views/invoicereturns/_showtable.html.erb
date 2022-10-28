@@ -1,0 +1,33 @@
+<table class="row-view">
+	<tr>
+		<th width="50">BKK</th>
+		<th>Keterangan</th>
+		<th width="40">Ktr</th>
+		<th width="80">No Pol</th>
+		<th width="100" class="right">Total</th>
+		<th width="60"></th>
+	</tr>
+	<tr class="subheading">
+		<th colspan="6" style="color:#000;">Bukti Kas Keluar <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%=@invoices.count%>)</span></th>
+	</tr>
+	
+	<% @invoices.each do |invoice| %>
+    <% @count_sj = invoice.taxinvoiceitems.where('money(total) > money(0) and deleted = false').count
+    %>
+	
+	<% if !invoice.invoicereturns.where(:deleted => false).any? && invoice.quantity > @count_sj  %>
+	<tr>
+		<td><%=zeropad(invoice.id)%></td>
+		<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+		<td><%=invoice.office.abbr%></td>
+		<td><%=invoice.vehicle.current_id rescue nil%></td>
+		<td align="right"><%=to_currency(invoice.total)%></td>
+		<td class="right">
+			<a class="cta" href="<%=new_invoicereturn_path%>/<%=invoice.id%>">BKM</a>
+		</td>
+	</tr>
+	<% end %>
+
+	<% end %>
+
+</table>

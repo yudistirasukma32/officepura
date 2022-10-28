@@ -1,0 +1,90 @@
+<%= form_for(@receipt) do |f| %>
+  <div class="actions" style="float:left; padding:0 0 30px 20px;">
+    <input type="hidden" id="printername" value="<%= Setting.find_by_name("Printer Name").value if !Setting.find_by_name("Printer Name").nil? %>" />
+    <a class="left" href="javascript:print();"><i class="icon-print"></i> Print Normal</a>
+    <a id="premi_printmatrix" class="left" href="javascript:zebraprint('premi');"><i class="icon-print"></i> Print Dot Matrix</a>
+    <a class="back left" href="<%=bonusreceipts_index_confirmed_path({:date => @receipt.created_at.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
+  </div>
+
+  <div id="premi-print" class="info-box bkk-paper" onLoad="javascript: LoadAppletPrinter();" style="width:560px; float:left; clear:left;">
+      <table class="row-view no-border">
+        <tr valign="top">
+          <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+          <td align="right" class="header">Bukti Kas Premi<br/>#<%=zeropad(@receipt.id)%><input type="hidden" id="strPremiId" value="#<%=zeropad(@receipt.id)%>" /></td>
+        </tr>
+    </table>
+    <hr style="width:600px;" />
+    <table class="row-view no-border">
+        <tr>
+          <td>BKK</td>
+          <td><span id="strInvoiceId">#<%=zeropad(@receipt.invoice.id)%></td>
+        </tr>
+        <tr>
+          <td>Kendaraan</td>
+          <td><span id="strVehicle"><%=@receipt.invoice.vehicle.current_id%></td>
+        </tr>
+        <tr>
+          <td>Supir</td>
+          <td>
+            <%=@receipt.invoice.driver.name%><% if !@receipt.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@receipt.invoice.driver.helpers.first.name%>)<% end %>
+            <input type="hidden" id="strDriver" value="<%=@receipt.invoice.driver.name%><% if !@receipt.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@receipt.invoice.driver.helpers.first.name%>)<% end %>" />
+          </td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td><span id="strRoute"><%=@receipt.invoice.route.name%></span></td>
+        </tr>
+         <tr>
+          <td>Konfirmasi</td>
+          <td><span id="strCreatedDate"><%=@receipt.created_at.strftime('%d %B %Y') if !@receipt.created_at.nil?%></span></td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td><span id="strTotalPremi"><%=to_currency(@receipt.total, "Rp. ")%></span></td>
+        </tr>
+        <tr>
+          <td><strong>Pemuatan</strong></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Lokasi</td>
+          <td><span id="strLoadLocation"><%=@receipt.load_location%></span></td>
+        </tr>
+        <tr>
+          <td>Tanggal</td>
+          <td><span id="strLoadDate"><%=@receipt.load_date.strftime('%d %B %Y') unless @receipt.load_date.nil? %></span></td>
+        </tr>
+        <tr>
+          <td>Jam</td>
+          <td><span id="strLoadHour"><%=@receipt.load_hour%></td>
+        </tr>
+        <tr>
+          <td><strong>Bongkar</strong></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Lokasi</td>
+          <td><span id="strUnloadLocation"><%=@receipt.unload_location%></span></td>
+        </tr>
+        <tr>
+          <td>Tanggal</td>
+          <td><span id="strUnloadDate"><%=@receipt.unload_date.strftime('%d %B %Y') unless @receipt.unload_date.nil? %></span></td>
+        </tr>
+        <tr>
+          <td>Jam</td>
+          <td><span id="strUnloadHour"><%=@receipt.unload_hour%></span></td>
+        </tr>
+        <tr>
+          <td>Keterangan</td>
+          <td><span id="strDescription"><%=@receipt.description%></span></td>
+        </tr>
+       </table>
+
+       <p>&nbsp;Dibuat oleh <strong id="strCreator"><%= @receipt.user_id.nil? ? current_user.username : @receipt.user.username%></strong></p>
+  </div>
+
+  
+  <div id="msg-box">
+    <p>Shop message here.</p>
+  </div>
+<% end %>

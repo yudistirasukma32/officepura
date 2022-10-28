@@ -1,0 +1,23 @@
+<%= form_for(@setting) do |f| %>
+  <div class="field-row first">
+    <%= f.label :name %>
+		<div class="align">
+    	<%= @setting.name %>
+	  </div>
+	</div>
+  <div class="field-row">
+    <%= f.label :description %>
+		<div class="align">
+    	<%= @setting.description %>
+	  </div>
+	</div>
+  <div class="field-row">
+    <%= f.label :value %>
+		<div class="field">
+			<%= f.text_area :value %>
+		</div>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

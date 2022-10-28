@@ -1,0 +1,162 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+	<a class="print btn-txt btn-green" href="/reports/downloadexcelproductorder/<%=@startdate%>&<%=@enddate%>"><i class="icon-file"></i> Excel</a>
+	
+	<h1><%=Setting.find_by_name("Client Name").value%> / Permintaan - Pembelian Stok: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+	<br class="clearfix" />
+
+	<div id="filter">
+		<form id="filterform" name="filterform" action="" method="get">
+		<div class="field-row continue">
+		<label for="productgroup_id" style="float:none">Pilih Grup</label>
+			<select name="productgroup_id" class=" half combo_route">
+				<option value="">- Pilih -</option>
+				<% Productgroup.order(:name).all.each do |productgroup| %>
+				<option value="<%=productgroup.id%>"<% if productgroup.id == @productgroup_id.to_i %> selected="selected"<% end %>><%=productgroup.name%></option>
+				<% end %>
+				<option value="0"<%= @productgroup_id == "0" ? ' selected="selected"' : '' %>>ALL</option>
+    	</select> 
+    	&nbsp;
+			<label for="startdate" style="float:none">Tanggal Awal</label> 
+			<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+			<label for="enddate" class="middle" style="float:none">Akhir</label> 
+			<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" /> 
+			<input class="submit" type="submit" value="Filter" />
+		</div>
+		</form>
+	</div>
+
+	<br class="clearfix" />
+
+	<% if @productgroups and @productgroups.any? %>
+
+	<table class="row-view report-view">
+
+	<% grand_total_order = 0 %>
+	<% grand_total_req = 0 %>
+
+	<% @productgroups.each do |group| %>
+		
+		<% @request = Productrequestitem.find_by_sql(["SELECT i.*, r.date from productrequestitems i inner join productrequests r on i.productrequest_id = r.id "+
+											   "where i.product_id in (SELECT id FROM products WHERE productgroup_id = #{group.id}) " + 
+											   "AND r.date >= ? and r.date < ? AND r.deleted = false order by r.date",@startdate.to_date, @enddate.to_date + 1.day]) %>
+
+		<% @order = Productorderitem.find_by_sql(["SELECT i.*, r.date from productorderitems i inner join productorders r on i.productorder_id = r.id "+
+											"WHERE product_id in (SELECT id FROM products WHERE productgroup_id = ?) "+
+										    "AND r.date >= ? and r.date < ? AND r.deleted = false order by r.date",group.id, @startdate.to_date, @enddate.to_date + 1.day]) %>
+
+		<% if (@request and @request.any?) or (@order and @order.any?)%>
+
+			<tr class="subheading">
+				<th colspan="7"><h2 class="red"><%= group.name %></h2></th>
+			</tr>
+			
+			<% total_order = 0 %>
+			<% total_req = 0 %>
+			
+			<tr>
+				<th width="30">No.</th>
+				<th width="80">Tanggal</th>
+				<th>Nama Barang</th>
+				<th width="80">No Pol</th>
+				<th width="60" class="right">Jumlah</th>
+				<th width="90" class="right">Harga</th>
+				<th width="90" class="right">Total</th>
+			</tr>
+
+			<% if @request.any? %>
+			<tr>
+				<th colspan="7"><span class="black">PERMINTAAN STOK</span></th>
+			</tr>
+
+			<% @request.each_with_index do |item, i| %>
+			<% if item.stockgiven > 0 %>
+			<% total_item = item.stockgiven * (item.total/item.quantity) %>
+			<% total_req += total_item %>
+			<% grand_total_req += total_item %>
+			<tr>
+				<td><%=i+1%>.</td>
+				<td><%= item.productrequest.date.strftime('%d-%m-%Y')%></td>
+				<td><%= item.product.name if !item.product_id.blank? %>
+					<% if !item.productrequest.description.blank? %><br /><%= nl2br(item.productrequest.description).html_safe %><% end %>
+				</td>
+				<td><%= item.productrequest.vehicle.current_id if !item.productrequest.vehicle_id.blank? %></td>
+				<td class="right"><%= to_currency_bank(item.stockgiven)%></td>
+				<td class="right"><%= to_currency(item.total / item.quantity)%></th>
+				<td class="right"><%= to_currency(total_item)%></th>
+			</tr>
+			<% end %>
+			<% end %>
+
+			<tr class="footer">
+				<td colspan="3">&nbsp;</td>
+				<td></td>
+				<td align="right">&nbsp;</td>
+				<td align="right">&nbsp;</td>					
+				<td align="right" class="total"><%=to_currency(total_req)%></td>
+			</tr>
+			<% end %>
+			
+			<% if @order.any? %>
+			<tr class="subheading">
+				<th colspan="7"><span class="black">PEMBELIAN</span></th>
+			</tr>
+			
+			<% @order.each_with_index do |item, i| %>
+			<% total_order += item.total %>
+			<% grand_total_order += item.total %>
+			<tr>
+				<td><%=i+1%>.</td>
+				<td><%= item.productorder.date.strftime('%d-%m-%Y')%></td>
+				<td><%= item.product.name if !item.product_id.blank? %>
+					<% if !item.productorder.description.blank? %><br /><%= nl2br(item.productorder.description).html_safe %><% end %>
+				</td>
+				<td><%= item.productorder.productrequest.vehicle.current_id if  !item.productorder.productrequest.blank? and !item.productorder.productrequest.vehicle_id.blank? %></td>
+				<td class="right"><%= item.quantity%></td>
+				<td class="right"><%= to_currency(item.price_per)%></th>
+				<td class="right"><%= to_currency(item.total)%></th>
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<td colspan="3">&nbsp;</td>
+				<td></td>
+				<td align="right">&nbsp;</td>
+				<td align="right">&nbsp;</td>					
+				<td align="right" class="total"><%=to_currency(total_order)%></td>
+			</tr>
+
+			<% end %>
+
+			<tr class="footer">
+				<td >&nbsp;</td>
+				<td class="total" colspan="5">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(total_req + total_order)%></td>
+			</tr>
+
+		<% end %> 
+
+	<% end %>
+
+	</table>
+
+	<h3 class="right" style="text-align:right;">
+		Total Permintaan <span class="red"><%= to_currency(grand_total_req, 'Rp. ') %></span><br />
+		Total Pembelian <span class="red"><%= to_currency(grand_total_order, 'Rp. ') %></span><br /><br />
+	</h3>
+
+	<br class="clearfix" /><br /><br />
+
+	<% end %>
+	
+	</div>
+</div>

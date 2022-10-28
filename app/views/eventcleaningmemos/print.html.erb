@@ -1,0 +1,79 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=events_path%>"><i class="icon-remove"></i> Batal</a>
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>	
+
+		<div class="showprint">
+			<table style="width: 100%; max-width: 800px; margin-top: 15%;">
+				<tr>
+				<td>
+					<p style="line-height: 2; margin-left: 1rem;"><strong>PT RAJAWALI DWI PUTRA INDONESIA</strong> 
+					<br/>Jl. LetJend Sutoyo No. 110 - 112, Sidoarjo 61256 
+					<br/>Telp. 031- 8531668 (Hunting) Fax. 031- 8535114 
+					</p>
+				</td>
+				<td>
+					<h2 style="text-decoration: underline; font-weight: 700; margin-top: 12rem; margin-bottom:2rem;">Surat Pernyataan Cleaning (CLC)</h2>	
+				</td>
+				</tr>
+			</table>
+		</div>
+
+
+		<div style="margin-left: 1rem;">
+			<h1 class="hideprint"><a href="<%=events_path%>">Kalendar Event</a> / DO / Memo Cleaning / Print</h1>
+			<br class="clearfix" />
+
+			<div class="field-row continue">
+				<label class="left">Tanggal</label>
+				<input type="text" class="disabled left" value=":  <%= @eventcleaningmemo.date%>" style="font-weight:700;" />
+			</div>
+			<div class="field-row continue">
+				<label class="left">No. DO</label>
+				<input type="text" class="disabled left" value=":  <%= @eventcleaningmemo.event_id%>" style="font-weight:700;" />
+			</div>
+			<div class="field-row continue">
+				<label class="left">Sopir</label>
+				<input type="text" class="disabled left" value=":  <%= @eventcleaningmemo.driver.name rescue nil%>" style="font-weight:700;" />
+			</div>
+			<div class="field-row continue">
+				<label class="left">Nopol</label>
+				<input type="text" class="disabled left" value=":  <%= @eventcleaningmemo.vehicle.current_id rescue nil%>" style="font-weight:700;" />
+			</div>
+			<% if @eventcleaningmemo.isotank_id.present? && @eventcleaningmemo.isotank_id != 0 %>
+				<div class="field-row continue">
+					<label class="left">Isotank</label>
+					<input type="text" class="disabled left" value=":  <%= @eventcleaningmemo.isotank.isotanknumber rescue nil%>" style="font-weight:700;" />
+				</div>
+			<% end %>
+			<% if @eventcleaningmemo.container_id.present? && @eventcleaningmemo.container_id != 0 %>
+			<div class="field-row continue">
+				<label class="left">Kontainer</label>
+				<input type="text" class="disabled left" value=":  <%= @eventcleaningmemo.container.containernumber rescue nil%>" style="font-weight:700;" />
+			</div>
+			<% end %>
+			<div class="field-row continue" style="display: flex;">
+				<label class="left">Keterangan</label>
+				<div style="font-weight: 700; margin-left: 4px;">:</div>
+				<div style="background: none; border: 0; font-size: 13px; color: #000; font-weight: 700; width: 410px; margin-top: -11px; margin-left: 5px;"><%= simple_format @eventcleaningmemo.description rescue nil%></div>
+			</div>
+			<div class="field-row continue">
+				<label class="left">Selanjutnya</label>
+				<input type="text" class="disabled left" value=":  <%= @eventcleaningmemo.next_description rescue nil%>" style="font-weight:700;" />
+			</div>
+		</div>
+		
+		
+		
+		<br class="clearfix" />
+		
+	</div>
+
+</div>

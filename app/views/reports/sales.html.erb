@@ -1,0 +1,63 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Penjualan Barang: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="startdate">Tanggal Awal</label>
+				<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>" />
+				<label for="enddate" class="middle">Akhir</label>
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view">
+			<% if @receiptsales.any? %>
+				<tr>
+					<th width="30">No.</th>
+					<th width="80">Tanggal</th>
+					<th>Nama Barang</th>
+					<th class="right" width="60">Jumlah</th>
+					<th class="right" width="100">Harga</th>
+					<th class="right" width="100">Total</th>
+				</tr>
+				<% total = i = 0 %>
+				<% @receiptsales.each do |receipt| %>
+					<% receipt.sale.saleitems.each do |item| %>
+						<tr>
+							<td><%= i+1%>.</td>
+							<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+							<td><%= item.productsale.name %></td>
+							<td align="right"><%=to_currency(item.quantity)%> <%=item.productsale.unit_name.upcase%></td>
+							<td align="right"><%=to_currency(item.price_per)%></td>
+							<td align="right"><%=to_currency(item.total)%></td>
+						</tr>
+						<% total += item.total %>
+						<% i += 1 %>
+					<% end %>
+				<% end %>
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td colspan="4" class="total">TOTAL</td>
+					<td align="right" class="total"><%=to_currency(total)%></td>
+				</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,41 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<h1>Settings / Index</h1>
+
+		<table class="row-view">
+		<tr>
+			<th>Nama</th>
+			<th>Keterangan</th>
+			<th>Data</th>
+			<th width="40"></th>
+		</tr>
+
+		<% @settings.each do |setting| %>
+		<tr>
+			<% if setting.editable %>		
+			<td><%= link_to setting.name, edit_setting_path(setting) %></td>
+			<% else %>
+			<td><span><p><%= setting.name %></p></span></td>
+			<% end %>
+			<td><span><%= simple_format setting.description %></span></td>
+			<td><span><%= simple_format setting.value %></span></td>
+			<td class="right" width="40">
+				<% if setting.editable %>		
+				<%= link_to '&#xf044;'.html_safe, edit_setting_path(setting), :class => "edit tipsy", :title => 'Edit' %> 
+				<% end %>
+			</td>
+		</tr>
+		<% end %>
+
+		</table>
+
+	</div>
+
+</div>

@@ -1,0 +1,122 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Estimasi Pendapatan BKK: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="width:100%;">
+
+				<label for="office_id" class="middle">Pilih Kantor</label>
+				<select name="office_id" class="half left ">	
+					<option value="">Semua Kantor</option>
+					<% Office.active.order(:name).each do |office| %>
+					<option value="<%=office.id%>"<% if office.id == params[:office_id].to_i %> selected='selected'<% end %>><%=office.name%></option>
+					<% end %>
+				</select> 
+				<label for="customer_id" class="middle">Customer</label>
+				<select name="customer_id" class="half left ">	
+					<option value="">Semua</option>
+					<% Customer.active.order(:name).each do |customer| %>
+					<option value="<%=customer.id%>"<% if customer.id == params[:customer_id].to_i %> selected='selected'<% end %>><%=customer.name%></option>
+					<% end %>
+				</select> 
+ 
+				&nbsp; &nbsp; Periode &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+				&nbsp; &nbsp; s/d &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+		<br class="clearfix" />
+
+		<h1>Total BKK : <%= @invoices.count %> 
+			<br/>Total BKM : <%= @receiptreturns.count %> 
+			<!-- <br/>Total Estimasi Pendapatan : <a href="#theTotal">klik disini</a> -->
+			<br/>Total Estimasi Pendapatan : <span id="span-total"></span>
+		</h1>
+
+		<% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
+
+		<% if @invoices.any? %>
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th>Keterangan</th>
+				<th width="45">Ktr</th>
+				<th width="80">No Pol</th>
+				<th width="90" class="right">Kg</th>
+				<th width="90" class="right">Harga</th>
+				<th width="100" class="right">Total</th>
+			</tr>
+			<% total_estimation = estimation = i = qty = day = 0 %>
+			<% @invoices.each do |invoice| %>
+			<% 
+				qty = invoice.quantity
+				qty -= invoice.receiptreturns.where(:deleted => false).sum(:quantity) if invoice.receiptreturns.where(:deleted => false).any? 
+			%>
+			<% 
+			total_estimation += invoice.get_estimation(offset,@customer_35) 
+			%>
+
+			<% if invoice.date.day > day %>
+			<tr class="subheading">
+				<th colspan="8"><span class="black">Tgl </span> <span class="red"><%=invoice.date.strftime('%d-%m-%Y')%></span></th>
+			</tr>
+			<% day = invoice.date.day %>
+			<% end %>
+
+			<tr<% if qty <= 0 %> class="red"<% end %>>
+				<td><%=i+=1%>.</td>
+				<td>#<%=zeropad(invoice.id)%>: <% if qty <= 0 %><span class="red"><% end %><%=qty%><% if qty <= 0 %></span><% end %> Rit, <%=invoice.route.name%> (<%=invoice.driver.name%>)
+					<% if invoice.receiptreturns.where(:deleted => false).any? %>
+						<% invoice.receiptreturns.where(:deleted => false).each do |receiptreturn| %>
+							<br/><span>Debitan : <%= receiptreturn.quantity %> Rit, Tanggal konfirmasi <%= receiptreturn.created_at.strftime('%d-%m-%Y') %></span>
+						<% end %>
+					<% end %>
+				</td>
+				<td><%=invoice.office.abbr%></td>
+				<td><%=invoice.vehicle.current_id%> <%= invoice.customer.name %></td>
+				<td align="right"><%= invoice.get_tonage(offset,@customer_35) %></td>
+				<td align="right"><%=to_currency((invoice.route.price_per || 0))%></td>
+				<td align="right"><%=to_currency(invoice.get_estimation(offset,@customer_35))%></td>
+			</tr>			
+			<% end %>
+
+			<tr class="footer" id="theTotal">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right">&nbsp;</td>
+				<td align="right">&nbsp;</td>					
+				<td align="right" class="total"><%=to_currency(total_estimation)%></td>
+			</tr>
+		</table>
+
+		<h1 class="right"><%= to_currency(total_estimation, 'Rp. ') %></h1>
+		<% end %>
+
+		<br class="clearfix" />
+	
+	</div>
+
+</div>
+
+<script>
+	(function() {
+		// your page initialization code here
+		// the DOM will be available here
+		document.getElementById('span-total').textContent = "<%= to_currency(total_estimation, 'Rp. ') %>";
+	})();
+</script>

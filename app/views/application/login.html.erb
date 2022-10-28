@@ -1,0 +1,23 @@
+<%= render "shared/header" %>
+
+<div id="main" class="login">
+	<div id="content-full">
+		<h2>Login</h2>
+
+		<form action="/login" method="post">
+			<div class="field-row invalid">
+				<label for="username">Akun</label>
+				<input id="username" name="user[username]" size="30" max-length="30" type="text" value="<%= @formdata and !@formdata["username"].blank? ? @formdata["username"] : ''%>" />
+				<span><%=@errors["username"]%></span>
+			</div>
+			<div class="field-row">
+				<label for="password">Password</label>
+				<input id="password" name="user[password]" size="30" max-length="30" type="password" />
+			</div>
+			<div class="actions">
+		  	<input name="submit" type="submit" value="Sign in" />
+			</div>
+		</form>
+	</div>
+</div>
+

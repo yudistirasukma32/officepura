@@ -1,0 +1,35 @@
+<% if !@events.first.nil? %>
+<div class="field-row">
+  <label for="event_id">DO Kalender Event</label>
+  <select id="invoice_event_id" name="invoice[event_id]" class="chzn-select double combo_route">
+    <option value="0">- Pilih DO -</option>
+    <% @events.each do |event| %>
+    <% event_qty = event.qty.to_i rescue 0 %>
+    <% bkk_qty = Invoice.active.where('event_id = ? AND id NOT IN (select invoice_id from invoicereturns WHERE deleted = false)', event.id).count.to_i rescue 0 %>  
+     
+    <% if event.invoicetrain == true %>
+    <% sisa = event_qty*2-bkk_qty%>
+    <% else %>
+    <% sisa = event_qty-bkk_qty%>
+    <% end %>
+    
+    <% if sisa < 0 %>
+    <% sisa = 0 %>
+    <% end %>
+      
+        <% if sisa > 0%>  
+        <option value="<%=event.id%>">
+            #<%=event.id%> <%=event.summary%> => <%= event.start_date.strftime('%d-%m-%y')%> 
+
+            <% if event.invoicetrain == true %>
+                (K) | Sisa <%=sisa%>
+            <% else %>
+                (S) | Sisa <%=sisa%>
+            <% end %>
+
+          </option>
+        <% end %>
+    <% end %>
+  </select>
+ </div>
+<% end %>

@@ -1,0 +1,88 @@
+<%= form_for(@legality) do |f| %>
+  <% if @legality.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@legality.errors.count, "error") %> prohibited this legality from being saved:</h2>
+
+      <ul>
+      <% @legality.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name, :class => 'half' %>
+  </div>
+  
+	<div class="field-row">
+    <%= f.label :number, "Nomor" %>
+    <%= f.text_field :number %>
+  </div>
+  
+  <div class="field-row">
+    <%= f.label :validity, "Masa Berlaku" %>
+    <%= f.text_field :validity, :class => 'half date-picker' %>
+    <span>(tgl/bln/thn)</span>
+  </div>
+  
+	<div class="field-row">
+    <%= f.label :description, "Deskripsi" %>
+    <%= f.text_area :description, :class => 'half' %>
+  </div>
+  
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+  
+	<% end %>
+  
+	<% if @legality %>
+
+	<h3 class="zone">Upload File</h3>
+
+	<% if @legality.images.any? %>
+
+	<% img = @legality.images.first %>
+	
+	<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+	
+	<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+	
+		<%= image_tag img.file.thumb('210x330').url(:suffix => "/#{img.name}") if img.file_uid %>
+	
+	<% else %>
+	
+		<a href="<%= img.file.thumb('210x330').url() %>"><%= img.name %></a>
+	
+	<% end %>
+	
+	<br /><br /><%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + @legality.images.first.id.to_s %>
+
+	<% else %>
+
+	<form action="/attachments/upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+		<input type="hidden" name="model_name" value="Legality" />
+		<input type="hidden" name="item_id" value="<%=@legality.id%>" />
+
+	<div class="field-row">
+		<label for="name">Nama</label>
+		<input type="text" name="attachment[name]" />
+	</div>
+
+	<div class="field-row continue">
+		<label for="file">Browse File</label>
+		<input type="file" name="attachment[file]" />
+	</div>
+
+	<div class="actions">
+		<input type="submit" value="Simpan File" />
+	</div>
+
+	</form>
+
+	<% end %>  
+
+  
+<% end %>

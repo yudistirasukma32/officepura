@@ -1,0 +1,24 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=driverlogs_path%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Supir Check / Edit Status <strong><%=@driver.name%></strong></h1>
+
+		
+		<br class="clearfix" />
+		
+		<%= render "form" %>
+		
+		<br class="clearfix" />
+
+	</div>
+
+</div>

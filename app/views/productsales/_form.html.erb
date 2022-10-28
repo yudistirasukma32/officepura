@@ -1,0 +1,21 @@
+<%= form_for(@productsale) do |f| %>
+  <div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :unit_name, "Satuan" %>
+    <%= f.text_field :unit_name, :class => 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :unit_price, "Harga Satuan" %>
+    <%= f.text_field :unit_price, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' %>
+    <a class="back left" href="<%=productsales_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

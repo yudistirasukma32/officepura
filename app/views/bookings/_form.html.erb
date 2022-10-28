@@ -1,0 +1,65 @@
+<%= form_for(@booking) do |f| %>
+
+  <%if @booking.office_id %>
+  <div class="field-row first">
+    <%= f.label :office_id, "Kantor" %>
+    <%= f.select :office_id, options_for_select(Office.where(:deleted => false).order('id ASC').collect {|g| [g.name, g.id]}, @booking.office_id), {}, :class => 'half chzn-select', :required => true%>
+  </div>
+  <% else %>
+  <div class="field-row first">
+    <%= f.label :office_id, "Kantor" %>
+    <%= f.select :office_id, options_for_select(Office.where(:deleted => false).order('id ASC').collect {|g| [g.name, g.id]}), {}, :class => 'half chzn-select', :required => true%>
+  </div>
+  <% end %>
+
+  <div class="field-row">
+    <%= f.label :date, "Tanggal" %> 
+		<%= f.text_field :date, :class => 'left half date-picker' %>
+  </div>
+
+  <div class="field-row">
+  <label for="event_id">DO Kalender</label>
+
+  <% if @process == 'new' %>
+
+  <select id="booking_event_id" name="booking[event_id]" class="chzn-select double combo_route">
+    <option value="0">- Pilih DO -</option>
+    <% @events.each do |event| %>
+
+      <option value="<%=event.id%>">
+      #<%=event.id%> <%=event.summary%> => <%= event.start_date.strftime('%d-%m-%y')%> 
+      </option>
+
+    <% end %>
+  </select>
+
+  <% else %>
+
+    <input type="text" class="double disabled" value="<%= !@booking.event.nil? ? @booking.event.summary : 'Harap memilih pelanggan terlebih dahulu.' %>" />
+    <%= f.hidden_field :event_id, :value => @booking.event_id %>
+
+  <% end %>
+
+ </div>
+
+  <div class="field-row">
+    <%= f.label :vehicle_id, "Kendaraan" %>
+    <select id="booking_vehicle_id" name="booking[vehicle_id]" class="chzn-select half left" onchange="">
+      <option value="0">- No Pol -</option>
+      <% Vehicle.active.order(:current_id).each do |vehicle| %>
+      <option value="<%=vehicle.id%>"<%= vehicle.id == @booking.vehicle_id ? ' selected="selected"' : '' %>><%=vehicle.current_id%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description, :rows => 2, :class => 'half' %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Operasional' %>
+    <a class="back left" href="<%=bookings_path%>">Kembali ke Index</a>
+  </div>
+
+<% end %>

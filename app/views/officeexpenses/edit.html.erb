@@ -1,0 +1,20 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=officeexpenses_path(:date => @officeexpense.date.strftime('%d-%m-%Y'))%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Transaksi / <a href="<%=officeexpenses_path(:date => @officeexpense.date.strftime('%d-%m-%Y'))%>">Petty Kas</a> / Edit</h1>
+
+		<br class="clearfix" />
+			<%= render "form" %>
+		<br class="clearfix" />
+
+	</div>
+
+</div>

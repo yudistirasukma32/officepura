@@ -1,0 +1,46 @@
+<table class="row-view">
+	<tr>
+		<th width="50">BKK</th>
+		<th width="80">Tanggal</th>
+		<th>Jurusan</th>
+		<th width="40">Ktr</th>
+		<th width="80">Nopol</th>
+		<th width="60" class="right">Premi</th>
+		<th width="60"></th>
+	</tr>
+
+	<% @invoices.each do |invoice| %>
+	<% qty = invoice.quantity %>
+	<% qty -= invoice.invoicereturns.where(:deleted => false).first.quantity if !invoice.invoicereturns.where(:deleted => false).first.nil? %>
+	
+	<% if qty > 0 %>
+	<% if invoice.deleted %>
+	<% if current_user.adminrole%>
+	<tr class="deleted">
+		<td><%=zeropad(invoice.id)%></td>
+		<td><%=invoice.date.strftime('%d-%m-%Y')%></td>
+		<td><%= qty%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+		<td><%=invoice.office.abbr%></td>
+		<td align="right"><%= invoice.vehicle.current_id if !invoice.vehicle_id.blank? %></td>
+		<td align="right">0</td>	
+		<td class="right">&nbsp;</td>
+	</tr>
+	<% end %>
+	<% else %>
+	<tr>
+		<td><%=zeropad(invoice.id)%></td>
+		<td><%=invoice.date.strftime('%d-%m-%Y')%></td>
+		<td><%= qty%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+		<td><%=invoice.office.abbr%></td>
+		<td><%= invoice.vehicle.current_id if !invoice.vehicle_id.blank? %></td>
+		<td align="right">0</td>
+		<td class="right">
+			<a class="cta" href="<%=new_bonusreceipt_path%>/<%=invoice.id%>">Premi</a>
+		</td>
+	</tr>
+	<% end %>
+	<% end %>	
+	<% end %>
+
+
+</table>

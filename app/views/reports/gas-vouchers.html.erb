@@ -1,0 +1,76 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Solar Bon: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="startdate">Tanggal Awal</label>
+				<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>" />
+				<label for="enddate" class="middle">Akhir</label>
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view">
+			<tr>
+				<th width="30">No.</th>
+				<th width="80">Tanggal</th>
+				<th width="80">No Pol</th>
+				<th>Keterangan</th>
+				<th width="70" class="right">Liter</th>
+				<th width="70" class="right">Solar</th>
+				<th width="100" class="right">Total</th>
+			</tr>
+
+			<% total = 0 %>
+			<% @invoices.each_with_index do |invoice, i| %>
+			<% total += invoice.gas_voucher.to_i * invoice.gas_cost.to_i %>
+			<tr<% if i % 2 == 0 %> class="even"<% end %>>
+				<td><%=i+1%></td>
+				<td><%=invoice.date.strftime('%d-%m-%Y')%></td>
+				<td><%=invoice.vehicle.current_id%></td>
+				<td>#<%=zeropad(invoice.id)%>: <%=invoice.quantity%> Rit, <%=invoice.route.name%> (<%=invoice.driver.name%>)</td>
+				<% if invoice.gas_start > 0 and invoice.gas_voucher > invoice.gas_start %>
+				<td align="right"><%=invoice.gas_voucher%> / <%=invoice.gas_start%></td>
+				<% else %>
+				<td align="right"><%=invoice.gas_voucher%></td>
+				<% end %>
+				<td align="right">@<%=invoice.gas_cost.to_i%></td>
+				<td align="right"><%=to_currency(invoice.gas_voucher.to_i * invoice.gas_cost.to_i)%></td>
+			</tr>
+			<% end %>	
+
+			<% if @invoices.any? %>
+			<tr class="footer">
+				<td colspan="4" class="total">TOTAL</td>
+				<td align="right"><%=@invoices.sum('gas_voucher')%></td>
+				<td>&nbsp;</td>
+				<td align="right" class="total"><%=to_currency(total)%></td>
+			</tr>
+			<% end %>
+
+		</table>
+
+		<% if !@invoices.any? %>
+		<div class="norecord"><p><i class="icon-warning-sign"></i> <span>Data<br />Kosong</span></p></div>
+		<% end %>
+
+	</div>
+
+</div>

@@ -1,0 +1,465 @@
+<% if @receipts.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Bukti Kas Keluar (<%=@receipts.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receipts.each do |receipt| %>
+<% total += receipt.total %>
+<% invoice = receipt.invoice %>
+	<tr>
+		<td><%=zeropad(receipt.invoice_id)%></td>
+		<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=receipt.quantity%> Rit: <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%> <%= zeropad(invoice.driver.id) rescue nil%>) <%= receipt.invoice.invoicetrain ? '= Kereta =' : '' %>
+            <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
+            <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
+            <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
+        </td>
+		<td class="<%= receipt.invoice.office.abbr == 'SUB' || receipt.invoice.office.abbr == 'PRB' ? 'red' : '' %>">
+		<%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%>
+		</td>
+		<td><%=receipt.invoice.vehicle.current_id%></td>
+		<td class="red" align="right"><%=to_currency(receipt.total)%></td>
+		<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+		<td class="right">
+			<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receipt_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+			<% end %>
+			<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+		</td>
+	</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+<% if @receipt_invtrains.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Bukti Kas Keluar Kereta (<%=@receipt_invtrains.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receipt_invtrains.each do |receipt| %>
+<% total += receipt.total %>
+<% invoice = receipt.invoice %>
+	<tr>
+		<td><%=zeropad(receipt.invoice_id)%></td>
+		<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=receipt.quantity%> Rit: <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%> <%= zeropad(invoice.driver.id) rescue nil%>) <%= receipt.invoice.invoicetrain ? '= Kereta =' : '' %>
+            <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
+            <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
+            <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
+        </td>
+		<td class="<%= receipt.invoice.office.abbr == 'SUB' || receipt.invoice.office.abbr == 'PRB' ? 'red' : '' %>">
+		<%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%>
+		</td>
+		<td><%=receipt.invoice.vehicle.current_id%></td>
+		<td class="red" align="right"><%=to_currency(receipt.total)%></td>
+		<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+		<td class="right">
+			<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receipt_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+			<% end %>
+			<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+		</td>
+	</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+<% if @receiptreturns.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Bukti Kas Masuk (<%=@receiptreturns.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receiptreturns.each do |receipt| %>
+<% total += receipt.total %>
+	<tr>
+		<td><%=zeropad(receipt.invoice_id)%></td>
+		<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=receipt.quantity%> Rit: <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>)  <%= receipt.invoice.invoicetrain ? '= Kereta =' : '' %></td>
+		<td class="<%= receipt.invoice.office.abbr == 'SUB' || receipt.invoice.office.abbr == 'PRB' ? 'red' : '' %>">
+		<%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%>
+		</td>
+		<td><%=receipt.invoice.vehicle.current_id%></td>
+		<td class="green" align="right"><%=to_currency(receipt.total)%></td>
+		<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+		<td class="right">
+			<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receiptreturn_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+			<% end %>
+			<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+		</td>
+	</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="green"><strong><%=to_currency(total)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+<% if @receiptpremis.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Bukti Kas Premi (<%=@receiptpremis.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receiptpremis.each do |receipt| %>
+<% total += receipt.total %>
+<tr>
+	<td><%=zeropad(receipt.invoice_id)%></td>
+	<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=receipt.bonusreceipt.quantity%> Rit: <%=receipt.invoice.route.name%></td>
+	<td><%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%></td>
+	<td><%=receipt.invoice.vehicle.current_id%></td>
+	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
+	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td class="right">
+		<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receiptpremi_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+		<% end %>
+		<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+	</td>
+</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+<% if @receiptincentives.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Bukti Kas Insentif (<%=@receiptincentives.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receiptincentives.each do |receipt| %>
+<% total += receipt.total %>
+<tr>
+	<td><%=zeropad(receipt.invoice_id)%></td>
+	<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=receipt.incentive.quantity%> Rit: <%=receipt.invoice.route.name%></td>
+	<td><%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%></td>
+	<td><%=receipt.invoice.vehicle.current_id%></td>
+	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
+	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td class="right">
+		<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receiptincentive_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+		<% end %>
+		<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+	</td>
+</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+<% if @receiptorders.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Order Pembelian Barang (<%=@receiptorders.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receiptorders.each do |receipt| %>
+	<% total += receipt.total %>
+	<% productname = "" %>
+	<% receipt.productorder.productorderitems.each do |item| %>
+	<%		productname += item.product.name + ", " %>
+	<% end %>
+	<% productname = productname[0...-2] %>
+<tr>
+	<td><%=zeropad(receipt.productorder_id)%></td>
+	<td><%=receipt.productorder.date.strftime('%d-%m-%Y')%>, <%= getwords(productname, 45) %></td>
+	<td>&nbsp;</td>
+	<td><%=receipt.productorder.productrequest.vehicle.current_id if !receipt.productorder.productrequest.nil? and !receipt.productorder.productrequest.vehicle_id.blank? %></td>
+	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
+	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td class="right">
+		<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receiptorder_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+		<% end %>
+		<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+	</td>
+</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="red"><strong><%=to_currency(total)%><strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+<% if @receiptexpenses.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Bukti Kas Umum &amp; Kantor (<%=@receiptexpenses.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receiptexpenses.each do |receipt| %>
+<% 	if receipt.expensetype == 'Kredit'
+		total += receipt.total * -1 
+	else
+		total += receipt.total
+	end	%>
+<tr>
+	<td><%=zeropad(receipt.officeexpense_id)%></td>
+	<td>
+        <%=receipt.officeexpense.date.strftime('%d-%m-%Y')%>, <%=nl2br(receipt.officeexpense.description).html_safe%>
+        <%= (receipt.officeexpense.isotank_id.present? && receipt.officeexpense.isotank_id.to_i != 0) ? ("Isotank = " + receipt.officeexpense.isotank.isotanknumber) : '' %>
+        <%= (receipt.officeexpense.container_id.present? && receipt.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + receipt.officeexpense.container.containernumber) : '' %>
+    </td>
+	<td><%=receipt.officeexpense.office.abbr if !receipt.officeexpense.office_id.nil?%></td>
+	<td><%=receipt.officeexpense.vehicle.current_id if !receipt.officeexpense.vehicle_id.blank? %></td>
+	<td class="<% if receipt.expensetype == 'Kredit' %>red<% else %>green<% end %>" align="right"><%=to_currency(receipt.total)%></td>
+	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td class="right">
+		<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receiptexpense_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+		<% end %>
+		<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+	</td>
+</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="<% if total < 0 %> red <% else %> green <% end %> "><strong><%=to_currency(total.abs)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+<% if @receiptsales.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Penjualan Barang (<%=@receiptsales.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receiptsales.each do |receipt| %>
+	<% total += receipt.total %>
+	<% productname = "" %>
+	<% receipt.sale.saleitems.each do |item| %>
+	<%		productname += item.productsale.name + ", " %>
+	<% end %>
+	<% productname = productname[0...-2] %>
+<tr>
+	<td><%= zeropad(receipt.sale_id)%></td>
+	<td><%=receipt.sale.date.strftime('%d-%m-%Y')%>, <%= getwords(productname, 45) %></td>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+	<td class="green" align="right"><%=to_currency(receipt.total)%></td>
+	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td class="right">
+		<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receiptsale_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+		<% end %>
+		<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+	</td>
+</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="green"><strong><%=to_currency(total.abs)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+<% if @receiptdrivers.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Kas Supir (<%=@receiptdrivers.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receiptdrivers.each do |receipt| %>
+<% 	total += receipt.total%>
+<tr>
+	<td><%=zeropad(receipt.driverexpense_id)%></td>
+	<% if !receipt.driverexpense.driver_id.nil? %>
+	<td><%=receipt.driverexpense.driver.name if !receipt.driverexpense.driver_id.blank? %> (SUPIR) : <%=nl2br(receipt.driverexpense.description).html_safe%></td>
+	<% else %>
+	<td><%=receipt.driverexpense.helper.name if !receipt.driverexpense.helper_id.blank? %> (KERNET) : <%=nl2br(receipt.driverexpense.description).html_safe%></td>
+	<%end%>
+	<td><%=receipt.driverexpense.office.abbr if !receipt.driverexpense.office_id.nil?%></td>
+	<td>&nbsp;</td>
+	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
+	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td class="right">
+		<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receiptdriver_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+		<% end %>
+		<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+	</td>
+</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="red"><strong><%=to_currency(total.abs)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+<% if @receiptpayrollreturns.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">BKM Supir (<%=@receiptpayrollreturns.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receiptpayrollreturns.each do |receipt| %>
+<% total += receipt.total %>
+<tr>
+	<td><%=zeropad(receipt.payroll_id)%></td>
+	<% if !receipt.payroll.driver_id.nil? %>
+	<td><%=receipt.payroll.driver.name%> (SUPIR)</td>
+	<% else %>
+	<td><%=receipt.payroll.helper.name%> (KERNET)</td>
+	<%end%>
+	<td><%=receipt.payroll.office.abbr if !receipt.payroll.office_id.blank? %></td>
+	<td><%=receipt.payroll.vehicle.current_id if !receipt.payroll.vehicle_id.blank? %></td>
+	<td class="green" align="right"><%=to_currency(receipt.total)%></td>
+	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td class="right">
+		<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receiptpayrollreturn_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+		<% end %>
+		<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+	</td>
+</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="green"><strong><%=to_currency(total.abs)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+
+
+<% if @receiptpayrolls.any? %>
+<% total = 0 %>
+<tbody class="tablesorter-no-sort">
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">BKK SUpir (<%=@receiptpayrolls.count%>)</th>
+	</tr>
+</tbody>
+
+<tbody>
+<% @receiptpayrolls.each do |receipt| %>
+<% total += receipt.total %>
+<tr>
+	<td><%=zeropad(receipt.payroll_id)%></td>
+	<% if !receipt.payroll.driver_id.nil? %>
+	<td><%=receipt.payroll.driver.name%> (SUPIR)</td>
+	<% else %>
+	<td><%=receipt.payroll.helper.name%> (KERNET)</td>
+	<%end%>
+	<td><%=receipt.payroll.office.abbr if !receipt.payroll.office_id.blank? %></td>
+	<td><%=receipt.payroll.vehicle.current_id if !receipt.payroll.vehicle_id.blank? %></td>
+	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
+	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td class="right">
+		<% if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_receiptpayroll_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
+		<% end %>
+		<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+	</td>
+</tr>
+<% end %>
+</tbody>
+
+<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td>&nbsp;</td>
+		<td colspan="3">TOTAL</td>
+		<td align="right" class="red"><strong><%=to_currency(total.abs)%></strong></td>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+</tbody>
+<% end %>
+

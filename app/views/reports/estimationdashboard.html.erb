@@ -1,0 +1,138 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main" class="dashboard">
+
+	<div id="content-full">
+
+		<h1>Dashboard Estimasi<br /><span class="red"><%=@startdate.to_date.strftime('%d %B %Y')%></span> s/d <span class="red"><%=@enddate.to_date.strftime('%d %B %Y')%></span></h1>
+
+		<br class="clearfix" />
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="width:100%;">
+				&nbsp; &nbsp; Tanggal Awal &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+				&nbsp; &nbsp; Akhir &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+		<br>
+		<br>
+		<br>
+		<% if current_user.adminrole || current_user.owner %>
+			<div class="row">
+				<div class="widget cherry medium-widget">
+					<ul>
+						<li class="head"><a href="/reports/estimation"><h3>Estimasi Pendapatan BKK</h3></a></li>
+						<li class="footer green">Rp. <%=to_currency(@total)%>,00</li>
+					</ul>
+				</div>
+
+				<div class="widget cherry medium-widget">
+					<ul>
+						<li class="head"><a href="/cashiers"><h3>Total Saldo Kantor</h3></a></li>
+						<li class="footer green">Rp. <%=to_currency(@saldoKas)%>,00 </li>
+					</ul>
+				</div>
+			</div>
+ 		<% end %>
+
+		<div class="row">
+			<div class="widget green small-widget">
+			<ul>
+				<li class="head"><a href="/taxinvoiceitems"><h3>Surat Jln (<%=(@date.to_date - 2.month).strftime('%b')%> - <%=@date.to_date.strftime('%b')%>)</h3></a></li>
+				<li>
+					Bikin
+					<strong><%= to_currency(@totalSuratjalan)%></strong>
+				</li>
+				<li>
+					Ditagihkan 
+					<strong><%= to_currency(@totalDitagihkan)%></strong>
+				</li>
+				<li  <% if @persentaseSuratJalan >=90 %> class="footer green" <%else%> class="footer red" <%end%> >
+					<% if (@persentaseSuratJalan - @persentaseSuratJalan.to_i) == 0 %>
+						<%=@persentaseSuratJalan.to_i %>
+					<% else %>
+						<%=number_with_precision(@persentaseSuratJalan, :precision => 2)%>
+					<% end %>
+					%
+				</li>
+			</ul>
+		</div>
+
+		<div class="widget green small-widget">
+			<ul>
+				<li class="head"><a href="/taxinvoices"><h3>Tagihan (<%=(@date.to_date - 2.month).strftime('%b')%> - <%=@date.to_date.strftime('%b')%>)</h3></a></li>
+
+				<li>
+					Total 
+					<strong><%=@totalInvoice%></strong>
+				</li>
+				<li>
+					Lunas
+					<strong><%=@totalPaidinvoice%></strong>
+				</li>
+				<li  <% if @persentaseInvoice >=90 %> class="footer green" <%else%> class="footer red" <%end%> >
+					<% if (@persentaseInvoice - @persentaseInvoice.to_i) == 0 %>
+						<%=@persentaseInvoice.to_i %>
+					<% else %>
+						<%=number_with_precision(@persentaseInvoice, :precision => 2)%>
+					<% end %>
+					%
+				</li>
+			</ul>
+		</div>
+
+		<div class="widget blue small-widget">
+			<ul>
+				<li class="head"><a href="/invoices"><h3>Bukti Kas Keluar</h3></a></li>
+				<li>
+					Bikin (Rit)
+					<strong><%= to_currency(@totalBkk) %></strong>
+				</li>
+				<li>
+					Konfirmasi (Rit)
+					<strong><%= to_currency(@receipts.sum(:quantity)) %></strong>
+				</li>
+				<li  <% if @persentaseBkk >=90 %> class="footer green" <%else%> class="footer red" <%end%> >
+					<% if (@persentaseBkk - @persentaseBkk.to_i) == 0 %>
+						<%=@persentaseBkk.to_i %>
+					<% else %>
+						<%=number_with_precision(@persentaseBkk, :precision => 2)%>
+					<% end %>
+					%
+				</li>
+			</ul>
+		</div>
+
+		<div class="widget blue small-widget">
+			<ul>
+				<li class="head"><a href="/invoicereturns"><h3>Bukti Kas Masuk</h3></a></li>
+				<li>
+					Bikin (Rit)
+					<strong><%= to_currency(@totalBkm) %></strong>
+				</li>
+				<li>
+					Konfirmasi (Rit)
+					<strong><%= to_currency(@receiptreturns.sum(:quantity)) %></strong>
+				</li>
+				<li  <% if @persentaseBkm >=90 %> class="footer green" <%else%> class="footer red" <%end%> >
+					<% if (@persentaseBkm - @persentaseBkm.to_i) == 0 %>
+						<%=@persentaseBkm.to_i %>
+					<% else %>
+						<%=number_with_precision(@persentaseBkm, :precision => 2)%>
+					<% end %>
+					%
+				</li>
+			</ul>
+		</div>
+
+		</div> 
+	</div>
+</div>

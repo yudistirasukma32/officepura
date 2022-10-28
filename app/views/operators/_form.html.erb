@@ -1,0 +1,22 @@
+<%= form_for(@operator) do |f| %>
+	<div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row first">
+    <%= f.label :abbr, "Singkatan" %>
+    <%= f.text_field :abbr %>
+  </div>
+
+  <div class="field-row first">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_field :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Marketing' %>
+    <a class="back left" href="<%=operators_path%>">Kembali ke Index</a>
+  </div>
+  
+<% end %>

@@ -1,0 +1,15 @@
+RewriteEngine on
+
+RewriteCond %{HTTPS} off
+RewriteCond %{REQUEST_URI} !^(.*)/confirmation$
+RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [L,R=301]
+
+#RewriteCond %{HTTPS} on
+#RewriteCond %{REQUEST_URI} ^(.*)/confirmation$
+#RewriteRule ^ http://%{SERVER_NAME}%{REQUEST_URI} [L,R=301]
+
+<FilesMatch "\.(ttf|woff|woff2)$">
+<IfModule mod_headers.c>
+	Header set Access-Control-Allow-Origin "*"
+</IfModule>
+</FilesMatch>

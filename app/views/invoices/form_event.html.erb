@@ -1,0 +1,112 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>		
+</div>	
+
+<div id="main">
+
+	<div id="content-full">
+		<h1><a href="/invoices/form_event">Kalender EVENT</a> / <a href="<%=invoices_path%>">BKK</a></h1>
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue">
+					<table>
+						<tr>
+							<td>
+								<label for="date" class="left">Filter</label>
+								<select id="month" name="month" class="half left" style="margin-right:10px;">
+									<% (1.upto(12)).each do |m| %>
+									<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+									<% end %>
+								</select>
+							</td>
+							<% year_to = Invoice.order(:date).first.date.year rescue nil || Date.today.year %>
+							<td>
+								<select id="year" name="year" class="short left">
+									<% (Date.today.year.downto(year_to)).each do |y| %>
+									<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+									<% end %>
+								</select>
+							</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>
+								<select name="vehicle_id" class="third left chzn-select">
+									<option value="">- Semua NoPol -</option>
+									<% Vehicle.active.order(:current_id).each do |vehicle| %>
+									<option value="<%=vehicle.id%>"<% if vehicle.id == @vehicle_id %> selected='selected'<% end %>><%=vehicle.current_id%></option>
+									<% end %>
+								</select>
+							</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>
+								<select name="driver_id" class="third left chzn-select">
+									<option value="">- Semua Supir -</option>
+									<% Driver.active.order(:name).each do |driver| %>
+									<option value="<%=driver.id%>"<% if driver.id == @driver_id %> selected='selected'<% end %>><%=driver.name%></option>
+									<% end %>
+								</select>
+							</td>
+							<td><input class="submit right" type="submit" value="Go" /></td>
+						</tr>
+					</table>
+				</div>
+			</form>
+		</div>
+		
+		<br class="clearfix" />
+		
+		<table class="row-view">
+			<thead>
+				<tr>
+					<th width="35">No.</th>
+					<th width="120">NoPol</th>
+					<th>Jurusan</th>
+					<th width="60"></th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<% invoice_date = '' 
+				   invoice_date_temp = ''
+				   total = 0
+				%>
+				<% @invoices.each_with_index do |invoice, i| %>
+					<% qty_return = (invoice.invoicereturns.where(:deleted => false).first.quantity if !invoice.invoicereturns.where(:deleted => false).first.nil?) || 0 %>
+					<tr>
+						<% invoice_date = invoice.date %>
+						<% if invoice_date != invoice_date_temp %>
+							<tr class="subheading">
+					          <th colspan="4"><span class="red"><%=invoice.date.strftime('%d-%m-%Y')%></span></th>
+					        </tr>
+				        <% end %>
+				        <% invoice_date_temp = invoice_date %>
+
+				        <td><%=i+1%>.</td>
+				        <td><%=invoice.current_id%></td>
+				        <td><%=invoice.route_name%> (<%=invoice.driver_name%>)</td>
+				        <td align="right"><%=invoice.quantity%>-<span class="red"><%= qty_return %></span> Rit</td>
+				    </tr>
+				    <% total += invoice.quantity - qty_return %>
+				<% end %>
+			</tbody>
+
+			<tfoot>
+				<tr class="footer">
+				    <td colspan="1"></td>
+				    <td align="left" class="total">TOTAL</td>
+				    <td align="right">&nbsp;</td>
+				    <td align="right" class="total"><%= total %> Rit</td>
+				</tr>
+			</tfoot>
+
+				
+		</table>
+		
+		<br class="clearfix" />
+	</div>
+
+</div>

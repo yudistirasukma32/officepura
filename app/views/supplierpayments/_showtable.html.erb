@@ -1,0 +1,54 @@
+<table class="row-view">
+	<tr>
+		<th width="30">No.</th>
+		<th>Nama Supplier</th>
+		<th width="110">No Giro</th>
+		<th width="80">Jatuh Tempo</th>
+		<th width="30">Sisa Hari</th>
+		<th width="100" class="right">Total</th>
+		<th width="50"></th>
+	</tr>
+	<% if !@supplierpayments.first.nil? %>
+	<% @supplierpayments.each_with_index do |supplierpayment,i| %>
+	<% if supplierpayment.deleted %>
+	<% if current_user.adminrole %>
+	<tr class="deleted">
+		<td><%= i+1%>.</td>
+		<td><%= supplierpayment.supplier.name %></td>
+		<td><%= supplierpayment.no_giro %></td>
+		<td><%= supplierpayment.due_date.strftime('%d-%m-%Y') if !supplierpayment.due_date.blank?%></td>
+		<td align="center">
+			<% if !supplierpayment.due_date.blank? %>
+			<% days = (supplierpayment.due_date.to_date - Date.today).to_i %>
+			<% days = days < 0 ? 0 :days %>
+			<span class="<%= days <= 5 ? 'red' : '' %>"><%=days%></span>
+			<% end %>
+		</td>
+		<td align="right"><%= to_currency(supplierpayment.total) %></td>
+		<td class="right">&nbsp;</td>
+	</tr>
+	<% end %>
+	<% else %>
+	<tr>
+		<td><%= i+1%>.</td>
+		<td><%= supplierpayment.supplier.name %></td>
+		<td><%= supplierpayment.no_giro %></td>
+		<td><%= supplierpayment.due_date.strftime('%d-%m-%Y') if !supplierpayment.due_date.blank?%></td>
+		<td align="center">
+			<% if !supplierpayment.due_date.blank? %>
+			<% days = (supplierpayment.due_date.to_date - Date.today).to_i %>
+			<% days = days < 0 ? 0 :days %>
+			<span class="<%= days <= 5 ? 'red' : '' %>"><%=days%></span>
+			<% end %>
+		</td>
+		<td align="right"><%= to_currency(supplierpayment.total) %></td>
+		<td class="right">
+			<a class="cta" href="<%= edit_supplierpayment_path(supplierpayment) %>">Giro</a>
+		</td>
+	</tr>
+	<% end %>
+	
+	<% end %>
+	<% end %>
+
+</table>

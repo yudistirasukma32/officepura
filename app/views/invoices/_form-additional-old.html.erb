@@ -1,0 +1,110 @@
+<% if !@invoice_ori.nil? %>
+<form id="invoice" name="invoice" action="/invoices/updateinvoice/" method="post">
+	<input type="hidden" id="invoice_id" name="invoice[invoice_id]" value="<%=@invoice_id%>"/>
+	<input type="hidden" name="invoice[process]" value="create" />
+
+	<div class="field-row first">
+		<label for="date">Tanggal</label>
+		<input type="text" name="invoice[date]" class="half date-picker"/>
+		<div class="field-row continue">
+			<label for="quantity">Jumlah</label>
+			<select id="invoice_quantity" name="invoice[quantity]" class="half" onchange="javascript:getAllowanceInvoiceAdd();">
+			  <% (1..15).each do |i| %>
+			  	<option value="<%=i%>"><%=i%> Rit</option>
+			  <% end %>
+			</select>
+		</div>
+	</div>
+
+  <div class="actions">
+    <input type="submit" value="Tambah Data" class="left"/>
+  </div>
+
+	<div class="info-box">
+    <h3>Bukti Kas Keluar #<%=zeropad(@invoice_ori.id)%></h3>
+
+      <table class="row-view no-border">
+        <tr>
+	        <td width="90">Tanggal</td>
+	        <td><%=@invoice_ori.created_at.strftime('%d-%m-%Y')%>&nbsp;(KTR: <%=@invoice_ori.office.name%>)</td>
+      	</tr>
+      	<tr>
+	        <td>Pelanggan</td>
+	        <td><%=@invoice_ori.customer.name%></td>
+	    </tr>
+	    <tr>
+	        <td>Jurusan</td>
+	        <td><strong><%=@invoice_ori.quantity%></strong> Rit: <%=@invoice_ori.route.name%></td>
+	    </tr>
+	    <tr>
+          <td>Tipe</td>
+          <td><%=@invoice_ori.route.routegroup.name%></td>
+        </tr>
+	    <tr>
+	        <td>Kendaraan</td>
+	        <td><%=@invoice_ori.vehicle.current_id%>&nbsp;(UP: <%= @invoice_ori.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+	    </tr>
+	    <tr>
+	        <td>Supir</td>
+	        <td><%=@invoice_ori.driver.name%><% if !@invoice_ori.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice_ori.driver.helpers.first.name%>)<% end %></td>
+	    </tr>       
+      </table>
+      <table class="row-view">
+        <tr>
+          <th width="90">Keterangan</th>
+          <th>&nbsp;</th>
+          <th width="160" class="right" style="padding-right:5px;">Total</th>
+        </tr>
+        <tr>
+    	    <td>UM Supir</td>
+          <td>&nbsp;</td>
+          <td>
+          	<% driver_allowance_single = @invoice_ori.driver_allowance / @invoice_ori.quantity %>
+          	<input type="hidden" id="invoice_driver_single" value="<%=driver_allowance_single%>" />
+          	<input type="text" id="invoice_driver" class="half disabled allowance-field" value="<%=to_currency(driver_allowance_single)%>" readOnly="true" /></td>
+        </tr>
+        <tr>
+          <td>UM Kernet</td>
+          <td>&nbsp;</td>
+          <td>
+            <% helper_allowance_single = @invoice_ori.helper_allowance / @invoice_ori.quantity %>
+            <input type="hidden" id="invoice_helper_single" value="<%=helper_allowance_single%>" />
+            <input type="text" id="invoice_helper" class="half disabled allowance-field" value="<%=to_currency(helper_allowance_single)%>" readOnly="true" /></td>
+        </tr>
+        <tr>
+    	  <td>Lain-lain</td>
+          <td>&nbsp;</td>
+          <td>
+          	<% misc_allowance_single = @invoice_ori.misc_allowance.to_f / @invoice_ori.quantity %>
+          	<input type="hidden" id="invoice_misc_single" value="<%=misc_allowance_single%>" />
+          	<input type="text" id="invoice_misc" class="half disabled allowance-field" value="<%=to_currency(misc_allowance_single)%>" readOnly="true" /></td>
+        </tr>
+        <tr>
+          <% tol_single = @invoice_ori.tol_fee / @invoice_ori.quantity %> 
+          <td>Tol</td>
+          <td>&nbsp;</td>
+          <td>
+          	<input type="hidden" id="invoice_tol_single" value="<%=tol_single%>" />
+          	<input type="text" id="invoice_tol_fee" class="half disabled allowance-field" value="<%= to_currency(tol_single) %>" />
+          </td>
+        </tr>
+        <tr>
+          <% gas_single = @invoice_ori.gas_allowance / @invoice_ori.quantity %> 
+          <td>Solar</td>
+          <td>&nbsp;</td>
+          <td>
+          	<input type="hidden" id="invoice_gas_single" value="<%=gas_single%>" />
+          	<input type="text" id="invoice_gas" class="half disabled allowance-field" value="<%= to_currency(gas_single) %>" />
+          </td>
+        </tr>
+        <tr class="total-row">
+          <td>Total</td>
+          <td>&nbsp;</td>
+          <td><input type="text" id="invoice_total" class="half disabled allowance-field" value="<%=to_currency(driver_allowance_single + tol_single + misc_allowance_single)%>" readOnly="true" /></td>
+        </tr>
+     </table>
+  	</div>
+
+
+</form>
+<% end %>

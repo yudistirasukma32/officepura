@@ -1,0 +1,26 @@
+<%= form_for(@supplierpayment) do |f| %>
+	<div class="field-row">
+		<%= f.label :supplier_id, "Supplier" %>
+		<%= @supplierpayment.supplier.name %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :total, "Total" %>
+		<%= to_currency(@supplierpayment.total) %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :due_date, "Jatuh Tempo" %>
+		<%= f.text_field :due_date, :class => 'half date-picker'  %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :no_giro, "No. Giro" %>
+		<%= f.text_field :no_giro, :class => 'half' %>
+	</div>
+
+	<div class="actions">
+    	<%= f.submit "Tambah Data", :class => 'left' %>
+    	<a class="back left" href="<%=supplierpayments_path%>">Kembali</a>
+  	</div>
+<% end %>

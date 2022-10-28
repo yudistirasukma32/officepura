@@ -1,0 +1,133 @@
+<%= form_for(@eventmemo, html: { class: "form_ajax", "data-resource" => "eventmemo" }) do |f| %>
+
+    <% if @process == 'new' %>
+    <div class="field-row first">
+      <%= f.label :date, "Tanggal" %> 
+      <%= f.text_field :date, :class => 'left half date-picker', :value => @event.start_date.to_date.strftime('%d-%m-%Y') %> 
+    </div>
+    <% else %>
+    <div class="field-row first">
+      <%= f.label :date, "Tanggal" %> 
+      <%= f.text_field :date, :class => 'left half date-picker' %> 
+    </div>
+    <% end %>
+
+    <div class="field-row">
+        <%= f.label :summary, "No. DO" %>
+        <%= f.text_field :event_id, :placeholder => 'No. DO', :value => @event_id, :disabled => true %>
+        <%= f.hidden_field :event_id, :value => @event_id %>
+    </div>
+
+    <% if @process == 'new' %>
+    <div class="field-row">
+        <%= f.label :customer_id, "Pelanggan" %>
+        <%= f.text_field :summary, :placeholder => 'Pelanggan', :value => @event.customer.name+"-"+@event.customer.city.upcase, :disabled => true %>
+        <%= f.hidden_field :customer_id, :value => @event.customer_id %>
+    </div>
+    <% else %>
+    <div class="field-row">
+        <%= f.label :customer_id, "Pelanggan" %>
+        <%= f.text_field :summary, :placeholder => 'Pelanggan', :value => @eventmemo.customer.name+"-"+@eventmemo.customer.city.upcase, :disabled => true %>
+        <%= f.hidden_field :customer_id, :value => @eventmemo.customer_id %>
+    </div>
+    <% end %>
+
+    <div class="field-row">
+      <%= f.label :commodity_id, "Komoditas" %>
+      <%= f.text_field :commodity_id, :placeholder => 'Komoditas', :value => @event.commodity.name, :disabled => true %>
+      <%= f.hidden_field :commodity_id, :value => @event.commodity_id %>
+    </div>
+
+    <div class="field-row">
+    <%= f.label :route_id, "Jurusan" %>
+    <select id="eventmemo_route_id" name="eventmemo[route_id]" class="double chzn-select" required>
+      <option value="0">- Pilih Jurusan -</option>
+      <% @routes.each do |route| %>
+      <option value="<%=route.id%>"
+        <% if route.id == @eventmemo.route_id %> selected="selected"<% end %>><%=route.name%></option>
+      <% end %>
+    </select>
+  </div>
+
+    <div class="field-row">
+      <%= f.label :isotank_id, "No. Isotank" %>
+      <select id="eventmemo_isotank_id" name="eventmemo[isotank_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
+        <option value="0">- No. Isotank -</option>
+        <% Isotank.active.order(:isotanknumber).each do |isotank| %>
+        <option value="<%=isotank.id%>"<%= isotank.id == @eventmemo.isotank_id ? ' selected="selected"' : '' %>><%=isotank.isotanknumber%></option>
+        <% end %>
+      </select>
+    </div> 
+   
+    <div class="field-row">
+      <%= f.label :container_id, "No. Kontainer" %>
+      <select id="eventmemo_container_id" name="eventmemo[container_id]" class="chzn-select double combo_route">
+        <option value="0">- No. Kontainer -</option>
+        <% Container.active.order(:containernumber).each do |container| %>
+        <option value="<%=container.id%>"<%= container.id == @eventmemo.container_id ? ' selected="selected"' : '' %>><%=container.containernumber%></option>
+        <% end %>
+      </select>
+    </div> 
+
+    <div class="field-row">
+        <%= f.label :vehicle_id, "Kendaraan" %>
+
+    <select id="eventmemo_vehicle_id" name="eventmemo[vehicle_id]" class="chzn-select half left combo_route" required>
+        <option value="0">- No Pol -</option>
+        <% Vehicle.active.order(:current_id).each do |vehicle| %>
+        <option value="<%=vehicle.id%>"<%= vehicle.id == @eventmemo.vehicle_id ? ' selected="selected"' : '' %>><%=vehicle.current_id%></option>
+        <% end %>
+    </select> 
+
+    </div>
+
+    <div class="field-row">
+        <%= f.label :driver_id, "Driver" %>
+        <% if @iseditable or current_user.owner %>
+        <select id="eventmemo_driver_id" name="eventmemo[driver_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);" required>
+            <option value="0">- Driver -</option>
+            <% Driver.active.order(:name).each do |driver| %>
+            <option value="<%=driver.id%>"<%= driver.id == @eventmemo.driver_id ? ' selected="selected"' : '' %>><%=driver.name%> (<%=zeropad(driver.id)%>)</option>
+            <% end %>
+            </select> 
+            <%#= f.select :driver_id, options_for_select(Driver.active.order(:name).collect {|g| [g.name, g.id]}, @eventmemo.driver_id), {:include_blank => '- Supir -'}, :class => 'double chzn-select' %>
+        <% else %>
+            <input type="text" class="double disabled" value="<%=@eventmemo.driver.name%>" />
+            <%= f.hidden_field :driver_id, :value => @eventmemo.driver_id %>
+        <% end %>
+    </div>
+
+    <div class="field-row">
+        <%= f.label :driver_phone, "No.Hp Driver" %>
+        <%= f.text_field :driver_phone, :class => 'half', :id => 'phone_driver' %>
+    </div>
+
+    <% if @process == 'new' %>
+    <div class="field-row">
+        <%= f.label :quantity, "Sebanyak" %>
+        <%= f.text_field :quantity, :class => 'half', :id => 'quantity', :value => @quantity_memo %>
+    </div>
+
+    <% else %>
+    <div class="field-row">
+        <%= f.label :quantity, "Sebanyak" %>
+        <%= f.text_field :quantity, :class => 'half', :id => 'quantity' %>
+    </div>
+
+    <% end %>
+ 
+	<div class="field-row">
+ 		<%= f.label :description, "Keterangan" %>
+ 		<%= f.text_area :description, :rows => 2, :class => 'half' %>
+	</div>
+
+  </div>
+
+	<div class="actions">
+    <input type="hidden" name="event_id" value="<%= @event_id %>">
+  	<%= f.submit "Tambah Data", :id => 'eventmemo_submit', :class => 'left' if current_user.owner or checkroleonly 'Admin Marketing,Admin Operasional' %>
+  	
+  	<a class="back left" href="/events/<%=@event_id%>/edit">Kembali ke Index</a>
+	</div>
+
+<% end %>

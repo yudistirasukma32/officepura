@@ -1,0 +1,11 @@
+<div id="left">
+	<%= render 'shared/nav' %>
+</div>
+
+<div id="mid">
+	<span class="btn cancel">&times;<%= link_to "Cancel", @settings_path %></span>
+
+	<h1>Settings / <%= @group %> / Edit Setting</h1>
+
+	<%= render 'form' %>
+</div>

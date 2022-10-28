@@ -1,0 +1,22 @@
+<%= form_for(@assetgroup) do |f| %>
+	<div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :percent_decrease, "Penyusutan", :class => 'left' %>
+    <%= f.text_field :percent_decrease, :class => 'short left', :onkeypress => 'javascript: return isMoneyKey(this);' %> 
+    <label class="middle">%</label>
+  </div>
+
+   <div class="actions">
+      <%= f.submit "Tambah Data", :class => 'left' %>
+      <a class="back left" href="<%=assetgroups_path%>">Kembali ke Index</a>
+    </div>
+<% end %>

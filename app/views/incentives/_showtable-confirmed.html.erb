@@ -1,0 +1,47 @@
+<table class="row-view">
+	<tr>
+		<th width="50">ID</th>
+		<th width="50">TGL</th>
+		<th>BKK, Jurusan</th>
+		<th width="40">Ktr</th>
+		<th width="80">Nopol</th>
+		<th width="80">Supir</th>
+		<th width="100" class="right">Total</th>
+		<th width="80"></th>
+	</tr>
+
+	<tr class="subheading">
+		<th colspan="8" style="color:#000;">Bukti Kas Insentif Sudah Terkonfirmasi Kasir <span class="red"><%=@startdate%> <%=@enddate%> (<%=@incentives.count%>)</span></th>
+	</tr>
+
+	<% @incentives.each do |incentive| %>
+	<% if incentive.deleted && current_user.adminrole %>
+	<tr class="deleted">
+		<td><%=zeropad(incentive.id)%></td>
+		<td><strong><%=incentive.created_at.strftime('%d')%></strong>.<%=incentive.created_at.strftime('%m')%></td>
+		<td>#<%=zeropad(incentive.invoice.id)%> (<%=incentive.invoice.date.strftime('%d.%m')%>), <%=incentive.quantity%> Rit: <%=incentive.invoice.route.name%> (<%=incentive.invoice.driver.name%>)</td>
+		<td><%=incentive.invoice.office.abbr%></td>
+		<td><%=incentive.invoice.vehicle.current_id%></td>	
+		<td><%=incentive.invoice.driver.name%></td>	
+		<td align="right"><%= to_currency(incentive.total) %></td>
+		<td class="right">DIHAPUS</td>
+	</tr>
+	<% else %>
+	<tr>
+		<td><%=zeropad(incentive.id)%></td>
+		<td><strong><%=incentive.created_at.strftime('%d')%></strong>.<%=incentive.created_at.strftime('%m')%></td>
+		<td>#<%=zeropad(incentive.invoice.id)%> (<%=incentive.invoice.date.strftime('%d.%m')%>), <%=incentive.quantity%> Rit: <%=incentive.invoice.route.name%></td>
+		<td><%=incentive.invoice.office.abbr%></td>
+		<td><%=incentive.invoice.vehicle.current_id%></td>	
+		<td><%=incentive.invoice.driver.name%></td>	
+		<td align="right"><%= to_currency(incentive.total) %></td>
+		<td class="right">
+			<a href="/incentives/<%=incentive.id%>" class="delete tipsy" title="Print Bukti Kas Insentif"><i class="icon-print"></i></a>
+			<%= link_to '&#xf00d;'.html_safe, incentive, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+		</td>
+	</tr>
+	<% end %>
+	<% end %>	
+
+
+</table>

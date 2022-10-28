@@ -1,0 +1,39 @@
+<table class="row-view">
+	<tr>
+		<th width="50">BKK</th>
+		<th>Nama</th>
+		<th width="100">Tipe</th>
+		<th width="40">Ktr</th>
+		<th width="80">No Pol</th>
+		<th width="100" class="right">Total</th>
+		<th width="60"></th>
+	</tr>
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">BKK Supir <span class="red"> (<%=@payrolls.count%>)</span></th>
+	</tr>
+	
+	<% @payrolls.each do |payroll| %>
+	
+	<% if !payroll.payrollreturns.where(:deleted => false).any? %>
+	<tr>
+		<td><%=zeropad(payroll.id)%></td>
+		<% if !payroll.driver_id.nil? %>
+		<td><%= payroll.driver.name unless payroll.driver.nil?%></td>
+		<td>SUPIR</td>
+		<% else %>
+		<td><%= payroll.helper.name unless payroll.helper.nil?%></td>
+		<td>KERNET</td>
+		<% end %>
+		<td><%=payroll.office.abbr unless payroll.office.nil? %></td>
+		<td><%=payroll.vehicle.current_id unless payroll.vehicle.nil? %></td>
+		<td align="right" class="red"><%=to_currency(payroll.total)%></td>
+		<td class="right">
+			<a class="cta" href="<%=new_payrollreturn_path%>/<%=payroll.id%>">BKM</a>
+		</td>
+	</tr>
+
+	<% end %>
+
+	<% end %>
+
+</table>

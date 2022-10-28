@@ -1,0 +1,63 @@
+<%= form_for(@productrequest) do |f| %>
+	<div class="field-row first">
+		<%= f.label :vehicle_id, "Kendaraan" %>
+		<%= f.select :vehicle_id, options_for_select(Vehicle.all(:order =>:id).collect{|g| [g.current_id, g.id]},@productrequest.vehicle_id), {:include_blank => '-No. Pol-'}, :class => 'half left chzn-select'  %>		
+	</div>
+	<div class="field-row continue">
+		<%= f.label :driver_id, "Supir" %>
+		<%= f.select :driver_id, options_for_select(Driver.all(:order => :name). collect{|g| [g.name, g.id]}, @productrequest.driver_id), {:include_blank => '- Supir -'}, :class => 'half left chzn-select' %>
+	</div>
+	<div class="field-row continue">
+		<%= f.label :date, "Tanggal" %>
+		<%= f.text_field :date, :class => 'half date-picker none', :value=> @date , :readonly => true%>
+	</div>
+
+	<div class="field-row continue">
+		<%= f.label :description, "Keterangan" %>
+		<%= f.text_area :description, :style => 'width:350px;'%>	
+	</div>
+
+	<div class="field-row continue">
+		<%= f.label :productgroup_id, "Permintaan" %>
+		<%= f.select :productgroup_id, options_for_select(Productgroup.active.order(:name). collect{|g| [g.name, g.id]}, @productrequest.productgroup_id), {:include_blank => '- Permintaan -'}, :onchange => "javascript: getProductByGroup();",:class => 'half left chzn-select' %>
+	</div>
+	<div id="tiretarget" class="field-row continue hide">
+	 	<label>Sisa Target Ban</label>
+	 	<input class="half left" id="tire_target" name="vehicle[previous_id]" size="30" type="text" value="" readonly>
+	</div>
+	<div class="field-row continue">
+	
+	<table class="row-view">
+		<tr>
+			<th width="30">No.</th>
+			<th>Nama Barang</th>
+			<th width="40">Jumlah</th>
+			<th class="right">Stok Gudang<th>				
+		</tr>
+		<% (1..10).each do |i| %>
+		<tr>
+			<td><%=i%></td>
+			<td>
+				<select id="productrequestitems_<%=i%>" onchange="javascript:getStockProduct(this.value, <%=i%>);" style="width:400px">
+					<option value="">- Barang - </option>
+				</select>
+				<input type="hidden" id="productid_<%=i%>" name="productrequest[productid_<%=i%>]" />
+			</td>
+			<td>
+<!--				<input type="text" id="quantity_<%=i%>" name="productrequest[quantity_<%=i%>]" class="short" style="text-align:right;" onkeypress="javascript:return isDecimalKey(this);" value="0" onchange="javascript:this.value = minmax('' + this.value, '0', '' + stock_<%=i%>.value);" />-->
+				<input type="text" id="quantity_<%=i%>" name="productrequest[quantity_<%=i%>]" class="short" style="text-align:right;" onkeypress="javascript:return isDecimalKey(this);" value="0" />
+			</td>
+			<td><input type="text" id="stock_<%=i%>" name="productrequest[stock_<%=i%>]" readonly="readonly" class="half disabled right" value="0" /></td>
+		</tr>
+		<% end %>		
+	</table>
+		
+	</div>
+
+	<div class="actions">
+		<a class="btn right" href="<%=productrequests_path%>">Kembali ke Index</a>
+  		<input type="submit" class="btn right" value="Tambah Data" />
+	</div>
+
+
+<% end %>

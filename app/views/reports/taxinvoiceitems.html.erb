@@ -1,0 +1,71 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+	
+	<h1><%=Setting.find_by_name("Client Name").value%> / Surat Jalan: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+	<br class="clearfix" />
+
+	<div id="filter">
+		<form id="filterform" name="filterform" action="" method="get">
+		<div class="field-row continue">
+			<label for="startdate">Tanggal Awal</label>
+			<input type="text" name="startdate" class="left half date-picker" value="<%=@startdate%>" />
+			<label for="enddate" class="middle">Akhir</label>
+			<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" />
+			<input class="submit" type="submit" value="Filter" />
+		</div>
+		</form>
+	</div>
+
+	<br class="clearfix" />
+
+	<% if @invoices.any? %>
+		<table class="tablesorter row-view tablesorterFilters">
+			<thead>
+			<tr>
+				<th class="{sorter:false, filter: false}" width="30">No.</th>
+				<th class="{sorter: false, filter: true}" width="50">BKK</th>
+				<th class="{sorter: false}">Keterangan</th>
+				<th width="80">NoPol</th>
+				<th width="180">Pelanggan</th>
+				<th width="70" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">S.Jalan</th>
+				<th width="30" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;"><i class="icon-lock red icon-large" title="Surat Tagihan sudah di Invoice"></i></th>
+			</tr>
+			</thead>
+			<tbody>
+			<% i = 0 %>
+			<% @invoices.each do |invoice| %>
+				<% if invoice.taxinvoiceitems.where("total > money(0)").count > 0 %>
+					<% qty = invoice.quantity %>
+					<% qty -= invoice.receiptreturns.active.first.quantity if !invoice.receiptreturns.where(:deleted=>false).first.nil? %>
+					<% if qty > 0 %>
+						<tr>
+							<td><%= i+1 %></td>
+							<td><%=zeropad(invoice.id)%></td>
+							<td><%=invoice.date.strftime('%d/%m/%y')%>,<%=qty%> Rit: <%=invoice.route.name%> (<%=invoice.driver.name%>)</td>
+							<td><%=invoice.vehicle.current_id%></td>
+							<td><%=invoice.customer.name%></td>
+							<% if invoice.taxinvoiceitems.any? %>
+							<td align="center"><%=invoice.taxinvoiceitems.where("total > money(0)").count%> / <%= qty%></td>
+							<% else %>
+							<td align="center">0 / <%= qty%></i></td>
+							<% end %>
+							<td align="center"><%=invoice.taxinvoiceitems.where("total > money(0) and taxinvoice_id IS NOT NULL").count%></td>
+						</tr>
+						<% i += 1 %>
+					<% end %>	
+				<% end %>	
+			<% end %>	
+			</tbody>
+
+		</table>
+	<% end %>
+</div>

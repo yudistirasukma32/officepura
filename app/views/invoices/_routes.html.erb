@@ -1,0 +1,11 @@
+<% if !@routes.first.nil? %>
+<div class="field-row">
+  <label for="route_id">Jurusan</label>
+  <select id="invoice_route_id" name="invoice[route_id]" class="chzn-select double combo_route" onchange="javascript:getAllowances();">
+    <option value="0">- Pilih Jurusan -</option>
+    <% @routes.each do |route| %>
+    <option value="<%=route.id%>"><%=route.name%> (<%=route.routegroup.name%>)</option>
+    <% end %>
+  </select>
+ </div>
+<% end %>

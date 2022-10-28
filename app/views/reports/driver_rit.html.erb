@@ -1,0 +1,82 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Rit Sopir: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="width:100%;">
+				&nbsp; &nbsp; Tanggal Awal &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+				&nbsp; &nbsp; Akhir &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<!--<h1>Total BKK : 
+			<br/>Total BKM :
+			 <br/>Total Estimasi Pendapatan : <a href="#theTotal">klik disini</a> 
+			<br/>Total Estimasi Pendapatan : <span id="span-total"></span>
+		</h1>-->
+
+		<%# offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
+
+		<table class="row-view report-view">
+			<tr>
+				<th >Sopir</th>
+				<th align="right" style="text-align: right">Jumlah BKK</th>
+				<th align="right" style="text-align: right">Jumlah Rit</th>
+				
+			</tr>
+            <% 
+                bkk = 0
+                rit = 0
+             %>
+        <% @reports.each do |report| %>
+          <tr>
+            <td><%= report.name %></td>
+            <td align="right"><%= report.rit %></td>
+            <td align="right"><%= report.bkk %></td>
+          </tr>
+          <%
+            bkk = bkk + report.bkk.to_i
+            rit = rit + report.rit.to_i
+          %>
+        <% end %>
+
+			<tr class="footer" id="theTotal">
+				<td colspan="">TOTAL</td>
+				<td align="right" class=""><%=to_currency(bkk)%></td>
+				<td align="right" class=""><%=to_currency(rit)%></td>
+			</tr>
+		</table>
+
+		<!-- <h1 class="right"><%= to_currency(0, 'Rp. ') %></h1> -->
+
+		<br class="clearfix" />
+	
+	</div>
+
+</div>
+
+<script>
+	(function() {
+		// your page initialization code here
+		// the DOM will be available here
+		document.getElementById('span-total').textContent = "<%= to_currency(0, 'Rp. ') %>";
+	})();
+</script>

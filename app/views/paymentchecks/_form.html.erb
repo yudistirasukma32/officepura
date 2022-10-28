@@ -1,0 +1,73 @@
+<% if @paymentcheck %>
+<%= form_for(@paymentcheck) do |f| %>
+	
+	<div class="field-row first">
+          <label style="float:none;">Nama Supplier</label>
+          <strong><%=@supplier.name%></strong>
+          <%= f.hidden_field :supplier_id, :value => @supplier_id %>
+    </div>
+	<div class="field-row continue">
+    	<%= f.label :date, "Tanggal" %>
+    	<%= f.text_field :date, :class => 'half date-picker', :value => @paymentcheck.date.strftime('%d-%m-%Y') %>
+	</div>
+	<div class="field-row continue">
+    	<%= f.label :check_no, "Keterangan" %>
+    	<%= f.text_field :check_no, :class => 'half', :value => @paymentcheck.check_no %>&nbsp; <em style="font-size:11px;">Contoh: "ZI 123456" atau "Transfer Kontan"</em>
+	</div>
+
+	<div class="field-row continue">
+    	<label for="bank_id">Bank</label>
+		<select name="bank_id" class="third left">
+			<% Bankexpensegroup.where("UPPER(name) like 'BANK%' ").active.order(:name).each do |bankexpensegroup| %>
+			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultBankValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
+			<% end %>
+		</select>
+	</div>
+	<br class="clear" />
+	<table class="row-view" style="margin-top:20px;">
+		<tr>
+			<th width="30">No.</th>
+			<th>Keterangan</th>
+			<th width="50" class="right">Jumlah</th>
+			<th width="80" class="right">Harga</th>
+			<th width="110" class="right">Total</th> 				
+			<th width="50"></th>
+		</tr>
+		<% @productorders.each do |productorder| %>
+		<tr>
+			<th colspan ="4" style="color:#000;">
+				OP #<%= zeropad(productorder.id) %>: <%= productorder.date.strftime('%d %B %Y')%>
+			</th>
+			<th class="right" style="color:#000;">
+				<span id="productorder_total_<%=productorder.id%>"><%=to_currency(productorder.productorderitems.where(:bon => true).sum(:total))%></span>
+			</th>		
+			<th id="<%=productorder.id%>">&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="cb_<%=productorder.id%>" name='paymentcheck[cb_<%=productorder.id%>]' onclick="javascript: countTotalPaymentcheck();"/></th>
+		</tr>
+			<% productorder.productorderitems.each_with_index do |item, i| %>
+				<% if item.bon %>
+				<tr>
+					<td><%= i+1%>.</td>
+					<td><%= item.product.name rescue nil%></td>
+					<td align="right"><%= item.quantity %></td>
+					<td align="right"><%= to_currency(item.price_per)%></td> 				
+					<td class="right"><%=to_currency(item.total)%></td>		
+					<td>&nbsp;</td>
+				</tr>
+				<% end %>
+			<% end %>
+		<% end %>
+		<tr class="footer">
+		    <td colspan="3"></td>
+		    <td align="right" class="total">TOTAL</td>
+		    <td align="right" class="total"><span id="txt_total">0</span></td>
+		    <td></td>
+		</tr>
+	</table>
+
+	<div class="actions">
+		<a class="right" href="<%=paymentchecks_path%>">Kembali ke Index</a>
+	  	<input type="submit" id="paymentcheck_submit"value="Tambah Data" class="right" />
+	</div>
+ 	
+<% end %>
+<%end %>

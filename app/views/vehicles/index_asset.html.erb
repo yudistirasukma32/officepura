@@ -1,0 +1,82 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Master / <a href="/vehicles/index_asset">Aktiva Kendaraan</a> / Index</h1>
+
+		<%= render 'default/toggle_deleted_checkbox' %>
+
+		<br class="clearfix" />
+		<br class="clearfix" />
+
+		<table class="row-view tablesorter">
+			<thead>
+			<tr> 
+				<th>No Pol</th>
+				<th>Tanggal Beli</th>
+				<th>Grup</th>
+				<th width="60" class="{sorter: false}">Aktif</th>
+				<th width="60" class="{sorter: false}"></th>
+			</tr>
+			<thead>
+			<tbody>
+			<% @vehicles.each do |vehicle| %>
+			<% if vehicle.deleted %>
+				<% if current_user.adminrole %>
+				<tr class="deleted">
+					<td><%= vehicle.current_id %></td>
+					<td><%= vehicle.date_purchase.strftime('%d-%m-%Y') if !vehicle.date_purchase.blank? %></td>
+					<td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+					<% if vehicle.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+					<% end %>
+					<td class="right" width="60">&nbsp;</td>
+				</tr>
+				<% end %>
+			<% else %>
+				<% if current_user.adminrole %>
+				<tr>
+					<td><%= link_to vehicle.current_id, "/vehicles/#{vehicle.id}/edit_asset" %> 
+					<td><%= vehicle.date_purchase.strftime('%d-%m-%Y') if !vehicle.date_purchase.blank? %></td>
+					<td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+					<% if vehicle.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+					<% end %>
+					<td class="right" width="60">
+						<%= link_to '&#xf044;'.html_safe, "/vehicles/#{vehicle.id}/edit_asset", :class => "edit tipsy", :title => 'Edit' %> 
+						<%= link_to '&#xf00d;'.html_safe, vehicle, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+					</td>
+				</tr>
+				<% else %>
+				<tr>
+					<td><%= vehicle.current_id %></td>
+					<td><%= vehicle.date_purchase.strftime('%d-%m-%Y') if !vehicle.date_purchase.blank? %></td>
+					<td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+					<% if vehicle.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+					<% end %>
+					<td class="right" width="60">&nbsp;</td>
+				</tr>
+				<% end %>
+			<% end %>
+			
+			<% end %>	
+			</tbody>
+		
+		</table>
+
+		<br class="clearfix" />
+
+	</div>
+</div>

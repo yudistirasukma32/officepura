@@ -1,0 +1,89 @@
+<%= form_for(@eventcleaningmemo, html: { class: "form-cleaningmemo form_ajax", "data-resource" => "eventcleaningmemo" }) do |f| %>
+
+    <% if @process == 'new' %>
+    <div class="field-row first">
+      <%= f.label :date, "Tanggal" %> 
+      <%= f.text_field :date, :class => 'left half date-picker', :value => @event.start_date.to_date.strftime('%d-%m-%Y') %> 
+    </div>
+    <% else %>
+    <div class="field-row first">
+      <%= f.label :date, "Tanggal" %> 
+      <%= f.text_field :date, :class => 'left half date-picker' %> 
+    </div>
+    <% end %>
+
+    <div class="field-row">
+        <%= f.label :summary, "No. DO" %>
+        <%= f.text_field :event_id, :placeholder => 'No. DO', :value => @event_id, :disabled => true %>
+        <%= f.hidden_field :event_id, :value => @event_id %>
+        <input type="hidden" name="event_id" value="<%= @event_id %>"> 
+    </div>
+
+    <div class="field-row">
+    <%= f.label :driver_id, "Driver" %>
+    <% if @iseditable or current_user.owner %>
+    <select id="eventcleaningmemo_driver_id" name="eventcleaningmemo[driver_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
+        <option value="0">- Driver -</option>
+        <% Driver.active.order(:name).each do |driver| %>
+        <option value="<%=driver.id%>"<%= driver.id == @eventcleaningmemo.driver_id ? ' selected="selected"' : '' %>><%=driver.name%> (<%=zeropad(driver.id)%>)</option>
+        <% end %>
+        </select> 
+        <%#= f.select :driver_id, options_for_select(Driver.active.order(:name).collect {|g| [g.name, g.id]}, @eventcleaningmemo.driver_id), {:include_blank => '- Supir -'}, :class => 'double chzn-select' %>
+    <% else %>
+        <input type="text" class="double disabled" value="<%=@eventcleaningmemo.driver.name%>" />
+        <%= f.hidden_field :driver_id, :value => @eventcleaningmemo.driver_id %>
+    <% end %>
+    </div>
+
+    <div class="field-row">
+        <%= f.label :vehicle_id, "Kendaraan" %>
+
+    <select id="eventcleaningmemo_vehicle_id" name="eventcleaningmemo[vehicle_id]" class="chzn-select half left combo_route">
+        <option value="0">- No Pol -</option>
+        <% Vehicle.active.order(:current_id).each do |vehicle| %>
+        <option value="<%=vehicle.id%>"<%= vehicle.id == @eventcleaningmemo.vehicle_id ? ' selected="selected"' : '' %>><%=vehicle.current_id%></option>
+        <% end %>
+    </select> 
+
+    </div>
+
+    <div class="field-row">
+      <%= f.label :isotank_id, "No. Isotank" %>
+      <select id="eventcleaningmemo_isotank_id" name="eventcleaningmemo[isotank_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
+        <option value="0">- No. Isotank -</option>
+        <% Isotank.active.order(:isotanknumber).each do |isotank| %>
+        <option value="<%=isotank.id%>"<%= isotank.id == @eventcleaningmemo.isotank_id ? ' selected="selected"' : '' %>><%=isotank.isotanknumber%></option>
+        <% end %>
+      </select>
+    </div> 
+   
+    <div class="field-row">
+      <%= f.label :container_id, "No. Kontainer" %>
+      <select id="eventcleaningmemo_container_id" name="eventcleaningmemo[container_id]" class="chzn-select double combo_route">
+        <option value="0">- No. Kontainer -</option>
+        <% Container.active.order(:containernumber).each do |container| %>
+        <option value="<%=container.id%>"<%= container.id == @eventcleaningmemo.container_id ? ' selected="selected"' : '' %>><%=container.containernumber%></option>
+        <% end %>
+      </select>
+    </div>
+    
+ 
+	<div class="field-row">
+ 		<%= f.label :description, "Keterangan / Last Cargo" %>
+ 		<%= f.text_area :description, :rows => 2, :class => 'half' %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :next_description, "Selanjutnya" %>
+    <%= f.text_field :next_description, :class => 'half', :id => 'next_description' %>
+  </div>
+
+  </div>
+
+	<div class="actions">
+  	<%= f.submit "Tambah Data", :id => 'eventcleaningmemo_submit', :class => 'left' if current_user.owner or checkroleonly 'Admin Marketing,Admin Operasional' %>
+  	
+  	<a class="back left" href="/events/<%=@event_id%>/edit">Kembali ke Index</a>
+	</div>
+
+<% end %>

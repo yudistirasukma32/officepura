@@ -1,0 +1,5 @@
+<ul id="steps">
+  <li<% if step == 1 %> class="on"<% end %>><% if !@receipt.id.nil? and @receipt.invoice.receiptincentives.active.count == 0  %><a href="/incentives/new/<%=@receipt.invoice.id%>"><% end %><span>1</span> Data Insentif<% if !@receipt.id.nil? and @receipt.invoice.receiptincentives.active.count == 0 %></a><% end %></li>
+  <li class="separator"><i class="icon-chevron-right"></i></li>
+  <li<% if step == 2 %> class="on"<% end %>><% if !@receipt.id.nil? %><a href="<%=confirmation_bonusreceipt_url(@receipt)%>"><% end %><span>2</span> Konfirmasi<% if !@receipt.id.nil? %></a><% end %></li>
+</ul>

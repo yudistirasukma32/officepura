@@ -1,0 +1,312 @@
+<%= form_for(@event) do |f| %>
+    <div class="field-row first">
+      <%= f.label :start_date, "Tanggal" %> 
+      <%= f.text_field :start_date, :class => 'left half date-picker' %>
+      <%= f.label :start_date, "s/d", :class => 'middle' %> 
+      <%= f.text_field :end_date, :class => 'left half date-picker' %>
+    </div>
+
+    <div class="field-row">
+      <%= f.label :customer_id, "Pelanggan" %>
+      <select id="event_customer_id" name="event[customer_id]" class="double chzn-select" onchange="javascript:getRoutesOnly2(this.value);">
+        <option value="0">- Pilih Pelanggan -</option>
+        <% Customer.active.order(:name).each do |customer| %>
+        <option value="<%=customer.id%>"
+          <% if customer.id == @event.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase%></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="field-row">
+        <%= f.label :summary, "Berita Acara" %>
+        <%= f.text_field :summary, :placeholder => 'Berita Acara' %>
+    </div>
+
+    <% if @process == 'new' %>
+
+    <div id="div_routes">
+      <div class="field-row">
+        <%= f.label :route_id, "Jurusan" %>
+        <input type="text" class="double disabled" value="<%= !@event.route.nil? ? @event.route.name : 'Harap memilih pelanggan terlebih dahulu.' %>" />
+        <%= f.hidden_field :route_id, :value => @event.route_id %>
+        <small>Pilih Jurusan dari Master</small>
+      </div>
+    </div>
+
+    <% else %>
+
+      <% if @event.route_id.nil?  %>
+      
+        <div class="field-row">
+            <%= f.label :route_summary, "Jurusan" %>
+            <%= f.text_field :route_summary, class: "", :placeholder => 'Jurusan A - B' %>
+        </div>
+
+      <% else %>
+
+        <div id="div_routes">
+          <div class="field-row">
+            <%= f.label :route_id, "Jurusan" %>
+            <input type="text" class="double disabled" value="<%= !@event.route.nil? ? @event.route.name : 'Harap memilih pelanggan terlebih dahulu.' %>" />
+            <%= f.hidden_field :route_id, :value => @event.route_id %>
+          </div>
+        </div>
+
+      <% end %>
+
+    <% end %>
+
+    <div class="field-row">
+    <%= f.label :commodity_id, "Komoditas" %>
+    <select id="event_commodity_id" name="event[commodity_id]" class="double chzn-select">
+      <option value="0">- Pilih Komoditas -</option>
+      <% Commodity.active.order(:name).each do |commodity| %>
+      <option value="<%=commodity.id%>"
+        <% if commodity.id == @event.commodity_id %> selected="selected"<% end %>><%=commodity.name%></option>
+      <% end %>
+    </select>
+    </div>
+
+  <div class="field-row">
+		<%= f.label :load_date, "Tgl Muat" %> 
+		<%= f.text_field :load_date, :class => 'left half date-picker' %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :unload_date, "Tgl Bongkar" %> 
+    <%= f.text_field :unload_date, :class => 'left half date-picker' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :estimated_tonage, "Rata-rata Tonage"  %>
+    <%= f.select :estimated_tonage, options_for_select(@estimated_tonage.collect {|w| [w, w]}, (params[:estimated_tonage].present? ? params[:estimated_tonage] : @event.estimated_tonage)), {}, { :class => 'half chzn-select' } %>
+    <span style="position: absolute; margin-top: 0.5rem;"><strong>kg</strong></span>
+  </div>
+
+    <div class="field-row">
+        <%= f.label :cargo_type, "Tipe Kargo" %>
+        <% if active_node == "edit" %>
+
+            <% if @event.cargo_type != "" %>
+
+                <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+                  <%= f.radio_button :cargo_type, "padat", :checked => @event.cargo_type == "padat" ? true : false %> Padat
+                <% end %>
+                <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+                  <%= f.radio_button :cargo_type, "cair", :checked => @event.cargo_type == "cair" ? true : false %> Cair
+                <% end %>
+
+            <% else %>
+
+                <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+                  <%= f.radio_button :cargo_type, "padat", :checked => true  %> Padat
+                <% end %>
+                <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+                  <%= f.radio_button :cargo_type, "cair" %> Cair
+                <% end %>
+
+            <% end %>
+
+        <% else %>
+
+            <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+              <%= f.radio_button :cargo_type, "padat", :checked => true  %> Padat
+            <% end %>
+            <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+              <%= f.radio_button :cargo_type, "cair" %> Cair
+            <% end %>
+
+        <% end %>
+
+    </div>
+
+    <div class="field-row" id="event_tanktype">
+    <%= f.label :tanktype, "Tipe Tangki"  %>
+    <%= f.select :tanktype, options_for_select(@tanktype.collect {|w| [w, w]}, (params[:tanktype].present? ? params[:tanktype] : @event.tanktype)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+    <div class="field-row">
+        <% @quant = Array(0..50) %>
+        <%= f.label :qty, "Jumlah" %>   
+        <%= f.select :qty, options_for_select(@quant.collect {|w| [w, w]}, (params[:qty].present? ? params[:qty] : @event.qty)), {}, { :class => 'half' } %>
+        <span style="position: absolute; margin-top: 0.5rem;"><strong>RIT</strong></span>
+    </div>
+
+  <div class="field-row">
+    <% @quant = Array(0..50) %>
+    <%= f.label :truck_quantity, "Jumlah Truk" %>   
+    <%= f.select :truck_quantity, options_for_select(@quant.collect {|w| [w, w]}, (params[:qty].present? ? params[:qty] : @event.truck_quantity)), {}, { :class => 'half' } %>
+    <span style="position: absolute; margin-top: 0.5rem;"><strong>Truk</strong></span>
+</div>
+
+	<div class="field-row">
+ 		<%= f.label :volume, "Volume" %>
+ 		<%= f.text_field :volume, :placeholder => '20000' %>
+	</div>
+
+    <div class="field-row">
+      <%= f.label :invoicetrain, "Moda" %>
+      <% if active_node == "edit" %>
+          <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, false, :checked => (@event.invoicetrain == false ? true : false), class: "moda-standart" %> Standart
+          <% end %>
+          <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, true, :checked => (@event.invoicetrain == true ? true : false),  class: "moda-kereta" %> Kereta
+          <% end %>
+      <% else %>
+          <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, false, :checked => true, class: "moda-standart"  %> Standart
+          <% end %>
+          <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, true, class: "moda-kereta" %> Kereta
+          <% end %>
+      <% end %>
+    </div>
+
+    <div class="field-row">
+		<%= f.label :office_id, "Kantor" %>
+		<select id="event_office_id" name="event[office_id]" class="half chzn-select">
+		<option value="0">- Pilih Kantor -</option>
+		<% Office.active.order(:name).each do |office| %>
+		<option value="<%=office.id%>"
+			<% if office.id == @event.office_id %> selected="selected"<% end %>><%=office.name%></option>
+		<% end %>
+		</select>
+	  </div>
+
+    <div class="field-row">
+		<%= f.label :station_id, "Stasiun" %>
+		<select id="event_station_id" name="event[station_id]" class="half chzn-select">
+		<option value="0">- Pilih Stasiun -</option>
+		<% Station.active.order(:name).each do |station| %>
+		<option value="<%=station.id%>"
+			<% if station.id == @event.station_id %> selected="selected"<% end %>><%=station.name%></option>
+		<% end %>
+		</select>
+	  </div>
+
+
+	<div class="field-row">
+ 		<%= f.label :need_vendor, "Pakai Vendor" %>
+ 		<%= f.check_box :need_vendor %>
+	</div>
+  
+  <div class="field-row first event-vendor" id="event-vendors" <%= @event.need_vendor == true ? "" : 'style="display: none;"'.html_safe %>>
+    <h3>Data Vendor</h3>
+    <hr style="margin-bottom: 1.5rem;">
+    <% eventvendors = @event.eventvendors %>
+    <div id="message-vendor-blank" style="<%= eventvendors.present? ? "display:none;" : "" %>
+    text-align: center;font-weight: bold;">Tidak ada no Vendor yang ditambahkan</div>
+    <% eventvendors.each do |item| %>
+      <% @item = item %>
+      <%= render "event_vendor_form" %>
+    <% end %>
+  </div>
+
+  <div class="field-row first event-vendor" <%= @event.need_vendor == true ? "" : 'style="display: none;"'.html_safe %>>
+    <button type="button" id="btn-add-vendor" class="icon-plus btn-txt">Tambah No. Vendor</button>
+  </div>
+
+	<div class="field-row">
+ 		<%= f.label :description, "Keterangan" %>
+ 		<%= f.text_area :description, :rows => 2, :class => 'half' %>
+	</div>
+
+	<div class="field-row">
+ 		<%= f.label :payments_by, "Dibayar Oleh" %>
+ 		<%= f.text_field :payments_by, :placeholder => 'Nama' %>
+	</div>
+	
+	<div class="field-row">
+ 		<%= f.label :cancelled, "DO Ditolak?", :style => 'font-weight:700;' %>
+ 		<%= f.check_box :cancelled %>
+	</div>
+
+	<% if current_user.owner %>
+
+	<div class="field-row">
+ 		<%= f.label :authorised, "Otorisasi", :style => 'font-weight:700;' %>
+ 		<%= f.check_box :authorised %> &nbsp; Owner
+	</div>
+
+	<div class="field-row first">
+		<%= f.label :authorised_dated, "Tgl Otorisasi" %> 
+		<%= f.text_field :authorised_dated, :class => 'half date-picker' %>
+	</div>
+
+	<% end %>
+
+
+<!-- Event SO -->
+
+
+<!-- Event end SO -->
+
+<!-- Event Vendor -->
+
+
+
+<!-- Event end Vendor -->
+  
+	<% query = @event.cancelled ? "cancelled" : "" %>
+
+	<div class="actions">
+
+  	<% if @isdelete %>
+  	<%= link_to ' Hapus Event', @event, :method => :delete, :confirm => "Are you sure?", :class => 'left btn-txt cancel icon-remove', :style => 'margin-top:0; float:left;' if current_user.owner or checkroleonly 'Admin Marketing' %>
+  	<% end %>
+
+  </div>
+
+	<div class="actions">
+
+  	<%= f.submit "Tambah Data", :id => 'event_submit', :class => 'left' if current_user.owner or checkroleonly 'Admin Marketing' %>
+  	
+  	<a class="back left" href="<%= events_path + '?type=' + query %>">Kembali ke Index</a>
+	</div>
+
+<% end %>
+
+
+
+<%= content_for :js do %>
+<script>
+  $(document).ready(function() {
+    
+  })
+
+  .on("click","#btn-add-so",function(){
+    <% @item = nil %>
+    $("#message-so-blank").hide();
+    $("#event-so-number").append(`<%= render "so_number_form" %>`);
+  })
+  .on("click",".btn-delete-so",function(){
+    $(this).parents(".nested_fields").remove();
+    if ($(".so_number").length == 0) {
+      $("#message-so-blank").show();
+    }
+  })
+    
+    
+  .on("click","#btn-add-vendor",function(){
+    <% @item = nil %>
+    $("#message-vendor-blank").hide();
+    $("#event-vendors").append(`<%= render "event_vendor_form" %>`);
+  })
+  .on("click",".btn-delete-vendor",function(){
+    $(this).parents(".nested_field_vendors").remove();
+    if ($(".vendor_name").length == 0) {
+      $("#message-vendor-blank").show();
+    }
+  })
+  .on("click","#event_need_vendor",function() {
+    if($("#event_need_vendor:checked").length > 0){
+        $(".event-vendor").show();
+
+    }else{
+        $(".event-vendor").hide();
+    }
+  })    
+  ;
+</script>
+<% end %>

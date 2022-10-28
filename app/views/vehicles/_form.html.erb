@@ -1,0 +1,301 @@
+<% tab = 0 %>
+
+  <ul class="rounded" id="tabbed">
+    <li><a id="link_<%=tab+=1%>" href="">Data Kendaraan</a></li>
+    <li><a id="link_<%=tab+=1%>" href="">Tanggal Penting</a></li>
+    <li><a id="link_<%=tab+=1%>" href="">Target Ban</a></li>
+    <% if @vehiclelogs %><li><a id="link_<%=tab+=1%>" href="">Data Histori</a></li><% end %>    
+  </ul>
+
+  <br class="clearfix" />
+
+<% tab = 0 %>
+  <div id="sliding_window">
+    <div class="sliding_container">
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+      <%= form_for(@vehicle) do |f| %>
+
+    	<div class="field-row first">
+        <%= f.label :current_id, "No Pol" %>
+        <%= f.text_field :current_id, :class => 'half left', :required => true %>
+        <%= f.label :previous_id, "Lama", :class => 'middle' %>
+        <%= f.text_field :previous_id, :class => 'half left' %>
+    	</div>
+        
+      <div class="field-row">
+        <%= f.label :office_id, "Kantor" %>
+        <%= f.select :office_id, options_for_select(Office.where(:deleted => false).order('id ASC').collect {|g| [g.name, g.id]}, @vehicle.office_id), {}, :class => 'half chzn-select', :required => true%>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :year_made, "Thn. Kendaraan" %>
+        <%= f.text_field :year_made, :class => 'half left', :required => true %>
+        <%= f.label :vehicle_type, "Tipe", :class => 'middle' %>
+        <%= f.text_field :vehicle_type, :class => 'half left', :required => true %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :registration, "No STNK" %>
+        <%= f.text_field :registration, :class => 'half left', :required => true %>
+        <%= f.label :machine_serial, "No Mesin", :class => 'middle' %>
+        <%= f.text_field :machine_serial, :class => 'half left' %>
+      </div>            
+
+      <div class="field-row">
+        <%= f.label :vehiclegroup_id, "Grup" %>
+        <%= f.select :vehiclegroup_id, options_for_select(Vehiclegroup.all.collect {|g| [g.name, g.id]}, @vehicle.vehiclegroup_id), {}, :class => 'half left' %>
+        <%= f.label :vehicleincentivegroup_id, "Insentif", :class => 'middle' %>
+        <%= f.select :vehicleincentivegroup_id, options_for_select(Vehicleincentivegroup.all.collect {|g| [g.name, g.id]}, @vehicle.vehicleincentivegroup_id), {:include_blank => 'Normal'}, :class => 'half' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :skel_bar_serial, "Rangka #1" %>
+        <%= f.text_field :skel_bar_serial, :class => 'half left' %>
+        <%= f.label :skel_bar_serial_2, "Rangka #2", :class => 'middle' %>
+        <%= f.text_field :skel_bar_serial_2, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :tank_capacity, "Kapasitas Tangki" %>
+        <%= f.text_field :tank_capacity, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+        <%= f.label :tire_size, "Ukuran Ban", :class => 'middle' %>
+        <%= f.text_field :tire_size, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :gas_capacity, "Solar" %>
+        <%= f.text_field :gas_capacity, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+        <strong>Liter</strong>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :gas_leftover, "Gantungan" %>
+        <%= f.text_field :gas_leftover, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+        <strong>Liter</strong>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :tank_type, "Jenis Truk" %>
+        <select name="vehicle[platform_type]" class="half left ">
+            <option value="">-- Jenis Truk --</option>
+            <option value="Platform" <% if @vehicle.platform_type == "Platform"%> selected="selected" <% end %>>Platform</option>
+            <option value="Tangki" <% if @vehicle.platform_type == "Tangki"%> selected="selected" <% end %>>Tangki</option>
+            <option value="Multifungsi" <% if @vehicle.platform_type == "Multifungsi"%> selected="selected" <% end %>>Multifungsi</option>
+            <option value="Box" <% if @vehicle.platform_type == "Box"%> selected="selected" <% end %>>Box</option>
+            <option value="Flatbed" <% if @vehicle.platform_type == "Flatbed"%> selected="selected" <% end %>>Flatbed</option>
+            <option value="Threeway" <% if @vehicle.platform_type == "Threeway"%> selected="selected" <% end %>>Threeway</option>
+            <option value="DropSide" <% if @vehicle.platform_type == "DropSide"%> selected="selected" <% end %>>DropSide</option>
+            <option value="LossBak" <% if @vehicle.platform_type == "LossBak"%> selected="selected" <% end %>>LossBak</option>
+        </select>
+      </div>
+        
+      <div class="field-row">
+        <%= f.label :tank_type, "Jenis Tangki" %>
+        <select name="vehicle[tank_type]" class="half left ">
+            <option value="">-- Jenis Tangki --</option>
+            <option value="Besi" <% if @vehicle.tank_type == "Besi"%> selected="selected" <% end %>>Besi</option>
+            <option value="Stainless" <% if @vehicle.tank_type == "Stainless"%> selected="selected" <% end %>>Stainless</option>
+        </select>
+        <%= f.label :plat_type, "Jenis Plat", :class => 'middle' %>
+        <select name="vehicle[plat_type]" class="half  ">
+            <option value="">-- Jenis Plat --</option>
+            <option value="Hitam" <% if @vehicle.plat_type == "Hitam"%> selected="selected" <% end %>>Hitam</option>
+            <option value="Kuning" <% if @vehicle.plat_type == "Kuning"%> selected="selected" <% end %>>Kuning</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :tire_target, "Target Ban" %>
+        <%= f.text_field :tire_target, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :gps_number, "No. GPS Tracking" %>
+        <%= f.text_field :gps_number, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :description, "Keterangan" %>
+        <%= f.text_area :description %>
+      </div>
+
+      <div class="actions">
+        <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Operasional, Admin Kendaraan' %>
+        <a class="back left" href="<%=vehicles_path%>">Kembali ke Index</a>
+      </div>
+
+      <% end %>
+
+      <% if @vehicle %>
+
+      <h3 class="zone">Upload Gambar</h3>
+
+      <% if @vehicle.images.any? %>
+      
+      <% img = @vehicle.images.first %>
+      <%= image_tag img.file.thumb('180x180').url(:suffix => "/#{img.name}") if img.file_uid %>
+      <br /><%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + @vehicle.images.first.id.to_s %>
+
+      <% else %>
+
+      <form action="/attachments/upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+        <input type="hidden" name="model_name" value="Vehicle" />
+        <input type="hidden" name="item_id" value="<%=@vehicle.id%>" />
+
+      <div class="field-row">
+        <label for="name">Nama</label>
+        <input type="text" name="attachment[name]" />
+      </div>
+
+      <div class="field-row continue">
+        <label for="file">Browse File</label>
+        <input type="file" name="attachment[file]" />
+      </div>
+
+      <div class="actions">
+        <input type="submit" value="Simpan File" />
+      </div>
+
+      </form>
+
+      <% end %>
+
+      <% end %>
+
+    </div>
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+      <%= form_for(@vehicle) do |f| %>
+
+      <p><br />Mohon memasukan tanggal-tanggal untuk pengecekan selanjutnya.</p>
+
+      <div class="field-row first">
+        <%= f.label :id_expiry, "No Pol" %>
+        <%= f.text_field :id_expiry, :class => 'half date-picker' %>
+        <span>(tgl/bln/thn)</span>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :next_checkup_date, "Kir" %>
+        <%= f.text_field :next_checkup_date, :class => 'half date-picker' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :next_checkup_date_second, "Kir 2" %>
+        <%= f.text_field :next_checkup_date_second, :class => 'half date-picker' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :next_registration_date, "STNK" %>
+        <%= f.text_field :next_registration_date, :class => 'half date-picker' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :next_tax_date, "Pajak" %>
+        <%= f.text_field :next_tax_date, :class => 'half date-picker' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :siup, "SIUP" %>
+        <%= f.text_field :siup, :class => 'half date-picker' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :next_tera_date, "TERA" %>
+        <%= f.text_field :next_tera_date, :class => 'half date-picker' %>
+      </div>
+
+      <div class="actions">
+        <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Operasional, Admin Kendaraan' %>
+        <a class="back left" href="<%=vehicles_path%>">Kembali ke Index</a>
+      </div>
+
+      <% end %>
+
+    </div>
+
+    <% if !params[:id].nil? %>
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+      <form action="/tirebudgets/updateitems" method="post">
+        <input type="hidden" name="vehicle_id" value="<%=@vehicle.id%>" />
+
+        <!-- <div class="field-row">
+          <label style="float:none;">Nama Jurusan</label>
+          <strong><%#=@route.name%></strong>
+        </div>
+        <br /> -->
+
+        <table class="row-view">
+          <tr>
+            <th width="250">&nbsp;</th>
+            <th width="150" class="right">Budget Ban</th>
+            <th></th>
+          </tr>
+
+          <% @vehicle.tirebudgets.order(:productgroup_id).each do |tirebudget| %>
+          <tr>
+            <td><%=tirebudget.productgroup.name%></td>
+            <td><input type="text" name="budget[<%=tirebudget.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=tirebudget.budget.to_i%>" /></td>
+            <td></td>
+          </tr>
+          <% end %>
+
+        </table>
+
+        <div class="actions">
+          <% if checkrole 'Admin Operasional, Admin Kendaraan' %>
+          <input type="submit" value="Simpan Budget Ban" />
+          <% end %>
+        </div>
+
+      </form>
+
+    </div>
+
+    <% end %>
+
+    <% if @vehiclelogs %>
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+      <br />
+
+      <table class="row-view">
+        <tr>
+          <th width="80">Tanggal</th>
+          <th>Keterangan</th>
+          <th width="80">Ready</th>
+          <th width="80">Rusak</th>
+        </tr>
+
+        <% @vehiclelogs.each do |vehiclelog| %>
+        <tr>
+          <td><%=vehiclelog.created_at.strftime('%d-%m-%Y')%></td>
+          <td><%=nl2br(vehiclelog.description).html_safe if !vehiclelog.description.nil?%></td>
+          <% if vehiclelog.ready %>
+          <td><i class="icon-ok-sign enabled"></i></td>
+          <% else %>
+          <td><i class="icon-remove-sign disabled"></i></td>
+          <% end %>
+          <% if vehiclelog.broken %>
+          <td><i class="icon-ok-sign enabled"></i></td>
+          <% else %>
+          <td><i class="icon-remove-sign disabled"></i></td>
+          <% end %>
+        </tr>
+        <% end %> 
+      
+      </table>
+
+    </div>
+
+    <% end %>
+
+  </div>
+</div>
+

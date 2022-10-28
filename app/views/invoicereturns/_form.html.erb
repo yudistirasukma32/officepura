@@ -1,0 +1,190 @@
+<% if @invoice %>
+
+<%= form_for(@invoice) do |f| %>
+
+  <div class="info-box" style="margin-bottom:30px;">  
+
+    <h3>Bukti Kas Keluar #<%=zeropad(@invoice.id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Tanggal</td>
+        <td><%=@invoice.date.strftime('%d-%m-%Y')%>&nbsp;(KTR: <%=@invoice.office.name%>)</td>
+      </tr>
+      <tr>
+        <td>Pelanggan</td>
+        <td><%=@invoice.customer.name%></td>
+      </tr>
+      <tr>
+          <td>Jurusan</td>
+          <td><strong><%=@invoice.quantity%></strong> Rit: <%=@invoice.route.name%></td>
+      </tr>
+    <tr>
+        <td>Tipe</td>
+        <td><%=@invoice.route.routegroup.name%></td>
+    </tr>
+    <tr>
+        <td>Kendaraan</td>
+        <td><%=@invoice.vehicle.current_id%>&nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+    </tr>
+        
+    <% if @invoice.isotank_id != 0 %>
+    <tr>
+        <td>No. Isotank</td>
+        <td id="strIsotank"><%=@invoice.isotank.isotanknumber%></td>
+    </tr>
+    <% end %>
+    <% if @invoice.container_id != 0 %>
+    <tr>
+        <td>No. Kontainer</td>
+        <td id="strContainer"><%=@invoice.container.containernumber rescue nil%></td>
+    </tr>
+    <% end %>
+        
+      <tr>
+        <td>Supir</td>
+        <td><%=@invoice.driver.name%> (<%=zeropad(@invoice.driver.id)%>)<br/><% if !@invoice.driver.helpers.first.nil? %>(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
+      </tr>
+    </table>
+
+    <table class="row-view">
+      <tr>
+        <th width="90">Keterangan</th>
+        <th>&nbsp;</th>
+        <th width="100" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr>
+        <td><label for="invoice_driver_allowance">UM Supir</label></td>
+        <td>&nbsp;</td>
+        <td><input type="text" id="invoice_driver_allowance" name="invoice_driver_allowance" class="half disabled allowance-field" value="<%=to_currency(@invoice.driver_allowance)%>" readonly="true" /></td>
+      </tr>
+
+      <tr>
+        <td><label for="invoice_helper_allowance">UM Kernet</label></td>
+        <td>&nbsp;</td>
+        <td><input type="text" id="invoice_helper_allowance" name="invoice_helper_allowance" class="half disabled allowance-field" value="<%=to_currency(@invoice.helper_allowance)%>" readonly="true" /></td>
+      </tr>
+
+      <tr>
+        <td><label for="invoice_misc_allowance">Lain - lain</label></td>
+        <td>&nbsp;</td>
+        <td><input type="text" id="invoice_misc_allowance" name="invoice_misc_allowance" class="half disabled allowance-field" value="<%=to_currency(@invoice.misc_allowance)%>" readonly="true" /></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :gas_allowance, "Solar *" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :gas_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.gas_allowance), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :ferry_fee, "Penyebrangan" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :ferry_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.ferry_fee), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :tol_fee, "Tol" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :tol_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.tol_fee), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :premi_allowance, "Premi" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :premi_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.premi_allowance), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr class="total-row">
+        <td><%= f.label :total, "Total" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.total), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td colspan="3"><span id="invoice_gas_detail">* Ket Solar: (<%=@invoice.gas_litre+@invoice.gas_voucher+@invoice.gas_leftover%> - <%=@invoice.gas_voucher%> (B) - <%=@invoice.gas_leftover%> (G) = <%=@invoice.gas_litre%> liter @ <%=@invoice.gas_cost%>)</span></td>
+      </tr>
+    </table>
+
+  </div>
+
+  <% end %>
+
+<%= form_for(@invoicereturn) do |f| %>
+
+  <%= f.hidden_field :process, :value => 'create' %>
+  <%= f.hidden_field :invoice_id, :value => @invoice_id %>
+
+  <div class="field-row first" style="margin-bottom:-20px;">
+    <label for="invoicereturn_quantity">Jumlah</label>
+    <select id="invoicereturn_quantity" name="invoicereturn[quantity]" class="half chzn-select" onchange="javascript:changeDriverAllowance(this.value);">
+      <% @count_sj = @invoice.taxinvoiceitems.where("money(total) > money(0) and deleted = false").count
+          @count = @invoice.quantity.to_i - @count_sj
+       %>
+      <% (1..@count).each do |i| %>
+      <option value="<%=i%>"><%=i%> Rit</option>
+      <% end %>
+    </select>  
+    <span> / &nbsp;<%=@invoice.quantity%></span>
+    <div class="field-row continue">
+      <%= f.label :date, "Tanggal" %>
+      <%= f.text_field :date, :class => 'half date-picker', :value => @date %>
+    </div>
+    <div class="field-row continue">
+      <%= f.label :driver_allowance, "UM Supir" %>
+      <%= f.text_field :driver_allowance, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => (@invoice.driver_allowance / @invoice.quantity).to_i %>
+      <span>/ &nbsp;<%=to_currency(@invoice.driver_allowance, 'Rp. ')%></span>
+      <input type="hidden" id="invoicereturn_price_per" name="invoicereturn_price_per" value="<%=@invoice.driver_allowance / @invoice.quantity%>" />
+      <input type="hidden" id="invoicereturn_max_allowance" name="invoicereturn_max_allowance" value="<%=@invoice.driver_allowance%>" />
+    </div>
+    <div class="field-row continue">
+      <%= f.label :helper_allowance, "UM Kernet" %>
+      <%= f.text_field :helper_allowance, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => (@invoice.helper_allowance / @invoice.quantity).to_i %>
+      <span>/ &nbsp;<%=to_currency(@invoice.helper_allowance, 'Rp. ')%></span>
+      <input type="hidden" id="invoicereturn_helper_trip" name="invoicereturn_helper_trip" value="<%=@invoice.helper_allowance / @invoice.quantity%>" />
+    </div>
+    <div class="field-row continue">
+      <%= f.label :misc_allowance, "Lain-lain" %>
+      <%= f.text_field :misc_allowance, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => (@invoice.misc_allowance / @invoice.quantity).to_i %>
+      <span>/ &nbsp;<%=to_currency(@invoice.misc_allowance, 'Rp. ')%></span>
+       <input type="hidden" id="invoicereturn_misc_per" name="invoicereturn_price_per" value="<%=@invoice.misc_allowance / @invoice.quantity%>" />
+    </div>
+    <div class="field-row continue">
+      <%= f.label :premi_allowance, "Premi" %>
+      <%= f.text_field :premi_allowance, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => (@invoice.premi_allowance / @invoice.quantity).to_i %>
+      <span>/ &nbsp;<%=to_currency(@invoice.premi_allowance, 'Rp. ')%></span>
+      <input type="hidden" id="invoicereturn_premi_per" name="invoicereturn_premi_per" value="<%=@invoice.premi_allowance / @invoice.quantity%>" />
+    </div>
+    <div class="field-row continue">
+      <%= f.label :ferry_fee, "Penyebrangan" %>
+      <%= f.text_field :ferry_fee, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => (@invoice.ferry_fee / @invoice.quantity).to_i %>
+      <span>/ &nbsp;<%=to_currency(@invoice.ferry_fee, 'Rp. ')%></span>
+      <input type="hidden" id="invoicereturn_ferry_per" name="invoicereturn_ferry_per" value="<%=@invoice.ferry_fee / @invoice.quantity%>" />
+    </div>
+    <div class="field-row continue">
+      <%= f.label :tol_fee, "Tol" %>
+      <%= f.text_field :tol_fee, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => (@invoice.tol_fee / @invoice.quantity).to_i %>
+      <span>/ &nbsp;<%=to_currency(@invoice.tol_fee, 'Rp. ')%></span>
+      <input type="hidden" id="invoicereturn_tol_per" name="invoicereturn_tol_per" value="<%=@invoice.tol_fee / @invoice.quantity%>" />
+    </div>
+    <div class="field-row continue">
+      <%= f.label :gas_leftover, "Gantungan" %>
+      <%= f.text_field :gas_leftover, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => (@invoice.gas_litre+@invoice.gas_voucher+@invoice.gas_leftover) / @invoice.quantity %>
+      <strong>Liter</strong><p style="margin-left:120px;">(Data Gantungan No Pol - <%=@invoice.vehicle.current_id%> - akan disesuaikan)</p>
+      <input type="hidden" id="invoicereturn_gas_per" name="invoicereturn_gas_per" value="<%=(@invoice.gas_litre+@invoice.gas_voucher+@invoice.gas_leftover) / @invoice.quantity%>" />
+    </div>
+
+    
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'submit' %>
+    <a class="back" href="<%=invoicereturns_path()%>">Kembali ke Index</a>
+  </div>
+
+<% end %>
+
+
+
+<% end %>

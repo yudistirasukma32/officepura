@@ -1,0 +1,71 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main" class="dashboard">
+
+	<div id="content-full">
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Dashboard<br /><span class="red"><%=@date.to_date.strftime('%B %Y')%></span></h1>
+
+		<div class="row">
+			<div class="widget blue small-widget">
+				<ul>
+					<li class="head"><a href="/customers"><i class="icon-user"></i><br /><h3>Pelanggan</h3></a></li>
+					<li class="footer grey"><%=@customer%></li>
+				</ul>
+			</div>
+
+			<div class="widget blue small-widget">
+				<ul>
+					<li class="head"><a href="/suppliers"><i class="icon-user"></i><br /><h3>Supplier</h3></a></li>
+					<li class="footer grey"><%=@supplier%></li>
+				</ul>
+			</div>
+			<div class="widget blue small-widget">
+				<ul>
+					<li class="head"><a href="/drivers"><i class="icon-user"></i><br /><h3>Supir</h3></a></li>
+					<li class="footer grey"><%=@driver%></li>
+				</ul>
+			</div>
+			<div class="widget blue small-widget">
+				<ul>
+					<li class="head"><a href="/staffs"><i class="icon-user"></i><br /><h3>Staff</h3></a></li>
+					<li class="footer grey"><%=@staff%></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="widget blue small-widget">
+				<ul>
+					<li class="head"><a href="/products"><i class="icon-tags"></i><br /><h3>Stok Barang</h3></a></li>
+					<li class="footer grey"><%=@product%></li>
+				</ul>
+			</div>
+
+			<div class="widget blue small-widget">
+				<ul>
+					<li class="head"><a href="/customers"><i class="icon-road"></i><br /><h3>Jurusan</h3></a></li>
+					<li class="footer grey"><%=@route%></li>
+				</ul>
+			</div>
+
+			<div class="widget blue small-widget">
+				<ul>
+					<li class="head"><a href="/vehicles"><i class="icon-truck"></i><br /><h3>Kendaraan</h3></a></li>
+					<li class="footer grey"><%=@vehicle%></li>
+				</ul>
+			</div>
+
+			<div class="widget blue small-widget">
+				<ul>
+					<li class="head"><a href="/productsales"><i class="icon-tags"></i><br /><h3>Barang Bekas</h3></a></li>
+					<li class="footer grey"><%=@productsale%></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,22 @@
+  <div class="field-row">
+    <%= f.label :ship_name, "Nama Kapal" %>
+    <%= f.text_field :ship_name %>
+  </div>  
+
+  <div class="field-row">
+    <%= f.label :quantity, "Jumlah" %>
+    <%= f.text_field :quantity, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+    <strong>Rit</strong>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :driver_allowance, "Sangu" %>
+    <%= f.text_field :driver_allowance, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+    <%= f.label :gas_allowance, "Solar", :class => 'middle' %>
+    <%= f.text_field :gas_allowance, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Simpan Data", :class => 'left' %>
+    <a class="back left" href="<%=invoices_path%>">Kembali</a>
+  </div>

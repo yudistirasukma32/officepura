@@ -1,0 +1,149 @@
+
+<style>
+
+.danger {
+  background-image: linear-gradient(#e61818, #a61111) !Important;
+  border-color: #a61111 #a61111 #961010 !Important;
+}
+
+.mini {
+  padding: 4px 8px !Important;
+  font-size: 0.75rem !Important;
+}
+
+.update-box img {
+  max-width: 280px;
+  width: 100%;
+}
+
+</style>
+
+<div style="float: left; width: 600px;">
+<%= form_for(@customer) do |f| %>
+	<div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :email, "Email" %>
+    <%= f.text_field :email %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :address, "Alamat" %>
+    <%= f.text_field :address %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :city, "Kota" %>
+    <%= f.text_field :city %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :contact, "Nama Kontak" %>
+    <%= f.text_field :contact %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :phone, "No. Telp" %>
+    <%= f.text_field :phone, :class => 'half left' %>
+    <%= f.label :mobile, "No. HP", :class => 'middle' %>
+    <%= f.text_field :mobile, :class => 'half left' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :fax, "No. Fax" %>
+    <%= f.text_field :fax, :class => 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :npwp, "NPWP" %>
+    <%= f.text_field :npwp, :class => 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :terms_of_payment_in_days, "Batas Hutang" %>
+    <%= f.text_field :terms_of_payment_in_days, :class => 'half' %>
+    <span>Hari</span>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :wholesale_price, "Tarif Borongan" %>
+    <%= f.text_field :wholesale_price, :class => 'half', :onkeypress => "javascript:return isNumberKey(this);", :readonly => !current_user.owner %>
+    <% if !current_user.owner %>&nbsp; <i class="icon-lock red"></i><% end %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Keuangan, Admin Marketing, Marketing' %>
+    <a class="back left" href="<%=customers_path%>">Kembali ke Index</a>
+  </div>
+<% end %>
+</div>
+
+
+<div class="update-box" style="padding-top: 0; border-top: none;">
+<h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment</h3>
+
+<% if @customer.images.any? %>
+
+<ul style="margin-left: 0; padding-left: 0;">
+
+  <% @customer.images.each do |img| %>
+
+    <% if img.file_uid.present? %>
+
+    <li style="margin-bottom: 2.5rem; list-style: none;">
+
+      <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+
+      <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+      
+        <a href="<%= img.file.url() %>" target="_blank">
+            <%= image_tag img.file.url(:suffix => "/#{img.name}") if img.file_uid %>
+        </a>
+      
+      <% else %>
+      
+        <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid).truncate(40) %></a>
+      
+      <% end %>
+
+      <br /><br /><br /><%= link_to 'Hapus File'.html_safe, '/attachments/remove/'+ img.id.to_s, class: "btn-txt danger mini" %>
+
+      </li>          
+    <% end %>
+
+  <% end %>
+
+<% end %>
+
+</ul>
+
+<br />
+
+<form action="/attachments/upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+  <input type="hidden" name="model_name" value="Customer" />
+  <input type="hidden" name="item_id" value="<%=@customer.id%>" />
+
+<div class="field-row" style="width: 300px;">
+  <label for="name">Nama</label>
+  <input type="text" name="attachment[name]" style="width: 300px;"/>
+</div>
+
+<div class="field-row continue" style="width: 300px;">
+  <label for="file">Browse File</label>
+  <input type="file" name="attachment[file]"/>
+</div>
+
+<div class="actions">
+  <input type="submit" value="Simpan File" />
+</div>
+
+</form>
+</div>

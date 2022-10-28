@@ -1,0 +1,75 @@
+<% if @invoice %>
+
+<form id="incentives" name="incentives" action="/incentives/updateitems" method="post">
+  <input type="hidden" id="process" name="incentives[process]" value="create" />
+  <input type="hidden" id="invoice_id" name="incentives[invoice_id]" value="<%=@invoice.id%>" />
+  <input type="hidden" id="price_per" name="incentives[price_per]" value="<%=@invoice.price_per%>" />
+  <input type="hidden" id="receipt_new" name="receipt_new" value="<%=@receipt_new%>" />
+  
+  <div class="info-box" style="margin-bottom:30px;">  
+
+    <h3>Bukti Kas Keluar #<%=zeropad(@invoice.id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Tanggal</td>
+        <td><%=@invoice.created_at.strftime('%d-%m-%Y')%> &nbsp;(KTR: <%=@invoice.office.name%>)</td>
+      </tr>
+      <tr>
+        <td>Pelanggan</td>
+        <td><%=@invoice.customer.name%></td>
+      </tr>
+      <tr>
+        <td>Jurusan</td>
+        <td><strong><%=@invoice.quantity%></strong> Rit: <%=@invoice.route.name%></td>
+      </tr>
+      <tr>
+        <td>Tipe</td>
+        <td><%=@invoice.route.routegroup.name%></td>
+      </tr>
+      <tr>
+        <td>Kendaraan</td>
+        <td><%=@invoice.vehicle.current_id%>&nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+      </tr>
+      <tr>
+        <td>Supir</td>
+        <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="field-row" style="margin-bottom:20px;">
+      <% qty = @invoice.quantity %>
+      <% qty -= @invoice.receiptreturns.where(:deleted => false).sum(:quantity) if @invoice.receiptreturns.where(:deleted => false).any? %>
+      <% bonus_total = qty.to_i * @invoice.route.bonus %>
+
+    <div style="border:3px dotted grey; padding: 0.5rem 1rem; background: white;">
+
+      <label>Insentif ID</label>
+      <input type="checkbox" id="is_premi" name="is_premi" <% if @receipt.description.blank? %> checked="true" <% end %>  /> 
+      
+      <div class="field-row continue">
+        <label for="incentive_quantity">Jumlah</label>
+        <input type="text" id="quantity" name="incentives[quantity]" class="half" readonly="true" value="<%= qty%>" />
+        <span> / &nbsp;@ <%=to_currency(@invoice.route.bonus)%></span>
+      </div>
+      
+      <div class="field-row continue" id="div_totalbonus" style="padding-bottom:20px;">
+        <label for="incentive_totalbonus">Insentif</label>
+        <input type="text" id="totalbonus" name="incentives[totalbonus]" class="half" onkeypress="javascript:return isNumberKey(this);" <% if @receipt.total > 0 %> value="<%=(@receipt.total).to_i%>" <% else %> value="<%=bonus_total.to_i%>" <% end %> />    
+        <strong>Rupiah</strong>
+        <input type="hidden" id="bonus_route" name="bonus_route" value="<%=@invoice.route.bonus%>" />
+      </div>
+
+      <div class="field-row" id="div_description">
+        <label for="description">Keterangan</label>
+        <input type="text" id="description" name="incentives[description]" style="width:350px;" value="<%= @receipt.description%>" />
+      </div>
+
+    </div>
+      
+  </div>
+  
+</form>
+
+<% end %>

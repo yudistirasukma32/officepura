@@ -1,0 +1,31 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Transaksi / <a href="<%=invoicereturns_path%>">Bukti Kas Masuk Kereta</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<%= render "sublinktrain", :sublink => 1 %>
+		
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date">Pilih Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<%= render "showtable", :train => true %>
+		<br class="clearfix" />
+
+	</div>
+
+</div>

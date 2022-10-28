@@ -1,0 +1,137 @@
+<style type="text/css">
+	.headsignature {margin-top:0px;margin-left: 250px;}
+
+	@media print{
+		@page { margin-top:120px;margin-bottom:120px; }
+		.d-none-print {
+			display: none;
+		}
+	}
+</style>
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+
+<div id="main">
+	
+	<div id="content-full" class="invoice-paper">
+		<a  class="btn-txt cancel hideprint" href="<%=taxinvoices_path({:customer_id => $globalCustomer_id, :month => $globalMonth, :year => $globalYear})%>"><i class="icon-remove"></i> Batal</a>
+ 
+		<% if !@taxinvoice.nil? %>
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print Kwitansi</a>
+		<a style="display: none;" class="print btn-txt btn-green" href="/taxinvoices/downloadexcel/<%=@taxinvoice.id%>"><i class="icon-file"></i> Excel</a>
+
+		<h1 class="hideprint"><%=Setting.find_by_name("Client Name").value%> / Kwitansi</h1>
+		<% if @taxinvoice.price_tax > 0 %>
+			<div class="row continue d-none-print" style="float: right;">
+				<input type="checkbox" id="chk_price_tax_print" name="price_tax" value="Yes" /> &nbsp; <h4 style="display: inline-block">PPH Tidak dihitung</h4>
+			</div>
+		<% end %>
+		<br /><br />
+		<p style="line-height: 2; margin-left: 1rem;" class="showprint"><strong>PT RAJAWALI DWI PUTRA INDONESIA</strong> 
+		<br/>Jl. LetJend Sutoyo No. 110 - 112, Sidoarjo 61256 
+		<br/>Telp. 031- 8531668 (Hunting) Fax. 031- 8535114 
+		<br/>E-Mail : <%= current_user.staff_id.nil? ? 'info@rdpitrans.com' : current_user.staff.email %></p>
+        
+        <span class="showprint"><hr/></span>
+		<br />
+
+		<div style="border: 2px solid #000000; padding: 0.25rem 0.5rem; width: fit-content;">
+		<p style="padding: 0; margin: 0.5rem 0;"><strong>KWITANSI No : <%=@taxinvoice.long_id%></strong></p>
+		</div>
+
+		<br/>
+
+		<div class="field-row continue">
+			<label class="left" style="width: 120px;">Sudah diterima dari</label>
+  			<input style="font-weight: bold;" type="text" class="disabled left" value=":  <%=@taxinvoice.customer.name%>" />
+		</div>
+
+		<div class="field-row continue">
+			<label class="left" style="width: 120px;">Banyaknya Uang</label>
+  			<input type="text" class="disabled left" value=":  <%=@taxinvoice.total_in_words%>" />
+		</div>
+
+		<div class="field-row continue">
+			<label class="left" style="width: 120px;">Untuk Pembayaran</label>
+			<input type="text" class="disabled left" value=":  Jasa Angkutan" />
+		</div>
+ 
+		<div class="field-row continue">
+			<label class="left" style="width: 120px; font-weight: bold;">Jumlah</label>
+			<input style="font-weight: bold;" type="text" class="disabled left" id="txt_total" value=":  Rp <%= @is_pembulatan ? to_currency(@taxinvoice.total) : to_currency_bank(@taxinvoice.total)%>" /> 
+		</div>
+
+		<br/><br/>
+		<div style="width: 100%; height: 130px;"></div>
+
+		<div class="showprint" style="width: 50%; float: left;" > 
+		<div class="field-row continue">
+			<label class="left" style="width: 500px;">Pembayaran ditransfer ke</label> 
+		</div>
+
+		<div class="field-row continue">
+			<label class="left" style="width: 120px; font-weight: bold;">No. Rek</label>
+			<input style="font-weight: bold;" type="text" class="disabled left" value=":  333 - 84 - 88888" />
+		</div>
+
+		<div class="field-row continue">
+			<label class="left" style="width: 120px; font-weight: bold;">Bank</label>
+			<input style="font-weight: bold;" type="text" class="disabled left" value=":  BNI Cabang Graha Pangeran Surabaya" />
+		</div>
+
+		<div class="field-row continue">
+			<label class="left" style="width: 120px; font-weight: bold;">Atas Nama</label>
+			<input style="font-weight: bold;" type="text" class="disabled left" value=":  PT. RAJAWALI DWIPUTRA INDONESIA" />
+		</div>
+
+		<div class="field-row continue">
+			<label class="left" style="width: 500px;">Pembayaran dianggap lunas setelah kami uangkan.</label> 
+		</div> 
+		</div>
+
+		<div style="width: 30%; float: left; margin-left: 20%;" >
+		<table class="row-view no-border showprint" style="border:0; width:75%; margin: 0 auto;">
+			<tr>
+				<th width="" style="text-align: center; font-size: 13px; color: #000;">Surabaya, <%=@taxinvoice.date.strftime('%d %B %Y')%></th>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+            <tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td style="text-align:center"><%= current_user.staff_id.nil? ? current_user.username : current_user.staff.name %></td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
+		</div>
+
+ 
+  		<% end %>
+	</div>
+
+</div>
+
+
+<%= content_for :js do %>
+	<script>
+		grandtotal = `<%= @is_pembulatan ? to_currency(@taxinvoice.total) : to_currency_bank(@taxinvoice.total)%>`;
+		pph = `<%= to_currency_bank(0 - @taxinvoice.price_tax)%>`;
+		grandtotal_no_tax = `<%= to_currency_bank(@taxinvoice.total + @taxinvoice.price_tax) %>`;
+		$(document).ready(function() {
+			
+		})
+		.on("change","#chk_price_tax_print",function() {
+			if($(this).is(":checked")){
+				$("#txt_total").val(":  Rp "+grandtotal_no_tax);
+			}else{
+				$("#txt_total").val(":  Rp "+grandtotal);
+			}
+		})
+		;
+	</script>
+<% end %>

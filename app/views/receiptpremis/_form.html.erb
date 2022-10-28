@@ -1,0 +1,64 @@
+<% if @invoice && @bonusreceipt %>
+	<%= form_for(@receiptpremi) do |f| %>
+		<%= f.hidden_field :process, :value => 'create' %>
+  		<%= f.hidden_field :invoice_id, :value => @invoice.id %>
+
+  		 <% if @errors.include?'receiptpremi' %>
+	      <div class="field-row red">
+	        <%=@errors['receiptpremi']%>
+	      </div>
+	    <% end %>
+
+  		<div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
+  			<h3>Bukti Kas Keluar #<%=zeropad(@invoice.id)%></h3>
+
+  			<table class="row-view no-border">
+				<tr>
+			        <td width="90">Tanggal</td>
+			        <td><%=@invoice.date.strftime('%d-%m-%Y')%>&nbsp;(KTR: <%=@invoice.office.name%>)</td>
+			    </tr>
+			    <tr>
+			        <td>Pelanggan</td>
+			        <td><%=@invoice.customer.name%></td>
+			    </tr>
+		        <tr>
+			        <td>Jurusan</td>
+			        <td><strong><%=@bonusreceipt.quantity%></strong> Rit: <%=@invoice.route.name%></td>
+	     	    </tr>
+	     	    <tr>
+		          <td>Tipe</td>
+		          <td><%=@invoice.route.routegroup.name%></td>
+		        </tr>
+			    <tr>
+			        <td>Kendaraan</td>
+			        <td><%=@invoice.vehicle.current_id%>&nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+			    </tr>
+			    <tr>
+			        <td>Supir</td>
+			        <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
+      			</tr>       			   
+  			</table>
+
+  			<table class="row-view">
+  				<tr>
+	  				<th width="90">Keterangan</th>
+			        <th>&nbsp;</th>
+			        <th width="160" class="right" style="padding-right:5px;">Total</th>
+		    	</tr>
+		    	<tr>
+		    		<td>Premi</td>
+		    		<td>&nbsp;</th>
+		    		<td class="half allowance-field"><%= to_currency(@bonusreceipt.total)%></td>
+		    	</tr>
+		    	<tr class="total-row">
+			        <td><%= f.label :total, "Total" %></td>
+			        <td>&nbsp;</td>
+			        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@bonusreceipt.total), :readOnly => 'true' %></td>
+			    </tr>
+  			</table>
+  			<div class="field-row continue">
+		      <%= f.submit "Tambah Data", :class => 'submit right' %>    
+		    </div>
+  		</div>
+	<% end %>
+<% end %>

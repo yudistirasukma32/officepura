@@ -1,0 +1,205 @@
+<% tab = 0 %>
+
+  <ul class="rounded" id="tabbed">
+    <li><a id="link_<%=tab+=1%>" href="">Data Supir</a></li>
+    <% if @helper %><li><a id="link_<%=tab+=1%>" href="">Data Kernet</a></li><% end %>
+  </ul>
+
+  <br class="clearfix" />
+
+<% tab = 0 %>
+  <div id="sliding_window">
+    <div class="sliding_container">
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+    <%= form_for(@driver) do |f| %>
+    	<div class="field-row first">
+        <%= f.label :name, "Nama" %>
+        <%= f.text_field :name %>
+    	</div>
+
+      <div class="field-row">
+        <%= f.label :address, "Alamat" %>
+        <%= f.text_field :address %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :city, "Kota" %>
+        <%= f.text_field :city %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :bank_account, "No. Rekening" %>
+        <%= f.text_field :bank_account %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :phone, "No. Telp" %>
+        <%= f.text_field :phone, :class => 'half left' %>
+        <%= f.label :mobile, "No. HP", :class => 'middle' %>
+        <%= f.text_field :mobile, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :emergency_number, "No. Telp Darurat" %>
+        <%= f.text_field :emergency_number, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :driver_licence, "SIM" %>
+        <%= f.text_field :driver_licence, :class => 'half left' %>
+        <%= f.label :driver_licence_expiry, "Expired", :class => 'middle' %>
+        <%= f.text_field :driver_licence_expiry, :class => 'half left date-picker' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :id_card, "KTP" %>
+        <%= f.text_field :id_card, :class => 'half left' %>
+        <%= f.label :id_card_expiry, "Expired", :class => 'middle' %>
+        <%= f.text_field :id_card_expiry, :class => 'half left date-picker' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :salary, "Gaji Pokok" %>
+        <%= f.text_field :salary, :class => 'half left' %>
+        <%= f.label :min_wages, "Jamsostek", :class => 'middle' %>
+        <%= f.text_field :min_wages, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :start_working, "Mulai Kerja" %>
+        <%= f.text_field :start_working, :class => 'half left date-picker' %>
+        <%= f.label :status, :class => 'middle' %>
+        <%= f.select :status, options_for_select(@statuses.collect {|w| [w, w]}, @driver.status), {}, { :class => 'half left chzn-select' } %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :vehicle_id, "No Pol"%>
+        <%= f.select :vehicle_id, options_for_select(Vehicle.all(:order => :current_id).collect {|w| [w.current_id, w.id]}, @driver.vehicle_id), {:include_blank => '- No Pol -'}, { :class => 'half left chzn-select' } %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :accident, "Klm Kecelakaan" %>
+        <%= f.text_field :accident, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);'%>
+        <%= f.label :weight_loss, "Klm Susut", :class => 'middle' %>
+        <%= f.text_field :weight_loss, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :sparepart, "Klm Onderdil" %>
+        <%= f.text_field :sparepart, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);'%>
+        <%= f.label :bon, "Pinjaman", :class => 'middle' %>
+        <%= f.text_field :bon, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :saving, "Tabungan" %>
+        <%= f.text_field :saving, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);'%>
+      </div>
+
+      <div class="field-row" style="display:none">
+        <%= f.label :terms_of_payment_in_days, "Batas Hutang" %>
+        <%= f.text_field :terms_of_payment_in_days, :class => 'half' %>
+        <span>Hari</span>
+      </div>
+
+      <div class="field-row" >
+        <%= f.label :description, "Keterangan" %>
+        <%= f.text_area :description %>
+      </div>
+
+      <div class="actions">
+        <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin HRD' %>
+        <a class="back left" href="<%=drivers_path%>">Kembali ke Index</a>
+      </div>
+    <% end %>
+
+    </div>
+
+    <% if @helper %>
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+     
+    <%= form_for(@helper) do |f| %>
+      <input type="hidden" name="helper[driver_id]" value="<%=@driver.id%>" />
+
+      <div class="field-row first">
+        <%= f.label :name, "Nama" %>
+        <%= f.text_field :name %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :address, "Alamat" %>
+        <%= f.text_field :address %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :city, "Kota" %>
+        <%= f.text_field :city %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :phone, "No. Telp" %>
+        <%= f.text_field :phone, :class => 'half left' %>
+        <%= f.label :mobile, "No. HP", :class => 'middle' %>
+        <%= f.text_field :mobile, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :emergency_number, "No. Telp Darurat" %>
+        <%= f.text_field :emergency_number, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :driver_licence, "SIM" %>
+        <%= f.text_field :driver_licence, :class => 'half left' %>
+        <%= f.label :driver_licence_expiry, "Expired", :class => 'middle' %>
+        <%= f.text_field :driver_licence_expiry, :class => 'half left date-picker' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :id_card, "KTP" %>
+        <%= f.text_field :id_card, :class => 'half left' %>
+        <%= f.label :id_card_expiry, "Expired", :class => 'middle' %>
+        <%= f.text_field :id_card_expiry, :class => 'half left date-picker' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :salary, "Gaji Pokok" %>
+        <%= f.text_field :salary, :class => 'half left' %>
+        <%= f.label :saving, "Tabungan", :class => 'middle' %>
+        <%= f.text_field :saving, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);'%>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :accident, "Klm Kecelakaan" %>
+        <%= f.text_field :accident, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);'%>
+        <%= f.label :weight_loss, "Klm Susut", :class => 'middle' %>
+        <%= f.text_field :weight_loss, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :sparepart, "Klm Onderdil" %>
+        <%= f.text_field :sparepart, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);'%>
+        <%= f.label :bon, "Pinjaman", :class => 'middle' %>
+        <%= f.text_field :bon, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :description, "Keterangan" %>
+        <%= f.text_area :description %>
+      </div>
+
+      <div class="actions">
+        <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin HRD' %>
+        <a class="back left" href="<%=drivers_path%>">Kembali ke Index</a>
+      </div>
+    <% end %>
+
+    </div>
+
+    <% end %>
+
+  </div>
+</div>

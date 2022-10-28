@@ -1,0 +1,39 @@
+<%= form_for(@vehiclelog) do |f| %>
+  <%= f.hidden_field :vehicle_id %>
+  <%= f.hidden_field :ready %>
+
+  <div class="field-row first">
+    <label for="date">Tanggal</label>
+    <input type="text" class="disabled half left" readonly="true" value="<%=Date.today.strftime('%d-%m-%Y')%>" />
+  </div>          
+
+	<div class="field-row">
+    <label for="current_id">No Pol</label>
+    <input type="text" class="disabled half left" readonly="true" value="<%=@vehicle.current_id%>" />
+	</div>          
+
+  <div class="field-row">
+    <label for="status" class="left">Status</label>
+    <input type="text" class="disabled half left" readonly="true" value="<%=@status%>" />
+  </div>
+
+  <% if !@vehiclelog.ready %>
+  <div class="field-row">
+    <%= f.label :broken, "Rusak" %>
+    <%= f.check_box :broken %>
+  </div>
+  <% end %>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <input class="left" id="vehiclelog_submit" name="commit" type="submit" value="Tambah Data">
+    <a class="back left" href="<%=vehiclelogs_path%>">Kembali ke Index</a>
+  </div>
+
+</div>
+
+<% end %>

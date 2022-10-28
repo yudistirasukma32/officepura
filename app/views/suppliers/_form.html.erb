@@ -1,0 +1,59 @@
+<%= form_for(@supplier) do |f| %>
+	<div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :address, "Alamat" %>
+    <%= f.text_field :address %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :city, "Kota" %>
+    <%= f.text_field :city %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :contact, "Nama Kontak" %>
+    <%= f.text_field :contact %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :phone, "No. Telp" %>
+    <%= f.text_field :phone, :class => 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :mobile, "No. HP" %>
+    <%= f.text_field :mobile, :class => 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :fax, "No. Fax" %>
+    <%= f.text_field :fax, :class => 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :npwp, "NPWP" %>
+    <%= f.text_field :npwp, :class => 'half' %>
+  </div>
+
+  <!--
+  <div class="field-row">
+    <%= f.label :terms_of_payment_in_days, "Batas Hutang" %>
+    <%= f.text_field :terms_of_payment_in_days, :class => 'half' %>
+    <span>Hari</span>
+  </div>
+  -->
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if 'Admin Gudang' %>
+    <a class="back left" href="<%=suppliers_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

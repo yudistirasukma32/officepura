@@ -1,0 +1,89 @@
+<%= render "shared/header" %>
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+<div id="main">
+	<div id="content-full">
+		<a class="btn print" href="<%=new_productrequest_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<h1>Transaksi / <a href="<%=productrequests_path%>">Permintaan Stok Barang</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="customer_id">Kategori Barang</label>
+				<select name="productgroup_id" class="third left">
+					<option value="">Semua Kategori Barang</option>
+					<% Productgroup.active.order(:name).each do |productgroup| %>
+					<option value="<%=productgroup.id%>"<% if productgroup.id == @productgroup_id %> selected='selected'<% end %>><%=productgroup.name%></option>
+					<% end %>
+				</select>
+
+				<label class="middle" for="date">Tanggal</label>
+				<input type="text" name="date" class="half left date-picker" value="<%=@date%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+			
+		<table class="row-view">
+			<tr>				
+				<th width="30">No.</th>
+				<th width="50">Req</th>
+				<th>Keterangan</th>
+				<th width="80">No Pol</th>
+				<th width="80"></th>	
+			</tr>
+			<% total, i = 0, 0 %>
+			<% @productrequests.each do |productrequest| %>
+				<%  items = "" 
+					productrequest.productrequestitems.each do |productrequestitem| 
+						items += productrequestitem.quantity.to_s + " " + productrequestitem.product.unit_name + ": " + productrequestitem.product.name + ", "
+					end
+					items = items[0...-2]	
+				%>
+				<% if productrequest.deleted %>
+				<% if current_user.adminrole %>
+				<tr class="deleted">
+					<td><%= i+=1 %>.</td>
+					<td><%= zeropad(productrequest.id) %></td>
+					<td><%= items %></td>
+					<td><%= productrequest.vehicle.current_id if !productrequest.vehicle_id.nil? %></td>
+					<td width="60">DIHAPUS</td>
+				</tr>
+				<% end %>
+				<% else %>
+				<% total += productrequest.productrequestitems.sum(:total) %>
+				<tr>
+					<td><%= i+=1 %>.</td>
+					<td><%= link_to zeropad(productrequest.id), edit_productrequest_path(productrequest) %></td>
+					<td><%= link_to items, edit_productrequest_path(productrequest) %></td>
+					<td><%= productrequest.vehicle.current_id if !productrequest.vehicle_id.nil? %></td>
+					<td class="right" width="80">
+						<%= link_to '&#xf044;'.html_safe, edit_productrequest_path(productrequest), :class => "edit tipsy", :title => 'Detail' %> 
+						<% if !productrequest.productorders.first.nil? %>
+						<a href="/productrequests/<%=productrequest.id%>/confirmation" class="delete tipsy" title="Print Permintaan Pembelian"><i class="icon-print"></i></a>
+						<% end %>
+						<% if current_user.adminrole || current_user.owner %>
+						<%= link_to '&#xf00d;'.html_safe, productrequest, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+						<% end %>				
+					</td>
+				</tr>
+				<% end %>
+			<% end %>
+			<% if @productrequests.any? %>
+			<tr class="footer">
+				<td colspan="5" class="total" style="padding-left:10px;">TOTAL PERMINTAAN <span class="red"><%=to_currency(total, 'Rp. ')%></span></td>
+			</tr>
+			<% end %>
+		</table>
+		
+		<br class="clearfix" />
+		<div class="actions">
+			<a class="btn-txt right" href="<%=new_productrequest_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		</div>
+	</div>
+</div>

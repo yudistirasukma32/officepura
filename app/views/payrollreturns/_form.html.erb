@@ -1,0 +1,160 @@
+<% if @payroll %>
+
+<%= form_for(@payrollreturn) do |f| %>
+  <div class="actions" style="float:left; padding:0 0 30px 20px;">
+    <%= f.hidden_field :payroll_id, :value => @payroll.id %>
+    <%= f.submit "Tambah Data", :class => 'submit left' %> 
+    <a class="back left" href="<%=payrollreturns_path%>">Kembali ke Index</a>
+  </div>  
+
+
+ <div class="info-box" style="width:560px; float:left; clear:left;">  
+
+    <h3>BKK Supir #<%=zeropad(@payroll.id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Tanggal</td>
+        <td><span id="strDate"><%=@payroll.date.strftime('%d %B %Y')%></span></td>
+      </tr>
+      <tr>
+        <td width="90">Periode</td>
+        <td><span id="strPeriod"><%=@payroll.period_start.strftime('%d %B %Y')%> - <%=@payroll.period_end.strftime('%d %B %Y')%></span></td>
+      </tr>
+      <% if !@payroll.driver_id.nil?%>
+      <tr>
+        <td>Supir</td>
+        <td><span id="strDriver"><%=@payroll.driver.name%></span></td>
+      </tr>
+      <%else%>
+      <tr>
+        <td>Kernet</td>
+        <td><span id="strHelper"><%=@payroll.helper.name%></name></td>
+      </tr>
+      <%end%>
+      <tr>
+        <td>Nopol</td>
+        <td><span id="strVehicle"><%=@payroll.vehicle.nil? ? '-' : @payroll.vehicle.current_id %></span></td>
+      </tr>
+    </table>
+    
+    <table class="row-view">
+      <tr>
+        <th colspan="4">PENERIMAAN</th>
+        <th width="100" class="right">Total</th>
+      </tr>
+
+      <tr>
+        <td>Non HLN</td>
+        <td class="right" id="lblNonHolidays"><%= @payroll.non_holidays || 0 %></td>
+        <td width="5">*</td>
+        <td class="right" id="lblNonHolidaysFare"><%= to_currency(@payroll.non_holidays_fare)%></td>
+        <td class="right green" id="lblNonHolidaysPayment"><%= to_currency(@payroll.non_holidays_payment) %></td>
+      </tr>
+
+      <tr>
+        <td>HLN</td>
+        <td class="right" id="lblHolidays"><%= @payroll.holidays || 0 %></td>
+        <td width="5">*</td>
+        <td class="right" id="lblHolidaysFare"><%= to_currency(@payroll.holidays_fare)%></td>
+        <td class="right green" id="lblHolidaysPayment"><%= to_currency(@payroll.holidays_payment) %></td>
+      </tr>
+
+      <tr>
+        <td>Ambil Tabungan</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="right green" id="lblSavingReduction"><%= to_currency(@payroll.saving_reduction)%></td>
+      </tr>
+      
+      <tr>
+        <td>Premi Hadir</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="right green" id="lblBonus"><%= to_currency(@payroll.bonus)%></td>
+      </tr>
+
+      <tr>
+        <td colspan="4"><strong>TOTAL</strong></td>
+        <td class="right green" id="lblTotalPayment"><%= to_currency(@payroll.holidays_payment + @payroll.non_holidays_payment + @payroll.saving_reduction + @payroll.bonus) %></td>
+      </tr>
+
+        <tr><td colspan="6" style="font-size:13px;">Revisi Tabungan (<span id="lblMasterSaving"><%= to_currency(@payroll.master_saving || 0) %></span> - <span id="lblSavingReduction2"><%= to_currency(@payroll.saving_reduction)%></span> = <span id="lblSavingRed"><%= to_currency(@payroll.master_saving - @payroll.saving_reduction) %></span>)</td></tr>
+
+      <tr><td colspan="6">&nbsp;</td></tr>
+
+      <tr>
+        <th>POTONGAN</th>
+        <th width="100" class="right">JML</th>
+        <th width="5"></th>
+        <th width="100" class="right">POT</th>
+        <th width="100" class="right">SISA</th>
+      </tr>
+
+      <tr>
+        <td>Klaim Susut</td>
+         <td class="right" id="lblMasterWeightLoss"><%= to_currency(@payroll.master_weight_loss) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollWeightLoss"><%= to_currency(@payroll.weight_loss) %></td>
+        <td class="right" id="lblTotalWeightLoss" ><%= to_currency(@payroll.master_weight_loss - @payroll.weight_loss) %></td>
+      </tr>
+
+      <tr>
+        <td>Klaim Kecelakaan</td>
+        <td class="right" id="lblMasterAccident"><%= to_currency(@payroll.master_accident) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollAccident"><%= to_currency(@payroll.accident) %></td>
+        <td class="right" id="lblTotalAccident"><%= to_currency(@payroll.master_accident - @payroll.accident) %></td>
+      </tr>
+
+      <tr>
+        <td>Klaim Onderdil</td>
+        <td class="right" id="lblMasterSparepart"><%= to_currency(@payroll.master_sparepart) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollSparepart"><%= to_currency(@payroll.sparepart) %></td>
+        <td class="right" id="lblTotalSparepart"><%= to_currency(@payroll.master_sparepart - @payroll.sparepart) %></td>
+      </tr>
+
+      <tr>
+        <td>Pinjaman</td>
+        <td class="right" id="lblMasterBon"><%= to_currency(@payroll.master_bon) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollBon"><%= to_currency(@payroll.bon) %></td>
+        <td class="right" id="lblTotalBon"><%= to_currency(@payroll.master_bon - @payroll.bon) %></td>
+      </tr>
+
+      <tr>
+        <td>Gantungan Sangu</td>
+        <td class="right">-</td>
+        <td></td>
+        <td class="right red" id="lblPayrollAllowance"><%= to_currency(@payroll.allowance) %></td>
+        <td class="right">-</td>
+      </tr>
+
+      <tr>
+        <td>Menabung</td>
+        <td class="right" id="lblSavingRed2"><%= to_currency(@payroll.master_saving - @payroll.saving_reduction) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollSaving"><%= to_currency(@payroll.saving) %></td>
+        <td class="right" id="lblTotalSaving"><%= to_currency(@payroll.master_saving - @payroll.saving_reduction + @payroll.saving)%></td>
+      </tr>
+
+      <tr class="total-row">
+        <td colspan="3"><strong>TOTAL</strong></td>
+        <td class="right red" id="lblPayrollExpenseTotal"><%= to_currency(@payroll.saving + @payroll.weight_loss + @payroll.accident + @payroll.sparepart + @payroll.bon + @payroll.allowance) %></td>
+        <td></td>
+      </tr>
+
+      <tr class="total-row">
+        <td colspan="4"><strong>DITERIMA</strong></td>
+        <td class="right <%if @payroll.total >= 0 %> green <% else %> red <% end %>" id="lblPayrollTotal"><%= to_currency(@payroll.total.abs)%></td>
+      </tr>
+    </table>
+
+  </div>
+
+<% end %>
+
+<% end %>

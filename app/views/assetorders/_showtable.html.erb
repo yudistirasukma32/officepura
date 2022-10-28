@@ -1,0 +1,33 @@
+<table class="row-view">
+	<tr>
+		<th width="50">Order</th>
+		<th width="80">Tanggal</th>
+		<th>Nama Aset</th>
+		<th width="100" class="right">Total</th>
+		<th width="80"></th>
+	</tr>
+	<% @assetorders.each do |assetorder| %>
+		<% if assetorder.deleted %>
+			<% if current_user.adminrole %>
+				<tr class="deleted">
+					<td><%= zeropad(assetorder.id) %></td>
+					<td><%= assetorder.date.strftime('%d-%m-%Y') %></td>
+					<td><%= assetorder.asset.name %></td>
+					<td class="red" align="right"><%=to_currency(assetorder.total)%></td>
+					<td class="right">DIHAPUS</td>
+				</tr>
+			<% end %>
+		<% else %>
+			<tr>
+				<td><%= link_to zeropad(assetorder.id), edit_assetorder_path(assetorder) %></td>
+				<td><%= link_to assetorder.date.strftime('%d-%m-%Y'), edit_assetorder_path(assetorder)%></td>
+				<td><%= assetorder.asset.name unless assetorder.asset_id.nil? %></td>
+				<td class="red" align="right"><%=to_currency(assetorder.total)%></td>
+				<td class="right">
+					<%= link_to '&#xf044;'.html_safe, edit_assetorder_path(assetorder), :class => "edit tipsy", :title => 'Edit' %> 
+					<%= link_to '&#xf00d;'.html_safe, assetorder, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+				</td>
+			</tr>
+		<% end %>
+	<% end %>
+</table>

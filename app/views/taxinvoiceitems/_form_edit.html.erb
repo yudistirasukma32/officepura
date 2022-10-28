@@ -1,0 +1,184 @@
+<div id="filter">
+<form action="/taxinvoiceitems/new/" method="get">
+  <div class="field-row continue">
+    <label for="invoice_id">No. BKK</label>
+    <input type="text" name="invoice_id" class="half left" value="<%=@invoice_id%>" style="margin-right:10px;" />
+    <input type="submit" class="submit" value="Cari BKK" />    
+  </div>
+</form>
+</div>
+
+<br class="clearfix" /><br />
+
+<% if @invoice %>
+
+  <div class="info-box" style="width:560px; float:left; clear:left; margin-bottom:30px;">  
+
+    <h3>Bukti Kas Keluar #<%=zeropad(@invoice.id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Kantor</td>
+        <td><%=@invoice.office.name%></td>
+      </tr>
+      <tr>
+        <td width="90">Tgl. Bikin</td>
+        <td><%=@invoice.created_at.strftime('%d-%m-%Y')%></td>
+      </tr>
+      <tr>
+        <td>Pelanggan</td>
+        <td><%=@invoice.customer.name%></td>
+      </tr>
+      <tr>
+        <td>Jurusan</td>
+        <td><%=@invoice.quantity%> Rit: <%=@invoice.route.name%>, <%=@invoice.vehicle.current_id%></td>
+      </tr>
+      <tr>
+        <td>Supir</td>
+        <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
+      </tr>
+      <% if @invoice.price_per.to_f != @invoice.route.price_per.to_f %>
+      <tr>
+        <td>Harga Lama</td>
+        <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> </td>
+      </tr>
+      <tr>
+        <td>Harga Baru</td>
+        <td>@ <%= to_currency_bank(@invoice.route.price_per, 'Rp. ') %> </td>
+      </tr>
+      <% else %>
+      <tr>
+        <td>Harga Muatan</td>
+        <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> *</td>
+      </tr>
+      <% end %>
+      <tr><td colspan="2">&nbsp;</td></tr>
+      <tr>
+        <td colspan="2" style="font-size:13px" class="hideprint">* Secara default penghitungan total menggunakan harga bongkar. Perubahan penggunaan harga hitung dapat dirubah saat pembuatan tagihan invoice.</td>
+      </tr> 
+    </table>
+  </div>
+  <% if @invoice.price_per.to_f != @invoice.route.price_per.to_f %>
+  <div class="update-box">
+    Ada perubahan harga dalam Master Jurusan. Tekan tombol untuk update harga terbaru. 
+    <br class="clearfix"/>
+    <br class="clearfix"/>
+    <em class="red" style="font-size:11px;">Peringatan: Mohon berhati-hati ketika menekan tombol karena data yang sudah dirubah tidak dapat dikembalikan</em>
+    <br class="clearfix"/>
+    <br class="clearfix"/>
+    <a class="btn right btn-green" style="float:left" href="/taxinvoiceitems/new/<%= @invoice.id%>/true">Update Harga</a>
+  </div> 
+  <% end %>
+
+	<div class="hideprint" style="width:300px; float:left; clear:right; padding-left: 2rem;">
+		<% if @invoice %>
+
+		<h3 class="zone">Upload Gambar Surat Jalan</h3>
+
+			<% if @invoice.images.any? %>
+
+			<% img = @invoice.images.first %>
+			<%= image_tag img.file.thumb('320x320').url(:suffix => "/#{img.name}") if img.file_uid %>
+			<br /><br /><%= link_to '&raquo; Hapus File'.html_safe, '/attachments/removeTaxInv/' + @invoice.images.first.id.to_s %>
+
+			<% else %>
+
+			<form action="/attachments/uploadTaxInv" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+				<input type="hidden" name="model_name" value="Invoice" />
+				<input type="hidden" name="item_id" value="<%=@invoice.id%>" />
+
+			<div class="field-row" style="width: 300px;">
+				<label for="name">Nama</label>
+				<input type="text" name="attachment[name]" style="width: 300px;"/>
+			</div>
+
+			<div class="field-row continue" style="width: 300px;">
+				<label for="file">Browse File</label>
+				<input type="file" name="attachment[file]"/>
+			</div>
+
+			<div class="actions">
+				<input type="submit" value="Simpan File" />
+			</div>
+
+			</form>
+
+			<% end %>
+
+		<% end %>
+	</div>
+
+<br class="clearfix" />
+
+<% if @invoice.taxinvoiceitems.any? %>
+
+<form id="taxinvoiceitems" name="taxinvoiceitems" action="/taxinvoiceitems/updateitems" method="post">
+  <input type="hidden" id="price_per" name="taxinvoiceitems[price_per]" value="<%=@invoice.price_per%>" />
+  <input type="hidden" id="price_per_new" name="taxinvoiceitems[price_per_new]" value="<%=@invoice.price_per%>" />
+  <input type="hidden" name="taxinvoiceitems[invoice_id]" value="<%=@invoice.id%>" />
+  <input type="hidden" id="taxinvoiceitems_is_wholesale" name="taxinvoiceitems[is_wholesale]" value="<%=@is_wholesale%>" />
+  <input type="hidden" id="wholesale_price" name="taxinvoiceitems[wholesale_price]" value="<%=@invoice.customer.wholesale_price %>" />
+
+<table class="row-view" id="tabTaxinvoiceitems">
+	<thead>
+    <tr>
+  		<th width="30">No.</th>
+      <th width="70">Tanggal</th>
+  		<th width="120">Surat Jalan</th>
+      <th width="70">Tgl Muat</th>
+  		<th width="70" class="right">Muat</th>
+      <th width="70">Tgl Bkr</th>
+  		<th width="70" class="right">Bongkar</th>
+  		<th width="70" class="right">Susut</th>
+  		<th class="right">Total</th>
+      <th width="30"></th>
+  	</tr>
+  </thead>
+  <tbody>
+<% @invoice.taxinvoiceitems.order(:id).each_with_index do |taxinvoiceitem,i| %>
+<% date = taxinvoiceitem.date.strftime('%d-%m-%Y') if !taxinvoiceitem.date.blank? %>
+<% load_date = taxinvoiceitem.load_date.strftime('%d-%m-%Y') if !taxinvoiceitem.load_date.blank? %>
+<% unload_date = taxinvoiceitem.unload_date.strftime('%d-%m-%Y') if !taxinvoiceitem.unload_date.blank? %>
+
+	<tr id="<%=taxinvoiceitem.id%>">
+		<td><%=i+1%>.</td>
+    <td><input type="text" name="taxinvoiceitems[date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+		<td><input type="text" name="taxinvoiceitems[sku_id_<%=taxinvoiceitem.id%>]" style="width:120px;" class="<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.sku_id%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+    <td><input type="text" name="taxinvoiceitems[load_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=load_date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+		<td><input type="text" id="weight_gross_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[weight_gross_<%=taxinvoiceitem.id%>]" class="short weight-field<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.weight_gross%>" onchange="javascript:getWeightLost('<%=taxinvoiceitem.id%>')" onkeypress="javascript:return isMoneyKey(this);" <% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %>/></td>
+    <td><input type="text" name="taxinvoiceitems[unload_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=unload_date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+		<td><input type="text" id="weight_net_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[weight_net_<%=taxinvoiceitem.id%>]" class="short weight-field<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.weight_net%>" onchange="javascript:getWeightLost('<%=taxinvoiceitem.id%>')" onkeypress="javascript:return isMoneyKey(this);" <% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+		<td align="right">
+<!--			<span id="txt_weight_lost_<%=taxinvoiceitem.id%>"><%=taxinvoiceitem.weight_gross - taxinvoiceitem.weight_net%></span>-->
+			<input type="text" value="<%=taxinvoiceitem.weight_gross - taxinvoiceitem.weight_net%>" style="text-align: right; width: 100px;"/>	
+		</td>
+		<td align="right">
+			<span id="txt_total_<%=taxinvoiceitem.id%>" style="display:none;"><%=to_currency_bank(taxinvoiceitem.total)%></span>
+			<input type="text" id="total_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[total_<%=taxinvoiceitem.id%>]" value="<%=taxinvoiceitem.total%>" style="text-align: right; width: 200px;" /></td>
+    <td align="right">
+      <% if !taxinvoiceitem.taxinvoice_id.nil? %>
+        <i class="icon-lock red icon-large" title="Surat Tagihan sudah di Invoice"></i>
+      <% else %>
+        <% if current_user.owner %>
+        <%= link_to '&#xf00d;'.html_safe, taxinvoiceitem, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+        <% end %>
+      <% end %>
+    </td>
+	</tr>
+<% end %>
+</tbody>
+</table>
+
+<div class="actions">
+<!--
+  <a class="btn right" href="<%=taxinvoiceitems_path({:startdate => $globalStartdate, :enddate => $globalEnddate})%>">Kembali ke Index</a>
+  <input type="submit" class="btn right" value="Tambah Data" />
+-->
+	<a type="submit" href="javascript:print();" class="btn right" value="Print">Print Surat Jalan</a>
+	<a type="submit" href="/taxinvoiceitems/downloadexcel/<%= params[:invoice_id] %>" class="btn right" value="Print">Cetak Excel</a>
+</div>
+</form>
+
+<% end %>
+
+<% end %>

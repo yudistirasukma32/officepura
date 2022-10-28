@@ -1,0 +1,20 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=bankexpenses_path({:date => $globalDate})%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Transaksi / <a href="<%=bankexpenses_path%>"><%= @bankexpense.bankledger ? 'Bukti Bank' : 'Jurnal Umum' %></a> / Edit</h1>
+
+		<br class="clearfix" />
+		<%= render "form" %>
+		<br class="clearfix" />
+
+	</div>
+
+</div>

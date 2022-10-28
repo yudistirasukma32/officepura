@@ -1,0 +1,97 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / BKM: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="startdate">Tanggal Awal</label>
+				<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>" />
+				<label for="enddate" class="middle">Akhir</label>
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view report-view tablesorter tablesorterFilters">
+			<thead>
+				<tr>
+					<th class="{sorter:false, filter: false}" width="30">No.</th>
+					<th class="{sorter:true, filter: true}" width="75">Tgl</th>
+					<th class="{sorter:false, filter: true}">Keterangan</th>
+					<th class="{sorter:false, filter: false}" width="45">Ktr</th>
+					<th class="{sorter:false, filter: true}" width="80">No Pol</th>
+					<th class="{sorter:false, filter: false} right" width="90" >Total</th>
+				</tr>
+			</thead>
+			
+			<% if @receiptreturns.any? %>
+				<tbody class="tablesorter-no-sort">
+					<tr class="subheading">
+						<th colspan="6" style="color:#000;">BKM Sudah Dikonfirm</th>
+					</tr>
+				</tbody>
+				<tbody>
+				<% @receiptreturns.each_with_index do |receiptreturn, i| %>
+					<tr>
+						<td><%=i+1%>.</td>
+						<td><%=receiptreturn.created_at.strftime("%d/%m/%Y")%></td>
+						<td>#<%=zeropad(receiptreturn.invoice.id)%>: <%=receiptreturn.invoice.date.strftime("%d/%m/%y")%>, <%=receiptreturn.quantity%> Rit, <%=receiptreturn.invoice.route.name%> (<%=receiptreturn.invoice.driver.name%>)</td>
+						<td><%=receiptreturn.office.abbr%></td>
+						<td><%=receiptreturn.invoice.vehicle.current_id%></td>
+						<td align="right"><%=to_currency(receiptreturn.total)%></td>
+					</tr>
+				<% end %>
+				</tbody>
+				<tbody class="tablesorter-no-sort">
+					<tr class="footer">
+						<td>&nbsp;</td>
+						<td colspan="4">TOTAL</td>
+						<td align="right" class="green"><%=to_currency(@receiptreturns.sum(:total))%></td>
+					</tr>
+				</tbody>
+			<% end %>
+			
+			<% if @invoicereturns.any? %>
+				<tbody class="tablesorter-no-sort">
+					<tr class="subheading">
+						<th colspan="6" style="color:#000;">BKM Belum Dikonfirm</th>
+					</tr>
+				</tbody>
+				<tbody>
+				<% @invoicereturns.each_with_index do |invoicereturn, i| %>
+					<tr>
+						<td><%=i+1%>.</td>
+						<td><%=invoicereturn.date.strftime("%d/%m/%y")%></td>
+						<td>#<%=zeropad(invoicereturn.invoice.id)%>: <%=invoicereturn.invoice.date.strftime("%d/%m/%y")%>, <%=invoicereturn.quantity%> Rit, <%=invoicereturn.invoice.route.name%> (<%=invoicereturn.invoice.driver.name%>)</td>
+						<td><%=invoicereturn.office.abbr%></td>
+						<td><%=invoicereturn.invoice.vehicle.current_id%></td>
+						<td align="right"><%=to_currency(invoicereturn.total)%></td>
+					</tr>
+				<% end %>
+				</tbody>
+				<tbody class="tablesorter-no-sort">
+					<tr class="footer">
+						<td>&nbsp;</td>
+						<td colspan="4">TOTAL</td>
+						<td align="right" class="green"><%=to_currency(@invoicereturns.sum(:total))%></td>
+					</tr>
+				</tbody>
+			<% end %>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,356 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Neraca: <span class="red"> <%=Date::MONTHNAMES[@month.to_i]%> <%=@year%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label>Pilih Bulan</label>
+				<select name="month" class="half left combo_route">
+					<% (1.upto(12)).each do |m| %>
+					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+					<% end %>
+				</select>
+				<label class="middle">Tahun</label>
+				<select name="year" class="half left combo_route">
+					<% 2012.upto(Date.today.year) do |year| %>
+					<option value="<%=year%>"<% if year == @year.to_i %> selected="selected"<% end %>><%=year%></option>
+					<% end %>
+				</select>
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th>Keterangan</th>
+				<th colspan="2" style="text-align:center">Saldo Awal</th>
+				<th colspan="2" style="text-align:center">Mutasi</th>
+				<th colspan="2" style="text-align:center">Saldo Akhir</th>
+			</tr>
+			<tr>
+				<th>&nbsp;</th>
+				<th>&nbsp;</th>
+				<th width="110" class="right">Debit</th>
+				<th width="110" class="right">Kredit</th>
+				<th width="110" class="right">Debit</th>
+				<th width="110" class="right">Kredit</th>
+				<th width="110" class="right">Debit</th>
+				<th width="110" class="right">Kredit</th>
+			</tr>
+			<% 	id_group_hutangtoko = 19 
+			  	id_group_piutang = 6 
+			  	id_group_kas = 1  
+			  	id_group_sangu = 54  
+			  	id_group_premi = 8  
+			  	id_groupbank_sangu = 25  
+			  	id_groupbank_premi = 32  
+			  	id_groupbank_solar = 27  
+				startdate = Date.new(@year.to_i, @month.to_i, 1) 
+				totalcreditbefore = totaldebitbefore = totalcredit = totaldebit = totalcreditafter = totaldebitafter = 0 %>
+			
+			<!-- GROUP SANGU DAN SOLAR-->
+			<% i = 0 %>
+			<% receipts = Receipt.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}") %>
+			<% if receipts.any? %>
+				<% 	debitbefore = Receipt.active.where("created_at < ?", startdate.to_date)
+					creditbefore = Receiptreturn.active.where("created_at < ?", startdate.to_date)
+					kasdebitbefore = Receiptexpense.active.where("created_at < ? and expensetype = 'Kredit' and officeexpensegroup_id = ?", startdate.to_date, id_group_sangu)
+					kascreditbefore = Receiptexpense.active.where("created_at < ? and expensetype = 'Debit' and officeexpensegroup_id = ?", startdate.to_date, id_group_sangu)
+					bankdebitbefore = Bankexpense.active.where("date < ? and debitgroup_id = ?", startdate.to_date, id_groupbank_sangu)
+					bankcreditbefore = Bankexpense.active.where("date < ? and creditgroup_id = ?", startdate.to_date, id_groupbank_sangu)
+				    saldoawal = debitbefore.sum("driver_allowance + helper_allowance + misc_allowance + tol_fee + ferry_fee").to_i - creditbefore.sum("driver_allowance + helper_allowance + misc_allowance + tol_fee").to_i + kasdebitbefore.sum(:total).to_i - kascreditbefore.sum(:total).to_i + bankdebitbefore.sum(:total).to_i - bankcreditbefore.sum(:total).to_i
+				    totaldebitbefore += saldoawal
+
+				    receiptreturns = Receiptreturn.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}")
+
+				    kasdebit = Receiptexpense.active.where("to_char(created_at, 'MM-YYYY') = ? and expensetype = 'Kredit' and officeexpensegroup_id = ?", "#{@month}-#{@year}", id_group_sangu)
+					kascredit = Receiptexpense.active.where("to_char(created_at, 'MM-YYYY') = ? and expensetype = 'Debit' and officeexpensegroup_id = ?", "#{@month}-#{@year}", id_group_sangu)
+					bankdebit = Bankexpense.active.where("to_char(date, 'MM-YYYY') = ? and debitgroup_id = ?", "#{@month}-#{@year}", id_groupbank_sangu)
+					bankcredit = Bankexpense.active.where("to_char(date, 'MM-YYYY') = ? and creditgroup_id = ?", "#{@month}-#{@year}", id_groupbank_sangu)
+				    
+				    debit = receipts.sum("driver_allowance + helper_allowance + misc_allowance + tol_fee + ferry_fee").to_i + kasdebit.sum(:total).to_i + bankdebit.sum(:total).to_i
+				    credit = receiptreturns.sum("driver_allowance + helper_allowance + misc_allowance + tol_fee").to_i + kascredit.sum(:total).to_i + bankcredit.sum(:total).to_i
+				    totaldebit += debit
+				    totalcredit += credit
+					saldoakhir = saldoawal + debit - credit
+					totaldebitafter = totaldebitafter + saldoakhir if saldoakhir >= 0 
+					totalcreditafter = totalcreditafter + saldoakhir if saldoakhir < 0 
+				%>
+				<tr>
+					<td><%= i+1%></th>
+					<td>SANGU</th>
+					<td width="110" class="right"><%= saldoawal >= 0 ? to_currency_bank(saldoawal) : '-'%></td>
+					<td width="110" class="right"><%= saldoawal < 0 ? to_currency_bank(saldoawal.abs) : '-'%></td>
+					<td width="110" class="right"><%= debit > 0 ? to_currency_bank(debit) : '-' %></td>
+					<td width="110" class="right"><%= credit > 0 ? to_currency_bank(credit) : '-'%></td>
+					<td width="110" class="right"><%= to_currency_bank(saldoakhir) if saldoakhir >= 0%></td>
+					<td width="110" class="right"><%= to_currency_bank(saldoakhir.abs) if saldoakhir < 0 %></td>
+				</tr>
+				<% i += 1 %>
+
+				<%  debitbefore = Receipt.active.where("created_at < ?", startdate.to_date)
+					bankdebitbefore = Bankexpense.active.where("date < ? and debitgroup_id = ?", startdate.to_date, id_groupbank_solar)
+					bankcreditbefore = Bankexpense.active.where("date < ? and creditgroup_id = ?", startdate.to_date, id_groupbank_solar)
+					saldoawal = bankdebitbefore.sum(:total).to_i - bankcreditbefore.sum(:total).to_i
+					debitbefore.sum("gas_allowance").to_i  + bankdebitbefore.sum(:total).to_i - bankcreditbefore.sum(:total).to_i
+				    totaldebitbefore += saldoawal
+
+					bankdebit = Bankexpense.active.where("to_char(date, 'MM-YYYY') = ? and debitgroup_id = ?", "#{@month}-#{@year}", id_groupbank_solar)
+					bankcredit = Bankexpense.active.where("to_char(date, 'MM-YYYY') = ? and creditgroup_id = ?", "#{@month}-#{@year}", id_groupbank_solar)
+					debit = receipts.sum(:gas_allowance).to_i + bankdebit.sum(:total).to_i
+					credit =  bankcredit.sum(:total).to_i
+
+					totaldebit += debit
+				    totalcredit += credit
+				    saldoakhir = saldoawal + debit - credit
+					totaldebitafter = totaldebitafter + saldoakhir if saldoakhir >= 0 
+					totalcreditafter = totalcreditafter + saldoakhir if saldoakhir < 0 
+				%>
+				<tr>
+					<td><%= i+1%></th>
+					<td>SOLAR</th>
+					<td width="110" class="right"><%= saldoawal > 0 ? to_currency_bank(saldoawal) : '-'%></td>
+					<td width="110" class="right"><%= saldoawal < 0 ? to_currency_bank(saldoawal.abs) : '-'%></td>
+					<td width="110" class="right"><%= debit > 0 ? to_currency_bank(debit) : '-' %></td>
+					<td width="110" class="right"><%= credit > 0 ? to_currency_bank(credit) : '-'%></td>
+					<td width="110" class="right"><%= to_currency_bank(saldoakhir) if saldoakhir >= 0%></td>
+					<td width="110" class="right"><%= to_currency_bank(saldoakhir.abs) if saldoakhir < 0 %></td>
+				</tr>
+				<% i += 1 %>
+			<% end %>
+			<!-- END GROUP SANGU -->
+
+			<!-- GROUP ONDERDIL-->
+			<% receiptorders = Receiptorder.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}") %>
+			<% if receiptorders.any? %>
+				<% 	debitbefore = Receiptorder.active.where("created_at < ?", startdate.to_date)
+					
+					saldoawal = debitbefore.sum(:total).to_i
+				    totaldebitbefore += saldoawal
+				    
+				   	debit = receiptorders.sum(:total).to_i
+				   	credit = 0
+					totaldebit += debit
+				    saldoakhir = saldoawal + debit
+					totaldebitafter = totaldebitafter + saldoakhir if saldoakhir >= 0 
+					totalcreditafter = totalcreditafter + saldoakhir if saldoakhir < 0 
+				%>
+				<tr>
+					<td><%= i+1%></th>
+					<td>ONDERDIL</th>
+					<td width="110" class="right"><%= saldoawal > 0 ? to_currency_bank(saldoawal) : '-'%></td>
+					<td width="110" class="right"><%= saldoawal < 0 ? to_currency_bank(saldoawal.abs) : '-'%></td>
+					<td width="110" class="right"><%= debit > 0 ? to_currency_bank(debit) : '-' %></td>
+					<td width="110" class="right"><%= credit > 0 ? to_currency_bank(credit) : '-'%></td>
+					<td width="110" class="right"><%= to_currency_bank(saldoakhir) if saldoakhir >= 0%></td>
+					<td width="110" class="right"><%= to_currency_bank(saldoakhir.abs) if saldoakhir < 0 %></td>
+				</tr>
+				<% i += 1 %>
+			<% end %>
+			<!-- END GROUP ONDERDIL-->
+
+			<!-- GROUP ONDERDIL-->
+			<% receiptpremis = Receiptpremi.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}") %>
+			<% if receiptpremis.any? %>
+				<% 	debitbefore = Receiptpremi.active.where("created_at < ?", startdate.to_date)
+					kasdebitbefore = Receiptexpense.active.where("created_at < ? and expensetype = 'Kredit' and officeexpensegroup_id = ?", startdate.to_date, id_group_premi)
+					kascreditbefore = Receiptexpense.active.where("created_at < ? and expensetype = 'Debit' and officeexpensegroup_id = ?", startdate.to_date, id_group_premi)
+					bankdebitbefore = Bankexpense.active.where("date < ? and debitgroup_id = ?", startdate.to_date, id_groupbank_premi)
+					bankcreditbefore = Bankexpense.active.where("date < ? and creditgroup_id = ?", startdate.to_date, id_groupbank_premi)
+					saldoawal = debitbefore.sum(:total).to_i + kasdebitbefore.sum(:total).to_i - kascreditbefore.sum(:total).to_i + bankdebitbefore.sum(:total).to_i - bankcreditbefore.sum(:total).to_i
+				    totaldebitbefore += saldoawal
+
+
+				    kasdebit = Receiptexpense.active.where("to_char(created_at, 'MM-YYYY') = ? and expensetype = 'Kredit' and officeexpensegroup_id = ?", "#{@month}-#{@year}", id_group_premi)
+					kascredit = Receiptexpense.active.where("to_char(created_at, 'MM-YYYY') = ? and expensetype = 'Debit' and officeexpensegroup_id = ?", "#{@month}-#{@year}", id_group_premi)
+					bankdebit = Bankexpense.active.where("to_char(date, 'MM-YYYY') = ? and debitgroup_id = ?", "#{@month}-#{@year}", id_groupbank_premi)
+					bankcredit = Bankexpense.active.where("to_char(date, 'MM-YYYY') = ? and creditgroup_id = ?", "#{@month}-#{@year}", id_groupbank_premi)
+					debit = receiptpremis.sum(:total).to_i + kasdebit.sum(:total).to_i + bankdebit.sum(:total).to_i
+					credit = kascredit.sum(:total).to_i + bankcredit.sum(:total).to_i
+				    totaldebit += debit
+				    totalcredit += credit
+				   	
+				   	saldoakhir = saldoawal + debit + credit
+					totaldebitafter = totaldebitafter + saldoakhir if saldoakhir >= 0 
+					totalcreditafter = totalcreditafter + saldoakhir if saldoakhir < 0 
+				%>
+				<tr>
+					<td><%= i+1%></th>
+					<td>PREMI</th>
+					<td width="110" class="right"><%= saldoawal > 0 ? to_currency_bank(saldoawal) : '-'%></td>
+					<td width="110" class="right"><%= saldoawal < 0 ? to_currency_bank(saldoawal.abs) : '-'%></td>
+					<td width="110" class="right"><%= debit > 0 ? to_currency_bank(debit) : '-' %></td>
+					<td width="110" class="right"><%= credit > 0 ? to_currency_bank(credit) : '-'%></td>
+					<td width="110" class="right"><%= to_currency_bank(saldoakhir) if saldoakhir >= 0 %></td>
+					<td width="110" class="right"><%= to_currency_bank(saldoakhir.abs) if saldoakhir < 0 %></td>
+				</tr>
+				<% i += 1 %>
+			<% end %>
+			<!-- END GROUP ONDERDIL-->
+
+			<!-- GROUP PENJUALAN BARANG-->
+			<% receiptsales = Receiptsale.active.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}") %>
+			<% if receiptsales.any? %>
+				<% 	creditbefore = Receiptsale.active.where("created_at < ?", startdate.to_date)
+					saldoawal = creditbefore.sum(:total).to_i
+				    totalcreditbefore += saldoawal
+				    totalcredit += receiptsales.sum(:total).to_i
+				   	saldoakhir = saldoawal + receiptsales.sum(:total).to_i
+					totalcreditafter += saldoakhir
+				%>
+				<tr>
+					<td><%= i+1%></th>
+					<td>PENJUALAN BARANG</th>
+					<td width="110" class="right"><%= saldoawal < 0 ? to_currency_bank(saldoawal.abs) : '-'%></td>
+					<td width="110" class="right"><%= saldoawal > 0 ? to_currency_bank(saldoawal) : '-'%></td>
+					<td width="110" class="right">-</td>
+					<td width="110" class="right"><%= to_currency_bank(receiptsales.sum(:total).to_i) %></td>
+					<td width="110" class="right">-</td>
+					<td width="110" class="right"><%= to_currency_bank(saldoakhir)%></td>
+				</tr>
+				<% i += 1 %>
+			<% end %>
+			<!-- END GROUP PENJUALAN BARANG-->
+
+			<!-- GROUP KAS HARIAN -->
+			<% if @officeexpensegroups.any? %>
+				<% @officeexpensegroups.each do |group| %>
+					<% expenses = Receiptexpense.active.where("officeexpensegroup_id = ? and to_char(created_at, 'MM-YYYY') = ?", group.id, "#{@month}-#{@year}") rescue nil%>
+					<% if expenses.any? %>
+					<% 	debitbefore = Receiptexpense.active.where("created_at < ? and officeexpensegroup_id = ? and expensetype = 'Kredit'", startdate.to_date, group.id)
+						creditbefore = Receiptexpense.active.where("created_at < ? and officeexpensegroup_id = ? and expensetype = 'Debit'", startdate.to_date, group.id)
+						saldoawal = debitbefore.sum(:total).to_i - creditbefore.sum(:total).to_i
+					    totaldebitbefore += saldoawal > 0 ? saldoawal.abs : 0
+					    totalcreditbefore += saldoawal < 0 ? saldoawal.abs : 0
+					    
+					    debit = expenses.where("expensetype = 'Kredit'").sum(:total).to_i
+					    totaldebit += debit
+					    credit = expenses.where("expensetype = 'Debit'").sum(:total).to_i
+					    totalcredit += credit
+					   	
+					   	saldoakhir = saldoawal + debit - credit
+						totaldebitafter = totaldebitafter + saldoakhir.abs if saldoakhir >= 0 
+						totalcreditafter = totalcreditafter + saldoakhir.abs if saldoakhir < 0 
+					%>
+					<tr>
+						<td><%= i+1%></th>
+						<td><%= group.name.upcase%></th>
+						<td width="110" class="right"><%= saldoawal > 0 ? to_currency_bank(saldoawal.abs) : '-'  %></td>
+						<td width="110" class="right"><%= saldoawal < 0 ? to_currency_bank(saldoawal.abs) : '-'  %></td>
+						<td width="110" class="right"><%= debit > 0 ? to_currency_bank(debit) : '-' %></td>
+						<td width="110" class="right"><%= credit > 0 ? to_currency_bank(credit) : '-' %></td>
+						<td width="110" class="right"><%= to_currency_bank(saldoakhir) if saldoakhir >= 0 %></td>
+						<td width="110" class="right"><%= to_currency_bank(saldoakhir.abs) if saldoakhir < 0 %></td>
+					</tr>
+					<% i += 1 %>
+				<% end %>
+				<% end %>
+			<% end %>
+			<!-- GROUP KAS HARIAN -->
+
+			<!-- GROUP KAS BANK -->
+			<% if @bankexpensegroups.any? %>
+				<% @bankexpensegroups.each do |group| %>
+					<% if group.id == id_group_kas %>
+						<% expenses = Bankexpense.active.where("(creditgroup_id = ? or debitgroup_id = ?) and to_char(date, 'MM-YYYY') = ?", group.id, group.id,"#{@month}-#{@year}") rescue nil%>
+						<% if expenses.any? %>
+							<% 	debitbefore = Bankexpense.active.where("date < ? and debitgroup_id = ?", startdate.to_date, group.id)
+								creditbefore = Bankexpense.active.where("date < ? and creditgroup_id = ?", startdate.to_date, group.id)
+								saldoawal = debitbefore.sum(:total).to_i - creditbefore.sum(:total).to_i
+							    totaldebitbefore += saldoawal > 0 ? saldoawal.abs : 0
+							    totalcreditbefore += saldoawal < 0 ? saldoawal.abs : 0
+							    
+							    receipts = Receipt.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}")
+							    receiptreturns = Receiptreturn.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}")
+							    receiptorders = Receiptorder.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}")
+							    receiptpremis = Receiptpremi.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}")
+							    receiptsales = Receiptsale.active.active.where("to_char(created_at, 'MM-YYYY') = ?","#{@month}-#{@year}")
+							    receiptexpenses = Receiptexpense.active.where("to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}") rescue nil
+
+							    debit = expenses.where(:debitgroup_id => group.id).sum(:total).to_i + receiptreturns.sum(:total).to_i + receiptexpenses.where("expensetype = 'Debit'").sum(:total).to_i + receiptsales.sum(:total).to_i
+							    totaldebit += debit
+							    credit = expenses.where(:creditgroup_id => group.id).sum(:total).to_i + receipts.sum(:total).to_i + receiptpremis.sum(:total).to_i + receiptorders.sum(:total).to_i + receiptexpenses.where("expensetype = 'Kredit'").sum(:total).to_i
+							    totalcredit += credit
+							   	
+							   	saldoakhir = saldoawal + debit - credit
+								totaldebitafter = totaldebitafter + saldoakhir.abs if saldoakhir >= 0 
+								totalcreditafter = totalcreditafter + saldoakhir.abs if saldoakhir < 0 
+							%>
+							<tr>
+								<td><%= i+1%></th>
+								<td><%= group.name.upcase%></th>
+								<td width="110" class="right"><%= saldoawal > 0 ? to_currency_bank(saldoawal.abs) : '-'  %></td>
+								<td width="110" class="right"><%= saldoawal < 0 ? to_currency_bank(saldoawal.abs) : '-'  %></td>
+								<td width="110" class="right"><%= debit > 0 ? to_currency_bank(debit) : '-' %></td>
+								<td width="110" class="right"><%= credit > 0 ? to_currency_bank(credit) : '-' %></td>
+								<td width="110" class="right"><%= to_currency_bank(saldoakhir) if saldoakhir >= 0 %></td>
+								<td width="110" class="right"><%= to_currency_bank(saldoakhir.abs) if saldoakhir < 0 %></td>
+							</tr>
+							<% i += 1 %>
+						<% end %>
+					<% else %>
+						<% expenses = Bankexpense.active.where("(creditgroup_id = ? or debitgroup_id = ?) and to_char(date, 'MM-YYYY') = ?", group.id, group.id,"#{@month}-#{@year}") rescue nil%>
+						<% if expenses.any? %>
+							<% 	debitbefore = Bankexpense.active.where("date < ? and debitgroup_id = ?", startdate.to_date, group.id)
+								creditbefore = Bankexpense.active.where("date < ? and creditgroup_id = ?", startdate.to_date, group.id)
+								saldoawal = debitbefore.sum(:total).to_i - creditbefore.sum(:total).to_i
+							    totaldebitbefore += saldoawal > 0 ? saldoawal.abs : 0
+							    totalcreditbefore += saldoawal < 0 ? saldoawal.abs : 0
+							    
+								debit = expenses.where(:debitgroup_id => group.id).sum(:total).to_i
+							    totaldebit += debit
+							    credit = expenses.where(:creditgroup_id => group.id).sum(:total).to_i
+							    totalcredit += credit
+							   	
+							   	saldoakhir = saldoawal + debit - credit
+								totaldebitafter = totaldebitafter + saldoakhir.abs if saldoakhir >= 0 
+								totalcreditafter = totalcreditafter + saldoakhir.abs if saldoakhir < 0 
+							%>
+							<tr>
+								<td><%= i+1%></th>
+								<td><%= group.name.upcase%></th>
+								<td width="110" class="right"><%= saldoawal > 0 ? to_currency_bank(saldoawal.abs) : '-'  %></td>
+								<td width="110" class="right"><%= saldoawal < 0 ? to_currency_bank(saldoawal.abs) : '-'  %></td>
+								<td width="110" class="right"><%= debit > 0 ? to_currency_bank(debit) : '-' %></td>
+								<td width="110" class="right"><%= credit > 0 ? to_currency_bank(credit) : '-' %></td>
+								<td width="110" class="right"><%= to_currency_bank(saldoakhir) if saldoakhir >= 0 %></td>
+								<td width="110" class="right"><%= to_currency_bank(saldoakhir.abs) if saldoakhir < 0 %></td>
+							</tr>
+							<% i += 1 %>
+						<% end %>
+					<% end %>
+				<% end %>
+			<% end %>
+			<!-- GROUP KAS BANK -->
+
+			<tr class="footer">
+				<td>&nbsp;</th>
+				<td class="total">TOTAL</th>
+				<td width="110" class="right total"><%= to_currency_bank(totaldebitbefore) %></td>
+				<td width="110" class="right total"><%= to_currency_bank(totalcreditbefore) %></td>
+				<td width="110" class="right total"><%= to_currency_bank(totaldebit) %></td>
+				<td width="110" class="right total"><%= to_currency_bank(totalcredit) %></td>
+				<td width="110" class="right total"><%= to_currency_bank(totaldebitafter) %></td>
+				<td width="110" class="right total"><%= to_currency_bank(totalcreditafter) %></td>
+			</tr>
+		</table>
+
+	</div>
+</div>

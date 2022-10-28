@@ -1,0 +1,21 @@
+<%= form_for(@officeexpensegroup) do |f| %>
+	<div class="field-row">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+<div class="field-row">
+    <%= f.label :officeexpensegroup_id, "Tipe Group Kas" %>
+    <%= f.select :officeexpensegroup_id, options_for_select(Officeexpensegroup.active.where("officeexpensegroup_id IS NULL").order(:name).collect {|g| [g.name, g.id]}, @officeexpensegroup.officeexpensegroup_id), {:include_blank => '- Tipe Group Kas -'}, :class => 'double chzn-select'  %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' %>
+    <a class="back left" href="<%=officeexpensegroups_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

@@ -1,0 +1,78 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Transaksi / <a href="<%=paymentchecks_path%>">Pembayaran Bon</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<%= render "sublink", :sublink => 2 %>
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label>Pilih Bulan</label>
+				<select name="month" class="half left combo_route">
+					<% (1.upto(12)).each do |m| %>
+					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+					<% end %>
+				</select>
+				<label class="middle">Tahun</label>
+				<select name="year" class="half left combo_route">
+					<% 2012.upto(Date.today.year) do |year| %>
+					<option value="<%=year%>"<% if year == @year.to_i %> selected="selected"<% end %>><%=year%></option>
+					<% end %>
+				</select>
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th width="80">Tgl Bikin</th>
+				<th>Supplier</th>
+				<th width="100">Tgl Bayar</th>
+				<th width="100">Ket</th>
+				<th width="110" class="right">Total</th>
+				<th width="60"></th>
+			</tr>
+		
+			<% @paymentchecks.each do |paymentcheck| %>
+			<% if paymentcheck.deleted %>
+				<% if current_user.adminrole %>
+					<tr class="deleted">
+						<td>#<%= zeropad(paymentcheck.id)%>.</td>
+						<td><%= paymentcheck.created_at.strftime('%d-%m-%Y')%></td>
+						<td><%= paymentcheck.supplier.name%></td>
+						<td><%= paymentcheck.date.strftime('%d-%m-%Y')%></td>
+						<td><%= paymentcheck.check_no%></td>
+						<td align="right"><%= to_currency(paymentcheck.total)%></td>
+						<td>DIHAPUS</td>
+					</tr>
+				<% end %>
+			<% else %>
+				<tr>
+					<td>#<%= zeropad(paymentcheck.id)%>.</td>
+					<td><%= paymentcheck.created_at.strftime('%d-%m-%Y')%></td>
+					<td><%= paymentcheck.supplier.name%></td>
+					<td><%= paymentcheck.date.strftime('%d-%m-%Y')%></td>
+					<td><%= paymentcheck.check_no%></td>
+					<td align="right"><%= to_currency(paymentcheck.total)%></td>
+					<td class="right" width="60">
+						<%= link_to '&#xf00d;'.html_safe, paymentcheck, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+					</td>
+				</tr>
+			<% end %>
+			<% end %>
+		</table>
+		<br class="clearfix" />
+	</div>
+</div>

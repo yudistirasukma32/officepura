@@ -1,0 +1,42 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+        <a class="btn-txt cancel" href="<%=customers_path%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Master / <a href="<%=customers_path%>">Pelanggan</a> / Cloning Jurusan</h1>
+
+		<br class="clearfix" />
+
+		<p>Nama Pelanggan: <%= @customer.name %></p>
+
+		<form action="/customers/transfer" method="post">
+
+		<div class="field-row continue">
+			<label for="customer_id">Pelanggan</label>&nbsp;&nbsp;
+			<select name="customer_id" class="third left chzn-select">
+				<option value="0">- Harap Pilih -</option>
+				<% @customerlist.each do |customer| %>
+				<option value="<%=customer['id']%>"><%=customer['name']%></option>
+				<% end %>
+			</select>
+			<small>Pelanggan dari office.puratrans.com</small>
+		</div>
+
+		<div class="actions">
+			<input type="hidden" name="id" value="<%= @customer.id %>">
+			<input type="submit" id="customer_submit" value="Mulai Copy" class="right" />
+		</div>
+
+		</form>
+ 
+		<br class="clearfix" />
+
+	</div>
+
+</div>

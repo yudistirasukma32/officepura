@@ -1,0 +1,170 @@
+<% if @receiptpayrollreturn %>
+
+<%= form_for(@receiptpayrollreturn) do |f| %>
+
+   <% if @errors.include?'receiptpayrollreturn' %>
+      <div class="field-row red">
+        <%=@errors['receiptpayrollreturn']%>
+      </div>
+    <% end %>
+
+ 
+ <div class="info-box" style="margin-bottom:30px;">  
+
+    <h3>BKK Supir #<%=zeropad(@receiptpayrollreturn.payroll.id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Tanggal</td>
+        <td><span id="strDate"><%=@receiptpayrollreturn.payroll.date.strftime('%d %B %Y')%></span></td>
+      </tr>
+      <tr>
+        <td width="90">Periode</td>
+        <td><span id="strPeriod"><%=@receiptpayrollreturn.payroll.period_start.strftime('%d %B %Y')%> - <%=@receiptpayrollreturn.payroll.period_end.strftime('%d %B %Y')%></span></td>
+      </tr>
+      <% if !@receiptpayrollreturn.payroll.driver_id.nil?%>
+      <tr>
+        <td>Supir</td>
+        <td><span id="strDriver"><%=@receiptpayrollreturn.payroll.driver.name%></span></td>
+      </tr>
+      <%else%>
+      <tr>
+        <td>Kernet</td>
+        <td><span id="strHelper"><%=@receiptpayrollreturn.payroll.helper.name%></name></td>
+      </tr>
+      <%end%>
+      <tr>
+        <td>Nopol</td>
+        <td><span id="strVehicle"><%=@receiptpayrollreturn.payroll.vehicle.nil? ? '-' : @receiptpayrollreturn.payroll.vehicle.current_id %></span></td>
+      </tr>
+    </table>
+    
+    <table class="row-view">
+      <tr>
+        <th colspan="4">PENERIMAAN</th>
+        <th width="100" class="right">Total</th>
+      </tr>
+
+      <tr>
+        <td>Non HLN</td>
+        <td class="right" id="lblNonHolidays"><%= @receiptpayrollreturn.payroll.non_holidays || 0 %></td>
+        <td width="5">*</td>
+        <td class="right" id="lblNonHolidaysFare"><%= to_currency(@receiptpayrollreturn.payroll.non_holidays_fare)%></td>
+        <td class="right green" id="lblNonHolidaysPayment"><%= to_currency(@receiptpayrollreturn.payroll.non_holidays_payment) %></td>
+      </tr>
+
+      <tr>
+        <td>HLN</td>
+        <td class="right" id="lblHolidays"><%= @receiptpayrollreturn.payroll.holidays || 0 %></td>
+        <td width="5">*</td>
+        <td class="right" id="lblHolidaysFare"><%= to_currency(@receiptpayrollreturn.payroll.holidays_fare)%></td>
+        <td class="right green" id="lblHolidaysPayment"><%= to_currency(@receiptpayrollreturn.payroll.holidays_payment) %></td>
+      </tr>
+
+      <tr>
+        <td>Ambil Tabungan</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="right green" id="lblSavingReduction"><%= to_currency(@receiptpayrollreturn.payroll.saving_reduction)%></td>
+      </tr>
+
+      <tr>
+        <td>Premi Hadir</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="right green" id="lblBonus"><%= to_currency(@receiptpayrollreturn.payroll.bonus)%></td>
+      </tr>
+      
+      <tr>
+        <td colspan="4"><strong>TOTAL</strong></td>
+        <td class="right green" id="lblTotalPayment"><%= to_currency(@receiptpayrollreturn.payroll.holidays_payment + @receiptpayrollreturn.payroll.non_holidays_payment + @receiptpayrollreturn.payroll.saving_reduction + @receiptpayrollreturn.payroll.bonus) %></td>
+      </tr>
+
+        <tr><td colspan="6" style="font-size:13px;">Revisi Tabungan (<span id="lblMasterSaving"><%= to_currency(@receiptpayrollreturn.payroll.master_saving || 0) %></span> - <span id="lblSavingReduction2"><%= to_currency(@receiptpayrollreturn.payroll.saving_reduction)%></span> = <span id="lblSavingRed"><%= to_currency(@receiptpayrollreturn.payroll.master_saving - @receiptpayrollreturn.payroll.saving_reduction) %></span>)</td></tr>
+
+      <tr><td colspan="6">&nbsp;</td></tr>
+
+      <tr>
+        <th>POTONGAN</th>
+        <th width="100" class="right">JML</th>
+        <th width="5"></th>
+        <th width="100" class="right">POT</th>
+        <th width="100" class="right">SISA</th>
+      </tr>
+
+      <tr>
+        <td>Klaim Susut</td>
+         <td class="right" id="lblMasterWeightLoss"><%= to_currency(@receiptpayrollreturn.payroll.master_weight_loss) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollWeightLoss"><%= to_currency(@receiptpayrollreturn.payroll.weight_loss) %></td>
+        <td class="right" id="lblTotalWeightLoss" ><%= to_currency(@receiptpayrollreturn.payroll.master_weight_loss - @receiptpayrollreturn.payroll.weight_loss) %></td>
+      </tr>
+
+      <tr>
+        <td>Klaim Kecelakaan</td>
+        <td class="right" id="lblMasterAccident"><%= to_currency(@receiptpayrollreturn.payroll.master_accident) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollAccident"><%= to_currency(@receiptpayrollreturn.payroll.accident) %></td>
+        <td class="right" id="lblTotalAccident"><%= to_currency(@receiptpayrollreturn.payroll.master_accident - @receiptpayrollreturn.payroll.accident) %></td>
+      </tr>
+
+      <tr>
+        <td>Klaim Onderdil</td>
+        <td class="right" id="lblMasterSparepart"><%= to_currency(@receiptpayrollreturn.payroll.master_sparepart) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollSparepart"><%= to_currency(@receiptpayrollreturn.payroll.sparepart) %></td>
+        <td class="right" id="lblTotalSparepart"><%= to_currency(@receiptpayrollreturn.payroll.master_sparepart - @receiptpayrollreturn.payroll.sparepart) %></td>
+      </tr>
+
+      <tr>
+        <td>Pinjaman</td>
+        <td class="right" id="lblMasterBon"><%= to_currency(@receiptpayrollreturn.payroll.master_bon) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollBon"><%= to_currency(@receiptpayrollreturn.payroll.bon) %></td>
+        <td class="right" id="lblTotalBon"><%= to_currency(@receiptpayrollreturn.payroll.master_bon - @receiptpayrollreturn.payroll.bon) %></td>
+      </tr>
+
+      <tr>
+        <td>Gantungan Sangu</td>
+        <td class="right">-</td>
+        <td></td>
+        <td class="right red" id="lblPayrollAllowance"><%= to_currency(@receiptpayrollreturn.payroll.allowance) %></td>
+        <td class="right">-</td>
+      </tr>
+
+      <tr>
+        <td>Menabung</td>
+        <td class="right" id="lblSavingRed2"><%= to_currency(@receiptpayrollreturn.payroll.master_saving - @receiptpayrollreturn.payroll.saving_reduction) %></td>
+        <td></td>
+        <td class="right red" id="lblPayrollSaving"><%= to_currency(@receiptpayrollreturn.payroll.saving) %></td>
+        <td class="right" id="lblTotalSaving"><%= to_currency(@receiptpayrollreturn.payroll.master_saving - @receiptpayrollreturn.payroll.saving_reduction + @receiptpayrollreturn.payroll.saving)%></td>
+      </tr>
+
+      <tr class="total-row">
+        <td colspan="3"><strong>TOTAL</strong></td>
+        <td class="right red" id="lblPayrollExpenseTotal"><%= to_currency(@receiptpayrollreturn.payroll.saving + @receiptpayrollreturn.payroll.weight_loss + @receiptpayrollreturn.payroll.accident + @receiptpayrollreturn.payroll.sparepart + @receiptpayrollreturn.payroll.bon + @receiptpayrollreturn.payroll.allowance) %></td>
+        <td></td>
+      </tr>
+
+      <tr class="total-row">
+        <td colspan="4"><strong>DITERIMA</strong></td>
+        <td class="right <%if @receiptpayrollreturn.total >= 0 %> green <% else %> red <% end %>" id="lblPayrollTotal"><%= to_currency(@receiptpayrollreturn.total.abs)%></td>
+      </tr>
+    </table>
+
+  </div>
+
+  <div class="field-row first" style="margin-bottom:-20px;">
+    <%= f.label :created_at, "Tgl Konfirmasi" %>
+    <%= f.text_field :created_at, :class => 'half date-picker', :value => to_currency(@receiptpayrollreturn.created_at.strftime('%d-%m-%Y')) %>
+    <%= f.hidden_field :receiptpayrollreturn_id, :value => @receiptpayrollreturn.id %>
+  </div>
+  
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'submit' %> 
+  </div>
+<% end %>
+
+<% end %>

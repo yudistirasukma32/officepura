@@ -1,0 +1,142 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+		
+		<h1><%=Setting.find_by_name("Client Name").value%> / Kas Harian Supir: <span class="red"><%=@date.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date">Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
+			</div>
+			</form>
+		</div>
+		<% running = balance = 0 %>
+		<h2 class="right">Saldo Awal: <%=to_currency(balance, 'Rp. ')%></h2>
+
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th>Keterangan</th>
+				<th width="45" class="office-col">Ktr</th>
+				<th width="80" class="nopol-col">No Pol</th>
+				<th width="90" class="right number-col">Debit</th>
+				<th width="90" class="right number-col">Kredit</th>
+				<th width="100" class="right number-col">Saldo</th>
+			</tr>
+
+			<!-- BKM Gaji Supir -->
+			<% if @receiptpayrollreturns.where("money(total) > money(0)").any? %>
+			<tr class="subheading">
+				<th colspan="8"><span class="green">BKM Supir</span></th>
+			</tr>
+
+			<% @receiptpayrollreturns.where("money(total) > money(0)").each_with_index do |receipt, i| %>
+			<% running += receipt.total %>
+			<tr>
+				<td><%=i+1%>.</td>
+				<% if !receipt.payroll.driver_id.nil? %>
+				<td>#<%=zeropad(receipt.payroll.id)%>: <%=receipt.payroll.driver.name%> (SUPIR)</td>
+				<td><%=receipt.payroll.office.abbr%></td>
+				<td><%=receipt.payroll.vehicle.current_id if !receipt.payroll.vehicle_id.nil?%></td>
+				<% else %>
+				<td>#<%=zeropad(receipt.payroll.id)%>: <%=receipt.payroll.helper.name%> (KERNET)</td>
+				<td><%=receipt.payroll.office.abbr%></td>
+				<td><%=receipt.payroll.helper.driver.vehicle.current_id if !receipt.payroll.helper.driver.vehicle_id.nil?%></td>
+				<%end%>
+				<td align="right"><%=to_currency(receipt.total)%></td>
+				<td align="right">0</td>
+				<td align="right" <% if running < 0 %> class="red"<% end %>><%=to_currency(running)%></td>
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="green"><%=to_currency(@receiptpayrollreturns.sum(:total))%></td>
+				<td>&nbsp;</td>		
+				<td>&nbsp;</td>
+			</tr>
+			<% end %>
+
+			<!-- Gaji Supir -->
+			<% if @receiptpayrolls.where("money(total) > money(0)").any? %>
+			<tr class="subheading">
+				<th colspan="8"><span class="red">BKK Supir</span></th>
+			</tr>
+
+			<% @receiptpayrolls.where("money(total) > money(0)").each_with_index do |receipt, i| %>
+			<% running -= receipt.total %>
+			<tr>
+				<td><%=i+1%>.</td>
+				<% if !receipt.payroll.driver_id.nil? %>
+				<td>#<%=zeropad(receipt.payroll.id)%>: <%=receipt.payroll.driver.name%> (SUPIR)</td>
+				<td><%=receipt.payroll.office.abbr%></td>
+				<td><%=receipt.payroll.vehicle.current_id if !receipt.payroll.vehicle_id.nil?%></td>
+				<% else %>
+				<td>#<%=zeropad(receipt.payroll.id)%>: <%=receipt.payroll.helper.name%> (KERNET)</td>
+				<td><%=receipt.payroll.office.abbr%></td>
+				<td><%=receipt.payroll.helper.driver.vehicle.current_id if !receipt.payroll.helper.driver.vehicle_id.nil?%></td>
+				<%end%>
+				<td align="right">0</td>
+				<td align="right"><%=to_currency(receipt.total)%></td>
+				<td align="right" <% if running < 0 %> class="red"<% end %>><%=to_currency(running)%></td>
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td>&nbsp;</td>					
+				<td align="right" class="red"><%=to_currency(@receiptpayrolls.sum(:total))%></td>
+				<td>&nbsp;</td>
+			</tr>
+			<% end %>
+
+			<% if @receiptdrivers.where("money(total) > money(0)").any? %>
+			<tr class="subheading">
+				<th colspan="8"><span class="red">Kas Supir</span></th>
+			</tr>
+
+			<% @receiptdrivers.where("money(total) > money(0)").each_with_index do |receipt, i| %>
+			<% running -= receipt.total %>
+			<tr>
+				<td><%=i+1%>.</td>
+				<% if !receipt.driverexpense.driver_id.nil? %>
+				<td><%=receipt.driverexpense.driver.name if !receipt.driverexpense.driver_id.blank? %> (SUPIR) : <%=nl2br(receipt.driverexpense.description).html_safe%></td>
+				<% else %>
+				<td><%=receipt.driverexpense.helper.name if !receipt.driverexpense.helper_id.blank? %> (KERNET) : <%=nl2br(receipt.driverexpense.description).html_safe%></td>
+				<%end%>
+				<td><%=receipt.driverexpense.office.abbr%></td>
+				<td>&nbsp;</td>
+				<td align="right">0</td>
+				<td align="right"><%=to_currency(receipt.total)%></td>
+				<td align="right" <% if running < 0 %> class="red"<% end %>><%=to_currency(running)%></td>
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td>&nbsp;</td>					
+				<td align="right" class="red"><%=to_currency(@receiptdrivers.sum(:total))%></td>
+				<td>&nbsp;</td>
+			</tr>
+			<% end %>
+
+		</table>
+
+		<h2 class="right">Saldo Akhir: <% if running < 0 %><span class="red"><% end %><%=to_currency(running, 'Rp. ')%><% if running < 0 %></span><% end %></h2>
+
+	</div>
+
+</div>

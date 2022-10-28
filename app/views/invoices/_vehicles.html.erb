@@ -1,0 +1,9 @@
+<div class="field-row left">
+  <label for="invoice_vehicle_id">Kendaraan</label>
+  <select id="invoice_vehicle_id" name="invoice[vehicle_id]" class="chzn-select half left combo_route">
+    <option value="">- No Pol -</option>
+    <% @vehicles.each do |vehicle| %>
+    <option value="<%=vehicle.id%>"><%=vehicle.current_id%></option>
+    <% end %>
+  </select>  
+</div>

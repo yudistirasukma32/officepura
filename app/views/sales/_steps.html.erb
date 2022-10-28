@@ -1,0 +1,5 @@
+<ul id="steps">
+  <li <% if step == 1 %> class="on" <% end %>><% if !@sale.id.nil? and @sale.receiptsales.active.count == 0 %><a href="<%=edit_sale_url(@sale)%>"><% end %><span>1</span> Data Penjualan<% if !@sale.id.nil? and @sale.receiptsales.active.count == 0 %></a><% end %></li>
+  <li class="separator"><i class="icon-chevron-right"></i></li>
+  <li<% if step == 2 %> class="on"<% end %>><% if !@sale.id.nil? %><a href="<%=confirmation_sale_url(@sale)%>"><% end %><span>2</span> Konfirmasi<% if !@sale.id.nil? %></a><% end %></li>
+</ul>

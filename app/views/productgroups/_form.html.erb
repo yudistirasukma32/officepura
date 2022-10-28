@@ -1,0 +1,20 @@
+<%= form_for(@productgroup) do |f| %>
+ <div class="field-row first">
+    <%= f.label :tire_flag, "Kategori Ban" %>
+    <%= f.check_box :tire_flag, :class => 'half', :checked => @productgroup.tire_flag %>
+  </div>
+	<div class="field-row">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' %>
+    <a class="back left" href="<%=productgroups_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

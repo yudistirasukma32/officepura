@@ -1,0 +1,140 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Laba Rugi Estimasi Kendaraan: <span class="red"> <%=Date::MONTHNAMES[@month.to_i]%> <%=@year%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label>Pilih Bulan</label>
+				<select name="month" class="half left combo_route">
+					<% (1.upto(12)).each do |m| %>
+					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+					<% end %>
+				</select>
+				<label class="middle">Tahun</label>
+				<select name="year" class="half left combo_route">
+					<% 2012.upto(Date.today.year) do |year| %>
+					<option value="<%=year%>"<% if year == @year.to_i %> selected="selected"<% end %>><%=year%></option>
+					<% end %>
+				</select>
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view report-view">
+		<% if @vehiclegroups.any? %>
+			
+			<tr>
+				<th width="30">No.</th>
+				<th>Kendaraan</th>
+				<th width="90" class="right">Pemasukan</th>
+				<th width="90" class="right">Pengeluaran</th>
+				<th width="90" class="right">Ban</th>
+				<th width="90" class="right">Onderdil</th>
+				<th width="90" class="right">Profit</th>
+				<th width="60" class="hideprint"></th>
+			</tr>
+			<% j=0 %>
+			<% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
+
+
+			<% @vehiclegroups.each do |vehiclegroup| %>
+			<% totalgroupincome = 0;
+				totalgroupoutcome = 0;
+				totalgroupban = 0
+				totalgrouponderdil = 0
+				totalgroupreceipt = 0
+				%>
+			<tr class="subheading">
+				<th colspan="6"><span class="red"><%= vehiclegroup.name %></span></th>
+			</tr>
+			<% vehiclegroup.vehicles.each_with_index do |vehicle, i| %>
+			<% 	totalincome = 0;
+				totaloutcome = 0;
+
+				# Kodingan Sebelumnya -------------------->
+				# invoice_borongan = Invoice.joins(:route).where(vehicle_id: vehicle.id).where("routes.price_per >= money(#{offset.to_i})").where("extract(year from invoices.date) = #{@year} and extract(month from invoices.date) = #{@month}").active.select("sum((select ( (invoices.quantity - count(id)) * routes.price_per) from receiptreturns where invoice_id = invoices.id and deleted = false)) as estimation").first.estimation.to_i rescue 0
+
+
+				# invoice_20ton = Invoice.joins(:route).where(vehicle_id: vehicle.id).where("invoices.isotank_id != 0 and routes.price_per < money(#{offset.to_i}) and routes.price_per_type = 'KG' and invoices.invoicetrain = true").where("extract(year from invoices.date) = #{@year} and extract(month from invoices.date) = #{@month}").active.select("sum((select ( (invoices.quantity - count(id)) * 20000 * routes.price_per) from receiptreturns where invoice_id = invoices.id and deleted = false)) as estimation").first.estimation.to_i
+
+				# invoice_25ton = Invoice.joins(:route).where(vehicle_id: vehicle.id).where("routes.price_per < money(#{offset.to_i}) and invoices.invoicetrain = false").where("isotank_id = 0 or (isotank_id != 0 and routes.price_per_type != 'KG')").where("extract(year from invoices.date) = #{@year} and extract(month from invoices.date) = #{@month}").active.select("sum((select ( (invoices.quantity - count(id)) * 25000 * routes.price_per) from receiptreturns where invoice_id = invoices.id and deleted = false)) as estimation").first.estimation.to_i 
+				# totalincome = invoice_borongan.to_i + invoice_20ton.to_i + invoice_25ton.to_i 
+
+				estimation = 0
+				count = 0
+				Invoice.active.where("extract(year from invoices.date) = #{@year} and extract(month from invoices.date) = #{@month}").where(vehicle_id: vehicle.id).each do |invoice|
+					estimation += invoice.get_estimation(offset,@customer_35)
+				end
+
+				
+				totalincome = estimation
+				totalgroupincome += totalincome
+
+				receipts = Receipt.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total) 
+		      	receiptreturns = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+		      	receiptpremis = Receiptpremi.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+
+		      	receiptexpenses = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+
+				# productgroup aktifa 7
+				# productgroup ban 1 8 9 10 11
+				# productgroup selain Aktifa = Onderdil 2 3 4 5 6
+				
+		      	productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id = 7)").sum(:total) 
+
+				ban = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (1,8,9,10,11))").sum(:total) 
+				
+				onderdil = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (2,3,4,5,6))").sum(:total) 
+				totalreceipt = receipts.to_i + receiptpremis.to_i + receiptexpenses.to_i + productrequests.to_i - receiptreturns.to_i
+				totaloutcome = totalreceipt + ban.to_i + onderdil.to_i
+				totalgroupoutcome += totaloutcome
+				totalgroupreceipt += totalreceipt
+
+				totalgroupban += ban
+				totalgrouponderdil += onderdil
+			%>
+				<% if totalincome != 0 || totaloutcome != 0 || ban != 0 || onderdil != 0 %>	
+				<tr>
+					<td><%= j+=1%>.</td>
+					<td><%= vehicle.current_id%></td>
+					<td align="right"><%= to_currency(totalincome)%></td>
+					<td align="right"><%= to_currency(totalreceipt)%></td>
+					<td align="right"><%= to_currency(ban)%></td>
+					<td align="right"><%= to_currency(onderdil)%></td>
+					<td align="right"><%= to_currency(totalincome - totaloutcome)%></td>
+					<td class="hideprint"><a class="cta" href="/reports/annualreport_vehicle/<%=vehicle.id%>/<%=@year%>">Detail</a></td>
+				</tr>
+				<% end %>
+			<% end %>
+			
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="green"><%=to_currency(totalgroupincome)%></td>
+				<td align="right" class="red"><%=to_currency(totalgroupreceipt)%></td>
+				<td align="right" class="red"><%=to_currency(totalgroupban)%></td>
+				<td align="right" class="red"><%=to_currency(totalgrouponderdil)%></td>
+				<td align="right" class="<% if totalgroupincome >= (totalgroupoutcome) %> green <% else %> red <% end %>"><%=to_currency(totalgroupincome-totalgroupoutcome)%></td>
+				<td>&nbsp;</td>
+			</tr>
+			<% end%>
+		<% end%>
+	</table>
+
+	</div>
+	
+</div>

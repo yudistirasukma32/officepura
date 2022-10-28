@@ -1,0 +1,24 @@
+<table class="row-view">
+	<tr>
+		<th width="50">BKK</th>
+		<th width="80">Tanggal</th>
+		<th>Supir</th>
+		<th>Jurusan</th>
+		<th width="110" class="right">Total</th>
+		<th width="30"></th>
+	</tr>
+
+	<% @receipts.each do |receipt| %>
+	<tr>
+		<td><%=zeropad(receipt.invoice_id)%></td>
+		<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+		<td><%=receipt.invoice.driver.name%></td>
+		<td><%=receipt.quantity%> Rit: <%=receipt.invoice.route.name%></td>
+		<td class="red" align="right"><%=to_currency(receipt.total)%></td>
+		<td class="right">
+			<%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+		</td>
+	</tr>
+	<% end %>	
+
+</table>

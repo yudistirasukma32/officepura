@@ -1,0 +1,12 @@
+<%= form_for(@commodity) do |f| %>
+	<div class="field-row first">
+    <%= f.label :name, "Nama Komoditas" %>
+    <%= f.text_field :name %>
+	</div>
+
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Marketing' %>
+    <a class="back left" href="<%=commodities_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

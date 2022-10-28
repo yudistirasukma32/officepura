@@ -1,0 +1,78 @@
+<% if @driverexpense %>
+<%= form_for(@receiptdriver) do |f| %>
+	<%= f.hidden_field :process, :value => 'create' %>
+  	<%= f.hidden_field :driverexpense_id, :value => @driverexpense_id %>
+
+
+  	<% if @errors.include?'receiptdriver' %>
+	    <div class="field-row red">
+	      <%=@errors['receiptdriver']%>
+	    </div>
+	<% end %>
+ 
+  	<div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
+  		<h3>Kas Harian #<%=zeropad(@driverexpense.id)%></h3>
+  		
+  		<table class="row-view no-border">
+  			<tr>
+				<td width="90">Tanggal</td>
+				<td><%=@driverexpense.date.strftime('%d-%m-%Y')%></td>
+			</tr>	
+			<% if !@driverexpense.driver_id.blank? %>
+			<tr>
+				<td width="90">Supir</td>
+				<td><%=@driverexpense.driver.name%></td>
+			</tr>
+			<% end %>
+			<% if !@driverexpense.helper_id.blank? %>
+			<tr>
+				<td width="90">Kernet</td>
+				<td><%=@driverexpense.helper.name%></td>
+			</tr>
+			<% end %>
+			<tr>
+				<td width="90">Keterangan</td>
+				<td><%=@driverexpense.description%></td>
+			</tr>
+  		</table>
+
+  		<table class="row-view">
+			<tr>
+				<th width="150">Keterangan</th>
+	        <th>&nbsp;</th>
+	        <th width="160" class="right" style="padding-right:5px;">Total</th>
+	    	</tr>
+	    	<tr>
+	    		<td>Klaim Susut</td>
+	    		<td>&nbsp;</th>
+	    		<td class="half allowance-field"><%= to_currency(@driverexpense.weight_loss)%></td>
+	    	</tr>
+	    	<tr>
+	    		<td>Klaim Kecelakaan</td>
+	    		<td>&nbsp;</th>
+	    		<td class="half allowance-field"><%= to_currency(@driverexpense.accident)%></td>
+	    	</tr>
+	    	<tr>
+	    		<td>Klaim Onderdil</td>
+	    		<td>&nbsp;</th>
+	    		<td class="half allowance-field"><%= to_currency(@driverexpense.sparepart)%></td>
+	    	</tr>
+	    	<tr>
+	    		<td>Pinjaman</td>
+	    		<td>&nbsp;</th>
+	    		<td class="half allowance-field"><%= to_currency(@driverexpense.bon)%></td>
+	    	</tr>
+	    	<tr class="total-row">
+		        <td><%= f.label :total, "Total" %></td>
+		        <td>&nbsp;</th>
+				<td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@driverexpense.total), :readOnly => 'true' %></td>
+		    </tr>
+		</table>
+
+      	<div class="field-row continue">
+		    <%= f.submit "Tambah Data", :class => 'submit right' %>      
+		  </div>
+  	</div>
+
+<% end %>
+<% end %>

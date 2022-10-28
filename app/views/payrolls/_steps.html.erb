@@ -1,0 +1,5 @@
+<ul id="steps">
+  <li<% if step == 1 %> class="on"<% end %>><% if !@payroll.id.nil? and @payroll.receiptpayrolls.active.count == 0 %><a href="<%=edit_payroll_url(@payroll)%>"><% end %><span>1</span> Data BKK Supir<% if !@payroll.id.nil? and @payroll.receiptpayrolls.active.count == 0 %></a><% end %></li>
+  <li class="separator"><i class="icon-chevron-right"></i></li>
+  <li<% if step == 2 %> class="on"<% end %>><% if !@payroll.id.nil? %><a href="<%=confirmation_payroll_url(@payroll)%>"><% end %><span>2</span> Konfirmasi<% if !@payroll.id.nil? %></a><% end %></li>
+</ul>

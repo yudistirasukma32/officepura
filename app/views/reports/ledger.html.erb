@@ -1,0 +1,913 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		
+		<a class="print btn" href="\reports\filterledger"><i class="icon-remove"></i> Kembali</a>
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Buku Besar: <span class="red"><%=@inputs[:startdate].to_date.strftime('%d %b %Y')%> - <%=@inputs[:enddate].to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th width="80">Tanggal</th>
+				<th>Keterangan</th>
+				<th width="110" class="right">Debit</th>
+				<th width="110" class="right">Kredit</th>
+				<th width="120" class="right">Saldo</th>
+			</tr>
+			<% id_group_hutangtoko = 19 %>
+			<% id_group_piutang = 6 %>
+			<% id_group_kas = 1 %>
+			<% id_group_sangu = 54 %>
+			<% id_group_premi = 8 %>
+			<% id_groupbank_sangu = 25 %>
+			<% id_groupbank_premi = 32 %>
+			<% id_groupbank_solar = 27 %>
+			<% @startdate = @inputs[:startdate] %>
+			<%# @enddate = @inputs[:enddate].to_date + 1.day %>
+			<% @enddate = @inputs[:enddate].to_date %>
+
+
+			<!-- GROUP SANGU -->
+			<% if @inputs["Kas_Sangu"] == 'Yes' %>
+				<% @receipts = Receipt.find_by_sql("SELECT *
+													FROM (
+													select r.id, r.created_at, r.invoice_id, r.quantity, r.driver_allowance, r.helper_allowance, r.misc_allowance, 
+													r.tol_fee, r.ferry_fee, r.total, '' as expensetype,'' as description, 'r' as type
+													from receipts r
+												    where (r.created_at >= '#{@startdate.to_date}' and r.created_at < '#{@enddate.to_date + 1}') AND r.deleted = false AND
+												    r.driver_allowance + r.helper_allowance + r.misc_allowance + r.tol_fee + r.ferry_fee > money(0) 
+												    union
+												    select rt.id, rt.created_at, rt.invoice_id, rt.quantity, rt.driver_allowance, rt.helper_allowance, rt.misc_allowance, 
+												    rt.tol_fee, money(0), rt.total, '' as expensetype, '' as description, 'rt' as type
+													from receiptreturns rt
+												    where (rt.created_at >= '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.deleted = false AND
+												    rt.driver_allowance + rt.helper_allowance + rt.misc_allowance + rt.tol_fee > money(0) and invoice_id not in 
+												    (select invoice_id from receipts where (created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}') AND deleted = false)
+												    union
+												    select re.id, re.created_at, 0, 0, money(0), money(0), money(0), money(0), money(0), re.total, re.expensetype, of.description, 're' as type
+												    from receiptexpenses re inner join officeexpenses of on re.officeexpense_id = of.id
+												    where re.officeexpensegroup_id = #{id_group_sangu} and re.deleted = false and (re.created_at >= '#{@startdate.to_date}' and re.created_at < '#{@enddate.to_date + 1}')
+												    union
+												    select be.id, be.date as created_at, 0, 0, money(0), money(0), money(0), money(0), money(0), be.total, 'Debit', be.description, 're' as type
+												    from bankexpenses be
+												    where be.debitgroup_id = #{id_groupbank_sangu} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date + 1}')
+												    union
+												    select be.id, be.date as created_at, 0, 0, money(0), money(0), money(0), money(0), money(0), be.total, 'Kredit', be.description, 're' as type
+												    from bankexpenses be
+												    where be.creditgroup_id = #{id_groupbank_sangu} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date + 1}')
+												    ) AS rec order by rec.created_at" ) 
+													%>
+
+				<% if @receipts.any? %>
+					<tr class="subheading">
+						<th colspan="6" style="color:#000;">Sangu</th>
+					</tr>
+
+					<% 	debitbefore = Receipt.active.where("created_at < ?", @startdate.to_date) 
+					   	creditbefore = Receiptreturn.active.where("created_at < ?", @startdate.to_date) 
+					   	kasdebit = Receiptexpense.active.where("created_at < ? and expensetype = 'Kredit' and officeexpensegroup_id = ?", @startdate.to_date, id_group_sangu)
+					   	kascredit = Receiptexpense.active.where("created_at < ? and expensetype = 'Debit' and officeexpensegroup_id = ?", @startdate.to_date, id_group_sangu)
+					   	bankdebit = Bankexpense.active.where("date < ? and debitgroup_id = ?", @startdate.to_date, id_groupbank_sangu)
+						bankcredit = Bankexpense.active.where("date < ? and creditgroup_id = ?", @startdate.to_date, id_groupbank_sangu)
+						running = debitbefore.sum("driver_allowance + helper_allowance + misc_allowance + tol_fee + ferry_fee").to_i - creditbefore.sum("driver_allowance + helper_allowance + misc_allowance + tol_fee").to_i + kasdebit.sum(:total).to_i - kascredit.sum(:total).to_i + bankdebit.sum(:total).to_i - bankcredit.sum(:total).to_i%>
+
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>Saldo Awal</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+					</tr>
+
+					<% totaldebit = totalcredit = 0 %>
+					
+					<% @receipts.each_with_index do |receipt,i| %>
+						<% if receipt.type == 'r'%>
+						
+							<% running += receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee %>
+							<% totaldebit += receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee %>
+							
+							<tr>
+								<td><%=i+1%>.</td>
+								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+								<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
+								
+								<% if !receipt.invoice.receiptreturns.active.where("created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}'").first.nil? %>
+								<% receiptreturn = receipt.invoice.receiptreturns.where("created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}'").active.first %>
+								<% running -= receiptreturn.driver_allowance + receiptreturn.helper_allowance + receiptreturn.misc_allowance + receiptreturn.tol_fee%>
+								<% totalcredit += receiptreturn.driver_allowance + receiptreturn.helper_allowance + receiptreturn.misc_allowance + receiptreturn.tol_fee %>
+								
+								<td align="right"><%=to_currency_bank(receiptreturn.driver_allowance + receiptreturn.helper_allowance + receiptreturn.misc_allowance + receiptreturn.tol_fee) %></td>
+								<% else %>
+								<td align="right"><%=to_currency_bank(0) %></td>	
+								<% end %>
+								
+								<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+							</tr>
+						
+						<% elsif receipt.type == 'rt' %>
+						
+							<% running -= receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee %>
+							<% totalcredit += receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee %>
+							
+							<tr>
+								<td><%=i+1%>.</td>
+								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+								<td align="right"><%=to_currency_bank(0) %></td>	
+								<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
+								<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+							</tr>
+
+						<% else %>
+							<% if receipt.expensetype == 'Kredit' %>
+								<% running += receipt.total %>
+								<% totaldebit += receipt.total %>
+								
+								<tr>
+									<td><%=i+1%>.</td>
+									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+									<td><%= receipt.description%></td>
+									<td align="right"><%=to_currency_bank(receipt.total) %></td>
+									<td align="right"><%=to_currency_bank(0) %></td>
+									<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+								</tr>
+							<% else %>
+								<% running -= receipt.total %>
+								<% totalcredit += receipt.total %>
+								
+								<tr>
+									<td><%=i+1%>.</td>
+									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+									<td><%= receipt.description%></td>
+									<td align="right"><%=to_currency_bank(0) %></td>
+									<td align="right"><%=to_currency_bank(receipt.total) %></td>
+									<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+								</tr>
+							<% end %>
+						
+						<% end %>
+					<% end %>
+					
+					<tr class="footer">
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td class="total">TOTAL</td>
+						<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+						<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+						<td align="right">&nbsp;</td>
+					</tr>
+				<% end %>
+			<% end %>
+			<!-- END GROUP SANGU -->
+
+			<!-- GROUP SOLAR -->
+			<% if @inputs["Kas_Solar"] == 'Yes' %>
+				<% @receipts = Receipt.find_by_sql("SELECT *
+													FROM (
+														select rt.id, rt.created_at, rt.invoice_id, rt.quantity, rt.gas_allowance ,rt.total, '' as expensetype, '' as description, 'rt' as type 
+														from receipts rt
+														where(rt.created_at > '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.gas_allowance > money(0) AND rt.deleted = false
+														union
+													    select be.id, be.date as created_at, 0, 0, money(0), be.total, 'Debit', be.description, 're' as type
+													    from bankexpenses be
+													    where be.debitgroup_id = #{id_groupbank_solar} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date}')
+													    union
+													    select be.id, be.date as created_at, 0, 0, money(0), be.total, 'Kredit', be.description, 're' as type
+													    from bankexpenses be
+													    where be.creditgroup_id = #{id_groupbank_solar} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date}')
+													    ) AS rec order by rec.created_at") %>
+				<% if @receipts.any? %>
+					<tr class="subheading">
+						<th colspan="6" style="color:#000;">Solar</th>
+					</tr>
+
+					<%  debitbefore = Receipt.active.where("created_at < ?", @startdate.to_date)
+						bankdebit = Bankexpense.active.where("date < ? and debitgroup_id = ?", @startdate.to_date, id_groupbank_solar)
+						bankcredit = Bankexpense.active.where("date < ? and creditgroup_id = ?", @startdate.to_date, id_groupbank_solar)
+						running = debitbefore.sum(:gas_allowance).to_i + bankdebit.sum(:total).to_i - bankcredit.sum(:total).to_i%>
+
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>Saldo Awal</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+					</tr>
+
+					<% totaldebit = totalcredit = 0 %>
+
+					<% @receipts.each_with_index do |receipt,i| %>
+						<% if receipt.type == 'rt' %>
+							<% running += receipt.gas_allowance %>
+							<% totaldebit += receipt.gas_allowance %>
+						
+							<tr>
+								<td><%=i+1%>.</td>
+								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+								<td align="right"><%=to_currency_bank(receipt.gas_allowance) %></td>
+								<td align="right"><%=to_currency_bank(0) %></td>
+								<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+							</tr>
+						<% else %>
+							
+							<% if receipt.expensetype == 'Debit' %>
+								<% running += receipt.total %>
+								<% totaldebit += receipt.total %>
+								
+								<tr>
+									<td><%=i+1%>.</td>
+									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+									<td><%= receipt.description%></td>
+									<td align="right"><%=to_currency_bank(receipt.total) %></td>
+									<td align="right"><%=to_currency_bank(0) %></td>
+									<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+								</tr>
+							<% else %>
+								<% running -= receipt.total %>
+								<% totalcredit += receipt.total %>
+								
+								<tr>
+									<td><%=i+1%>.</td>
+									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+									<td><%= receipt.description%></td>
+									<td align="right"><%=to_currency_bank(0) %></td>
+									<td align="right"><%=to_currency_bank(receipt.total) %></td>
+									<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+								</tr>
+							<% end %>
+
+						<% end %>
+						
+					<% end %>
+
+					<tr class="footer">
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td class="total">TOTAL</td>
+						<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+						<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+						<td align="right">&nbsp;</td>
+					</tr>
+				<% end %>
+			<% end %>
+			<!-- END GROUP SOLAR -->
+
+			<!-- GROUP PREMI -->
+			<% if @inputs["Kas_Premi"] == 'Yes' %>
+				<% @receiptpremis = Receiptpremi.find_by_sql("SELECT * 
+																FROM (
+																select rt.id, rt.created_at, rt.invoice_id, rt.bonusreceipt_id, rt.total, '' as expensetype, '' as description, 'rt' as type
+																from receiptpremis rt
+															    where (rt.created_at >= '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.deleted = false
+															    union
+															    select re.id, re.created_at, 0, 0, re.total, re.expensetype, of.description, 're' as type
+															    from receiptexpenses re inner join officeexpenses of on re.officeexpense_id = of.id
+															    where re.officeexpensegroup_id = #{id_group_premi} and re.deleted = false and (re.created_at >= '#{@startdate.to_date}' and re.created_at < '#{@enddate.to_date + 1}')
+															    union
+															    select be.id, be.date as created_at, 0, 0, be.total, 'Kredit', be.description, 're' as type
+															    from bankexpenses be
+															    where be.debitgroup_id = #{id_groupbank_premi} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date}')
+															    union
+															    select be.id, be.date as created_at, 0, 0, be.total, 'Debit', be.description, 're' as type
+															    from bankexpenses be
+															    where be.creditgroup_id = #{id_groupbank_premi} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date}')
+															    ) AS rec order by rec.created_at") %>
+				<% if @receiptpremis.any? %>
+					<tr class="subheading">
+						<th colspan="6" style="color:#000;">Premi</th>
+					</tr>
+
+					<% debitbefore = Receiptpremi.active.where("created_at < ?", @startdate.to_date)
+						kasdebit = Receiptexpense.active.where("created_at < ? and expensetype = 'Kredit' and officeexpensegroup_id = ?", @startdate.to_date, id_group_premi)
+					   	kascredit = Receiptexpense.active.where("created_at < ? and expensetype = 'Debit' and officeexpensegroup_id = ?", @startdate.to_date, id_group_premi)
+					   	bankdebit = Bankexpense.active.where("date < ? and debitgroup_id = ?", @startdate.to_date, id_groupbank_premi)
+					   	bankcredit = Bankexpense.active.where("date < ? and creditgroup_id = ?", @startdate.to_date, id_groupbank_premi)
+						running = debitbefore.sum(:total).to_i + kasdebit.sum(:total).to_i - kascredit.sum(:total).to_i + bankdebit.sum(:total).to_i - bankcredit.sum(:total).to_i%>
+
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>Saldo Awal</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+					</tr>
+
+					<% totaldebit = totalcredit = 0 %>
+
+					<% @receiptpremis.each_with_index do |receipt,i| %>
+						
+						<% if receipt.type == 'rt' %>
+							<% running += receipt.total %>
+							<% totaldebit += receipt.total %>
+							
+							<tr>
+								<td><%=i+1%>.</td>
+								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.bonusreceipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+								<td align="right"><%=to_currency_bank(receipt.total) %></td>
+								<td align="right"><%=to_currency_bank(0) %></td>
+								<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+							</tr>
+						<% else %>
+							<% if receipt.expensetype == 'Kredit' %>
+								<% running += receipt.total %>
+								<% totaldebit += receipt.total %>
+								
+								<tr>
+									<td><%=i+1%>.</td>
+									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+									<td><%= receipt.description%></td>
+									<td align="right"><%=to_currency_bank(receipt.total) %></td>
+									<td align="right"><%=to_currency_bank(0) %></td>
+									<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+								</tr>
+							<% else %>
+								<% running -= receipt.total %>
+								<% totalcredit += receipt.total %>
+								
+								<tr>
+									<td><%=i+1%>.</td>
+									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+									<td><%= receipt.description%></td>
+									<td align="right"><%=to_currency_bank(0) %></td>
+									<td align="right"><%=to_currency_bank(receipt.total) %></td>
+									<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+								</tr>
+							<% end %>
+						<% end %>
+					<% end %>
+
+					<tr class="footer">
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td class="total">TOTAL</td>
+						<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+						<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+						<td align="right">&nbsp;</td>
+					</tr>
+				<% end %>
+			<% end %>
+			<!-- END GROUP PREMI -->
+
+			<!-- GROUP ONDERDIL KONTAN -->
+			<% if @inputs["Kas_Onderdil Kontan"] == 'Yes' %>
+				<% @receiptorders = Receiptorder.active.where("(created_at > ? and created_at < ?) AND total > money(0)", @startdate.to_date, @enddate.to_date + 1) %>
+				<% if @receiptorders.any? %>
+					<tr class="subheading">
+						<th colspan="6" style="color:#000;">Onderdil Kontan</th>
+					</tr>
+
+					<% debitbefore = Receiptorder.active.where("created_at < ?", @startdate.to_date) %>
+					<% running = debitbefore.sum(:total).to_i %>
+
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>Saldo Awal</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+					</tr>
+
+					<% totaldebit = totalcredit = 0 %>
+
+					<% @receiptorders.each_with_index do |receipt,i| %>
+						<% running += receipt.total %>
+						<% totaldebit += receipt.total %>
+
+						<% productname = "" %>
+						<% receipt.productorder.productorderitems.each do |item| %>
+						<%		productname += item.product.name + ", " %>
+						<% end %>
+						<% productname = productname[0...-2] %>
+						
+						<tr>
+							<td><%=i+1%>.</td>
+							<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+							<td><%= getwords(productname, 35) %><%= " (" + receipt.productorder.productrequest.vehicle.current_id + ")" if receipt.productorder.productrequest and !receipt.productorder.productrequest.vehicle_id.nil? %></td>
+							<td align="right"><%=to_currency_bank(receipt.total) %></td>
+							<td align="right"><%=to_currency_bank(0) %></td>
+							<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+						</tr>
+					<% end %>
+
+					<tr class="footer">
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td class="total">TOTAL</td>
+						<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+						<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+						<td align="right">&nbsp;</td>
+					</tr>
+				<% end %>
+			<% end %>
+			<!-- END GROUP ONDERDIL KONTAN -->
+
+			<!-- GROUP PENJUALAN BARANG -->
+			<% if @inputs["Kas_Penjualan Barang"] == 'Yes' %>
+				<% @receiptsales = Receiptsale.active.where("(created_at > ? and created_at < ?) AND total > money(0)", @startdate.to_date, @enddate.to_date + 1) %>
+				<% if @receiptsales.any? %>
+					<tr class="subheading">
+						<th colspan="6" style="color:#000;">Penjualan Barang</th>
+					</tr>
+
+					<% creditbefore = Receiptsale.active.where("created_at < ?", @startdate.to_date) %>
+					<% running = 0 - creditbefore.sum(:total).to_i %>
+
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>Saldo Awal</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+					</tr>
+
+					<% totaldebit = totalcredit = 0 %>
+
+					<% @receiptsales.each_with_index do |receipt,i| %>
+						<% running -= receipt.total %>
+						<% totalcredit += receipt.total %>
+
+						<% productname = "" %>
+						<% receipt.sale.saleitems.each do |item| %>
+						<%		productname += item.productsale.name + ", " %>
+						<% end %>
+						<% productname = productname[0...-2] %>
+						
+						<tr>
+							<td><%=i+1%>.</td>
+							<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+							<td><%= getwords(productname, 35) %></td>
+							<td align="right"><%=to_currency_bank(0) %></td>
+							<td align="right"><%=to_currency_bank(receipt.total) %></td>
+							<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+						</tr>
+					<% end %>
+
+					<tr class="footer">
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td class="total">TOTAL</td>
+						<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+						<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+						<td align="right">&nbsp;</td>
+					</tr>
+				<% end %>
+			<% end %>
+			<!-- END GROUP PENJUALAN BARANG -->
+
+			<!-- GROUP KAS HARIAN -->
+			<% if @officeexpensegroups.any? %>
+				<% @officeexpensegroups.each do |group| %>
+					<% if @inputs["Kas_" + group.name] == 'Yes' %>
+						<% expenses = Receiptexpense.where("deleted = false and officeexpensegroup_id = ? and (created_at >= ? and created_at < ?)", group.id, @startdate.to_date, @enddate.to_date + 1).order(:created_at) rescue nil%> 
+						<% if expenses.any? %>
+							<% totaldebit = totalcredit = 0 %>
+							<tr class="subheading">
+								<th colspan="6" style="color:#000;"><%=group.name%></th>
+							</tr>		
+
+							<% debitbefore = Receiptexpense.where("deleted = false and officeexpensegroup_id = ? and expensetype = 'Debit' and created_at < ?", group.id, @startdate.to_date) %>
+							<% creditbefore = Receiptexpense.where("deleted = false and officeexpensegroup_id = ? and expensetype = 'Kredit' and created_at < ?", group.id, @startdate.to_date) %>
+							<% running = creditbefore.sum(:total) - debitbefore.sum(:total) %>
+
+							<tr>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>Saldo Awal</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+							</tr>
+
+							<% expenses.each_with_index do |expense, i| %>
+							<% running -= expense.total if expense.expensetype == 'Debit' %>
+							<% totalcredit += expense.total if expense.expensetype == 'Debit' %>
+							<% running += expense.total if expense.expensetype == 'Kredit' %>
+							<% totaldebit += expense.total if expense.expensetype == 'Kredit' %>
+
+							<tr>
+								<td><%=i+1%>.</td>
+								<td><%=expense.created_at.to_date.strftime('%d-%m-%Y')%></td>
+								<td><%=expense.officeexpense.description%></td>
+								<td align="right"><%=expense.expensetype == 'Kredit' ? to_currency_bank(expense.total) : '0'%></td>
+								<td align="right"><%=expense.expensetype == 'Debit' ? to_currency_bank(expense.total) : '0'%></td>
+								<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+							</tr>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td class="total">TOTAL</td>
+								<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+								<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+								<td align="right">&nbsp;</td>
+							</tr>
+						<% end %>
+					<% end %>
+				<% end %>
+			<% end %>
+			<!-- END GROUP KAS HARIAN -->
+
+			<!-- GROUP KAS BANK -->
+			<% if @bankexpensegroups.any? %>
+				<% @bankexpensegroups.each do |group| %>
+					<% if @inputs["Bank_" + group.name] == 'Yes' %>
+						<% if group.id == id_group_kas %>
+
+							<% totaldebit = totalcredit = 0 %>
+							<tr class="subheading">
+								<th colspan="6" style="color:#000;"><%=group.name%></th>
+							</tr>
+
+							<% debitbefore = Bankexpense.where("enabled = true and deleted = false and debitgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+							<% creditbefore = Bankexpense.where("enabled = true and deleted = false and creditgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+							<% running = debitbefore.sum(:total) - creditbefore.sum(:total) %>
+							
+							<tr>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>Saldo Awal</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+							</tr>
+							<!-- KAS BANK -->
+							<% i = 0 %>
+						
+							<% expenses = Receiptexpense.find_by_sql("SELECT *
+																	FROM (
+																	Select f.id,f.created_at, o.description, f.expensetype, f.total
+																	from receiptexpenses f inner join officeexpenses o on f.officeexpense_id = o.id
+																	where (f.created_at >= '#{@startdate.to_date}' and f.created_at < '#{@enddate.to_date + 1}') AND f.deleted = false
+																	union
+																	select id,date as created_at, description, 'Debit' , total
+																	from bankexpenses
+																	where deleted = false and (date >= '#{@startdate.to_date}' and date < '#{@enddate.to_date}') and debitgroup_id = #{group.id}
+																	union
+																	select id,date as created_at, description, 'Kredit' , total
+																	from bankexpenses
+																	where deleted = false and (date >= '#{@startdate.to_date}' and date < '#{@enddate.to_date}') and creditgroup_id = #{group.id}) as rec
+																	order by rec.created_at") rescue nil%> 
+							<% if expenses.any? %>
+								<% expenses.each do |expense| %>
+									<% running += expense.total if expense.expensetype == 'Debit' %>
+									<% totaldebit += expense.total if expense.expensetype == 'Debit' %>
+									
+									<% running -= expense.total if expense.expensetype == 'Kredit' %>
+									<% totalcredit += expense.total if expense.expensetype == 'Kredit' %>
+
+									<tr>
+										<td><%=i+1%>.</td>
+										<td><%=expense.created_at.to_date.strftime('%d-%m-%Y')%></td>
+										<td><%=expense.description%></td>
+										<td align="right"><%=expense.expensetype == 'Debit' ? to_currency_bank(expense.total) : '0'%></td>
+										<td align="right"><%=expense.expensetype == 'Kredit' ? to_currency_bank(expense.total) : '0'%></td>
+										<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+									</tr>
+
+									<% i += 1 %>
+								<% end %>
+							<% end %>
+							
+							<!-- SANGU/BKK -->
+							<% @receipts = Receipt.find_by_sql("SELECT *
+														FROM (
+														select r.id, r.created_at, r.invoice_id, r.quantity, r.driver_allowance, r.helper_allowance, r.misc_allowance, 
+														r.tol_fee, r.ferry_fee, 'r' as type
+														from receipts r
+													    where (r.created_at >= '#{@startdate.to_date}' and r.created_at < '#{@enddate.to_date + 1}') AND r.deleted = false AND
+													    r.driver_allowance + r.helper_allowance + r.misc_allowance + r.tol_fee + r.ferry_fee > money(0) 
+													    union
+													    select rt.id, rt.created_at, rt.invoice_id, rt.quantity, rt.driver_allowance, rt.helper_allowance, rt.misc_allowance, 
+													    rt.tol_fee, money(0), 'rt' as type
+														from receiptreturns rt
+													    where (rt.created_at >= '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.deleted = false AND
+													    rt.driver_allowance + rt.helper_allowance + rt.misc_allowance + rt.tol_fee > money(0) and invoice_id not in 
+													    (select invoice_id from receipts where (created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}') AND deleted = false)
+													    ) AS rec
+														order by rec.created_at" ) %>
+
+							<% if @receipts.any? %>
+								<tr class="subheading">
+									<th>&nbsp;</th>
+									<th colspan="5" style="color:#000;">SANGU</th>
+								</tr>
+
+								<% @receipts.each do |receipt| %>
+									<% if receipt.type == 'r'%>
+									
+									<% running -= receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee %>
+									<% totalcredit += receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee %>
+									
+									<tr>
+										<td><%=i+1%>.</td>
+										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+										
+										<% if !receipt.invoice.receiptreturns.active.where("created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}'").first.nil? %>
+											<% receiptreturn = receipt.invoice.receiptreturns.active.where("created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}'").first %>
+											<% running += receiptreturn.driver_allowance + receiptreturn.helper_allowance + receiptreturn.misc_allowance + receiptreturn.tol_fee%>
+											<% totaldebit += receiptreturn.driver_allowance + receiptreturn.helper_allowance + receiptreturn.misc_allowance + receiptreturn.tol_fee %>
+											
+											<td align="right"><%=to_currency_bank(receiptreturn.driver_allowance + receiptreturn.helper_allowance + receiptreturn.misc_allowance + receiptreturn.tol_fee) %></td>
+										<% else %>
+											<td align="right"><%=to_currency_bank(0) %></td>	
+										<% end %>
+
+										<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
+										
+										<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+									</tr>
+									
+									<% else %>
+									
+									<% running += receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee %>
+									<% totaldebit += receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee %>
+									
+									<tr>
+										<td><%=i+1%>.</td>
+										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+										<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
+										<td align="right"><%=to_currency_bank(0) %></td>	
+
+										<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+									</tr>
+									
+									<% end %>
+
+									<% i += 1 %>
+								<% end %>
+							<% end %>
+
+							<!-- SOLAR -->
+							<% @receipts = Receipt.where("(created_at > ? and created_at < ?) AND gas_allowance > money(0) AND deleted = false", @startdate.to_date, @enddate.to_date + 1).order(:created_at) %>
+							<% if @receipts.any? %>
+								<tr class="subheading">
+									<th>&nbsp;</th>
+									<th colspan="5" style="color:#000;">SOLAR</th>
+								</tr>
+
+								<% @receipts.each do |receipt| %>
+									<% running -= receipt.gas_allowance %>
+									<% totalcredit += receipt.gas_allowance %>
+									
+									<tr>
+										<td><%=i+1%>.</td>
+										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+										<td align="right"><%=to_currency_bank(0) %></td>
+										<td align="right"><%=to_currency_bank(receipt.gas_allowance) %></td>
+										<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+									</tr>
+
+									<% i += 1 %>
+								<% end %>
+							<% end %>
+							
+							<% @receiptpremis = Receiptpremi.active.where("(created_at > ? and created_at < ?) AND total > money(0)", @startdate.to_date, @enddate.to_date + 1) %>
+							<% if @receiptpremis.any? %>
+								<tr class="subheading">
+									<th>&nbsp;</th>
+									<th colspan="5" style="color:#000;">PREMI</th>
+								</tr>
+
+								<% @receiptpremis.each do |receipt| %>
+									<% running -= receipt.total %>
+									<% totalcredit += receipt.total %>
+									
+									<tr>
+										<td><%=i+1%>.</td>
+										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.bonusreceipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+										<td align="right"><%=to_currency_bank(0) %></td>
+										<td align="right"><%=to_currency_bank(receipt.total) %></td>
+										<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+									</tr>
+
+									<% i += 1 %>
+								<% end %>
+							<% end %>
+
+							<% @receiptorders = Receiptorder.active.where("(created_at > ? and created_at < ?) AND total > money(0)", @startdate.to_date, @enddate.to_date + 1) %>
+							<% if @receiptorders.any? %>
+								<tr class="subheading">
+									<th>&nbsp;</th>
+									<th colspan="5" style="color:#000;">ONDERDIL KONTAN</th>
+								</tr>
+
+								<% @receiptorders.each do |receipt| %>
+									<% running -= receipt.total %>
+									<% totalcredit += receipt.total %>
+
+									<% productname = "" %>
+									<% receipt.productorder.productorderitems.each do |item| %>
+									<%		productname += item.product.name + ", " %>
+									<% end %>
+									<% productname = productname[0...-2] %>
+									
+									<tr>
+										<td><%=i+1%>.</td>
+										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+										<td><%= getwords(productname, 35) %><%= " (" + receipt.productorder.productrequest.vehicle.current_id + ")" if receipt.productorder.productrequest and !receipt.productorder.productrequest.vehicle_id.nil? %></td>
+										<td align="right"><%=to_currency_bank(0) %></td>
+										<td align="right"><%=to_currency_bank(receipt.total) %></td>
+										<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+									</tr>
+
+									<% i += 1 %>
+								<% end %>
+							<% end %>
+
+							<% @receiptsales = Receiptsale.active.where("(created_at > ? and created_at < ?) AND total > money(0)", @startdate.to_date, @enddate.to_date + 1) %>
+							<% if @receiptsales.any? %>
+								<tr class="subheading">
+									<th>&nbsp;</th>
+									<th colspan="5" style="color:#000;">PENJUALAN BARANG</th>
+								</tr>
+
+								<% @receiptsales.each do |receipt| %>
+									<% running += receipt.total %>
+									<% totaldebit += receipt.total %>
+									
+									<% productname = "" %>
+									<% receipt.sale.saleitems.each do |item| %>
+									<%		productname += item.productsale.name + ", " %>
+									<% end %>
+									<% productname = productname[0...-2] %>
+									
+									<tr>
+										<td><%=i+1%>.</td>
+										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+										<td><%= getwords(productname, 35) %></td>
+										<td align="right"><%=to_currency_bank(receipt.total) %></td>
+										<td align="right"><%=to_currency_bank(0) %></td>
+										<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+									</tr>
+
+									<% i += 1 %>
+								<% end %>
+							<% end %>
+
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td class="total">TOTAL</td>
+								<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+								<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+								<td align="right">&nbsp;</td>
+							</tr>
+						<% elsif group.id == id_group_hutangtoko or group.id == id_group_piutang%>
+							<% expenses = Bankexpense.where("deleted = false and enabled = true and (debitgroup_id = ? or creditgroup_id = ?) and (date >= ? and date <= ?) and id not in (select id from bankexpenses where bankexpense_id IN (select id from bankexpenses where (date >= ? and date <= ?) and deleted = false))", group.id, group.id, @startdate.to_date, @enddate.to_date, @startdate.to_date, @enddate.to_date).order('date') %>
+							
+							<% if expenses.any? %>
+								<% totaldebit = totalcredit = 0 %>
+								<tr class="subheading">
+									<th colspan="6" style="color:#000;"><%=group.name%></th>
+								</tr>		
+
+								<% debitbefore = Bankexpense.where("enabled = true and deleted = false and debitgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+								<% creditbefore = Bankexpense.where("enabled = true and deleted = false and creditgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+								<% running = debitbefore.sum(:total) - creditbefore.sum(:total) %>
+
+								<tr>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									<td>Saldo Awal</td>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+								</tr>
+
+								<% expenses.each_with_index do |expense, i| %>
+									<% child = expense.bankexpenses.where("deleted = false and (date >= ? and date <= ?)", @startdate.to_date, @enddate.to_date).first rescue nil %>
+									
+									<% running += expense.total if expense.debitgroup_id == group.id %>
+									<% totaldebit += expense.total if expense.debitgroup_id == group.id %>
+									
+									<% running += child.total if child and child.debitgroup_id == group.id %>
+									<% totaldebit += child.total if child and child.debitgroup_id == group.id %>
+									
+									<% running -= expense.total if expense.creditgroup_id == group.id %>
+									<% totalcredit += expense.total if expense.creditgroup_id == group.id %>
+
+									<% running -= child.total if child and child.creditgroup_id == group.id %>
+									<% totalcredit += child.total if child and child.creditgroup_id == group.id %>
+									
+									<tr>
+										<td><%=i+1%>.</td>
+										<td><%=expense.date.to_date.strftime('%d-%m-%Y')%></td>
+										
+										<% if group.id == id_group_hutangtoko %>
+											<% if expense.debitgroup_id == group.id %>
+											<td><%=expense.description%> <% if !expense.bankexpense.nil?%> (<%= expense.bankexpense.date.strftime('%d-%m-%Y')  %>) <% end %></td>
+											<% else %>
+											<td><%=expense.description%> <% if child%> (Lunas tgl <%= child.date.strftime('%d-%m-%Y')  %>) <% end %></td>
+											<% end %>
+										<% else %>
+											<% if expense.debitgroup_id == group.id %>
+											<td><%=expense.description%> <% if child%> (Lunas tgl <%= child.date.strftime('%d-%m-%Y')  %>) <% end %></td>
+											<% else %>
+											<td><%=expense.description%> <% if !expense.bankexpense.nil?%> (<%= expense.bankexpense.date.strftime('%d-%m-%Y')  %>) <% end %></td>
+											<% end %>
+										<% end %>
+										
+										<% if child and child.debitgroup_id == group.id %>
+										<td align="right"><%=to_currency_bank(child.total)%></td>
+										<% else %>
+										<td align="right"><%=expense.debitgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
+										<% end %>
+										
+										<% if child and child.creditgroup_id == group.id %>
+										<td align="right"><%=to_currency_bank(child.total)%></td>
+										<% else %>
+										<td align="right"><%=expense.creditgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
+										<% end %>
+										
+										<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+									</tr>
+
+									<% end %>
+								<tr class="footer">
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									<td class="total">TOTAL</td>
+									<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+									<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+									<td align="right">&nbsp;</td>
+								</tr>
+								
+							<% end %>
+						<% elsif group.id != 84%>
+							<% expenses = Bankexpense.where("deleted = false and enabled = true and (debitgroup_id = ? or creditgroup_id = ?) and (date >= ? and date <= ?)", group.id, group.id, @startdate.to_date, @enddate.to_date).order('date') %>
+						
+							<% if expenses.any? %>
+								<% totaldebit = totalcredit = 0 %>
+								<tr class="subheading">
+									<th colspan="6" style="color:#000;"><%=group.name%></th>
+								</tr>		
+
+								<% debitbefore = Bankexpense.where("enabled = true and deleted = false and debitgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+								<% creditbefore = Bankexpense.where("enabled = true and deleted = false and creditgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+								<% running = debitbefore.sum(:total) - creditbefore.sum(:total) %>
+
+								<tr>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									<td>Saldo Awal</td>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+								</tr>
+
+								<% expenses.each_with_index do |expense, i| %>
+									<% running += expense.total if expense.debitgroup_id == group.id %>
+									<% totaldebit += expense.total if expense.debitgroup_id == group.id %>
+									<% running -= expense.total if expense.creditgroup_id == group.id %>
+									<% totalcredit += expense.total if expense.creditgroup_id == group.id %>
+
+									<tr>
+										<td><%=i+1%>.</td>
+										<td><%=expense.date.to_date.strftime('%d-%m-%Y')%></td>
+										<td><%=expense.description%><% if !expense.productrequest_id.nil? %><%=" (" + expense.productrequest.vehicle.current_id + ")" if expense.productrequest and !expense.productrequest.vehicle_id.nil? %><% end %><% if !expense.productorder.nil? %><%=" (" + expense.productorder.productrequest.vehicle.current_id + ")" if expense.productorder.productrequest and !expense.productorder.productrequest.vehicle_id.nil? %><% end %></td>
+										<td align="right"><%=expense.debitgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
+										<td align="right"><%=expense.creditgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
+										<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+									</tr>
+								<% end %>
+								<tr class="footer">
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									<td class="total">TOTAL</td>
+									<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+									<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+									<td align="right">&nbsp;</td>
+								</tr>
+							<% end %>
+						<% end %>	
+					<% end %>	
+				<% end %>
+			<% end %>		
+			<!-- END GROUP KAS BANK -->
+
+		</table>
+	</div>
+</div>

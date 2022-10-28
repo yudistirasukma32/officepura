@@ -1,0 +1,5 @@
+<ul id="steps">
+  <li <% if step == 1 %> class="on" <% end %>><% if !@productorder.id.nil? and @productorder.receiptorders.active.count == 0 %><a href="<%=edit_productorder_url(@productorder)%>"><% end %><span>1</span> Data Pembelian Stok<% if !@productorder.id.nil? and @productorder.receiptorders.active.count == 0 %></a><% end %></li>
+  <li class="separator"><i class="icon-chevron-right"></i></li>
+  <li<% if step == 2 %> class="on"<% end %>><% if !@productorder.id.nil? %><a href="<%=confirmation_productorder_url(@productorder)%>"><% end %><span>2</span> Konfirmasi<% if !@productorder.id.nil? %></a><% end %></li>
+</ul>

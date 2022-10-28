@@ -1,0 +1,156 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+		<h1><%=Setting.find_by_name("Client Name").value%> / Hutang Supplier: <span class="red"><%=@year%></span></h1>
+
+		<br class="clearfix" />
+		
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue" style="width:100%;">
+					&nbsp; &nbsp; Tahun Laporan &nbsp; &nbsp;
+					<% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+					<select id="year" name="year" class="half">
+						<% (Date.today.year.downto(year_to)).each do |y| %>
+						<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+						<% end %>
+					</select>
+					<input class="submit" type="submit" value="Filter" />
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<ul class="rounded" id="tabbed">
+			<li><a id="link_1" class="finger">Januari - Juni</a></li>
+			<li><a id="link_2" class="finger">Juli - Desember</a></li>
+			<!-- <li><a id="link_3" class="finger">Grafik Omset Pelanggan</a></li> -->
+		</ul>
+
+		<div id="sliding_window" style="margin-top:10px;">
+			<div class="sliding_container">
+				<div class="sliding_tab" id="tab_1">
+					<br class="clearfix" />
+					<div id="jan_jun">
+
+						<table class="row-view tablesorter">
+							<thead>
+							<tr>
+								<th class="{sorter:false, filter: false}">Supplier</th>
+								<th width="90" class="right {sorter:true, filter: false}">Januari</th>
+								<th width="90" class="right {sorter:true, filter: false}">Februari</th>
+								<th width="90" class="right {sorter:true, filter: false}">Maret</th>
+								<th width="90" class="right {sorter:true, filter: false}">April</th>
+								<th width="90" class="right {sorter:true, filter: false}">Mei</th>
+								<th width="90" class="right {sorter:true, filter: false}">Juni</th>
+								<th width="90" class="right {sorter:true, filter: false}">Total</th>
+							</tr>
+							</thead>
+
+							<tbody>
+
+							<% totals = [0.0, 0.0, 0.0, 0,0, 0.0, 0.0, 0.0] %>
+							<% @suppliers.each do |supplier| %>
+								<% total_per_supplier = 0.0 %>
+								<tr>
+									<td><%= supplier.name %></td>
+
+									<% (1..6).each do |i| %>
+										<% totalcredits = (Productorderitem.joins(:productorder).where("extract(month from productorders.date) = #{i} and extract(year from productorders.date) = #{@year} and productorders.deleted = false and productorderitems.bon = true AND productorderitems.paymentcheck_id IS NULL and supplier_id = #{supplier.id}").sum(:total)).to_f %>
+										<% total_per_supplier += totalcredits %>
+										<% totals[i] += totalcredits %>
+										<td align="right"><%=to_currency(totalcredits)%></td>
+									<% end %>
+
+									<td align="right"><%=to_currency(total_per_supplier)%></td>
+									<% totals[7] += total_per_supplier %>
+								</tr>
+							<% end %>
+
+							</tbody>
+
+							<tfoot>
+								<tr>
+									<td><strong>Total</strong></td>
+									<% (1..6).each do |i| %>
+									<td align="right"><strong><%= to_currency(totals[i]) %></strong></td>
+									<% end %>
+									<td align="right"><strong><%= to_currency(totals[7]) %></strong></td>
+								</tr>
+							</tfoot>
+						</table>
+
+					</div>
+				</div>
+				
+				<div class="sliding_tab" id="tab_2">
+					<br class="clearfix" />
+					<div id="jul_des">
+
+						<table class="row-view tablesorter">
+							<thead>
+								<tr>
+									<th class="{sorter:false, filter: false}">Pelanggan</th>
+									<th width="90" class="right {sorter:true, filter: false}">Juli</th>
+									<th width="90" class="right {sorter:true, filter: false}">Agustus</th>
+									<th width="90" class="right {sorter:true, filter: false}">September</th>
+									<th width="90" class="right {sorter:true, filter: false}">Oktober</th>
+									<th width="90" class="right {sorter:true, filter: false}">Nopember</th>
+									<th width="90" class="right {sorter:true, filter: false}">Desember</th>
+									<th width="90" class="right {sorter:true, filter: false}">Total</th>
+								</tr>
+							</thead>
+
+							<tbody>
+
+							<% totals = [0.0, 0.0, 0.0, 0,0, 0.0, 0.0, 0.0] %>
+							<% @suppliers.each do |supplier| %>
+								<% total_per_supplier = 0.0 %>
+								<tr>
+									<td><%= supplier.name %></td>
+
+									<% (7..12).each do |i| %>
+										<% totalcredits = (Productorderitem.joins(:productorder).where("extract(month from productorders.date) = #{i} and extract(year from productorders.date) = #{@year} and productorders.deleted = false and productorderitems.bon = true AND productorderitems.paymentcheck_id IS NULL and supplier_id = #{supplier.id}").sum(:total)).to_f %>
+										<% total_per_supplier += totalcredits %>
+										<% totals[i-6] += totalcredits %>
+										<td align="right"><%=to_currency(totalcredits)%></td>
+									<% end %>
+
+									<td align="right"><%=to_currency(total_per_supplier)%></td>
+									<% totals[7] += total_per_supplier %>
+								</tr>
+							<% end %>
+
+							</tbody>
+
+							<tfoot>
+								<tr>
+									<td><strong>Total</strong></td>
+									<% (7..12).each do |i| %>
+									<td align="right"><strong><%= to_currency(totals[i-6]) %></strong></td>
+									<% end %>
+									<td align="right"><strong><%= to_currency(totals[7]) %></strong></td>
+								</tr>
+							</tfoot>
+
+						</table>
+
+					</div>
+				</div>
+<!-- 				<div class="sliding_tab" id="tab_3">
+					<br class="clearfix" />
+					<div id="chartcustomer" style="height:1400px; width:980px;"></div>
+				</div> -->
+			</div>
+		</div>
+	</div>
+
+</div>

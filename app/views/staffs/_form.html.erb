@@ -1,0 +1,72 @@
+<%= form_for(@staff) do |f| %>
+	<div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :email, "Email" %>
+    <%= f.text_field :email %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :address, "Alamat" %>
+    <%= f.text_field :address %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :city, "Kota" %>
+    <%= f.text_field :city %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :phone, "No. Telp" %>
+    <%= f.text_field :phone, :class => 'half left' %>
+    <%= f.label :mobile, "No. HP", :class => 'middle' %>
+    <%= f.text_field :mobile, :class => 'half left' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :driver_licence, "SIM" %>
+    <%= f.text_field :driver_licence, :class => 'half left' %>
+    <%= f.label :driver_licence_expiry, "Expired", :class => 'middle' %>
+    <%= f.text_field :driver_licence_expiry, :class => 'half left date-picker' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :id_card, "KTP" %>
+    <%= f.text_field :id_card, :class => 'half left' %>
+    <%= f.label :id_card_expiry, "Expired", :class => 'middle' %>
+    <%= f.text_field :id_card_expiry, :class => 'half left date-picker' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :salary, "Gaji Pokok" %>
+    <%= f.text_field :salary, :class => 'half left' %>
+    <%= f.label :min_wages, "Jamsostek", :class => 'middle' %>
+    <%= f.text_field :min_wages, :class => 'half left' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :start_working, "Mulai Kerja" %>
+    <%= f.text_field :start_working, :class => 'half left date-picker' %>
+    <%= f.label :status, :class => 'middle' %>
+    <%= f.select :status, options_for_select(@statuses.collect {|w| [w, w]}, @staff.status), {}, { :class => 'half left chzn-select' } %>
+  </div>
+
+  <div class="field-row" style="display:none">
+    <%= f.label :terms_of_payment_in_days, "Batas Hutang" %>
+    <%= f.text_field :terms_of_payment_in_days, :class => 'half' %>
+    <span>Hari</span>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin HRD' %>
+    <a class="back left" href="<%=staffs_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

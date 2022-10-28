@@ -1,0 +1,43 @@
+<%= form_for(@asset) do |f| %>
+	<div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :assetgroup_id, "Group Asset" %>
+    <%= f.select :assetgroup_id, options_for_select(Assetgroup.all.collect {|w| [w.name, w.id]}, @asset.assetgroup_id), {}, { :class => 'chzn-select half' } %>
+  </div>  
+
+  <div class="field-row">
+    <%= f.label :asset_type, "Jenis Aktiva" %>
+    <%= f.select :asset_type, options_for_select(@asset_types.collect {|w| [w, w]}, @asset.asset_type), {}, { :class => 'chzn-select half' } %>
+  </div>  
+
+  <div class="field-row">
+    <%= f.label :date_purchase, "Tgl Beli" %>
+    <%= f.text_field :date_purchase, :class => 'half date-picker' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :quantity, "Jumlah" %>
+    <%= f.text_field :quantity, :class => 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :amount_type, "Satuan" %>
+    <%= f.text_field :amount_type, :class => 'half left' %>
+    <%= f.label :amount, "Nominal", :class => 'middle' %>
+    <%= f.text_field :amount, :class => 'half left', :onkeypress => 'javascript: return isNumberKey(this);' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Simpan Data", :class => 'left' %>
+    <a class="back left" href="<%=assets_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

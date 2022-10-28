@@ -1,0 +1,18 @@
+<table class="row-view">
+  <tr>
+    <th>Name</th>
+    <th>Value</th>
+    <th></th>
+  </tr>
+
+<% @settings.each do |setting| %>
+
+  <tr>
+    <td width="300"><%= link_to setting.name, edit_setting_path(setting) %></td>
+		<td><span><%= setting.value %></span></td>
+    <td class="right" width="60">
+			<%= link_to '&#xf044;'.html_safe, edit_setting_path(setting), :class => "edit tipsy", :title => 'Edit' %> 
+		</td>
+  </tr>
+<% end %>
+</table>

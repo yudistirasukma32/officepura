@@ -1,0 +1,99 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Laporan Susut</h1>
+		
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="startdate" class="middle">Tgl Awal</label>
+				<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+				<label for="enddate" class="tiny">s/d</label>
+				<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<% if @taxinvoiceitems.any? %>
+            <table class="tablesorter row-view tablesorterFilters">
+                <thead>
+                <tr>
+                    <th width="30">#</th>
+                    <th width="50">TGL</th>
+                    <!-- <th class="{sorter: false}" width="50">BKK</th> -->
+                    <th class="{sorter: false}">Keterangan</th>
+                    <th width="80">NoPol</th> 
+                    <th width="150">Pelanggan</th>
+                    <th width="70" class="{sorter: false, filter: true} sorter-false" data-sorter="false" style="text-align:center;">S.Jalan</th>
+                    <th class="{sorter: false, filter: false} sorter-false" data-sorter="false">MUAT</th>
+                    <th class="{sorter: false, filter: false} sorter-false" data-sorter="false">BONGKAR</th>
+                    <th class="{sorter: false, filter: false} sorter-false" data-sorter="false">SUSUT</th> 
+                </tr>
+                </thead>
+                <tbody>
+                <% i = 0 %>
+                <% total_sj, total_sj_done, total_inv_done, run, second_driver, second_nopol = 0, 0, 0, false , nil, nil%>
+                <% @taxinvoiceitems.each do |taxinvoiceitem| %>
+                    <% if taxinvoiceitem.invoice.invoicetrain %>
+                        <% if taxinvoiceitem.invoice.invoices.any? %>
+                            <% run = true %>
+                            <% second_driver = taxinvoiceitem.invoice.invoices.first.driver.name %>
+                            <% second_nopol = taxinvoiceitem.invoice.invoices.first.vehicle.current_id %>
+
+                        <% else %>
+                            <% run = false %>
+                            <% second_driver = nil %>
+                        <% end %>
+
+                    <% else %>
+                        <% run = true %>
+                    <% end %>
+
+                    <% qty = taxinvoiceitem.invoice.quantity %>
+                    <% qty -= taxinvoiceitem.invoice.receiptreturns.active.sum(:quantity) if taxinvoiceitem.invoice.receiptreturns.active.any? %>
+                    <% if qty > 0 && run == true %>
+                    <tr>
+                        <td><%=i+=1%>.</td>
+                        <td><strong><%=taxinvoiceitem.invoice.date.strftime('%d')%></strong>.<%=taxinvoiceitem.invoice.date.strftime('%m')%></td>
+                        <td>&num;<%=zeropad(taxinvoiceitem.invoice.id)%>: 1 Rit -> <%=taxinvoiceitem.invoice.route.name%> (<%=taxinvoiceitem.invoice.driver.name rescue nil%><%= second_driver.nil? ? '' : ', ' +second_driver %>)</td>
+                        <td><%=taxinvoiceitem.invoice.vehicle.current_id%><%= second_nopol.nil? ? '' : ' ' +second_nopol %></td> 
+                        <td><%=taxinvoiceitem.invoice.customer.name%></td>
+                        <td class="right"><%= taxinvoiceitem.sku_id %></td>
+                        <td class="right"><%= to_currency(taxinvoiceitem.weight_gross) %></td>
+                        <td class="right"><%= to_currency(taxinvoiceitem.weight_net)%></td>
+                        <td class="right">
+                        <% susut = taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross %>
+                        <% if susut < 0 %>
+                        <span class="red"><%= susut %></span>
+                        <% else %>
+                        <span class="green"><%= susut %></span>
+                        <% end %>
+                        </td>
+                        
+                    </tr>
+ 
+                    <% end %>   
+                    <% end %>
+ 
+                </tbody>
+
+            </table>
+            <% end %>
+
+		
+		<br class="clearfix" />
+
+	</div>
+
+</div>

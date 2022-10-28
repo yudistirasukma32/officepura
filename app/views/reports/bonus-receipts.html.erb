@@ -1,0 +1,98 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+    <%= render "shared/nav" %>
+</div>
+
+<div id="main">
+    
+    <div id="content-full">
+        <h1><%=Setting.find_by_name("Client Name").value%> / Laporan Kas Premi: <span class="red"><%=Date::MONTHNAMES[@month.to_i]%> <%=@year%></span></h1>
+
+        <br class="clearfix" />
+        <div id="filter">
+            <form id="filterform" name="filterform" action="" method="get">
+            <div class="field-row continue">
+                <label for="driver_id">Supir</label>
+                <select name="driver_id" class="third left">
+                    <option value="">Semua Supir</option>
+                    <% Driver.active.order(:name).each do |driver| %>
+                    <option value="<%=driver.id%>"<% if driver.id == @driver_id %> selected='selected'<% end %>><%=driver.name%></option>
+                    <% end %>
+                </select>
+                <label for="date" class="middle">Bulan / Thn</label>
+                <select name="month" class="half left" style="margin-right:10px;">
+                    <% (1.upto(12)).each do |m| %>
+                    <option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+                    <% end %>
+                </select>
+                <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+                <select name="year" class="short left">
+                    <% (Date.today.year.downto(year_to)).each do |y| %>
+                    <option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+                    <% end %>
+                </select>
+                <input class="submit left" type="submit" value="Filter" />
+            </div>
+            </form>
+        </div>
+        
+        <br class="clearfix" />
+
+        <table class="row-view">
+    <tr>
+        <th width="50">Premi</th>
+        <th width="50">TGL</th>
+        <th>BKK, Jurusan</th>
+        <th width="40">Ktr</th>
+        <th width="80">Nopol</th>
+        <th width="100" class="right">Total Premi</th>
+    </tr>
+
+    <tr class="subheading">
+        <th colspan="7" style="color:#000;">Bukti Kas Premi <span class="red"><%=@startdate%> - <%=@enddate%> (<%=@bonusreceipts.count%>)</span></th>
+    </tr>
+
+    <% total = 0 %>
+    <% @bonusreceipts.each do |bonusreceipt| %>
+    <tr>
+        <td><%=zeropad(bonusreceipt.id)%></td>
+        <td><strong><%=bonusreceipt.created_at.strftime('%d')%></strong>.<%=bonusreceipt.created_at.strftime('%m')%></td>
+        <td>#<%=zeropad(bonusreceipt.invoice.id)%> (<%=bonusreceipt.invoice.date.strftime('%d.%m')%>), <%=bonusreceipt.quantity%> Rit: <%=bonusreceipt.invoice.route.name rescue nil%> (<%=bonusreceipt.invoice.driver.name rescue nil%>)</td>
+        <td><%=bonusreceipt.invoice.office.abbr%></td>
+        <td><%=bonusreceipt.invoice.vehicle.current_id%></td>       
+        <td align="right"><%= to_currency(bonusreceipt.total) %></td>
+        <% total += bonusreceipt.total %>
+    </tr>
+    <% end %>
+    <% @invpremis.each do |invoice_premi| %>
+        <tr>
+            <td><%=zeropad(invoice_premi.invoice.id)%></td>
+            <td><strong><%=invoice_premi.created_at.strftime('%d')%></strong>.<%=invoice_premi.created_at.strftime('%m')%></td>
+            <td>#<%=zeropad(invoice_premi.invoice.id)%> (<%=invoice_premi.invoice.date.strftime('%d.%m')%>), <%=invoice_premi.quantity%> Rit: <%=invoice_premi.invoice.route.name rescue nil%> (<%=invoice_premi.invoice.driver.name rescue nil%>)</td>
+            <td><%=invoice_premi.invoice.office.abbr%></td>
+            <td><%=invoice_premi.invoice.vehicle.current_id%></td>       
+            <td align="right"><%= to_currency(invoice_premi.premi_allowance) %></td>
+            <% total += invoice_premi.premi_allowance %>
+        </tr>
+    <% end %>
+
+    <tr class="footer">
+        <td colspan="1"></td>
+        <td align="left" class="total">TOTAL</td>
+        <td align="right">&nbsp;</td>
+        <td align="right">&nbsp;</td>
+        <td align="right">&nbsp;</td>
+        <td align="right" class="total"><span id="txt_total"><%=to_currency(total)%></span></td>
+    </tr>   
+
+
+</table>
+
+            
+        <br class="clearfix" />
+        <!-- <a class="btn-txt left" href="<%=new_bonusreceipt_path%>"><i class="icon-plus"></i> &nbsp;Tambah Data</a> -->
+
+    </div>
+
+</div>

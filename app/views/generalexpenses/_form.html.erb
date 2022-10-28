@@ -1,0 +1,42 @@
+ <form id="generalexpense" name="generalexpense" action="/generalexpenses/create" method="post">
+  <% if @errors.include?'generalexpense' %>
+    <div class="field-row red">
+      <%=@errors['generalexpense']%>
+    </div>
+  <% end %>
+
+  <div class="field-row first">
+    <input type="hidden" name="generalexpense[officeexpense_id]"  value="<%=@officeexpense_id%>" />
+    <input type="hidden" name="generalexpense[expensetype]"  value= "Kredit" />
+    <input type="hidden" name="generalexpense[officeexpensegroup_id]" value="<%=@generalexpensesgroup_id%>" />
+    <label>No Pol</label>
+    <select name="generalexpense[vehicle_id]" class="half left combo_route chzn-select" style="width:160px">
+        <% Vehicle.all.each do |vehicle| %>
+        <option value="<%=vehicle.id%>"<% if vehicle.id == @generalexpense.vehicle_id %> selected="selected"<% end %>><%=vehicle.current_id%></option>
+        <% end %>
+    </select>  
+  </div> 
+
+  <div class="field-row">
+    <label>Tanggal</label>
+    <input type="text" name="generalexpense[date]" class="half date-picker" value="<%=@generalexpense.date.to_date.strftime('%d-%m-%Y')%>" />
+    <span>(tgl/bln/thn)</span>
+  </div>
+
+  <div class="field-row">
+    <label>Jumlah</label>
+    <input type="text" name="generalexpense[total]" class="half" onkeypress="javascript:return isNumberKey(this);" value="<%=@generalexpense.total.to_i%>" />
+    <strong>Rupiah</strong>
+  </div>
+
+  <div class="field-row">
+    <label>Keterangan</label>
+    <textarea cols="40" rows="20" name="generalexpense[description]"><%=@generalexpense.description%></textarea>
+  </div>
+
+  <div class="actions">
+    <input type="submit" value="Tambah Data" class="left" />
+    <a class="back left" href="<%=generalexpenses_path%>">Kembali ke Index</a>
+  </div>
+
+</form>

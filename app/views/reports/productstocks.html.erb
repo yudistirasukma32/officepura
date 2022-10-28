@@ -1,0 +1,52 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+	<a class="print btn-txt btn-green" href="/reports/downloadexcelproductstocks"><i class="icon-file"></i> Excel</a>
+	
+	<h1><%=Setting.find_by_name("Client Name").value%> / Stok Barang: <span class="red"><%=Date.today.to_date.strftime('%d %b %Y')%></span></h1>
+
+	<table class="row-view report-view">
+	<% if @productgroups.any? %>
+	<% @productgroups.each do |group| %>
+		<tr class="subheading">
+			<th colspan="5"><h2 class="red"><%= group.name %></h2></th>
+		</tr>
+
+		<tr>
+			<th width="30">No.</th>
+			<th>Nama Barang</th>
+			<th width="60">Jumlah</th>
+			<th width="90" class="right">Harga</th>
+			<th width="90" class="right">Total</th>
+		</tr>
+
+		<% running = 0 %>
+		<% group.products.active.order(:name).each_with_index do |product,i| %>
+			<tr>
+				<td><%= i+1%>.</td>
+				<td><%= product.name%></td>
+				<td align="right"><%= to_currency_bank(product.stock)%></td>
+				<td align="right"><%= to_currency(product.unit_price)%></td>
+				<td align="right"><%= to_currency(product.stock * product.unit_price)%></td>
+			</tr>
+			<% running += product.stock * product.unit_price %>
+		<% end %>
+		
+		<tr class="footer">
+			<td>&nbsp;</td>
+			<td colspan="3" class="total">TOTAL</td>
+			<td align="right" class="total"><%=to_currency(running)%></td>
+		</tr>
+
+	<% end %>
+	<% end %>
+	</table>
+	</div>
+</div>

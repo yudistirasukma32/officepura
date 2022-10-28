@@ -1,0 +1,15 @@
+<%= render "shared/header" %>
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Transaksi / <a href="<%=assetpayments_path%>">Pembayaran Aset</a> / Index</h1>
+
+		<br class="clearfix" />
+			<%= render "sublink", :sublink => 1 %>
+			<%= render "showtable" %>
+		<br class="clearfix" />
+	</div>	
+</div>

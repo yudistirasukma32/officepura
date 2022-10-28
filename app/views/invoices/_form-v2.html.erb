@@ -1,0 +1,228 @@
+<%= form_for(@invoice) do |f| %>
+  
+  <%= render "info-box-v2", :f => f %>
+
+  <div class="field-row first">
+    <%= f.label :office_id, "Kantor" %>
+    <% if @iseditable %>
+    <%= f.select :office_id, options_for_select(Office.where(:deleted => false).collect {|g| [g.name, g.id]}, @invoice.office_id), {}, :class => 'half chzn-select'%>
+    <% else %>
+    <input type="text" class="double disabled" value="<%=@invoice.office.name%>" />
+    <%= f.hidden_field :office_id, :value => @invoice.office_id %>
+    <% end %>
+  </div>
+  
+  <div class="field-row">
+    <%= f.label :date, "Tanggal" %>
+    <%= f.text_field :date, :class => 'half date-picker', :value => @invoice.date.strftime('%d-%m-%Y') %>
+    <span>(tgl/bln/thn)</span>
+  </div>
+
+  <div class="field-row">
+  <%= f.label :transporttype, "Tipe BKK"  %>
+  <%= f.select :transporttype, options_for_select(@transporttypes.collect {|w| [w, w]}, (params[:type].present? ? params[:type] : @invoice.transporttype)), {}, { :class => 'half chzn-select' } %>
+  <input type="hidden" name="invoice[invoicetrain]" id="invoicetrain" value="false"/>
+  </div>
+
+  <div class="field-row">
+  <%= f.label :tanktype, "Tipe Tangki"  %>
+  <%= f.select :tanktype, options_for_select(@tanktypes.collect {|w| [w, w]}, (params[:type].present? ? params[:type] : @invoice.tanktype)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+<!--
+  <div class="field-row">
+    <label for="invoice_invoicetrain">Pilih Tangki</label>
+    <label class="checkbox" for="invoice_invoicetrain_false">
+        <input class="is_isotank" name="is_isotank"  type="radio" value="false" <%= (@invoice.isotank_id.blank? || @invoice.isotank_id.to_i == 0 ? "checked" : '') %>> Tangki
+    </label>
+    <label class="checkbox" for="invoice_invoicetrain_true">
+        <input  class="is_isotank" name="is_isotank" type="radio" value="true" <%= (@invoice.isotank_id.present? || @invoice.isotank_id.to_i != 0 || params[:type] == 'ISOTANK' ? "checked" : '') %>> Isotank
+    </label>
+    </div>
+-->
+
+  <% if @invoice_ori.nil? %>
+    <!-- <div id="<%# (!@invoice.invoicetrain || type != 'ISOTANK') ? 'isonumber' : 'isoid' %>" class="field-row"> -->
+    <div id="<%= !@invoice.invoicetrain ? 'isonumber' : 'isoid' %>" class="field-row isotank_id" <%= @invoice.invoicetrain.blank? || @invoice.invoicetrain.to_i == 0 ? "style=display:none;" : '' %>>
+      <%= f.label :isotank_id, "No. Isotank" %>
+      <select id="invoice_isotank_id" name="invoice[isotank_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
+        <option value="0">- No. Isotank -</option>
+        <% Isotank.active.order(:isotanknumber).each do |isotank| %>
+        <option value="<%=isotank.id%>"<%= isotank.id == @invoice.isotank_id ? ' selected="selected"' : '' %>><%=isotank.isotanknumber%></option>
+        <% end %>
+      </select>
+    </div>
+
+  <% end %>
+
+  <% if @invoice_ori.nil? %>
+      
+    <div id="<%= !@invoice.invoicetrain ? 'isonumber' : 'isoid' %>" class="field-row isotank_id" <%= @invoice.invoicetrain.blank? || @invoice.invoicetrain.to_i == 0 ? "style=display:none;" : '' %>>
+      <%= f.label :isotank_number, "No. Isotank" %>
+      <%= f.text_field :isotank_number %>
+      <small>Diisi manual</small>
+    </div>
+
+  <% end %>
+
+  <% if @invoice_ori.nil? %>
+    <!-- <div id="<%# (!@invoice.invoicetrain || type != 'ISOTANK') ? 'isonumber' : 'isoid' %>" class="field-row"> -->
+    <div id="<%= !@invoice.invoicetrain ? 'container_field' : 'container' %>" class="field-row container_id" <%= @invoice.invoicetrain.blank? || @invoice.invoicetrain.to_i == 0 ? "style=display:none;" : '' %>>
+      <%= f.label :container_id, "No. Kontainer" %>
+      <select id="invoice_container_id" name="invoice[container_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
+        <option value="0">- No. Kontainer -</option>
+        <% Container.active.order(:containernumber).each do |container| %>
+        <option value="<%=container.id%>"<%= container.id == @invoice.container_id ? ' selected="selected"' : '' %>><%=container.containernumber%></option>
+        <% end %>
+      </select>
+    </div>
+
+  <% end %>
+      
+  <div id="<%= @invoice.tanktype != 'KONTAINER' ? 'container_field' : 'container' %>" class="field-row container_id" <%= @invoice.tanktype.blank? || @invoice.tanktype != 'KONTAINER' ? "style=display:none;" : '' %>>
+    <%= f.label :container_number, "No. Kontainer" %>
+    <%= f.text_field :container_number %>
+    <small>Diisi manual</small>
+  </div>
+
+  <% @customers = Customer.where(:enabled => true, :deleted => false).order(:name) %>
+  
+  <% if !@customers.first.nil? %>
+
+  <div class="field-row">
+    <%= f.label :customer_id, "Pelanggan" %>
+
+    <% if @iseditable or current_user.owner %>
+    <select id="invoice_customer_id_new" name="invoice[customer_id]" class="double combo_route chzn-select" onchange="javascript:getRoutesWithTransportType(this.value);">
+      <option value="0">- Pelanggan -</option>
+      <% @customers.each do |customer| %>
+      <option value="<%=customer.id%>"
+        <% if customer.id == @invoice.customer_id %> selected="selected"<% end %>><%=customer.name%></option>
+      <% end %>
+    </select>
+    <% else %>
+      <input type="text" class="double disabled" value="<%=@invoice.customer.name%>" />
+      <%= f.hidden_field :customer_id, :value => @invoice.customer_id %>
+    <% end %>         
+  </div> 
+
+  <% end %>
+
+  <div id="div_events">
+    <div class="field-row">
+      <%= f.label :event_id, "Project / DO" %>
+      <input type="text" class="double disabled" value="<%= !@invoice.event.nil? ? @invoice.event.summary : 'Harap memilih pelanggan terlebih dahulu.' %>" />
+      <%= f.hidden_field :event_id, :value => @invoice.event_id %>
+    </div>
+  </div>
+  
+  <div id="div_routes">
+    <div class="field-row">
+      <%= f.label :route_id, "Jurusan" %>
+      <input type="text" class="double disabled" value="<%= !@invoice.route.nil? ? @invoice.route.name : 'Harap memilih pelanggan terlebih dahulu.' %>" />
+      <%= f.hidden_field :route_id, :value => @invoice.route_id %>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :vehicle_id, "Kendaraan" %>
+
+    <% if @iseditable or current_user.owner %>
+    <select id="invoice_vehicle_id" name="invoice[vehicle_id]" class="chzn-select half left combo_route" onchange="javascript:getAllowances();">
+      <option value="0">- No Pol -</option>
+      <% Vehicle.active.order(:current_id).each do |vehicle| %>
+      <option value="<%=vehicle.id%>"<%= vehicle.id == @invoice.vehicle_id ? ' selected="selected"' : '' %>><%=vehicle.current_id%></option>
+      <% end %>
+    </select>  
+    <% else %>
+    <input type="text" class="double disabled" value="<%=@invoice.vehicle.current_id%>" />
+    <%= f.hidden_field :vehicle_id, :value => @invoice.vehicle_id %>
+    <% end %>         
+  </div>
+  
+  <div class="field-row">
+    <%= f.label :driver_id, "Supir" %>
+    <% if @iseditable or current_user.owner %>
+    <select id="invoice_driver_id" name="invoice[driver_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
+      <option value="0">- Supir -</option>
+      <% Driver.active.order(:name).each do |driver| %>
+      <option value="<%=driver.id%>"<%= driver.id == @invoice.driver_id ? ' selected="selected"' : '' %>><%=driver.name%></option>
+      <% end %>
+    </select> 
+    <%#= f.select :driver_id, options_for_select(Driver.active.order(:name).collect {|g| [g.name, g.id]}, @invoice.driver_id), {:include_blank => '- Supir -'}, :class => 'double chzn-select' %>
+    <% else %>
+    <input type="text" class="double disabled" value="<%=@invoice.driver.name%>" />
+    <%= f.hidden_field :driver_id, :value => @invoice.driver_id %>
+    <% end %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :driver_phone, "No.Hp Driver" %>
+    <%= f.text_field :driver_phone, :class => 'half', :id => 'phone_driver' %>
+  </div>
+
+  <div class="field-row">
+    <%=f.label :need_helper, "Kernet" %>
+    <input type="checkbox" id="need_helper" name="invoice[need_helper]" value="Yes" <% if @invoice.need_helper == true %> checked="checked" <% end %> onchange="javascript:getAllowances();" />
+  </div>
+
+ 
+  <div id="<%= @invoice.transporttype != 'TOL LAUT' ? 'ship_field' : 'ship' %>" class="field-row">
+    <%= f.label :ship_id, "Kapal" %>
+    <select id="invoice_ship_id" name="invoice[ship_id]" class="chzn-select double combo_route">
+      <option value="0">- Nama Kapal -</option>
+      <% Ship.active.order(:name).each do |ship| %>
+      <option value="<%=ship.id%>"<%= ship.id == @invoice.ship_id ? ' selected="selected"' : '' %>><%=ship.name%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div id="<%= @invoice.transporttype != 'TOL LAUT' ? 'port_field' : 'port' %>" class="field-row">
+    <%= f.label :port_id, "Pelabuhan" %>
+    <select id="invoice_port_id" name="invoice[port_id]" class="chzn-select double combo_route">
+      <option value="0">- Nama Pelabuhan -</option>
+      <% Port.active.order(:name).each do |port| %>
+      <option value="<%=port.id%>"<%= port.id == @invoice.port_id ? ' selected="selected"' : '' %>><%=port.name%></option>
+      <% end %>
+    </select>
+  </div>
+  
+
+  <div class="field-row">
+    <%= f.label :quantity, "Jumlah" %>
+    <select id="invoice_quantity" name="invoice[quantity]" class="half chzn-select" onchange="javascript:getAllowances();">
+      <% (1..15).each do |i| %>
+      <option value="<%=i%>"<% if i == @invoice.quantity %> selected="selected"<% end %>><%=i%> Rit</option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :insurance, "Tanggungan" %>
+    <%= f.text_field :insurance, :class => 'half', :style => 'text-align:right;', :onkeypress => 'javascript:return isNumberKey(this);', :value => @invoice.insurance.to_i %>
+    <strong>Rupiah</strong>
+    <span>(Uang Pertanggungan)</span>
+  </div>  
+
+  <div class="field-row">
+    <%= f.label :spk_number, "Nomor SPK" %>
+    <%= f.text_field :spk_number %>
+  </div>
+  
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_field :description %>
+  </div>  
+
+  <div class="actions">
+    <%# if @invoice.receipts.active.count == 0 %>
+    <%# f.submit "Lanjut ke Potongan Solar", :id => 'invoice_submit', :class => 'left' %>
+    <%# end %>
+    <%= f.submit "Lanjut ke Potongan Solar", :id => 'invoice_submit', :class => 'left' %>
+    <a class="back left" href="<%=invoices_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
+  </div>
+
+<% end %>
+<script>
+  type = '<%= params[:type] %>';
+</script>

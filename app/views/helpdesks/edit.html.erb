@@ -1,0 +1,22 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+<!--		<a class="btn print" href="<%=%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>-->
+		
+		<h1><a href="<%= helpdesks_path %>">Pusat Bantuan</a> / Edit Ticket (#<%= @id[0...6] %>)</h1>
+
+		<br class="clearfix" />
+		<%= render "form" %>
+		<br class="clearfix" />
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

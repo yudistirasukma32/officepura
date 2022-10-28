@@ -1,0 +1,79 @@
+ <%= form_for(@officeexpense) do |f| %>
+  <% if @errors.include?'officeexpense' %>
+    <div class="field-row red">
+      <%=@errors['officeexpense']%>
+    </div>
+  <% end %>
+
+  <div class="field-row first">
+    <%= f.label :office_id, "Kantor" %>
+    <%= f.select :office_id, options_for_select(Office.where(:deleted => false).collect {|g| [g.name, g.id]}, @officeexpense.office_id), {},:class => 'half chzn-select' %>
+  </div>  
+
+  <div class="field-row">
+    <%= f.label :expensetype, "Tipe" %>
+    <%= f.select :expensetype, options_for_select(@types.collect {|w| [w, w]}, @officeexpense.expensetype), {}, :class => 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :officeexpensegroup_id, "Group Kas", :class => 'left' %>
+    <% parentgroup_id = @officeexpense.officeexpensegroup_id
+        parentgroup = Officeexpensegroup.find(@officeexpense.officeexpensegroup_id) 
+        if !parentgroup.officeexpensegroup_id.nil?
+          parentgroup_id = parentgroup.officeexpensegroup_id
+        end %>
+      
+    <select id="officeexpensegroupparent" name="officebankexpense[parentofficeexpensegroup_id]" class="half left" onchange="javascript: getOfficeexpensegroup();">
+      <% Officeexpensegroup.active.where(:officeexpensegroup_id => nil).each do |group| %>
+      <option value="<%=group.id%>" <% if parentgroup_id == group.id %>selected="selected" <% end %>><%=group.name %></option>
+      <% end %>
+    </select>
+
+    <select id="officeexpensegroupchild" name="officebankexpense[officeexpensegroup_id]" class="half left" style="margin-left:10px;">
+      <option value="">- Group Kas -</option>
+      <% if @officeexpensegroups and @officeexpensegroups.any? %>
+        <% @officeexpensegroups.each do |group| %>
+          <option value="<%=group.id%>" <% if @officeexpense.officeexpensegroup_id == group.id %>selected="selected" <% end %>><%=group.name %></option>
+        <% end %>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :bankexpense_id, "Jurnal", :class => 'left' %>
+    <select id="bankexpensegroup_id" name="officebankexpense[bankexpensegroup_id]" class="half left">
+      <% Bankexpensegroup.where(:deleted => false).order('name').each do |group| %>
+      <option value="<%=group.id%>" <% if !@officeexpense.bankexpense_id.nil? %> <% if @officeexpense.expensetype == 'Kredit' %><% if @officeexpense.bankexpense.debitgroup_id == group.id %> selected="selected" <% end %> <% else %> <% if @officeexpense.bankexpense.creditgroup_id == group.id %> selected="selected" <% end %> <% end %> <% end %> ><%=group.name %></option>
+      <% end %>
+    </select>
+  </div>    
+
+  <div class="field-row">
+    <%= f.label :vehicle_id, "No Pol" %>
+    <%= f.select :vehicle_id, options_for_select(Vehicle.where(:deleted => false).collect {|g| [g.current_id, g.id]}, @officeexpense.vehicle_id), {:include_blank => '- Kosong -'}, :class => 'half chzn-select',  :id => 'vehicle_id'%>
+  </div> 
+
+  <div class="field-row">
+    <%= f.label :date, "Tanggal" %>
+    <%= f.text_field :date, :class => 'half date-picker' %>
+    <span>(tgl/bln/thn)</span>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :total, "Jumlah" %>    
+    <%= f.text_field :total, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => @officeexpense.total.to_i %>
+    <strong>Rupiah</strong>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :id => 'officebankexpense_submit', :class => 'left' %>
+    <a class="back left" href="<%=officebankexpenses_path%>">Kembali ke Index</a>
+  </div>
+
+<% end %>
+

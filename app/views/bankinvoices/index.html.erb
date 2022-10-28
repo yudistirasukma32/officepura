@@ -1,0 +1,77 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn print" href="<%=new_bankexpense_path(:bankledger => 1)%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<h1>Transaksi / <a href="<%=bankexpenses_path%>">Bukti Bank</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date">Pilih Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view tablesorter">
+			<thead>
+			<tr>
+				<th width="80" class="{sorter: false}">No.</th>
+				<th>Keterangan</th>
+				<th>Debit</th>
+				<th>Kredit</th>
+				<th width="100" class="right {sorter: false}">Total</th>
+				<th  width="8%" class="{sorter: false}">&nbsp;</th>
+			</tr>
+			</thead>
+
+			<tbody>
+
+			<% @bankinvoices.each do |bankexpense| %>
+				<% if bankexpense.deleted %>
+					<% if current_user.adminrole %>
+						<tr class="deleted">
+							<td><%=zeropad(bankexpense.id)%></td>
+							<td><%=bankexpense.description%></td>
+							<td><%=Bankexpensegroup.find(bankexpense.debitgroup_id).name if !bankexpense.debitgroup_id.nil?%></td>
+							<td><%=Bankexpensegroup.find(bankexpense.creditgroup_id).name if !bankexpense.creditgroup_id.nil?%></td>
+							<td align="right"><%=to_currency_bank(bankexpense.total)%></td>
+							<td class="right" width="60">&nbsp;</td>
+						</tr>
+					<% end %>
+				<% else %>
+					<tr>
+						<td><%= link_to zeropad(bankexpense.id), edit_bankexpense_path(bankexpense) %></td>
+						<td><%=bankexpense.description%></td>
+						<td><%=Bankexpensegroup.find(bankexpense.debitgroup_id).name if !bankexpense.debitgroup_id.nil?%></td>
+						<td><%=Bankexpensegroup.find(bankexpense.creditgroup_id).name if !bankexpense.creditgroup_id.nil?%></td>
+						<td align="right"><%=to_currency_bank(bankexpense.total)%></td>
+						<td class="right" width="60">
+							<%= link_to '&#xf044;'.html_safe, edit_bankexpense_path(bankexpense), :class => "edit tipsy", :title => 'Edit' %>
+							<%= link_to '<i class="icon-print"></i>'.html_safe, print_bankinvoice_path(bankexpense), :class => 'delete tipsy', :title => "Print Bank Invoice"  %> 
+							<%= link_to '&#xf00d;'.html_safe, bankexpense, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+						</td>
+					</tr>
+				<% end %>	
+			<% end %>	
+			</tbody>
+		
+		</table>
+
+		<br class="clearfix" />
+		<div class="actions">
+			<a class="btn-txt right" href="<%=new_bankexpense_path(:bankledger => 1)%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		</div>
+	</div>
+
+</div>

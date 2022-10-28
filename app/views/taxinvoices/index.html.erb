@@ -1,0 +1,278 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt right" href="<%=new_taxinvoice_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+
+		<h1>Transaksi / <a href="<%=taxinvoices_path%>">Invoice Tagihan</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="customer_id">Pelanggan</label>
+				<select name="customer_id" class="third left">
+					<option value="">Semua Pelanggan</option>
+					<% Customer.active.order(:name).each do |customer| %>
+					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
+					<% end %>
+				</select>
+				<label for="date" class="middle">Bulan / Thn</label>
+				<select name="month" class="half left" style="margin-right:10px;">
+					<% (1.upto(12)).each do |m| %>
+					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+					<% end %>
+				</select>
+				<% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+				<select name="year" class="short left">
+					<% (Date.today.year.downto(year_to)).each do |y| %>
+					<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+					<% end %>
+				</select>
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<form id="paymentform" name="paymentform" action="" method="get">
+			<div id="filter">
+				<div class="field-row continue">
+					<input type="hidden" name="year" value="<%=@year%>" />
+					<input type="hidden" name="month" value="<%=@month%>" />
+					<input type="hidden" name="customer_id" value="<%=@customer_id%>" />
+					<input type="hidden" name="process" value="payment" />
+					<label class="left">Tanggal Bayar</label>
+					<input type="text" class="half date-picker left" id="paymentdate" name="paiddate" value="<%= Date.today.strftime('%d-%m-%Y')%>"/>&nbsp;
+					<input class="submit left" type="submit" value="Bayar" />
+				</div>
+			</div>
+			<br/>
+			<br class="clearfix" />
+			<%= render "showtable" %>
+			<br class="clearfix" />
+		</form>
+		<div class="actions">
+			<a class="btn-txt right" href="<%=new_taxinvoice_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		</div>
+	</div>
+
+</div>
+<%
+    ppn = Setting.where(name: 'ppn')
+    ppn = ppn.blank? ? 10 : ppn[0].value
+%>
+  <input type="hidden" id="ppn" value="<%= ppn %>"/>    
+
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    	<span class="close">&times;</span>
+	<form method="POST" id="update_tax" action="<%= update_tax_taxinvoices_url %>">
+		<h3 class="text-center" style="text-align: center; margin-top: unset; font-weight: bold;">Edit Cepat - Invoice Tagihan #<span id="invoice_long_id"></span></h3>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">No. Invoice</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="taxinvoice_long_id">#Invoice Long Id</span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Customer</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="taxinvoice_customer_name">Customer Name</span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Tanggal</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="taxinvoice_date">Date</span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex; margin-top: 10px;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Tanggal Kirim</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<input type="text" name="sentdate" class="date-picker" id="sentdate" autocomplete="off" value="Jatuh Tempo">
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex; margin-top: 10px;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Tanggal Konfirmasi</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<input type="text" name="confirmeddate" class="date-picker" id="confirmeddate" autocomplete="off" value="Tgl Konfirmasi Terima">
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">PPN</label>
+			</div>
+			<div style="width: 50%;">
+				<input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax ppn11" value="11" onchange="javascript:changeTaxes();" checked="checked"> &nbsp;  11% &nbsp;
+				<input type="radio" id="chk_gst_tax2" class="gst_tax ppn10" name="gst_tax" value="10" onchange="javascript:changeTaxes();"> &nbsp; 10 %&nbsp;
+				<input type="radio" id="chk_gst_tax2" class="gst_tax ppn1-1" name="gst_tax" value="1.1" onchange="javascript:changeTaxes();"> &nbsp; 1,1 %&nbsp;
+				<input type="radio" id="chk_gst_tax2" class="gst_tax ppn1" name="gst_tax" value="1" onchange="javascript:changeTaxes();"> &nbsp; 1 %&nbsp;
+				<input type="radio" id="chk_gst_tax2" class="gst_tax no-ppn" name="gst_tax" value="0" onchange="javascript:changeTaxes();"> &nbsp; No PPN &nbsp;
+			</div>
+		</div>
+		
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">PPH 2%</label>
+			</div>
+			<div style="width: 50%;">
+				<input type="checkbox" id="chk_price_tax" name="price_tax" value="Yes" onchange="javascript:changeTaxes();" /> &nbsp; <span> PPh PASAL 23 2% </span>
+			</div>
+		</div>
+
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Potongan Asuransi</label>
+			</div>
+			<div style="width: 50%;">
+				<input type="text" id="taxinvoice_insurance_cost" name="insurance_cost" value="0" onchange="javascript:changeTaxes();" />
+			</div>
+		</div>
+
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Potongan Klem Susut</label>
+			</div>
+			<div style="width: 50%;">
+				<input type="text" id="taxinvoice_claim_cost" name="claim_cost" value="0" onchange="javascript:changeTaxes();" />
+			</div>
+		</div>
+
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 20px;">
+				<label style="color:#000; font-weight:700;">Keterangan Lain</label>
+			</div>
+			<div style="width: 50%;">
+				<textarea cols="40" id="taxinvoice_remarks" name="remarks" rows="3" style="height: 25px;"></textarea>
+				<small>Penyebab Invoice gantung / tidak bisa ditagihkan (Sebagai Catatan Internal)</small>
+			</div>
+		</div>
+ 
+		<input type="hidden" class="half left" id="taxinvoice_extra_cost" name="extra_cost" value="0"/> 
+		<input type="hidden" class="half left" id="taxinvoice_id" name="id"/>
+
+		<table class="row-view more-pad" id="tbItem" style="width: 100%; margin-top: 30px;">
+			<thead>
+				<tr id="0">
+					<th width="30"></th>
+					<th width="30"></th>
+					<th width="30"></th>
+					<th width="30"></th>
+					<th width="30"></th>
+					<th width="50" class="right"></th>
+					<th width="50" class="right"></th>
+					<th width="30" class="right"></th>
+					<th width="70" class="right"></th>
+					<th width="30" style="display:none"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr id="-1" style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">
+					<td colspan="5"></td>
+					<td align="right" colspan="2">SUBTOTAL</td>
+					<td align="right"></td>
+					<td align="right"><span id="lbl_subtotal">0</span></td>
+					<input type="hidden" id="taxinvoice_subtotal" name="subtotal" value="0">
+				</tr>
+
+				<tr id="-2" style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">
+					<td colspan="5"></td>
+					<td align="right" colspan="2">Biaya Tambahan</td>
+					<td align="right">&nbsp;</td>
+					<td align="right"><span id="txt_extra_cost">0</span></td>
+				</tr>
+
+				<tr id="ppn-row" style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">
+					<td colspan="5"></td>
+					<td align="right" colspan="2">PPN <span id="ppn_amount"></span>%</td>
+					<td align="right">&nbsp;</td>
+					<td align="right"><span id="txt_gst_tax">0</span></td>
+				</tr>
+
+				<tr id="-3" style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">
+					<td colspan="5"></td>
+					<td align="right" colspan="2">Potongan Asuransi</td>
+					<td align="right">&nbsp;</td>
+					<td align="right"><span id="txt_insurance_cost" class="red">0</span></td>
+				</tr>
+
+				<tr id="-3" style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">
+					<td colspan="5"></td>
+					<td align="right" colspan="2">Potongan Klem Susut</td>
+					<td align="right">&nbsp;</td>
+					<td align="right"><span id="txt_claim_cost" class="red">0</span></td>
+				</tr>
+
+				<tr id="-4" style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">
+					<td colspan="5"></td>
+					<td align="right" colspan="2">PPH 2%</td>
+					<td align="right">&nbsp;</td>
+					<td align="right"><span id="txt_price_tax" class="red">0</span></td>
+				</tr>
+				<tr id="-5" class="footer" style="border-bottom: 1px dotted #bbb; margin-bottom: 30px;">
+					<td colspan="5"></td>
+					<td align="right" colspan="2" class="total">TOTAL</td>
+					<td align="right">&nbsp;</td>
+					<td align="right" class="total"><span id="txt_total">0</span></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="" style="padding-bottom:0px; text-align: right; width: 100%; margin-top: 1rem;">
+			<input type="submit" value="Simpan" class="btn btn-styled"/>
+		</div>
+	</form>
+  </div>
+
+</div>
+
+<style>
+.more-pad td {
+	padding: 0.5rem;
+}
+
+.btn-styled {
+	border-radius: 3px;
+	border: 0;
+	padding: 7px 10px;
+	text-decoration: none;
+	color: #fff;
+	font-size: 13px;
+	font-weight: 900;
+	cursor: pointer;
+	letter-spacing: 0.05em;
+	background-color: #24748f !important;
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#2d95b7", endColorstr="#23748e");
+	background-image: -khtml-gradient(linear, left top, left bottom, from(#2d95b7), to(#23748e));
+	background-image: -moz-linear-gradient(top, #2d95b7, #23748e);
+	background-image: -ms-linear-gradient(top, #2d95b7, #23748e);
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2d95b7), color-stop(100%, #23748e));
+	background-image: -webkit-linear-gradient(top, #2d95b7, #23748e);
+	background-image: -o-linear-gradient(top, #2d95b7, #23748e);
+	background-image: linear-gradient(#2d95b7, #23748e);
+	border-color: #23748e #23748e #216c85;
+	color: #fff !important;
+	text-shadow: 0 -1px 0 rgb(0 0 0 / 16%);
+	-webkit-font-smoothing: antialiased;
+}
+</style>

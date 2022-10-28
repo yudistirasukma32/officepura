@@ -1,0 +1,35 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+
+<div id="main">
+
+	<div id="content-full">
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Pengeluaran Kendaraan : <span class="red"><%=@year%></span></h1>
+
+		<br class="clearfix" />
+
+		<%= render "steps", :step => 2 %>
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue" style="width:100%;">
+					Pilih Tahun &nbsp; &nbsp;
+					<select name="year" id="year" class="half left combo_route chzn-select" onchange="javascript: submitFormFilter();">
+						<% 2012.upto(Date.today.year) do |year| %>
+						<option value="<%=year%>"<% if year == @year.to_i %> selected="selected"<% end %>><%=year%></option>
+						<% end %>
+					</select>
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<div id="chartexpensevehicle" style="height:1400px; width:980px;"></div>
+		<br class="clearfix" />
+	</div>
+</div>

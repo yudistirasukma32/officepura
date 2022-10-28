@@ -1,0 +1,429 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+		<a class="print btn-txt btn-green" href="/reports/downloadexcelpayroll/<%=@date%>"><i class="icon-file"></i> Excel</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Gaji Supir : <span class="red"><%=Date::MONTHNAMES[@month.to_i]%> <%=@year%></span></h1>
+
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date">Pilih Periode</label>
+				<select name="month" class="half left" style="margin-right:10px;">
+					<% (1.upto(12)).each do |m| %>
+					<option value="<%= m.to_s%>"<% if m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+					<% end %>
+				</select>
+				<% year_to = Payroll.order(:date).first.date.year rescue nil || Date.today.year %>
+				<select name="year" class="short left">
+					<% (Date.today.year.downto(year_to)).each do |y| %>
+					<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+					<% end %>
+				</select>
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<ul class="rounded" id="tabbed">
+			<li><a id="link_1" class="finger">Penghargaan Kehadiran</a></li>
+			<li><a id="link_2" class="finger">Klaim</a></li>
+			<li><a id="link_3" class="finger">Potongan Lain</a></li>
+		</ul>
+
+		<div id="sliding_window" style="margin-top:10px;">
+			<div class="sliding_container">
+				<div class="sliding_tab" id="tab_1">
+					<br class="clearfix" />
+					<table class="row-view">
+						<tr>
+							<th width="30">No</th>
+							<th>Nama</th>
+							<th width="80">Nopol</th>
+							<th colspan="3" width="220" style="text-align:center">Kehadiran</th>
+							<th colspan="3" width="240" style="text-align:center">Penghargaan Kehadiran</th>
+							<th width="80" class="right">Nett Biaya</th>
+						</tr>
+						<tr>
+							<th width="30">&nbsp;</th>
+							<th>&nbsp;</th>
+							<th width="80">&nbsp;</th>
+							<th width="70" class="right">Non HLN</th>
+							<th width="70" class="right">HLN</th>
+							<th width="70" class="right">Total</th>
+							<th width="80" class="right">Non HLN</th>
+							<th width="80" class="right">HLN</th>
+							<th width="80" class="right">Total</th>
+							<th width="80">&nbsp;</th>
+						</tr>
+						<% if @maindrivers and @maindrivers.any? %>
+							<tr class="subheading">
+								<th colspan="10" style="color:#000;">Supir Tetap</th>
+							</tr>
+							<% i = 0 %>
+							<% @maindrivers.each do |payroll| %>
+								<tr>
+									<td><%= i+1%></td>
+									<td><%= payroll.driver.name unless payroll.driver.nil?%></td>
+									<td><%= payroll.driver.vehicle.current_id if !payroll.driver.vehicle_id.nil? %></td>
+									<td class="right"><%= payroll.non_holidays %></td>
+									<td class="right"><%= payroll.holidays %></td>
+									<td class="right"><%= payroll.non_holidays + payroll.holidays %></td>
+									<td class="right"><%= to_currency(payroll.non_holidays_payment.to_i) %></td>
+									<td class="right"><%= to_currency(payroll.holidays_payment.to_i) %></td>
+									<td class="right"><%= to_currency(payroll.non_holidays_payment.to_i + payroll.holidays_payment.to_i) %></td>
+									<td class="right"><%= to_currency(payroll.total.to_i) %></td>
+								</tr>
+								<% i+=1%>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td colspan="2" class="total">TOTAL</td>
+								<td class="right total"><%= @maindrivers.sum(:non_holidays) %></td>
+								<td class="right total"><%= @maindrivers.sum(:holidays) %></td>
+								<td class="right total"><%= @maindrivers.sum("non_holidays + holidays") %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:non_holidays_payment)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:holidays_payment)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum("non_holidays_payment + holidays_payment")) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:total)) %></td>
+							</tr>
+						<% end %>
+
+						<% if @warnens and @warnens.any? %>
+							<tr class="subheading">
+								<th colspan="10" style="color:#000;">Warnen</th>
+							</tr>
+							<% i = 0 %>
+							<% @warnens.each do |payroll| %>
+								<tr>
+									<td><%= i+1%></td>
+									<td><%= payroll.driver.name unless payroll.driver.nil?%></td>
+									<td><%= payroll.driver.vehicle.current_id if !payroll.driver.vehicle_id.nil? %></td>
+									<td class="right"><%= payroll.non_holidays %></td>
+									<td class="right"><%= payroll.holidays %></td>
+									<td class="right"><%= payroll.non_holidays + payroll.holidays %></td>
+									<td class="right"><%= to_currency(payroll.non_holidays_payment.to_i) %></td>
+									<td class="right"><%= to_currency(payroll.holidays_payment.to_i) %></td>
+									<td class="right"><%= to_currency(payroll.non_holidays_payment.to_i + payroll.holidays_payment.to_i) %></td>
+									<td class="right"><%= to_currency(payroll.total.to_i) %></td>
+								</tr>
+								<% i+=1%>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td colspan="2" class="total">TOTAL</td>
+								<td class="right total"><%= @warnens.sum(:non_holidays) %></td>
+								<td class="right total"><%= @warnens.sum(:holidays) %></td>
+								<td class="right total"><%= @warnens.sum("non_holidays + holidays") %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:non_holidays_payment)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:holidays_payment)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum("non_holidays_payment + holidays_payment")) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:total)) %></td>
+							</tr>
+						<% end %>
+
+						<% if @helpers and @helpers.any? %>
+							<tr class="subheading">
+								<th colspan="10" style="color:#000;">Kernet</th>
+							</tr>
+							<% i = 0 %>
+							<% @helpers.each do |payroll| %>
+								<tr>
+									<td><%= i+1%></td>
+									<td><%= payroll.helper.name unless payroll.helper.nil?%></td>
+									<td><%= payroll.helper.driver.vehicle.current_id if !payroll.helper.driver.vehicle_id.nil? %></td>
+									<td class="right"><%= payroll.non_holidays %></td>
+									<td class="right"><%= payroll.holidays %></td>
+									<td class="right"><%= payroll.non_holidays + payroll.holidays %></td>
+									<td class="right"><%= to_currency(payroll.non_holidays_payment.to_i) %></td>
+									<td class="right"><%= to_currency(payroll.holidays_payment.to_i) %></td>
+									<td class="right"><%= to_currency(payroll.non_holidays_payment.to_i + payroll.holidays_payment.to_i) %></td>
+									<td class="right"><%= to_currency(payroll.total.to_i) %></td>
+								</tr>
+								<% i+=1%>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td colspan="2" class="total">TOTAL</td>
+								<td class="right total"><%= @helpers.sum(:non_holidays) %></td>
+								<td class="right total"><%= @helpers.sum(:holidays) %></td>
+								<td class="right total"><%= @helpers.sum("non_holidays + holidays") %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:non_holidays_payment)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:holidays_payment)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum("non_holidays_payment + holidays_payment")) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:total)) %></td>
+							</tr>
+						<% end %>
+					</table>
+				</div>
+				<div class="sliding_tab" id="tab_2">
+					<br class="clearfix" />
+					<table class="row-view">
+						<tr>
+							<th width="30">No</th>
+							<th>Nama</th>
+							<th colspan="3" style="text-align:center">Klaim Susut</th>
+							<th colspan="3" style="text-align:center">Klaim Kecelakaan</th>
+							<th colspan="3" style="text-align:center">Klaim Onderdil</th>
+						</tr>
+						<tr>
+							<th width="30">&nbsp;</th>
+							<th>&nbsp;</th>
+							<th width="70" class="right">Jml</th>
+							<th width="70" class="right">Pot</th>
+							<th width="70" class="right">Sisa</th>
+							<th width="70" class="right">Jml</th>
+							<th width="70" class="right">Pot</th>
+							<th width="70" class="right">Sisa</th>
+							<th width="70" class="right">Jml</th>
+							<th width="70" class="right">Pot</th>
+							<th width="70" class="right">Sisa</th>
+						</tr>
+						<% if @maindrivers and @maindrivers.any? %>
+							<tr class="subheading">
+								<th colspan="11" style="color:#000;">Supir Tetap</th>
+							</tr>
+							<% i = 0 %>
+							<% @maindrivers.each do |payroll| %>
+								<tr>
+									<td><%= i+1%></td>
+									<td><%= payroll.driver.name unless payroll.driver.nil?%></td>
+									<td class="right"><%= payroll.master_weight_loss.to_i > 0 ? to_currency(payroll.master_weight_loss.to_i) : "-"%></td>
+									<td class="right"><%= payroll.weight_loss.to_i > 0 ? to_currency(payroll.weight_loss.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_weight_loss.to_i - payroll.weight_loss.to_i > 0 ? to_currency(payroll.master_weight_loss.to_i - payroll.weight_loss.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_accident.to_i > 0 ? to_currency(payroll.master_accident.to_i) : "-"%></td>
+									<td class="right"><%= payroll.accident.to_i > 0 ? to_currency(payroll.accident.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_accident.to_i - payroll.accident.to_i > 0 ? to_currency(payroll.master_accident.to_i - payroll.accident.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_sparepart.to_i > 0 ? to_currency(payroll.master_sparepart.to_i) : "-"%></td>
+									<td class="right"><%= payroll.sparepart.to_i > 0 ? to_currency(payroll.sparepart.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_sparepart.to_i - payroll.sparepart.to_i > 0 ? to_currency(payroll.master_sparepart.to_i - payroll.sparepart.to_i) : "-"%></td>
+								</tr>
+								<% i+=1%>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td class="total">TOTAL</td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:master_weight_loss)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:weight_loss)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum("master_weight_loss - weight_loss")) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:master_accident)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:accident)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum("master_accident - accident")) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:master_sparepart)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:sparepart)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum("master_sparepart - sparepart"))%></td>
+							</tr>
+						<% end %>
+
+						<% if @warnens and @warnens.any? %>
+							<tr class="subheading">
+								<th colspan="11" style="color:#000;">Warnen</th>
+							</tr>
+							<% i = 0 %>
+							<% @warnens.each do |payroll| %>
+								<tr>
+									<td><%= i+1%></td>
+									<td><%= payroll.driver.name unless payroll.driver.nil?%></td>
+									<td class="right"><%= payroll.master_weight_loss.to_i > 0 ? to_currency(payroll.master_weight_loss.to_i) : "-"%></td>
+									<td class="right"><%= payroll.weight_loss.to_i > 0 ? to_currency(payroll.weight_loss.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_weight_loss.to_i - payroll.weight_loss.to_i > 0 ? to_currency(payroll.master_weight_loss.to_i - payroll.weight_loss.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_accident.to_i > 0 ? to_currency(payroll.master_accident.to_i) : "-"%></td>
+									<td class="right"><%= payroll.accident.to_i > 0 ? to_currency(payroll.accident.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_accident.to_i - payroll.accident.to_i > 0 ? to_currency(payroll.master_accident.to_i - payroll.accident.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_sparepart.to_i > 0 ? to_currency(payroll.master_sparepart.to_i) : "-"%></td>
+									<td class="right"><%= payroll.sparepart.to_i > 0 ? to_currency(payroll.sparepart.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_sparepart.to_i - payroll.sparepart.to_i > 0 ? to_currency(payroll.master_sparepart.to_i - payroll.sparepart.to_i) : "-"%></td>
+								</tr>
+								<% i+=1%>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td class="total">TOTAL</td>
+								<td class="right total"><%= to_currency(@warnens.sum(:master_weight_loss)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:weight_loss)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum("master_weight_loss - weight_loss")) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:master_accident)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:accident)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum("master_accident - accident")) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:master_sparepart)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:sparepart)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum("master_sparepart - sparepart"))%></td>
+							</tr>
+						<% end %>
+
+						<% if @helpers and @helpers.any? %>
+							<tr class="subheading">
+								<th colspan="11" style="color:#000;">Kernet</th>
+							</tr>
+							<% i = 0 %>
+							<% @helpers.each do |payroll| %>
+								<tr>
+									<td><%= i+1%></td>
+									<td><%= payroll.helper.name unless payroll.helper.nil?%></td>
+									<td class="right"><%= payroll.master_weight_loss.to_i > 0 ? to_currency(payroll.master_weight_loss.to_i) : "-"%></td>
+									<td class="right"><%= payroll.weight_loss.to_i > 0 ? to_currency(payroll.weight_loss.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_weight_loss.to_i - payroll.weight_loss.to_i > 0 ? to_currency(payroll.master_weight_loss.to_i - payroll.weight_loss.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_accident.to_i > 0 ? to_currency(payroll.master_accident.to_i) : "-"%></td>
+									<td class="right"><%= payroll.accident.to_i > 0 ? to_currency(payroll.accident.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_accident.to_i - payroll.accident.to_i > 0 ? to_currency(payroll.master_accident.to_i - payroll.accident.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_sparepart.to_i > 0 ? to_currency(payroll.master_sparepart.to_i) : "-"%></td>
+									<td class="right"><%= payroll.sparepart.to_i > 0 ? to_currency(payroll.sparepart.to_i) : "-"%></td>
+									<td class="right"><%= payroll.master_sparepart.to_i - payroll.sparepart.to_i > 0 ? to_currency(payroll.master_sparepart.to_i - payroll.sparepart.to_i) : "-"%></td>
+								</tr>
+								<% i+=1%>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td class="total">TOTAL</td>
+								<td class="right total"><%= to_currency(@helpers.sum(:master_weight_loss)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:weight_loss)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum("master_weight_loss - weight_loss")) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:master_accident)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:accident)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum("master_accident - accident")) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:master_sparepart)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:sparepart)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum("master_sparepart - sparepart"))%></td>
+							</tr>
+						<% end %>
+					</table>
+				</div>
+				<div class="sliding_tab" id="tab_3">
+					<br class="clearfix" />
+					<table class="row-view">
+						<tr>
+							<th width="30">No</th>
+							<th>Nama</th>
+							<th colspan="3" style="text-align:center">Pinjaman</th>
+							<th colspan="4" style="text-align:center">Tabungan</th>
+							<th class="right" width="80">G. Sangu</th>
+						</tr>
+						<tr>
+							<th width="30">&nbsp;</th>
+							<th>&nbsp;</th>
+							<th width="70" class="right">Jml</th>
+							<th width="70" class="right">Pot</th>
+							<th width="70" class="right">Sisa</th>
+							<th width="80" class="right">Awal</th>
+							<th width="80" class="right">Ambil</th>
+							<th width="80" class="right">Menabung</th>
+							<th width="80" class="right">Total</th>
+							<th width="80">&nbsp;</th>
+						</tr>
+						<% if @maindrivers and @maindrivers.any? %>
+							<tr class="subheading">
+								<th colspan="10" style="color:#000;">Supir Tetap</th>
+							</tr>
+							<% i = 0 %>
+							<% @maindrivers.each do |payroll| %>
+								<tr>
+									<td><%= i+1%></td>
+									<td><%= payroll.driver.name unless payroll.driver.nil?%></td>
+									<td class="right"><%= payroll.master_saving.to_i > 0 ? to_currency(payroll.master_saving.to_i) : "-" %></td>
+									<td class="right"><%= payroll.saving_reduction.to_i > 0 ? to_currency(payroll.saving_reduction.to_i) : "-" %></td>
+									<td class="right"><%= payroll.saving.to_i > 0 ? to_currency(payroll.saving.to_i) : "-" %></td>
+									<td class="right"><%= payroll.saving_reduction.to_i + payroll.master_saving.to_i - payroll.saving.to_i > 0 ? to_currency(payroll.saving_reduction.to_i + payroll.master_saving.to_i - payroll.saving.to_i) : "-" %></td>
+									<td class="right"><%= payroll.master_bon.to_i > 0 ? to_currency(payroll.master_bon.to_i) : "-" %></td>
+									<td class="right"><%= payroll.bon.to_i > 0 ? to_currency(payroll.bon.to_i) : "-" %></td>
+									<td class="right"><%= payroll.master_bon.to_i - payroll.bon.to_i > 0 ? to_currency(payroll.master_bon.to_i - payroll.bon.to_i) : "-" %></td>
+									<td class="right"><%= payroll.allowance.to_i > 0 ? to_currency(payroll.allowance.to_i) : "-" %></td>
+								</tr>
+								<% i+=1%>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td class="total">TOTAL</td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:master_saving)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:saving_reduction)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:saving)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum("saving_reduction + master_saving - saving")) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:master_bon)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:bon)) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum("master_bon - bon")) %></td>
+								<td class="right total"><%= to_currency(@maindrivers.sum(:allowance)) %></td>
+							</tr>
+						<% end %>
+
+						<% if @warnens and @warnens.any? %>
+							<tr class="subheading">
+								<th colspan="10" style="color:#000;">Warnen</th>
+							</tr>
+							<% i = 0 %>
+							<% @warnens.each do |payroll| %>
+								<tr>
+									<td><%= i+1%></td>
+									<td><%= payroll.driver.name unless payroll.driver.nil?%></td>
+									<td class="right"><%= payroll.master_saving.to_i > 0 ? to_currency(payroll.master_saving.to_i) : "-" %></td>
+									<td class="right"><%= payroll.saving_reduction.to_i > 0 ? to_currency(payroll.saving_reduction.to_i) : "-" %></td>
+									<td class="right"><%= payroll.saving.to_i > 0 ? to_currency(payroll.saving.to_i) : "-" %></td>
+									<td class="right"><%= payroll.saving_reduction.to_i + payroll.master_saving.to_i - payroll.saving.to_i > 0 ? to_currency(payroll.saving_reduction.to_i + payroll.master_saving.to_i - payroll.saving.to_i) : "-" %></td>
+									<td class="right"><%= payroll.master_bon.to_i > 0 ? to_currency(payroll.master_bon.to_i) : "-" %></td>
+									<td class="right"><%= payroll.bon.to_i > 0 ? to_currency(payroll.bon.to_i) : "-" %></td>
+									<td class="right"><%= payroll.master_bon.to_i - payroll.bon.to_i > 0 ? to_currency(payroll.master_bon.to_i - payroll.bon.to_i) : "-" %></td>
+									<td class="right"><%= payroll.allowance.to_i > 0 ? to_currency(payroll.allowance.to_i) : "-" %></td>
+								</tr>
+								<% i+=1%>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td class="total">TOTAL</td>
+								<td class="right total"><%= to_currency(@warnens.sum(:master_saving)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:saving_reduction)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:saving)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum("saving_reduction + master_saving - saving")) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:master_bon)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:bon)) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum("master_bon - bon")) %></td>
+								<td class="right total"><%= to_currency(@warnens.sum(:allowance)) %></td>
+							</tr>
+						<% end %>
+
+						<% if @helpers and @helpers.any? %>
+							<tr class="subheading">
+								<th colspan="10" style="color:#000;">Kernet</th>
+							</tr>
+							<% i = 0 %>
+							<% @helpers.each do |payroll| %>
+								<tr>
+									<td><%= i+1%></td>
+									<td><%= payroll.helper.name unless payroll.helper.nil?%></td>
+									<td class="right"><%= payroll.master_saving.to_i > 0 ? to_currency(payroll.master_saving.to_i) : "-" %></td>
+									<td class="right"><%= payroll.saving_reduction.to_i > 0 ? to_currency(payroll.saving_reduction.to_i) : "-" %></td>
+									<td class="right"><%= payroll.saving.to_i > 0 ? to_currency(payroll.saving.to_i) : "-" %></td>
+									<td class="right"><%= payroll.saving_reduction.to_i + payroll.master_saving.to_i - payroll.saving.to_i > 0 ? to_currency(payroll.saving_reduction.to_i + payroll.master_saving.to_i - payroll.saving.to_i) : "-" %></td>
+									<td class="right"><%= payroll.master_bon.to_i > 0 ? to_currency(payroll.master_bon.to_i) : "-" %></td>
+									<td class="right"><%= payroll.bon.to_i > 0 ? to_currency(payroll.bon.to_i) : "-" %></td>
+									<td class="right"><%= payroll.master_bon.to_i - payroll.bon.to_i > 0 ? to_currency(payroll.master_bon.to_i - payroll.bon.to_i) : "-" %></td>
+									<td class="right"><%= payroll.allowance.to_i > 0 ? to_currency(payroll.allowance.to_i) : "-" %></td>
+								</tr>
+								<% i+=1%>
+							<% end %>
+							<tr class="footer">
+								<td>&nbsp;</td>
+								<td class="total">TOTAL</td>
+								<td class="right total"><%= to_currency(@helpers.sum(:master_saving)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:saving_reduction)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:saving)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum("saving_reduction + master_saving - saving")) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:master_bon)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:bon)) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum("master_bon - bon")) %></td>
+								<td class="right total"><%= to_currency(@helpers.sum(:allowance)) %></td>
+							</tr>
+						<% end %>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+

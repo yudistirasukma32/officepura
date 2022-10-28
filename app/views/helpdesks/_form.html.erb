@@ -1,0 +1,106 @@
+
+<form accept-charset="UTF-8" action="/helpdesks/updateticket" class="edit_helpdesk" id="edit_helpdesk" method="post">
+	
+	<input type="hidden" name="helpdesk[id]" value="<%= @id %>">
+
+	<% if current_user.owner %>
+
+	<div class="field-row">
+    <label for="helpdesk_closed">Status</label>
+		<select class="half left" name="helpdesk[closed]" id="helpdesk_closed">
+			<option value="FALSE" <% if @ticket['closed'] == false %>
+				<%= 'selected="selected"' %>
+			<% end %>>Open</option> 
+			<option value="TRUE" <% if @ticket['closed'] == true %>
+				<%= 'selected="selected"' %>
+			<% end %>>Solved</option>
+		</select>
+	</div>
+	
+	<% else %>
+	
+	<div class="field-row">
+    <label for="helpdesk_closed">Status</label>
+    
+    <div class="half left">
+		<% if @ticket['closed'] == false %>
+			<span style="background: #00bcd4;color: #fff;line-height: 1.2;padding: 0.1rem 0.3rem;border-radius: 5px;">open</span>
+		<% else %>
+			<span style="background: #4CAF50;color: #fff;line-height: 1.2;padding: 0.1rem 0.3rem;border-radius: 5px;">solved</span>
+		<% end %>
+		</div>
+	</div>
+	
+	<% end %>
+	
+	<% if @ticket['closed'] == true %>
+	<div class="field-row">
+    <label for="helpdesk_dateclosed">Ticket Selesai</label>
+		<div class="half left">
+			<input id="helpdesk_dateclosed" name="helpdesk[dateClosed]" size="30" type="text" value="<%= @ticket['dateClosed']['date'][0...-7] %>" readonly>
+		</div>
+	</div>
+	
+	<% end %>
+
+	<div class="field-row">
+    <label for="productgroup_name">Nama Admin</label>
+    <input id="helpdesk_name" name="helpdesk[name]" size="30" type="text" value="<%= @ticket['name'] %>" readonly>
+	</div>
+	
+	<div class="field-row">
+    <label for="helpdesk_subject">Subject</label>
+    <input id="helpdesk_subject" name="helpdesk[subject]" size="30" type="text" value="<%= @ticket['subject'] %>" readonly>
+	</div>
+	
+	
+	<div class="field-row">
+    <label for="helpdesk_description">Deskripsi</label>
+    <textarea cols="40" id="helpdesk_description" name="helpdesk[description]" rows="20" readonly><%= @ticket['description'] %></textarea>
+	</div>
+	
+	<% if @process == 'show' %>
+	
+	<div class="field-row">
+    <label for="helpdesk_remarks">Catatan</label>
+    <textarea cols="40" id="helpdesk_remarks" name="helpdesk[remarks]" rows="20" readonly><%= @ticket['remarks'] %></textarea>
+    <small>*Diisi oleh super admin</small>
+	</div>
+	
+	<% else %>
+	
+	<div class="field-row">
+    <label for="helpdesk_remarks">Catatan</label>
+    <textarea cols="40" id="helpdesk_remarks" name="helpdesk[remarks]" rows="20"><%= @ticket['remarks'] %></textarea>
+    <small>*Diisi oleh super admin</small>
+	</div>
+	
+	<% end %>
+
+	<% if @process == 'new' %>
+
+	<div class="actions">
+		<input class="left" name="commit" type="submit" value="Tambah Data">
+		<a class="back left" href="/helpdesks">Kembali ke Index</a>
+	</div>
+	
+	<% else %>
+	
+	<% if @process == 'edit' %>
+	
+	<div class="actions">
+		<input class="left" name="commit" type="submit" value="Update Data">
+		<a class="back left" href="/helpdesks">Kembali ke Index</a>
+	</div>
+	
+	<% else %>
+	
+	<div class="actions">
+		<a class="back left" href="/helpdesks">Kembali ke Index</a>
+	</div>
+	
+	<% end %>
+	
+	<% end %>
+
+</form>

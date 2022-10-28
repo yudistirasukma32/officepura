@@ -1,0 +1,193 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+		<h1><%=Setting.find_by_name("Client Name").value%> / Penyusutan Aktiva: <span class="red"><%=Date::MONTHNAMES[@month.to_i]%>&nbsp;<%= @year%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date">Pilih Periode</label>
+				<select name="month" class="half left" style="margin-right:10px;">
+					<% (1.upto(12)).each do |m| %>
+					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+					<% end %>
+				</select>
+				<% year_to = Asset.order(:date_purchase).first.date.year rescue nil || Date.today.year %>
+				<select name="year" class="short left">
+					<% (Date.today.year.upto(year_to)).each do |y| %>
+					<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+					<% end %>
+				</select>
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<% if (@assetlancars and @assetlancars.any?) or (@assettaklancars and @assettaklancars.any?) or (@vehicles and @vehicles.any?) %>
+
+		<h2 class="right">Nominal Awal: <%=to_currency_bank(@balance, 'Rp. ')%></h2>
+		<% runningtaklancar = 0 %>
+		<% runninglancar = 0 %>
+		<% runningvehicle = 0 %>
+		<% percent = 0 %>
+		<table class="row-view report-view">
+			
+		<% if @assetlancars and @assetlancars.any? %>
+			
+			<tr class="subheading">
+				<th colspan="7"><h2 class="red">Aktiva Lancar</h2></th>
+			</tr>
+			<tr>
+				<th width="30">No.</th>
+				<th>Nama Barang</th>
+				<th width="80">Bulan Beli</th>
+				<th width="120" class="right">Nominal</th>
+				<th width="110">Persentase</th>
+				<th width="120" class="right">Defisit</th>
+				<th width="120" class="right">Total</th>
+			</tr>
+			<% @assetlancars.each_with_index do |asset, i| %>
+			<tr>
+				<td><%= i+1%></td>
+				<td><%= asset.name%></td>
+				<td><%= asset.date_purchase.strftime('%b %Y')%></td>
+				<td align="right"><%= to_currency_bank(asset.amount)%></td>
+				<% startDate = Date.new(asset.date_purchase.to_date.year, asset.date_purchase.to_date.month, 1)
+				   endDate = Date.new(@year.to_i, @month.to_i, 1)
+				   tot_year = ((endDate.year * 12 + endDate.month) - (startDate.year * 12 + startDate.month)) / 12%> 
+				<td><%= asset.assetgroup.percent_decrease%> % - <%= tot_year%> THN </td>
+				<% tot_defisit = 0
+					nominal_awal = asset.amount
+					1.upto(tot_year).each do |i|
+						defisit = nominal_awal * (asset.assetgroup.percent_decrease / 100)
+						nominal_awal += defisit * -1
+						tot_defisit += defisit
+					end 
+
+					runninglancar += (asset.amount - tot_defisit)%>
+				<td align="right"><%= to_currency_bank(tot_defisit)%></td>
+				<td align="right"><%= to_currency_bank(asset.amount - tot_defisit)%></td>
+			</tr>
+			<% end %>
+			<tr class="footer">
+				<td colspan="2">&nbsp;</td>
+				<td colspan="2">TOTAL</td>
+				<td align="right">&nbsp;</td>	
+				<td align="right">&nbsp;</td>					
+				<td align="right" class="total"><%=to_currency_bank(runninglancar)%></td>
+			</tr>
+		<% end %>
+
+		<% if @assettaklancars and @assettaklancars.any? %>
+			
+			<tr class="subheading">
+				<th colspan="7"><h2 class="red">Aktiva Tak Lancar</h2></th>
+			</tr>
+			<tr>
+				<th width="30">No.</th>
+				<th>Nama Barang</th>
+				<th width="80">Bulan Beli</th>
+				<th width="120" class="right">Nominal</th>
+				<th width="110">Persentase</th>
+				<th width="120" class="right">Defisit</th>
+				<th width="120" class="right">Total</th>
+			</tr>
+			<% @assettaklancars.each_with_index do |asset, i| %>
+			<tr>
+				<td><%= i+1%></td>
+				<td><%= asset.name%></td>
+				<td><%= asset.date_purchase.strftime('%b %Y') rescue nil%></td>
+				<td align="right"><%= to_currency_bank(asset.amount)%></td>
+				<% startDate = Date.new(asset.date_purchase.to_date.year, asset.date_purchase.to_date.month, 1) rescue nil
+				   endDate = Date.new(@year.to_i, @month.to_i, 1)
+				   tot_year = ((endDate.year * 12 + endDate.month) - (startDate.year * 12 + startDate.month)) / 12 rescue nil%> 
+				<td><%= asset.assetgroup.percent_decrease%> % - <%= tot_year%> THN </td>
+				<% tot_defisit = 0
+					nominal_awal = asset.amount
+					1.upto(tot_year.to_i).each do |i|
+						defisit = nominal_awal * (asset.assetgroup.percent_decrease / 100)
+						nominal_awal += defisit * -1
+						tot_defisit += defisit
+					end 
+
+					runningtaklancar += (asset.amount - tot_defisit)%>
+				<td align="right"><%= to_currency_bank(tot_defisit)%></td>
+				<td align="right"><%= to_currency_bank(asset.amount - tot_defisit)%></td>
+			</tr>
+			<% end %>
+			<tr class="footer">
+				<td colspan="2">&nbsp;</td>
+				<td colspan="2">TOTAL</td>
+				<td align="right">&nbsp;</td>	
+				<td align="right">&nbsp;</td>					
+				<td align="right" class="total"><%=to_currency_bank(runningtaklancar)%></td>
+			</tr>
+		
+		<% end %>
+
+		<% if @vehicles and @vehicles.any? %>
+			<tr class="subheading">
+				<th colspan="7"><h2 class="red">Aktiva Kendaraan</h2></th>
+			</tr>	
+			<tr>
+				<th width="30">No.</th>
+				<th>Kendaraan</th>
+				<th width="80">Bulan Beli</th>
+				<th width="120" class="right">Nominal</th>
+				<th width="110">Persentase</th>
+				<th width="120" class="right">Defisit</th>
+				<th width="120" class="right">Total</th>
+			</tr>
+			
+			<% assetvehicle = Assetgroup.find(2) %>
+
+			<% @vehicles.each_with_index do |vehicle, i| %>
+
+			<tr>
+				<td><%= i+1%></td>
+				<td><%= vehicle.current_id%></td>
+				<td><%= vehicle.date_purchase.strftime('%b %Y')%></td>
+				<td align="right"><%= to_currency_bank(vehicle.amount)%></td>
+				<% startDate = Date.new(vehicle.date_purchase.to_date.year, vehicle.date_purchase.to_date.month, 1)
+				   endDate = Date.new(@year.to_i, @month.to_i, 1)
+				   tot_year = ((endDate.year * 12 + endDate.month) - (startDate.year * 12 + startDate.month)) / 12 %> 
+				<td><%= assetvehicle.percent_decrease%> % - <%= tot_year%> THN </td>
+				<% tot_defisit = 0
+					nominal_awal = vehicle.amount
+					1.upto(tot_year).each do |i|
+						defisit = nominal_awal * (assetvehicle.percent_decrease / 100)
+						nominal_awal += defisit * -1
+						tot_defisit += defisit
+					end 
+
+					runningvehicle += (vehicle.amount - tot_defisit)%>
+				<td align="right"><%= to_currency_bank(tot_defisit)%></td>
+				<td align="right"><%= to_currency_bank(vehicle.amount - tot_defisit)%></td>
+			</tr>
+			<% end %>
+			<tr class="footer">
+				<td colspan="2">&nbsp;</td>
+				<td colspan="2">TOTAL</td>
+				<td align="right">&nbsp;</td>	
+				<td align="right">&nbsp;</td>					
+				<td align="right" class="total"><%=to_currency_bank(runningvehicle)%></td>
+			</tr>
+
+		<% end %>
+		<% running = runninglancar + runningtaklancar + runningvehicle %>
+		<% percent = ((@balance - running) / @balance) * 100 if @balance > 0  and running > 0 %>
+		</table>
+		<h2 class="right" style="text-align:right;">Nominal Akhir: <% if running < 0 %><span class="red"><% end %><%=to_currency_bank(running, 'Rp. ')%><% if running < 0 %></span><% end %><br/> Defisit : <%=to_currency_bank(percent)%> % </h2>
+
+		<% end %>
+	</div>
+</div>

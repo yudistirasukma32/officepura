@@ -1,0 +1,65 @@
+<%= form_for(@containermemo) do |f| %>
+
+  <div class="field-row first">
+    <%= f.label :date, "Tanggal" %> 
+    <%= f.text_field :date, :class => 'left half date-picker'%> 
+  </div>
+
+  <div class="field-row">
+    <%= f.label :operator_id, "Operator" %>
+    <select id="containermemo_operator_id" name="containermemo[operator_id]" class="chzn-select half">
+      <option value="0">- Operator -</option>
+      <% Operator.active.order(:abbr).each do |operator| %>
+      <option value="<%=operator.id%>"<%= operator.id == @containermemo.operator_id ? ' selected="selected"' : '' %>><%=operator.abbr%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :container_type, "Tipe Kontainer"  %>
+    <%= f.select :container_type, options_for_select(@contype.collect {|w| [w, w]}, (params[:container_type].present? ? params[:type] : @containermemo.container_type)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :container_id, "No. Kontainer" %>
+    <select id="containermemo_container_id" name="containermemo[container_id]" class="chzn-select double">
+      <option value="0">- No. Kontainer -</option>
+      <% Container.active.order(:containernumber).each do |container| %>
+      <option value="<%=container.id%>"<%= container.id == @containermemo.container_id ? ' selected="selected"' : '' %>><%=container.containernumber%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <% @quant = Array(0..30) %>
+    <%= f.label :storage_day, "Biaya Storage" %>   
+    <%= f.select :storage_day, options_for_select(@quant.collect {|w| [w, w]}, (params[:storage_day].present? ? params[:storage_day] : @containermemo.storage_day)), {}, { :class => 'half' } %>
+    <span style="position: absolute; margin-top: 0.5rem;"><strong>Hari</strong></span>
+  </div>
+  
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description, :rows => 2, :class => 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :container_fee, "Biaya LOLO" %>    
+    <%= f.text_field :container_fee, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => @containermemo.container_fee.to_i %>
+    <strong>Rupiah</strong>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :additional_fee, "Biaya Lain-lain" %>    
+    <%= f.text_field :additional_fee, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => @containermemo.additional_fee.to_i %>
+    <strong>Rupiah</strong>
+  </div>
+
+</div>
+
+<div class="actions">
+  <%= f.submit "Tambah Data", :id => 'containermemo_submit', :class => 'left' if current_user.owner or checkroleonly 'Admin Marketing, Admin Operasional' %>
+  
+  <a class="back left" href="/events/<%=@event_id%>/edit">Kembali ke Index</a>
+</div>
+
+<% end %>

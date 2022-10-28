@@ -1,0 +1,24 @@
+<label>Tipe Supir</label>
+<select id="type_driver" name="driverexpense[type_driver]" class="half" onchange="javascript: getDriverforDriverExpense();">
+	<option value="">-- Pilih --</option>
+	<option value="d" <% if params[:type] == 'd'%> selected="selected" <% end %>>Supir</option>
+	<option value="h" <% if params[:type] == 'h'%> selected="selected" <% end %>>Kernet</option>
+</select>
+
+<select id="driver_id" name="driverexpense[driver_id]" class="half">
+	 <% if params[:type] == 'd' %>
+	 	<option value="">-- Pilih Supir --</option>
+	 	<% Driver.where(:deleted => false).order(:name).each do |d| %>
+	 	<% if !d.name.blank? %>
+	 	<option value="<%=d.id%>"><%=d.name%></option>
+	 	<% end %>
+	 	<% end %>
+	 <% else %>
+	 	<option value="">-- Pilih Kernet --</option>
+	 	<% Helper.where(:deleted => false).order(:name).each do |d| %>
+	 	<% if !d.name.blank? %>
+	 	<option value="<%=d.id%>"><%=d.name%></option>
+	 	<% end %>
+	 	<% end %>
+	 <% end %>
+</select>

@@ -1,0 +1,109 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn print" href="helpdesks/new"><i class="icon-plus-sign"></i> &nbsp;Buat Tiket</a>
+		
+		<% if current_user.owner %>
+			<h1>Pusat Bantuan / Semua Support Ticket PURA</h1>
+			<h3><strong><%= @periode %></strong></h3>
+		<% else %>
+			<h1>Pusat Bantuan / Ticket Anda</h1>
+		<% end %>
+
+		<br class="clearfix" />
+		
+		<div id="filter">
+			<form id="filterform" name="filter" action="" method="get">
+			<div class="field-row continue">
+				<label for="start">Pilih Periode</label>
+				<input type="date" name="start" class="half" value="<%=@startdate%>" required />
+				<input type="date" name="end" class="half" value="<%=@enddate%>" required/>
+				<input type="submit" value="Filter">
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+ 
+		<table class="row-view tablesorter">
+			<thead>
+			<tr>
+				<th>#</th>
+<!--				<th>No. Ticket</th>-->
+				<% if current_user.owner %>
+				<th width="85">Nama</th>
+				<% end %>
+				<th width="115">Date Requested</th>
+<!--				<th>Subject</th>-->
+				<th>Description</th>
+				<th width="100">Status</th>
+<!--				<th class="hide">Detail</th>-->
+			</tr>
+			</thead>
+
+			<tbody>
+				<% 
+					
+					if @ticketsEmpty %>
+						 
+						<tr><td colspan="7" style="text-align: center; padding: 0.7rem 0.2rem;">Belum ada data</td></tr>
+						
+				<%	else 
+					x = 0 
+					@tickets.each do |ticket| %>
+				<tr>
+					<td style="padding: 0.7rem 0.2rem;"><%= x += 1 %></td>	
+<!--					<td></td>-->
+					<% if current_user.owner %>
+					<td><%= ticket['name'] %></td>
+					<% end %>
+					
+					<td><%= ((ticket['dateCreated'].to_time + 7).to_time).strftime('%d %b %Y %H:%M:%S') + ' WIB'  %></td>
+					<td>
+						<strong>
+						<% if current_user.owner %>
+							<a style="color: #007fe4; font-weight: 500;" href="helpdesks/edit/<%= ticket['id'] %>">
+								<%= ticket['subject'] %> (#<%= ticket['id'][0,6] %>)
+							</a>
+						<% else %>	
+							<a style="color: #007fe4; font-weight: 500;" href="helpdesks/show/<%= ticket['id'] %>">
+								<%= ticket['subject'] %> (#<%= ticket['id'][0,6] %>)
+							</a>
+						<% end %>
+						</strong>
+						<br/>
+						<%= ticket['description'] %>
+					
+					</td>
+					<td>
+						<% if ticket['closed'] == false %>
+							<span style="background: #00bcd4;color: #fff;line-height: 1.2;padding: 0.1rem 0.3rem;border-radius: 5px;">open</span>
+						<% else %>
+							<span style="background: #4CAF50;color: #fff;line-height: 1.2;padding: 0.1rem 0.3rem;border-radius: 5px;">solved</span>
+						<% end %>
+					</td>
+<!--
+					<% if current_user.owner %>
+					<td><a style="color: #007fe4; font-weight: 500;" href="helpdesks/edit/<%= ticket['id'] %>">Lihat Detail &#8250;</a></td>
+					<% else %>
+					<td><a style="color: #007fe4; font-weight: 500;" href="helpdesks/show/<%= ticket['id'] %>">Lihat Detail &#8250;</a></td>
+					<% end %>
+-->
+				</tr>
+				<% end end %>
+			</tbody>	
+		
+		</table>
+ 
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

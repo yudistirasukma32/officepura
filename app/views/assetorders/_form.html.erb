@@ -1,0 +1,41 @@
+<%= form_for(@assetorder) do |f| %>
+	<div class="field-row first">
+		<%= f.label :asset_id, "Aset" %>
+		<%= f.select :asset_id, options_for_select(Asset.active.collect {|g| [g.name, g.id]}, @assetorder.asset_id), {:include_blank => '- Pilih Aset -'}, :class => 'half chzn-select'%>
+    </div>
+
+    <div class="field-row">
+		<%= f.label :date, "Tanggal" %>
+		<%= f.text_field :date, :class => 'half date-picker', :value => @assetorder.date.strftime('%d-%m-%Y') %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :quantity, "Jumlah" %>
+		<%= f.text_field :quantity, :class => 'half',:onkeypress => 'javascript: return isNumberKey(this);', :onchange => 'javascript: countTotalAssetOrder();' %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :unit_name, "Satuan" %>
+		<%= f.text_field :unit_name, :class => 'half' %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :unit_price, "Harga" %>
+		<%= f.text_field :unit_price, :class => 'half',:onkeypress => 'javascript: return isMoneyKey(this);', :value => to_currency(@assetorder.unit_price.to_i), :onchange => 'javascript: countTotalAssetOrder();' %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :total, "Total" %>
+		<%= f.text_field :total, :class => 'half disabled', :onkeypress => 'javascript: return isMoneyKey(this);', :readonly => 'readonly', :value => to_currency(@assetorder.total.to_i) %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :description, "Keterangan" %>
+		<%= f.text_area :description %>
+	</div>
+	
+	<div class="actions">
+		<%= f.submit "Tambah Data", :class => 'left' %>
+		<a class="back left" href="<%=assetorders_path%>">Kembali ke Index</a>
+	</div>
+<% end %>

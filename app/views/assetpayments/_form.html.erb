@@ -1,0 +1,54 @@
+<% if @assetorder %>
+	<div class="info-box" style="margin-bottom:30px;"> 
+	 	<h3>Pembelian Aset #<%=zeropad(@assetorder.id)%></h3> 
+	 	<table class="row-view no-border">
+	      <tr>
+	        <td width="90">Aset</td>
+	        <td><%=@assetorder.asset.name%></td>
+	      </tr>
+	      <tr>
+	        <td>Tanggal</td>
+	        <td><%=@assetorder.date.strftime('%d-%m-%Y')%></td>
+	      </tr>
+	      <tr>
+	        <td>Jumlah</td>
+	        <td><strong><%=@assetorder.quantity%></strong> <%=@assetorder.unit_name%></td>
+	      </tr>
+	      <tr>
+	          <td>Harga</td>
+	          <td><%=to_currency(@assetorder.unit_price.to_i)%></td>
+	      </tr>
+	      <tr>
+	          <td>Total</td>
+	          <td><%=to_currency(@assetorder.total.to_i)%></td>
+	      </tr>
+	      <tr>
+	          <td>Keterangan</td>
+	          <td><%=@assetorder.description %></td>
+	      </tr>
+	    </table>
+	</div>
+<% end %>
+
+<%= form_for(@assetpayment) do |f| %>
+	<%= f.hidden_field :assetorder_id, :value => @assetorder_id %>
+	<div class="field-row">
+		<%= f.label :date, "Tanggal" %>
+		<%= f.text_field :date, :class => 'half date-picker', :value => @assetpayment.date.strftime('%d-%m-%Y') %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :total, "Total" %>
+		<%= f.text_field :total, :class => 'half', :onkeypress => 'javascript: return isMoneyKey(this);', :value => to_currency(@assetpayment.total.to_i) %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :description, "Keterangan" %>
+		<%= f.text_area :description %>
+	</div>
+	
+	<div class="actions">
+		<%= f.submit "Tambah Data", :class => 'left' %>
+		<a class="back left" href="<%=assetpayments_path%>">Kembali ke Index</a>
+	</div>
+<% end %>

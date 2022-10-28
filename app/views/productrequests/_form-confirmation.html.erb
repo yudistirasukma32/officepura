@@ -1,0 +1,65 @@
+<%= form_for(@productrequest) do |f| %>
+	<% if @productrequestitems.any? %>
+	<div class="actions" style="float:left; padding:0 0 30px 20px;">
+    	<a class="left" href="javascript:print();"><i class="icon-print"></i> Print Normal</a>
+    	<a class="back left" href="<%=productrequests_path%>">Kembali ke Index</a>
+  	</div>
+	<div class="info-box" style="width:560px; float:left; clear:left;">
+		<table class="row-view no-border">
+			<tr valign="top">
+				<td><strong><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+				<td align="right" class="header">Permintaan Pembelian<br/>#<%= zeropad(@productrequest.id)%></td>
+			</tr>
+		</table>
+		<hr style="width:600px;" />
+		<table class="row-view no-border">
+			<tr>
+				<% vehicle = "-" %>
+				<% vehicle = @productrequest.vehicle.current_id if !@productrequest.vehicle_id.nil? %>
+				<td width="90">No. Pol</td>
+				<td><%= vehicle %></td>				
+			</tr>
+			<tr>				
+				<% driver = "-" %>
+				<% driver = @productrequest.driver.name if !@productrequest.driver_id.nil? %>
+				<td>Supir</td>
+				<td><%= driver %></td>
+			</tr>
+			<tr>
+				<td>Tanggal</td>
+				<td><%= @productrequest.date.strftime('%d-%m-%Y') %></td>
+			</tr>
+			<tr>
+				<td>Keterangan</td>
+				<td><%= @productrequest.description %></td>
+			</tr>
+			<tr>
+				<td>Permintaan</td>
+				<td><%= @productrequest.productgroup.name %></td>
+			</tr>
+		</table>
+		<table class="row-view">
+			<tr>
+				<th width="30">No</th>
+				<th>Nama Barang</th>
+				<th width="50">Satuan</th>
+				<th width="80" class="right">Jumlah</th>
+			</tr>
+			<% @productrequestitems.each_with_index do |productrequestitem, i|%>
+			<tr>
+				<td><%=i+1%>.</td>
+				<td><%=productrequestitem.product.name%></td>
+				<td><%=productrequestitem.product.unit_name%></td>
+				<td align="right"><%=to_currency_bank(productrequestitem.quantity) %></td>
+			</tr>
+			<% end %>
+		</table>
+	</div>
+	
+
+	<% else %>
+		<p><h3 class="zone">Tidak ada pembelian barang</h3></p>
+	<% end %>
+
+	
+<% end %>

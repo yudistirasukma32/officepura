@@ -1,0 +1,120 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Pembelian Supplier : <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="width:100%;">
+				<label for="supplier_id">Pilih Supplier</label>
+				<select name="supplier_id" class="half left combo_route chzn-select">
+					<option value="all">All</option>
+					<% Supplier.order(:name).all.each do |supplier| %>
+					<option value="<%=supplier.id%>"<% if @supplier and supplier.id == @supplier.id %> selected="selected"<% end %>><%=supplier.name%></option>
+					<% end %>
+		    	</select> 
+				&nbsp; &nbsp; Tanggal Awal &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+				&nbsp; &nbsp; Akhir &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+		
+		<br class="clearfix" />
+
+
+		<table class="row-view report-view">
+		<% if @supplier %>
+
+			<% 	productorderitems = @supplier.productorderitems.joins("INNER JOIN productorders ON productorders.id = productorderitems.productorder_id").where("bon = true AND productorder_id in (SELECT id FROM productorders WHERE deleted = false AND (date >= ? and date < ?))", @startdate.to_date, @enddate.to_date + 1.day).order('productorders.date')
+				if productorderitems.any? %>
+				<% total = 0 %>
+				<tr class="subheading">
+					<th colspan="6"><span class="red"><%= @supplier.name%></span></th>
+				</tr>
+				<tr>
+					<th width="30">No.</th>
+					<th width="80">Tanggal</th>
+					<th>Nama Barang</th>
+					<th width="60">Jumlah</th>
+					<th width="90" class="right">Harga</th>
+					<th width="90" class="right">Total</th>
+				</tr>
+
+				
+				<% productorderitems.each_with_index do |productorderitem, i| %>
+				<tr>
+					<td><%= i+1%>.</td>
+					<td><%= productorderitem.productorder.date.strftime("%d-%m-%Y")%></td>
+					<td><%= productorderitem.product.name%></td>
+					<td align="right"><%= to_currency_bank(productorderitem.quantity)%></td>
+					<td align="right"><%= to_currency(productorderitem.price_per)%></td>
+					<td align="right"><%= to_currency(productorderitem.total)%></td>
+				</tr>
+				<% total += productorderitem.total %>
+				<% end %>
+
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td colspan="4" class="total">TOTAL</td>
+					<td align="right" class="total"><%=to_currency(total)%></td>
+				</tr>
+			<% end %>
+		<% end %>
+
+		<% if @suppliers %>
+		<% @suppliers.each do |supplier| %>
+
+		<% 	productorderitems = supplier.productorderitems.joins("INNER JOIN productorders ON productorders.id = productorderitems.productorder_id").where("bon = true AND productorder_id in (SELECT id FROM productorders WHERE deleted = false AND (date >= ? and date < ?))", @startdate.to_date, @enddate.to_date + 1.day).order('productorders.date')
+			if productorderitems.any? %>
+			<% total = 0 %>
+			<tr class="subheading">
+				<th colspan="6"><span class="red"><%= supplier.name%></span></th>
+			</tr>
+			<tr>
+				<th width="30">No.</th>
+				<th width="80">Tanggal</th>
+				<th>Nama Barang</th>
+				<th width="60">Jumlah</th>
+				<th width="90" class="right">Harga</th>
+				<th width="90" class="right">Total</th>
+			</tr>
+
+			
+			<% productorderitems.each_with_index do |productorderitem, i| %>
+			<tr>
+				<td><%= i+1%>.</td>
+				<td><%= productorderitem.productorder.date.strftime("%d-%m-%Y")%></td>
+				<td><%= productorderitem.product.name%></td>
+				<td align="right"><%= to_currency_bank(productorderitem.quantity)%></td>
+				<td align="right"><%= to_currency(productorderitem.price_per)%></td>
+				<td align="right"><%= to_currency(productorderitem.total)%></td>
+			</tr>
+			<% total += productorderitem.total %>
+			<% end %>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="4" class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(total)%></td>
+			</tr>
+		<% end %>
+	<% end %>
+	<% end %>
+		</table>
+
+
+	</div>
+</div>

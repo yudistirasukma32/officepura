@@ -1,0 +1,69 @@
+<%= form_for(@productorder) do |f| %>
+	<div class="actions" style="float:left; padding:0 0 30px 20px;">
+		<input type="hidden" id="printername" value="<%= Setting.find_by_name("Printer Name").value if !Setting.find_by_name("Printer Name").nil? %>" />
+    	<a class="left" href="javascript:print();"><i class="icon-print"></i> Print Normal</a>
+    	<a id="order_printmatrix" class="left" href="javascript:zebraprint('order');"><i class="icon-print"></i> Print Dot Matrix</a>
+    	<a class="back left" href="<%=productorders_path%>">Kembali ke Index</a>
+  	</div>
+	<div id="order-print" class="info-box" onLoad="javascript: LoadAppletPrinter();" style="width:560px; float:left; clear:left;">
+		<table class="row-view no-border">
+	        <tr valign="top">
+	          <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+	          <td align="right" class="header">Order Pembelian<br/>#<%=zeropad(@productorder.id)%><input type="hidden" id="strOrderId" value="#<%=zeropad(@productorder.id)%>" /></td>
+	        </tr>
+	      </table>
+	       <hr style="width:600px;" />
+		<table class="row-view no-border">
+			<tr>
+				<td width="90">Tanggal</td>
+				<td><span id="strDate"><%= @productorder.date.strftime('%d %B %Y')%></span></td>
+			</tr>
+			<tr>
+				<td width="90">Keterangan</td>
+				<td><span id="strDescription"><%= @productorder.description.blank? ? '-' : @productorder.description %></span></td>
+			</tr>
+		</table>
+		<table id="tableorder" class="row-view">
+		<% if @productorderitems.any? %>
+			<tr id="0">
+				<th width="30">No.</th>
+ 				<th>Nama Barang</th>
+ 				<th width="80">Jumlah</th> 				
+ 				<th width="60" class="right">Harga</th>
+ 				<th width="80" class="right">Total</th>
+			</tr>
+			<% total = 0 %>
+			<% @productorderitems.each_with_index do |productorderitem, i|%>
+			<tr id="<%= productorderitem.id%>">
+				<td><%=i+1%>.</td>
+				<td><span id="productname_<%= productorderitem.id%>"><%=productorderitem.product.name%></span>&nbsp;<% if productorderitem.bon == true%><strong>(bon)</strong><% end %> <br /><%='('+ productorderitem.supplier.name + ')' if !productorderitem.supplier_id.nil? %>
+					<input type="hidden" id="bon_<%= productorderitem.id%>" value="<% if productorderitem.bon == true%>(bon)<% end %>" />
+					<input type="hidden" id="supplier_<%= productorderitem.id%>" value="(<%=productorderitem.supplier.name%>)" />
+				</td>
+				<td><span id="quantity_<%= productorderitem.id%>"><%=to_currency_bank(productorderitem.quantity)%> @ <%=productorderitem.product.unit_name%></span></td>
+				<td style="text-align:right;"><span id="price_<%= productorderitem.id%>"><%=to_currency(productorderitem.price_per)%></span></td>
+				<td style="text-align:right;"><span id="total_<%= productorderitem.id%>"><%=to_currency(productorderitem.total)%></span></td>				
+			</tr>
+			<% total += productorderitem.total.to_i %>
+			<% end %>
+			<tr>
+ 				<td></td>
+ 				<td></td>
+ 				<td></td>
+ 				<td class="total right">TOTAL</td>
+ 				<td style="text-align:right;"><span id="strTotal"><%=to_currency(total)%></span></td> 				
+ 			</tr>
+		<% else %>
+			<tr>
+				<td><strong>Tidak ada order pembelian</strong></td>
+			</tr>
+		<% end %>
+		</table>
+		
+		<p>&nbsp;Dibuat oleh <strong id="strCreator"><%= @productorder.user_id.nil? ? current_user.username : @productorder.user.username%></strong></p>
+	</div>
+	
+	<div id="msg-box">
+	  <p>Shop message here.</p>
+	</div>
+<% end %>

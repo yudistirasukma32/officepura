@@ -1,0 +1,81 @@
+<div id="section">
+	<div class="wrapper">
+		<ul id="sectionnav">
+
+		<% if @section == "masters" %>
+
+			<li<% if section == "dashboards" %> class="on"<% end %>><a href="/dashboards">Dashboard</a></li>
+			<li<% if section == "customers" %> class="on"<% end %>><a href="/customers">Pelanggan</a></li>
+			<li<% if section == "suppliers" %> class="on"<% end %>><a href="/suppliers">Supplier</a></li>
+			<li<% if section == "drivers" %> class="on"<% end %>><a href="/drivers">Supir</a></li>
+			<li<% if section == "staffs" %> class="on"<% end %>><a href="/staffs">Staff</a></li>
+			<li<% if section == "products" %> class="on"<% end %>><a href="/products">Stok Barang</a></li>
+			<li<% if section == "vehicles" %> class="on"<% end %>><a href="/vehicles">Kendaraan</a></li>
+			<li<% if section == "isotanks" %> class="on"<% end %>><a href="/isotanks">Isotank</a></li>
+
+			<li<% if section == "assets" %> class="on"<% end %>><a href="/assets">Aktiva</a></li>
+			<li<% if section == "routes" %> class="on"<% end %>><a href="/routes">Jurusan</a></li>
+
+		<% elsif @section == "transactions" %>
+			<li class="sub<% if section == 'invoices' or section == 'invoicereturns' %> on<% end %>">
+				Transaksi BKK <i class="icon-caret-down"></i>
+				<div class="submenu">
+					<a href="/invoices"><i class="icon-caret-right"></i>Keluar</a>
+					<a href="/invoicereturns"><i class="icon-caret-right"></i>Masuk</a>
+					<a href="/invoices/add"><i class="icon-caret-right"></i>Tambahan</a>
+					<a href="/bonusreceipts"><i class="icon-caret-right"></i>Premi</a>
+					<a href="/incentives"><i class="icon-caret-right"></i>Insentif</a>
+				</div>
+			</li>
+			
+			<li<% if section == "cashiers" %> class="on"<% end %>><a href="/cashiers">Transaksi Kasir</a></li>
+
+			<li class="sub<% if section == 'officeexpenses' or section == 'bankexpenses' %> on<% end %>">
+				Transaksi Kas <i class="icon-caret-down"></i>
+				<div class="submenu">
+					<a href="/officeexpenses"><i class="icon-caret-right"></i>Kantor</a>
+					<a href="/bankexpenses"><i class="icon-caret-right"></i>Bank</a>
+				</div>
+			</li>
+			<li class="sub<% if section == 'taxinvoiceitems' or section == 'taxinvoices' %> on<% end %>">
+				Surat Tagihan <i class="icon-caret-down"></i>
+				<div class="submenu">
+					<a href="/taxinvoiceitems"><i class="icon-caret-right"></i>Pengisian</a>
+					<a href="/taxinvoices"><i class="icon-caret-right"></i>Invoice</a>
+				</div>
+			</li>
+			<li class="sub<% if section == 'productorders' or section == 'productrequests' or section == 'supplierpayments' %> on<% end %>" style="width:160px;"> 
+				Transaksi Inventori <i class="icon-caret-down"></i>
+				<div class="submenu" style="width:160px;">
+					<a href="/productrequests"><i class="icon-caret-right"></i>Permintaan Servis</a>
+					<a href="/productorders"><i class="icon-caret-right"></i>Order Pembelian</a>
+					<a href="/supplierpayments"><i class="icon-caret-right"></i>Bayar Supplier</a>
+				</div>
+			</li>
+
+		<% elsif @section == "reports" %>
+
+			<li<% if section == "expenses-daily" %> class="on"<% end %>><a href="/reports/expenses-daily">Kas Harian</a></li>
+			<li<% if section == "expenses-bank" %> class="on"<% end %>><a href="/reports/expenses-bank">Kas Bank</a></li>
+			<li<% if section == "expenses-drivers" %> class="on"<% end %>><a href="/reports/expenses-drivers">Sangu</a></li>
+			<li<% if section == "expenses-gas" %> class="on"<% end %>><a href="/reports/expenses-gas">Solar Kontan</a></li>
+			<li<% if section == "gas-vouchers" %> class="on"<% end %>><a href="/reports/gas-vouchers">Solar Bon</a></li>
+			<li<% if section == "gas-leftovers" %> class="on"<% end %>><a href="/reports/gas-leftovers">Solar Gantungan</a></li>
+
+		<% elsif @section == "logs" %>
+
+			<li<% if section == "vehiclelogs" %> class="on"<% end %>><a href="/vehiclelogs">Check Harian</a></li>
+			<li<% if section == "vehicledates" %> class="on"<% end %>><a href="/vehicledates">Tanggal Penting</a></li>
+			<li<% if section == "driverlogs" %> class="on"<% end %>><a href="/driverlogs">Check Supir</a></li>
+			<li<% if section == "events" %> class="on"<% end %>><a href="/events">Kalender Event</a></li>
+
+		<% elsif @section == "settings" %>
+
+			<li<% if section == "settings" %> class="on"<% end %>><a href="/settings">Data Tetap</a></li>
+			<li<% if section == "users" %> class="on"<% end %>><a href="/users">Data User</a></li>
+		<% end %>
+		
+		</ul>
+
+	</div>
+</div>

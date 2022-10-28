@@ -1,0 +1,28 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>		
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<% if checkrole 'Admin Operasional' %>
+		<a class="print btn" href="<%=new_booking_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<a class="print btn" href="bookings/report-bookings"><i class="icon-data"></i> &nbsp;Report Booking</a>
+		<% end%>
+		
+		<h1><a href="<%=bookings_path%>">Kalender OPS</a> / Index</h1>
+
+		<input type="hidden" id="arrayevents" />
+		
+		<br class="clearfix" />
+				
+		<div id='calendar' class='bookings'></div>
+
+		<br class="clearfix" />
+        
+        <div class="loader main-dashboard d-block" style="margin:3rem auto 0 auto;"></div>
+	</div>
+
+</div>

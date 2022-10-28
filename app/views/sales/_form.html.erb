@@ -1,0 +1,81 @@
+<%= form_for(@sale) do |f| %>
+	<div class="field-row first">
+		 <label for="date">Tanggal</label>
+		 <input type="text" name="sale[date]" class="half date-picker" value="<%= @sale.date.strftime('%d-%m-%Y') if !@sale.date.nil? %>" />
+		 <div class="field-row continue">
+ 			<label for="description">Keterangan</label>
+ 			<input type="text" name="sale[description]" style="width:350px;" value="<%= @sale.description if !@sale.description.nil?%>" />	 		
+ 		</div>			
+	</div> 
+
+	<table class="row-view">
+		<tr>
+			<th width="30">No.</th>
+			<th>Nama Barang</th>
+			<th width="40" class="right">Jumlah</th>
+			<th width="40" class="right">Harga</th>
+			<th width="40" class="right">Total<th>				
+		</tr>
+		<% if @sale.saleitems.any? %>
+			<% total = 0%>
+			<% @sale.saleitems.each_with_index do |item, i | %>
+			<tr>
+				<td><%=i + 1%></td>
+				<td><%= item.productsale.name %></td>
+				<td>
+					<input type="text" id="quantity_<%=item.id%>" name="sale[quantity_<%=item.id%>]" class="short" style="text-align:right;" onkeypress="javascript:return isDecimalKey(this);" value="<%= item.quantity%>" onchange="javascript: changeTotalProductsale(<%=item.id%>);"/>
+				</td>
+				<td>
+					<input type="text" id="price_<%=item.id%>" name="sale[price_<%=item.id%>]" class="half right none" readonly="readonly" style="text-align:right;" value="<%= to_currency(item.price_per)%>" />
+				</td>
+				<td>
+					<input type="text" id="total_<%=item.id%>" style="text-align:right;" name="sale[total_<%=item.id%>]" readonly="readonly" class="half right none" value="<%= to_currency(item.total) %>" />
+				</td>
+			</tr>
+			<% total += item.total %>
+			<% end %>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td class="total right">TOTAL</td>
+				<td><input type="text" class="half right none" readonly="readonly" id="totalsale" style="text-align:right;" value="<%= to_currency(total)%>"/></td>
+			</tr>
+		<% else %>
+			<% (1..10).each do |i| %>
+			<tr>
+				<td><%=i%></td>
+				<td>
+					<select id="productsaleid_<%=i%>" name="sale[productsaleid_<%=i%>]" onchange="javascript:getPriceProductsale(this.value, <%=i%>);" style="width:500px">
+						<option value="">- Barang - </option>
+						<% Productsale.where(:deleted => false).order(:name).each do |item|%>
+						<option value="<%= item.id%>"><%= item.name%></option>
+						<% end %>
+					</select>
+				</td>
+				<td>
+					<input type="text" id="quantity_<%=i%>" name="sale[quantity_<%=i%>]" class="short" style="text-align:right;" onkeypress="javascript:return isDecimalKey(this);" value="0" 
+					onchange="javascript: changeTotalProductsale(<%=i%>);"/>
+				</td>
+				<td>
+					<input type="text" id="price_<%=i%>" name="sale[price_<%=i%>]" class="half right none" readonly="readonly" style="text-align:right;" value="0" />
+				</td>
+				<td>
+					<input type="text" id="total_<%=i%>" style="text-align:right;" name="sale[total_<%=i%>]" readonly="readonly" class="half right none" value="0" />
+				</td>
+			</tr>
+			<% end %>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td class="total right">TOTAL</td>
+				<td><input type="text" class="half right none" readonly="readonly" id="totalsale" style="text-align:right;" value="0"/></td>
+			</tr>
+		<% end %>
+	<table>
+	<div class="actions">
+		<a class="back right" href="<%=sales_path%>">Kembali ke Index</a>
+		<input type="submit" class="btn right" value="Tambah Data" %>
+	</div>
+<% end %>

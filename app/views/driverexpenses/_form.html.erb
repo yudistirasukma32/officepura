@@ -1,0 +1,84 @@
+ <%= form_for(@driverexpense) do |f| %>
+  <% if @errors.include?'driverexpense' %>
+    <div class="field-row red">
+      <%=@errors['driverexpense']%>
+    </div>
+  <% end %>
+
+  <div class="field-row first">
+    <%= f.label :office_id, "Kantor" %>
+    <%= f.select :office_id, options_for_select(Office.where(:deleted => false).collect {|g| [g.name, g.id]}, @driverexpense.office_id), {},:class => 'half chzn-select' %>
+  </div>  
+
+  <div id="div-driver" class="field-row">
+    <label>Tipe Supir</label>
+    <select id="type_driver" name="driverexpense[type_driver]" class="half" onchange="javascript: getDriverforDriverExpense();">
+      <option value="">-- Pilih --</option>
+      <option value="d" <% if !@driverexpense.driver_id.nil? %> selected="selected" <%end%>>Supir</option>
+      <option value="h" <% if !@driverexpense.helper_id.nil? %> selected="selected" <%end%>>Kernet</option>
+    </select>
+    
+    <select id="driver_id" name="driverexpense[driver_id]" class="half">
+      <% if !@driverexpense.driver_id.nil? %>
+        <option value="">-- Pilih Supir --</option>
+          <% Driver.where(:deleted => false).order(:name).each do |d| %>
+          <% if !d.name.blank? %>
+            <option value="<%=d.id%>" <% if d.id == @driverexpense.driver_id %> selected="selected" <% end %>><%=d.name%></option>
+          <% end %>
+        <% end %>
+      <% elsif !@driverexpense.helper_id.nil? %>
+      <option value="">-- Pilih Kernet --</option>
+      <% Helper.where(:deleted => false).order(:name).each do |d| %>
+        <% if !d.name.blank? %>
+          <option value="<%=d.id%>" <% if d.id == @driverexpense.helper_id %> selected="selected" <% end %>><%=d.name%></option>
+        <% end %>
+      <% end %>
+      <% else %>
+        <option>-- Kosong --</option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :date, "Tanggal" %>
+    <%= f.text_field :date, :class => 'half date-picker' %>
+    <span>(tgl/bln/thn)</span>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :weight_loss, "Klm Susut" %>    
+    <%= f.text_field :weight_loss, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countTotalDriverExpense();', :value => @driverexpense.weight_loss.to_i %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :accident, "Klm Kecelakaan" %>    
+    <%= f.text_field :accident, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countTotalDriverExpense();', :value => @driverexpense.accident.to_i%>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :sparepart, "Klm Onderdil" %>    
+    <%= f.text_field :sparepart, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countTotalDriverExpense();', :value => @driverexpense.sparepart.to_i %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :bon, "Pinjaman" %>    
+    <%= f.text_field :bon, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countTotalDriverExpense();', :value => @driverexpense.bon.to_i%>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :total, "Jumlah" %>    
+    <%= f.text_field :total, :class => 'half none', :value => to_currency(@driverexpense.total.to_i)%>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :id => 'driverexpense_submit', :class => 'left' %>
+    <a class="back left" href="<%=driverexpenses_path%>">Kembali ke Index</a>
+  </div>
+
+<% end %>
+

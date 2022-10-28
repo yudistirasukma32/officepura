@@ -1,0 +1,35 @@
+<%= render "shared/header" %>
+
+<div id="main">
+
+	<div id="nav">
+		<%= render "shared/nav" %>		
+	</div>
+	<div id="mid">
+		<h1>Transaksi / <a href="<%=supplierpayments_path%>">Bayar Supplier</a> / Index</h1>
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue">
+					<label for="date" class="middle">Bulan / Thn</label>
+					<select name="month" class="half left" style="margin-right:10px;">
+						<% (1.upto(12)).each do |m| %>
+						<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+						<% end %>
+					</select>
+					<% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+					<select name="year" class="short left">
+						<% (Date.today.year.upto(year_to)).each do |y| %>
+						<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+						<% end %>
+					</select>
+					<input class="submit left" type="submit" value="Filter" />
+				</div>
+			</form>
+		</div>
+
+		<div id="content">
+			<%= render "showtable" %>		
+		</div>
+	</div>	
+</div>

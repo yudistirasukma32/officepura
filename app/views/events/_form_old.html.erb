@@ -1,0 +1,109 @@
+<%= form_for(@event) do |f| %>
+	<div class="field-row first">
+		<%= f.label :start_date, "Tanggal" %> 
+		<%= f.text_field :start_date, :class => 'left half date-picker' %>
+		<%= f.label :start_date, "s/d", :class => 'middle' %> 
+		<%= f.text_field :end_date, :class => 'left half date-picker' %>
+	</div>
+
+    <div class="field-row">
+        <%= f.label :customer_id, "Pelanggan" %>
+
+        <select id="event_customer_id" name="event[customer_id]" class="double chzn-select">
+          <option value="0">- Pilih Pelanggan -</option>
+          <% Customer.active.order(:name).each do |customer| %>
+          <option value="<%=customer.id%>"
+            <% if customer.id == @event.customer_id %> selected="selected"<% end %>><%=customer.name%></option>
+          <% end %>
+        </select>
+    </div>
+
+	<div class="field-row">
+ 		<%= f.label :summary, "Jurusan" %>
+ 		<%= f.text_field :summary, :placeholder => 'Jurusan' %>
+	</div>
+
+  <div class="field-row">
+      <% 
+	 	@quant = []  
+	   1..50.map do |i| 
+	  	@quant.push(i)
+	  end 
+	  %>
+      <%= f.label :qty, "Jumlah" %>   
+      <%= f.select :qty, options_for_select(@quant.collect {|w| [w, w]}, (params[:qty].present? ? params[:qty] : @event.qty)), {}, { :class => 'half' } %>
+      <span style="position: absolute; margin-top: 0.5rem;"><strong>Kontainer</strong></span>
+      
+  </div>
+
+    <div class="field-row">
+      <%= f.label :invoicetrain, "Moda" %>
+      <% if active_node == "edit" %>
+          <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, false, :disabled => !@event.invoicetrain ? false : true %> Standart
+          <% end %>
+          <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, true, :checked => !@event.invoicetrain ? false : true, :disabled => @event.invoicetrain ? false : true %> Kereta
+          <% end %>
+      <% else %>
+          <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, false, :checked => true  %> Standart
+          <% end %>
+          <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, true %> Kereta
+          <% end %>
+      <% end %>
+
+    </div>
+
+    <div class="field-row first">
+        <%= f.label :office_id, "Kantor" %>
+        <%= f.select :office_id, options_for_select(Office.where(:deleted => false).collect {|g| [g.name, g.id]}, @event.office_id), {}, :class => 'half chzn-select'%>
+    </div>
+
+	<div class="field-row">
+ 		<%= f.label :description, "Keterangan" %>
+ 		<%= f.text_area :description, :rows => 2, :class => 'half' %>
+	</div>
+
+	<div class="field-row">
+ 		<%= f.label :payments_by, "Dibayar Oleh" %>
+ 		<%= f.text_field :payments_by, :placeholder => 'Nama' %>
+	</div>
+	
+	<div class="field-row">
+ 		<%= f.label :cancelled, "DO Ditolak?", :style => 'font-weight:700;' %>
+ 		<%= f.check_box :cancelled %>
+	</div>
+
+	<% if current_user.owner %>
+
+	<div class="field-row">
+ 		<%= f.label :authorised, "Otorisasi", :style => 'font-weight:700;' %>
+ 		<%= f.check_box :authorised %> &nbsp; Owner
+	</div>
+
+	<div class="field-row first">
+		<%= f.label :authorised_dated, "Tgl Otorisasi" %> 
+		<%= f.text_field :authorised_dated, :class => 'half date-picker' %>
+	</div>
+
+	<% end %>
+
+	<% query = @event.cancelled ? "cancelled" : "" %>
+
+	<div class="actions">
+
+  	<% if @isdelete %>
+  	<%= link_to ' Hapus Event', @event, :method => :delete, :confirm => "Are you sure?", :class => 'left btn-txt cancel icon-remove', :style => 'margin-top:0; float:left;' if current_user.owner or checkroleonly 'Admin Marketing' %>
+  	<% end %>
+
+  </div>
+
+	<div class="actions">
+  	<%= f.submit "Tambah Data", :id => 'event_submit', :class => 'left' if current_user.owner or checkroleonly 'Admin Marketing' %>
+  	
+  	<a class="back left" href="<%= events_path + '?type=' + query %>">Kembali ke Index</a>
+	</div>
+
+<% end %>

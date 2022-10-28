@@ -1,0 +1,78 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<% if current_user.adminrole %>
+		<a class="btn print" href="<%=new_warehouse_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<% end %>
+		<h1>Master / <a href="<%=warehouses_path%>">Gudang</a> / Index</h1>
+
+		<br class="clearfix" />
+		<table class="row-view">
+			<tr>
+				<th>Nama</th>
+				<th>Kota</th>
+				<th>Aktif</th>
+				<th width="60"></th>
+			</tr>
+
+			<% @warehouses.each do |warehouse| %>
+			<% if warehouse.deleted %>
+				<% if current_user.adminrole %>
+				<tr class="deleted">
+					<td><%= warehouse.name %></td>
+					<td><%= warehouse.city %></td>
+					<% if warehouse.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe, 'javascript: void();', :class => 'disabled tipsy', :title => 'Tidak Aktif' %></td>
+					<% end %>
+					<td class="right" width="60">&nbsp;</td>
+				</tr>
+				<% end %>
+			<% else %>
+				<% if current_user.adminrole %>
+				<tr>
+					<td><%= link_to warehouse.name, edit_warehouse_path(warehouse) %></td>
+					<td><%= warehouse.city %></td>
+					<% if warehouse.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, disable_warehouse_path(warehouse), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe, enable_warehouse_path(warehouse), :class => 'disabled tipsy', :title => 'Aktifkan' %></td>
+					<% end %>
+					<td class="right" width="60">
+						<%= link_to '&#xf044;'.html_safe, edit_warehouse_path(warehouse), :class => "edit tipsy", :title => 'Edit' %> 
+						<%= link_to '&#xf00d;'.html_safe, warehouse, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+					</td>
+				</tr>
+				<% else %>
+				<tr>
+					<td><%= warehouse.name %></td>
+					<td><%= warehouse.city %></td>
+					<% if warehouse.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe, 'javascript: void();', :class => 'disabled tipsy', :title => 'Tidak Aktif' %></td>
+					<% end %>
+					<td class="right" width="60">&nbsp;</td>
+				</tr>
+				<% end %>
+			<% end %>
+			
+			<% end %>	
+		
+		</table>
+
+		
+		<% if current_user.adminrole %>
+		<a class="btn-txt right" href="<%=new_warehouse_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<% end %>
+		<br class="clearfix" />
+	</div>
+
+</div>

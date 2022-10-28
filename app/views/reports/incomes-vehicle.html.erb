@@ -1,0 +1,188 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Pemasukan <%= @vehicle ? "<span class='red'>'#{@vehicle.current_id}'</span>".html_safe : 'Kendaraan' %></span>: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="width:100%;">
+				<label for="vehicle_id" style="float:none">Pilih Kendaraan</label>
+				<select name="vehicle_id" class="chzn-select half combo_route">
+					<% Vehicle.order(:current_id).all.each do |vehicle| %>
+					<option value="<%=vehicle.id%>"<% if @vehicle and vehicle.id == @vehicle.id %> selected="selected"<% end %>><%=vehicle.current_id%></option>
+					<% end %>
+		    	</select> 
+				&nbsp; &nbsp; <label class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+				&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<!-- <h2 class="right">Jumlah Pemasukan Akhir: <span class="green"><%=to_currency(@income, 'Rp. ')%></span></h2> -->
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th width="80">Tgl</th>
+				<th>Keterangan</th>
+				<th width="60">SJ</th>
+				<th width="80" class="right">Muat (Kg)</th>
+				<th width="80" class="right">Bkr (Kg)</th>
+				<th width="80">Tgl Bkr</th>
+				<th width="65" class="right">Harga</th>
+				<th width="90" class="right">Total</th>
+			</tr>
+			<% running, running_train, taxinvoice_total = 0 , 0%>
+			<% totalGeneric = 0 %>
+			<% i = 0 %>
+			<% if @taxinvoiceitems and @taxinvoiceitems.any? %>
+				<tr><th colspan="9"><span class="red">Non Generic</span></th></tr>
+				<%# routes = Route.all(:order => :name) %>
+				<%# routes.each do |route| %>
+					<%# taxinvoiceitems = Taxinvoiceitem.find_by_sql("SELECT * FROM taxinvoiceitems WHERE money(total) > money(0) and invoice_id IN (SELECT id FROM invoices WHERE route_id = #{route.id} AND vehicle_id = #{@vehicle.id} AND (date >= '#{@startdate.to_date}'::date and date < '#{@enddate.to_date + 1.day}'::date))") %>
+
+					<% if @taxinvoiceitems.any? %>
+						<% @taxinvoiceitems.each do |taxinvoiceitem| %>
+							<% if taxinvoiceitem.total > 0 %>
+								<tr>
+									<td><%= i+1 %>.</td>
+									<td><%= taxinvoiceitem.date.strftime('%d/%m/%Y')%></td>
+									<td><%= zeropad(taxinvoiceitem.invoice.id)%>:(<%= taxinvoiceitem.invoice.route.name%>, <%= taxinvoiceitem.invoice.driver.name%>)</td>
+									<td><%= taxinvoiceitem.sku_id%></td>
+									<td class="right"><%= to_currency(taxinvoiceitem.weight_gross) %></td>
+									<td class="right"><%= to_currency(taxinvoiceitem.weight_net) %></td>
+									<td class="right"><%= taxinvoiceitem.unload_date.strftime('%d-%m-%Y') if !taxinvoiceitem.unload_date.nil?%></td>
+									<td class="right">
+										<% if taxinvoiceitem.invoice.invoicetrain %>
+											<%= taxinvoiceitem.price_per/2 %>
+										<% else %>
+											<%= to_currency(taxinvoiceitem.price_per.to_i)%></td>
+										<%end%>
+									<td class="right">
+										<% if taxinvoiceitem.invoice.invoicetrain %>
+											<% taxinvoice_total = taxinvoiceitem.total/2 %>
+											<%= to_currency(taxinvoice_total)%>
+										<% else %>
+											<% taxinvoice_total = taxinvoiceitem.total %>
+											<%= to_currency(taxinvoice_total)%>
+										<%end%>
+									</td>
+								</tr>
+								<% i += 1 %>
+								<% running += taxinvoice_total %>
+
+							<% end %>
+						<% end %>
+					<% end %>
+				<%# end %>
+			
+
+			<tr class="footer">
+				<td >&nbsp;</td>
+				<td colspan="7">TOTAL</td>
+				<td align="right" class="green"><%=to_currency(running)%></td>
+			</tr>
+			<% end %>
+
+			<% if @taxinvoicetrains and @taxinvoicetrains.any? %>
+				<tr><th colspan="9"><span class="red">Non Generic (Kereta)</span></th></tr>
+				<%# taxinvoicetrains = Taxinvoiceitem.active.where("money(total) > money(0) and invoice_id IN (#{@ids})") %>
+
+				<% if @taxinvoicetrains.any? %>
+					<% @taxinvoicetrains.each do |taxinvoiceitem| %>
+						<% if taxinvoiceitem.total > 0 %>
+							<tr>
+								<td><%= i+1 %>.</td>
+								<td><%= taxinvoiceitem.date.strftime('%d/%m/%Y')%></td>
+								<td><%= zeropad(taxinvoiceitem.invoice.invoices.first.id)%>:(<%= taxinvoiceitem.invoice.invoices.first.route.name%>, <%= taxinvoiceitem.invoice.invoices.first.driver.name%>)</td>
+								<td><%= taxinvoiceitem.sku_id%></td>
+								<td class="right"><%= to_currency(taxinvoiceitem.weight_gross) %></td>
+								<td class="right"><%= to_currency(taxinvoiceitem.weight_net) %></td>
+								<td class="right"><%= taxinvoiceitem.unload_date.strftime('%d-%m-%Y') if !taxinvoiceitem.unload_date.nil?%></td>
+								<td class="right">
+									<% if taxinvoiceitem.invoice.invoices.first.invoicetrain %>
+										<%= taxinvoiceitem.price_per/2 %>
+									<% else %>
+										<%= to_currency(taxinvoiceitem.price_per.to_i)%></td>
+									<%end%>
+								<td class="right">
+									<% if taxinvoiceitem.invoice.invoices.first.invoicetrain %>
+										<% taxinvoice_total = taxinvoiceitem.total/2 %>
+										<%= to_currency(taxinvoice_total)%>
+									<% else %>
+										<% taxinvoice_total = taxinvoiceitem.total %>
+										<%= to_currency(taxinvoice_total)%>
+									<%end%>
+								</td>
+							</tr>
+							<% i += 1 %>
+							<% running_train += taxinvoice_total %>
+
+						<% end %>
+					<% end %>
+				<% end %>
+			<% end %>
+            
+            <tr class="footer">
+				<td >&nbsp;</td>
+				<td colspan="7">TOTAL</td>
+				<td align="right" class="green"><%=to_currency(running_train)%></td>
+			</tr>
+
+			<% if @taxgenericitems and @taxgenericitems.any? %>
+				<tr><th colspan="9"><span class="red">Generic</span></th></tr>
+				<% @taxgenericitems.each do |taxgenericitem| %>
+					<% if taxgenericitem.total > 0 %>
+						<% totalGeneric += taxgenericitem.total %>
+						<tr>
+							<td><%= i+1 %>.</td>
+							<td><%= taxgenericitem.date.strftime('%d/%m/%Y')%></td>
+							<td><%= taxgenericitem.description%></td>
+							<td><%= taxgenericitem.sku_id%></td>
+							<td class="right"><%= to_currency(taxgenericitem.weight_gross) %></td>
+							<td class="right"><%= to_currency(taxgenericitem.weight_net) %></td>
+							<td class="right"><%= taxgenericitem.unload_date.strftime('%d-%m-%Y') if !taxgenericitem.unload_date.nil?%></td>
+							<td class="right"><%= to_currency(taxgenericitem.price_per.to_i)%></td>
+							<td class="right"><%= to_currency(taxgenericitem.total)%></td>
+						</tr>
+						<% i += 1 %>
+					<% end %>
+				<% end %>	
+				<tr class="footer">
+					<td >&nbsp;</td>
+					<td colspan="7">TOTAL</td>
+					<td align="right" class="green"><%=to_currency(totalGeneric)%></td>
+				</tr>			
+			<% end %>
+            
+		<% running += totalGeneric %>
+        <% running += running_train %>
+            
+			<tr class="footer">
+				<td class="total" align="right" colspan="7">JUMLAH PEMASUKAN AKHIR:</td>
+				<td>&nbsp;</td>
+				<td class="total red" align="right"><%=to_currency(running) %></td>
+			</tr>
+			<tr class="footer">
+				<td class="total" align="right" colspan="7">RATA-RATA PEMASUKAN AKHIR:</td>
+				<td>&nbsp;</td>
+                <% i = 0 ? i = 1 : i %>
+				<td class="total" align="right"><%=to_currency(running / i) %></td>
+			</tr>
+		</table>
+	</div>
+
+</div>

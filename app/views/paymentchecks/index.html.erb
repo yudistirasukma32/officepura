@@ -1,0 +1,61 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Transaksi / <a href="<%=paymentchecks_path%>">Pembayaran Bon</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<%= render "sublink", :sublink => 1 %>
+
+		<table class="row-view">
+			<tr>
+				<th width="50">No</th>
+				<th>Nama Supplier</th>
+				<th width="40">Nota</th>
+				<th width="100" class="right">Total</th>
+				<th width="60"></th>
+			</tr>
+			<% i, total_all = 0, 0 %>
+			<% @suppliers.each do |supplier| %>
+				<% total = supplier.productorderitems.where("bon = true AND paymentcheck_id IS NULL and productorder_id in (SELECT id from productorders where deleted = false)").sum(:total) %>
+				<% if total > 0 %>
+					<% if supplier.deleted %>
+						<% if current_user.adminrole %>
+						<tr class="deleted">
+							<td><%= i+1%>.</td>
+							<td><%= supplier.name%></td>
+							<td><%= supplier.productorderitems.where("bon = true AND paymentcheck_id IS NULL and productorder_id in (SELECT id from productorders where deleted=false)").count(:productorder_id, :distinct => true)%></td>
+							<td align="right"><%= to_currency(total)%></td>
+							<td>DIHAPUS</td>
+						</tr>
+						<% end %>
+					<% else %>
+					<tr>
+						<td><%= i+1%>.</td>
+						<td><%= supplier.name%></td>
+						<td><%= supplier.productorderitems.where("bon = true AND paymentcheck_id IS NULL and productorder_id in (SELECT id from productorders where deleted=false)").count(:productorder_id, :distinct  => true)%></td>
+						<td align="right"><%= to_currency(total)%></td>
+						<td><a class="cta" href="/paymentchecks/new/<%=supplier.id%>">Bayar</a></td>
+					</tr>
+					<% total_all += total %>
+					<% end %>
+					<% i += 1 %>
+				<% end %>
+			<% end %>
+			<tfoot>
+				<tr>
+					<td><strong>TOTAL</strong></td>
+					<td align="right" colspan="3"><strong><%= to_currency(total_all) %></strong></td>
+					<td>&nbsp;</td>
+				</tr>
+			</tfoot>
+		</table>
+		<br class="clearfix" />
+	</div>
+</div>

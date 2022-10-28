@@ -1,0 +1,30 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=taxinvoiceitems_path%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Transaksi / <a href="<%=taxinvoiceitems_path%>">Surat Jalan</a> / Tambah</h1>
+
+		<br class="clearfix" />
+		<%= render "form" %>
+		<br class="clearfix" />
+
+	</div>
+
+	<% if !@invoice_id.blank? %>
+		<% if @invoice.taxinvoiceitems.any? %>
+			<% if !@invoice.taxinvoiceitems[0].user_id.nil? %>
+				<p>Dibuat oleh <strong id="strCreator">
+				<%= @invoice.taxinvoiceitems[0].user.username%></strong>
+				</p>
+			<% end %>
+		<% end %>
+	<% end %>
+
+</div>

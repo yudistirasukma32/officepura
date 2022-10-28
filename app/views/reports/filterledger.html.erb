@@ -1,0 +1,90 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<h1><%=Setting.find_by_name("Client Name").value%> / Buku Besar: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+
+		<div style="background-color:#e3e0dd; padding:5px 10px 0 10px; clear:both; position:relative; ">
+			<form id="filterform" name="filterform" action="/reports/ledger" method="post">
+				<div class="field-row continue" style="width:100%">
+					<label for="startdate">Tanggal Awal</label>
+					<input type="text" name="filterform[startdate]" class="half left date-picker" value="<%=@startdate%>" />
+					<label for="enddate" class="middle">Akhir</label>
+					<input type="text" name="filterform[enddate]" class="half date-picker" value="<%=@enddate%>" />
+					<input class="submit" type="submit" value="Filter" data-confirm="Pembuatan laporan akan membutuhkan waktu 1-5 menit tergantung koneksi Anda. Apakah Anda yakin ?"/>
+				</div>
+				<div class="field-row continue" style="background-color:#e3e0dd;width:900px;">
+					<table border="0" style="float:left;" width="100px;">
+						<tr>
+							<td>
+								<label for="group">Group Kas</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="checkbox" id="checkallkas" value="Yes" onchange="javascript:checkAllKas();"/> All  
+							</td>
+						</tr>
+					</table>
+					
+					<table border="0" style="font-size:11px;float:left;" width="750px;">
+						<% i = 0 %>
+						<% @groups.each do |value| %>
+						<% i += 1 %>
+							<% if (i - 1) % 3 == 0 %>
+								<tr>
+							<% end %>
+								<td style="width:33%">
+									<input type="checkbox" id="Kas_<%= value %>" name="filterform[Kas_<%= value %>]" value="Yes" /> <%= value %>
+								</td>
+							<% if i % 3 == 0 %>
+								</tr>
+							<% end %>
+						<% end %>
+						
+					</table>
+				</div>
+				<div class="field-row continue" style="background-color:#e3e0dd;width:900px;">
+					<table border="0" style="float:left;" width="100px;">
+						<tr>
+							<td>
+								<label for="group">Group Bank</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="checkbox" id="checkallbank" value="Yes" onchange="javascript:checkAllBank();"/> All  
+							</td>
+						</tr>
+					</table>
+					<table border="0" style="font-size:11px;float:left;" width="750px;">
+						<% i = 0 %>
+						<% @groupbanks.each do |value| %>
+						<% i += 1 %>
+							<% if (i - 1) % 3 == 0 %>
+								<tr>
+							<% end %>
+								<td style="width:33%">
+									<input type="checkbox" id="Bank_<%= value %>" name="filterform[Bank_<%= value %>]" value="Yes" /> <%= value %>
+								</td>
+							<% if i % 3 == 0 %>
+								</tr>
+							<% end %>
+						<% end %>
+					</table>
+				</div>
+			</form>
+			<div style="clear:both;">&nbsp;</div>
+		</div>
+
+	</div>
+
+</div>

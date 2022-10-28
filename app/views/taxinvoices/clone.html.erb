@@ -1,0 +1,44 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=taxinvoices_path({:customer_id => $globalCustomer_id, :month => $globalMonth, :year => $globalYear})%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Transaksi / <a href="<%=taxinvoices_path%>">Invoice Tagihan</a> / Cloning</h1>
+
+		<br class="clearfix" />
+
+		<p>Invoice Tagihan: <%= @taxinvoice.long_id %></p>
+		<p>Pelanggan: <%= @taxinvoice.customer.name %></p>
+
+		<form action="/taxinvoices/transfer" method="post">
+
+		<div class="field-row continue">
+			<label for="customer_id">Pelanggan</label>&nbsp;&nbsp;
+			<select name="customer_id" class="third left chzn-select">
+				<option value="0">- Harap Pilih -</option>
+				<% @customerlist.each do |customer| %>
+				<option value="<%=customer['id']%>"><%=customer['name']%></option>
+				<% end %>
+			</select>
+			<small>Pelanggan dari office.puratrans.com</small>
+		</div>
+
+		<div class="actions">
+			<input type="hidden" name="id" value="<%= @taxinvoice.id %>">
+			<a class="btn right" href="<%=taxinvoices_path({:customer_id => $globalCustomer_id, :month => $globalMonth, :year => $globalYear})%>">Kembali ke Index</a>
+			<input type="submit" id="taxinvoice_submit" value="Mulai Copy" class="right" />
+		</div>
+
+		</form>
+ 
+		<br class="clearfix" />
+
+	</div>
+
+</div>

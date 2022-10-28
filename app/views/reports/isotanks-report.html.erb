@@ -1,0 +1,90 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+		
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Isotank :<span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter" style="height: 80px;">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue" style="display: flex;">
+					<div style="">
+						<label for="transporttype">Tipe BKK</label>
+						<select name="transporttype" class="chzn-select half combo_route" >
+							<option value="">Semua Tipe</option>
+							<% ["TRUK", "KERETA"].each do |type| %>
+							<option <%= type == params[:transporttype] ? 'selected' : '' %>><%=type%></option>
+							<% end %>
+						</select> 
+					</div>
+					<div>
+						<label for="isotank_id">ISOTANK</label>
+						<select name="isotank_id" class="chzn-select half" style="float:none">
+							<option value="">Semua Isotank</option>
+							<% Isotank.active.each do |isotank| %>
+							<option <%= isotank.id == params[:isotank_id].to_i ? 'selected' : '' %> value="<%= isotank.id %>"><%=isotank.isotanknumber%></option>
+							<% end %>
+						</select> 
+					</div>
+					<div>
+					&nbsp; &nbsp; <label class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
+						
+						<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+					</div>
+					<div>
+						&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
+					<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+					</div>
+					<div>
+						<input class="submit" type="submit" value="Filter" style="margin-top: 1.3rem;" />
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<table class="row-view report-view">
+			<thead>
+				<tr>
+					<th width="30">No.</th>
+					<th width="80">Tanggal</th>
+					<th>Keterangan</th>
+					<th>Type</th>
+					<th>No. Isotank</th>
+					<th>Nopol</th>
+				</tr>
+			</thead>
+
+			<tbody>
+			<% i = 0 %>
+			<% @invoices.each do |invoice| %>
+
+				<tr id="<%=invoice.id%>">
+					<td><%=i+=1%>.</td>
+					<td><%=invoice.date.strftime('%d-%m-%Y') rescue nil %></td>
+					<td><%=zeropad(invoice.id)%>: <%=invoice.route.name%> (<%=invoice.driver.name rescue nil%>)</td>
+					<td><%=invoice.invoicetrain ? 'KERETA' : 'TRUK'   %></td>
+					<td><%=invoice.isotank.isotanknumber rescue nil %> </td>
+					<td><%=invoice.vehicle.current_id %></td>
+				</tr>
+			<% end %>
+
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td class="total" colspan="3">TOTAL</td>
+					<td class="total" align="right"><%#= to_currency(total) %></td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+</div>

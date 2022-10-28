@@ -1,0 +1,59 @@
+<% tab = 0 %>
+
+  <ul class="rounded" id="tabbed">
+    <li><a id="link_<%=tab+=1%>" href="">Data Lokasi Jurusan</a></li>
+  </ul>
+
+<br class="clearfix"/>
+
+<% tab = 0 %>
+  <div id="sliding_window">
+    <div class="sliding_container">
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+				<%= form_for(@routelocation) do |r| %>
+ 
+				<input type="hidden" name="routelocation[route_id]" value="<%= @route.id %>">
+				<input type="hidden" name="routelocation[customer_id]" value="<%= @route.customer_id %>">
+				
+        <div class="field-row">
+          <label style="float:none;">Nama Jurusan</label>
+          <strong><%=@route.name%></strong>
+        </div>
+        <br />
+				
+				<div class="field-row">
+					<%= r.label :longitude_start, "Titik Longitude Awal" %>
+					<%= r.text_field :longitude_start, :class => 'half left' %>
+					<%= r.label :latitude_start, "Titik Latitude Awal", :class => 'middle' %>
+					<%= r.text_field :latitude_start, :class => 'half' %>
+				</div>
+				
+				<div class="field-row" style="margin-bottom:30px;">
+					<%= r.label :address_start, "Alamat Titik Awal" %>
+					<%= r.text_field :address_start %>
+				</div>
+				
+				<div class="field-row">
+					<%= r.label :longitude_end, "Titik Longitude Akhir" %>
+					<%= r.text_field :longitude_end, :class => 'half left' %>
+					<%= r.label :latitude_end, "Titik Latitude Akhir", :class => 'middle' %>
+					<%= r.text_field :latitude_end, :class => 'half' %>
+				</div>
+ 
+				<div class="field-row" style="margin-bottom:30px;">
+					<%= r.label :address_end, "Alamat Titik Akhir" %>
+					<%= r.text_field :address_end %>
+				</div>
+
+        <div class="actions">
+          <input type="submit" value="Simpan Lokasi Jurusan" />
+        </div>
+				<% end %>  
+
+    </div>
+
+  </div>
+</div>
+

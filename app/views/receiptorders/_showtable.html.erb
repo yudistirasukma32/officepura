@@ -1,0 +1,23 @@
+<table class="row-view">
+	<tr>
+		<th width="50">Order</th>
+		<th width="80">Tanggal</th>
+		<th>Keterangan</th>
+		<th width="110" class="right">Total Tunai</th>
+		<th width="60"></th>
+	</tr>
+	<% if @receiptorders %>
+	<% @receiptorders.each do |receiptorder| %>
+	<tr>
+		<td><%= zeropad(receiptorder.productorder_id) %></td>
+		<td><%= receiptorder.date.strftime('%d-%m-%Y') %></td>
+		<td>Pembelian Tunai : <%= receiptorder.productorder.productorderitems.where(:bon => false).count %> barang, Bon : <%= receiptorder.productorder.productorderitems.where(:bon => true).count %> barang</td>
+		<td class="red" align="right"><%=to_currency(receiptorder.total)%></td>
+		<td class="right">
+			<%= link_to '&#xf00d;'.html_safe, receiptorder, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+		</td>		
+	</tr>
+	<% end %>	
+	<% end %>
+
+</table>

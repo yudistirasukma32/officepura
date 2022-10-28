@@ -1,0 +1,67 @@
+<% if @receiptexpense %>
+<%= form_for(@receiptexpense) do |f| %>
+	<% if @errors.include?'receiptexpense' %>
+	    <div class="field-row red">
+	      <%=@errors['receiptexpense']%>
+	    </div>
+	<% end %>
+ 
+  	<div class="info-box" style="margin-bottom:30px;">  
+  		<h3>Kas Harian #<%=zeropad(@receiptexpense.officeexpense.id)%></h3>
+  		
+  		<table class="row-view no-border">
+  			<tr>
+				<td width="90">Tanggal</td>
+				<td><%=@receiptexpense.officeexpense.created_at.strftime('%d-%m-%Y')%></td>
+			</tr>	
+			<tr>
+				<td width="90">Grup Kas</td>
+				<td><%=@receiptexpense.officeexpense.officeexpensegroup.name%></td>
+			</tr>
+			<tr>
+				<td width="90">Tipe</td>
+				<td><%=@receiptexpense.officeexpense.expensetype%></td>
+			</tr>
+			<% if !@receiptexpense.officeexpense.vehicle_id.blank? %>
+			<tr>
+				<td width="90">No Pol</td>
+				<td><%=@receiptexpense.officeexpense.vehicle.current_id%></td>
+			</tr>
+			<% end %>
+			<tr>
+				<td width="90">Keterangan</td>
+				<td><%=@receiptexpense.officeexpense.description%></td>
+			</tr>
+  		</table>
+
+  		<table class="row-view">
+			<tr>
+				<th width="90">Keterangan</th>
+	        <th>&nbsp;</th>
+	        <th width="160" class="right" style="padding-right:5px;">Total</th>
+	    	</tr>
+	    	<tr>
+	    		<td>Total</td>
+	    		<td>&nbsp;</th>
+	    		<td class="half allowance-field"><%= to_currency(@receiptexpense.total)%></td>
+	    	</tr>
+	    	<tr class="total-row">
+		        <td><%= f.label :total, "Total" %></td>
+		        <td>&nbsp;</th>
+				<td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@receiptexpense.total), :readOnly => 'true' %></td>
+		    </tr>
+		</table>
+	</div>
+
+  	<div class="field-row first" style="margin-bottom:-20px;">
+        <%= f.label :created_at, "Tgl Konfirmasi" %>
+        <%= f.text_field :created_at, :class => 'half date-picker', :value => to_currency(@receiptexpense.created_at.strftime('%d-%m-%Y')) %>
+        <%= f.hidden_field :receiptexpense_id, :value => @receiptexpense.id %>
+    </div>
+    
+    <div class="actions">
+      <%= f.submit "Tambah Data", :class => 'submit' %> 
+    </div>
+
+<% end %>
+<% end %>

@@ -1,0 +1,22 @@
+<% if @isotanks %>
+    <div class="field-row left">
+        <label for="invoice_isotank_id">Isotank</label>
+        <select id="invoice_isotank_id" name="invoice[isotank_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
+            <option value="0">- No. Isotank -</option>
+            <% @isotanks.each do |isotank| %>
+            <option value="<%=isotank.id%>"><%=isotank.isotanknumber%></option>
+            <% end %>
+        </select>
+    </div>
+<% end %>
+<% if @containers.present? %>
+    <div class="field-row left">
+        <label for="invoice_container_id">Kontainer</label>
+        <select id="invoice_container_id" name="invoice[container_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
+            <option value="0">- No. Kontainer -</option>
+            <% @containers.each do |container| %>
+            <option value="<%=container.id%>"><%=container.containernumber%></option>
+            <% end %>
+        </select>
+    </div>
+<% end %>

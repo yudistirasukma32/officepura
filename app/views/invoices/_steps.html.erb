@@ -1,0 +1,7 @@
+<ul id="steps">
+  <li<% if step == 1 %> class="on"<% end %>><% if !@invoice.id.nil? and  @invoice.receipts.active.count == 0 %><a href="<%=edit_invoice_url(@invoice)%>"><% end %><span>1</span> Data BKK<% if !@invoice.id.nil? and  @invoice.receipts.active.count == 0 %></a><% end %></li>
+  <li class="separator"><i class="icon-chevron-right"></i></li>
+  <li<% if step == 2 %> class="on"<% end %>><% if !@invoice.id.nil? and  @invoice.receipts.active.count == 0%><a href="<%=step2_invoice_url(@invoice)%>"><% end %><span>2</span> Gantungan Solar<% if !@invoice.id.nil? and  @invoice.receipts.active.count == 0 %></a><% end %></li>
+  <li class="separator"><i class="icon-chevron-right"></i></li>
+  <li<% if step == 3 %> class="on"<% end %>><% if !@invoice.id.nil? %><a href="<%=confirmation_invoice_url(@invoice)%>"><% end %><span>3</span> Konfirmasi<% if !@invoice.id.nil? %></a><% end %></li>
+</ul>

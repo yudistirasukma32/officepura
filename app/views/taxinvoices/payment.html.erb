@@ -1,0 +1,20 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=taxinvoices_path({:customer_id => $globalCustomer_id, :month => $globalMonth, :year => $globalYear})%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Transaksi / <a href="<%=taxinvoices_path%>">Invoice Tagihan</a> / Tambah</h1>
+
+		<br class="clearfix" />
+			<%= render "form-payment" %>
+		<br class="clearfix" />
+
+	</div>
+
+</div>

@@ -1,0 +1,21 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+
+		<% if params[:operational] || params[:operational] == true %>
+		<a class="btn-txt cancel" href="../../routes"><i class="icon-remove"></i> Kembali Ke Jurusan</a>
+		<% else %>
+			<a class="btn-txt cancel" href="<%=edit_customer_path(@customer)%>/#2"><i class="icon-remove"></i> Kembali Ke Pelanggan</a>
+		<% end %>
+
+		<h1>Jurusan / Tambah Jurusan</h1>
+
+		<%= render "form" %>
+		<br class="clearfix" />
+	</div>
+</div>

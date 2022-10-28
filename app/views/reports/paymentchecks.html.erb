@@ -1,0 +1,60 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Pembayaran Bon: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="width:100%;">
+				&nbsp; &nbsp; Tanggal Awal &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+				&nbsp; &nbsp; Akhir &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th width="80">Tgl Bikin</th>
+				<th>Supplier</th>
+				<th width="100">Tgl Bayar</th>
+				<th width="100">Ket.</th>
+				<th width="110" class="right">Total</th>
+			</tr>
+			<% running = 0 %>
+			<% @paymentchecks.each_with_index do |paymentcheck, i| %>
+			<tr>
+				<td><%= i+1%>.</td>
+				<td><%= paymentcheck.created_at.strftime('%d-%m-%Y')%></td>
+				<td><%= paymentcheck.supplier.name%></td>
+				<td><%= paymentcheck.date.strftime('%d-%m-%Y')%></td>
+				<td><%= paymentcheck.check_no%></td>
+				<td align="right"><%= to_currency(paymentcheck.total)%></td>
+				<% running += paymentcheck.total %>
+			</tr>
+			<% end %>
+			<tr class="footer">
+				<td colspan="3">&nbsp;</td>
+				<td colspan="2" class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(running)%></td>
+			</tr>
+		</table>
+
+		
+	</div>
+</div>

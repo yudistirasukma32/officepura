@@ -1,0 +1,189 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=events_path%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1><a href="<%=events_path%>">Kalendar Event</a> / <% if @event.cancelled %> <a href="<%=events_path + '?type=cancelled' %>">DO Ditolak</a> /<% end %> Edit DO <%= @event.id %></h1>
+
+        <div id="content" style="width: 60%; float: left;">
+		
+            <%= render "form"%>
+
+            <div class="" style="margin-top: 3rem;">
+
+                <% if !@event.user_id.nil? %>
+                <p>Dibuat oleh <strong id="strCreator">
+                <%= @event.user.username%></strong>
+                </p>
+                <% end %>
+    
+            </div>
+
+        </div>
+
+        <div class="float-left" style="width: 40%; float: left; margin-top: 30px;">
+
+        <h2 class="title" style="font-weight: bold;">Memo 
+            <span class="button-add" style="text-align: right; float: right;">
+                <a href="/eventmemos/new?event_id=<%=@event.id%>" style="padding: 3px 10px;
+                background-color: #24748f !important;
+                color: white;
+                font-weight: 500;
+                font-size: 14px;">Tambah</a>
+            </span>
+        </h2>
+        <br/>
+        <table class="row-view" style="margin-bottom: 4.5rem;">
+            <thead>
+                <tr>
+                <th>No.</th>
+                <th>Tgl.</th>
+                <th>Deskripsi</th>
+                <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @eventmemos.each do |memo| %>
+                <tr>
+                    <td><a href="/eventmemos/<%= memo.id %>/edit"><%=zeropad(memo.id)%></a></td>
+                    <td><strong><%=memo.date.strftime('%d')%></strong>.<%=memo.date.strftime('%m')%></td>
+                    <td><%=memo.vehicle.current_id%><br/><%=memo.route.name%><br/><%=memo.driver.name%><br/><%=memo.driver_phone%></td>
+                    <td style="text-align: right;">
+                    <span style="float: right;">
+                        <a href="/eventmemos/<%= memo.id %>/edit" style="margin-top: 3px;">Edit</a>&nbsp;
+                        <span style="margin-top: -3px;">
+                            <%= link_to '&#xf00d;'.html_safe, memo, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', method: :delete%>
+                        </span>
+                    </span>
+                    </td>
+                </tr>
+                <% end %>
+
+            </tbody>
+        </table>
+
+        <h2 class="title" style="font-weight: bold;">Memo Cleaning
+            <span class="button-add" style="text-align: right; float: right;">
+                <a href="/eventcleaningmemos/new?event_id=<%=@event.id%>" style="padding: 3px 10px;
+                background-color: #24748f !important;
+                color: white;
+                font-weight: 500;
+                font-size: 14px;">Tambah</a>
+            </span>
+        </h2>
+        <br/>
+        <table class="row-view" style="margin-bottom: 4.5rem;">
+            <thead>
+                <tr>
+                <th>No.</th>
+                <th>Tgl.</th>
+                <th>Deskripsi</th>
+                <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @eventcleaningmemos.each do |cmemo| %>
+                <tr>
+                    <td><a href="/eventcleaningmemos/<%= cmemo.id %>/edit"><%=zeropad(cmemo.id)%></a></td>
+                    <td><strong><%=cmemo.date.strftime('%d')%></strong>.<%=cmemo.date.strftime('%m')%></td>
+                    <td><%=cmemo.driver.name%><br/><%=cmemo.vehicle.current_id%></td>
+                    <td style="text-align: right;">
+                    <span style="float: right;">
+                        <a href="/eventcleaningmemos/<%= cmemo.id %>/edit" style="margin-top: 3px;">Edit</a>&nbsp;
+                        <span style="margin-top: -3px;">
+                            <%= link_to '&#xf00d;'.html_safe, cmemo, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', method: "delete"%>
+                        </span>
+                    </span>
+                    </td>
+                </tr>
+                <% end %>
+
+            </tbody>
+        </table>
+
+        <% if @invoices.present? %> 
+        <h2 class="title" style="font-weight: bold;">List BKK</h2>
+        <br/>
+        <table class="row-view" style="margin-bottom: 3rem;">
+            <thead>
+                <tr>
+                <th>No.</th>
+                <th>Tgl.</th>
+                <th>Nopol</th>
+                <th>Deskripsi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @invoices.each do |invoice| %>
+                <tr>
+                    <td><a href="/invoices/<%= invoice.id %>/confirmation"><%=zeropad(invoice.id)%></a></td>
+                    <td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
+                    <td><%=invoice.vehicle.current_id%></td>
+                    <td><%=invoice.route.name%></td>
+                </tr>
+                <% end %>
+            </tbody>
+        </table>
+        <% end %>
+
+        <% if @invoicereturns.present? %> 
+        <h2 class="title" style="font-weight: bold;">List BKM</h2>
+        <br/>
+        <table class="row-view" style="margin-bottom: 3rem;">
+            <thead>
+                <tr>
+                <th>No.</th>
+                <th>Tgl.</th>
+                <th>Nopol</th>
+                <th>Deskripsi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @invoicereturns.each do |invoicereturn| %>
+                <tr>
+                    <td><a href="#"><%=zeropad(invoicereturn.invoice.id)%></a></td>
+                    <td><strong><%=invoicereturn.invoice.date.strftime('%d')%></strong>.<%=invoicereturn.invoice.date.strftime('%m')%></td>
+                    <td><%=invoicereturn.invoice.vehicle.current_id%></td>
+                    <td><%=invoicereturn.invoice.route.name%></td>
+                </tr>
+                <% end %>
+            </tbody>
+        </table>
+        <% end %>
+
+        <% if @taxinvoiceitems.present? %> 
+        <h2 class="title" style="font-weight: bold;">List Surat Jalan</h2>
+        <br/>
+        <table class="row-view" style="margin-bottom: 3rem;">
+            <thead>
+                <tr>
+                <th>No.</th>
+                <th>Tgl.</th>
+                <th>Deskripsi</th>
+                <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @taxinvoiceitems.each do |taxinvoiceitem| %>
+                <tr>
+                    <td><a href="/taxinvoiceitems/new/<%= taxinvoiceitem.invoice_id %>"><%=zeropad(taxinvoiceitem.invoice.id)%></a></td>
+                    <td><strong><%=taxinvoiceitem.invoice.date.strftime('%d')%></strong>.<%=taxinvoiceitem.invoice.date.strftime('%m')%></td>
+                    <td><%=taxinvoiceitem.invoice.vehicle.current_id%><br/><%=taxinvoiceitem.invoice.route.name%></td>
+                    <td>[<%= taxinvoiceitem.total > 0 ? 'OK' : 'Nominal 0' %>]</td>
+                </tr>
+                <% end %>
+            </tbody>
+        </table>
+        <% end %>
+ 
+        <br/>
+        </div>
+        
+
+	</div>
+</div>

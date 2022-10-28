@@ -1,0 +1,54 @@
+<%= form_for(@incentive) do |f| %>
+  <div class="actions" style="float:left; padding:0 0 30px 20px;">
+    <input type="hidden" id="printername" value="<%= Setting.find_by_name("Printer Name").value if !Setting.find_by_name("Printer Name").nil? %>" />
+    <a class="left" href="javascript:print();"><i class="icon-print"></i> Print Normal</a>
+    <a class="back left" href="<%=incentives_index_confirmed_path({:date => @incentive.created_at.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
+  </div>
+
+  <div id="incentive-print" class="info-box bkk-paper" onLoad="javascript: LoadAppletPrinter();" style="width:560px; float:left; clear:left;">
+      <table class="row-view no-border">
+        <tr valign="top">
+          <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+          <td align="right" class="header">Bukti Kas Insentif<br/>#<%=zeropad(@incentive.id)%><input type="hidden" id="strIncentiveId" value="#<%=zeropad(@incentive.id)%>" /></td>
+        </tr>
+    </table>
+    <hr style="width:600px;" />
+    <table class="row-view no-border">
+      <tr>
+        <td>BKK</td>
+        <td><span id="strInvoiceId">#<%=zeropad(@incentive.invoice.id)%></td>
+      </tr>
+      <tr>
+        <td>Kendaraan</td>
+        <td><span id="strVehicle"><%=@incentive.invoice.vehicle.current_id%></td>
+      </tr>
+      <tr>
+        <td>Supir</td>
+        <td>
+          <%=@incentive.invoice.driver.name%><% if !@incentive.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@incentive.invoice.driver.helpers.first.name%>)<% end %>
+          <input type="hidden" id="strDriver" value="<%=@incentive.invoice.driver.name%><% if !@incentive.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@incentive.invoice.driver.helpers.first.name%>)<% end %>" />
+        </td>
+      </tr>
+      <tr>
+        <td>Jurusan</td>
+        <td><span id="strRoute"><%=@incentive.invoice.route.name%></span></td>
+      </tr>
+       <tr>
+        <td>Konfirmasi</td>
+        <td><span id="strCreatedDate"><%=@incentive.created_at.strftime('%d %B %Y') if !@incentive.created_at.nil?%></span></td>
+      </tr>
+      <tr>
+        <td>Total</td>
+        <td><span id="strTotalIncentive"><%=to_currency(@incentive.total, "Rp. ")%></span></td>
+      </tr>
+      <tr>
+        <td>Keterangan</td>
+        <td><span id="strDescription"><%=@incentive.description%></span></td>
+      </tr>
+    </table>
+
+     <p>&nbsp;Dibuat oleh <strong id="strCreator"><%= @incentive.user_id.nil? ? current_user.username : @incentive.user.username %></strong></p>
+
+  </div>
+
+<% end %>

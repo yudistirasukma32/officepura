@@ -1,0 +1,59 @@
+<%= form_for(@productrequest) do |f| %>
+	<div class="field-row first">
+		<%= f.label :vehicle_id, "Kendaraan" %>
+		<%= f.select :vehicle_id, options_for_select(Vehicle.all(:order =>:id).collect{|g| [g.current_id, g.id]},@productrequest.vehicle_id), {:include_blank => '-No. Pol-'}, :class => 'half left chzn-select'  %>		
+	</div>
+	<div class="field-row continue">
+		<%= f.label :driver_id, "Supir" %>
+		<%= f.select :driver_id, options_for_select(Driver.all(:order => :name). collect{|g| [g.name, g.id]}, @productrequest.driver_id), {:include_blank => '- Supir -'}, :class => 'half left chzn-select' %>
+	</div>
+	<div class="field-row continue">
+		<%= f.label :date, "Tanggal" %>
+		<%= f.text_field :date, :class => 'half date-picker none', :value=> @productrequest.date.strftime('%d-%m-%Y'), :disabled => true %>
+	</div>
+
+	<div class="field-row continue">
+		<%= f.label :description, "Keterangan" %>
+		<%= f.text_area :description, :style => 'width:350px;', :value=> @productrequest.description%>	
+	</div>
+
+	<div class="field-row continue">
+		<%= f.label :productgroup_id, "Permintaan" %>
+		<%= f.select :productgroup_id, options_for_select(Productgroup.active.order(:name). collect{|g| [g.name, g.id]}, @productrequest.productgroup_id), {:include_blank => '- Permintaan -'},:class => 'half left chzn-select', :disabled => "disabled" %>
+	</div>
+	<div class="field-row continue">
+	
+	<table class="row-view">
+		<tr>
+			<th width="30">No.</th>
+			<th>Nama Barang</th>
+			<th width="80">Jumlah</th>
+			<th class="right">Stock yang Dikasih<th>				
+		</tr>
+		<% @productrequest.productrequestitems.each_with_index do |item,i| %>
+		<tr>
+			<td><%=i+1%></td>
+			<td>
+				<input type="text" id="productid_<%=i%>" class="none" style="width:400px" value="<%= item.product.name %>" readonly="readonly"/>
+				<input type="hidden" id="productid_<%=i%>" />
+			</td>
+			<td>
+				<input type="text" id="quantity_<%=i%>"  class="short none" style="text-align:right;" value="<%= item.quantity %>" />
+			</td>
+			<td>
+				<input type="text" id="stock_<%=i%>" readonly="readonly" class="half none right" value="<%= item.stockgiven %>" />
+			</td>
+		</tr>
+		<% end %>		
+	</table>
+	
+	</div>
+
+	<div class="actions">
+		<a class="btn right" href="<%=productrequests_path%>">Kembali ke Index</a>
+		<% if current_user.adminrole || current_user.owner %>
+		<input type="submit" class="btn right" value="Edit Data" />
+		<% end %>
+	</div>
+
+<% end %>

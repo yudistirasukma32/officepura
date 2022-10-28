@@ -1,0 +1,76 @@
+<%= content_for :css do %>	 
+<style>
+	#main #filter {
+		height: 96px;
+	}
+</style>
+<% end %>
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt right" href="<%=new_taxinvoiceitem_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<h1>Transaksi / <a href="<%=taxinvoiceitems_path%>">Surat Jalan</a> / Index</h1>
+		
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue">
+					<label for="startdate" class="middle">Tgl Awal</label>
+					<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+					<label for="enddate" class="tiny">s/d</label>
+					<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+					<label for="date" class="tiny">#BKK:</label>
+					<input type="text" name="invoice_id" class="short left" value="<%=params[:invoice_id]%>" />
+					<label for="plat_type" class="tiny">Plat:</label>
+					<select name="plat_type" class="short left ">
+						<option value="">-- Jenis Plat --</option>
+						<option value="Hitam" <%= @plat_type == 'Hitam' ? 'selected' : '' %>>Hitam</option>
+						<option value="Kuning" <%= @plat_type == 'Kuning' ? 'selected' : '' %>>Kuning</option>
+					</select>
+					<label for="spk_number" class="tiny">SPK:</label>
+					<input type="text" name="spk_number" class="short left" value="<%=params[:spk_number]%>" />
+					
+					
+				</div>
+				<div class="field-row continue" style="margin-top: 10px; display: flex; column-gap: 10px;">
+					<div style="display: inline-block;">
+						<label for="customer_id" class="middle">Customer</label>
+						<select name="customer_id" class="half left chzn-select">	
+							<option value="">Semua</option>
+							<% Customer.active.order(:name).each do |customer| %>
+							<option value="<%=customer.id%>"<% if customer.id == params[:customer_id].to_i %> selected='selected'<% end %>><%=customer.name%></option>
+							<% end %>
+						</select> 
+					</div>
+					<div style="display: inline-block;">
+						<label for="lain" class="middle">Opsi Lain:</label>
+						<select name="lain" class="chzn-select half">
+							<option value="">-- Semua --</option>
+							<option value="belum-sj" <%= params[:lain] == "belum-sj" ? "selected" : "" %>>Belum SJ</option>
+							<option value="belum-invoice" <%= params[:lain] == "belum-invoice" ? "selected" : "" %>>Belum Invoice</option>
+							<option value="upload-invoice" <%= params[:lain] == "upload-invoice" ? "selected" : "" %>>Belum Upload SJ</option>
+						</select>
+					</div>
+					<div style="display: inline-block;">
+						<input class="submit" type="submit"  class="" value="Filter" >
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<%= render "showtable" %>
+		
+		<br class="clearfix" />
+
+	</div>
+
+</div>

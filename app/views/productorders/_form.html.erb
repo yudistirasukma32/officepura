@@ -1,0 +1,78 @@
+<% if !@productorder.nil? %>
+	<%= form_for(@productorder) do |f| %>
+		<input type="hidden" id="productrequest_id" name="productorder[productrequest_id]" value="<%=@productrequest_id%>" />
+		<input type="hidden" name="productorder[process]" value="create" />
+		
+		<% if @errors.include?'receiptpremi' %>
+	      <div class="field-row red">
+	        <%=@errors['productorder']%>
+	      </div>
+	    <% end %>
+		<div class="field-row first">
+			 <label for="date">Tanggal</label>
+			 <input type="text" name="productorder[date]" class="half date-picker" value="<%= @productorder.date.strftime('%d-%m-%Y') if !@productorder.date.nil? %>" />
+			 <div class="field-row continue">
+	 			<label for="description">Keterangan</label>
+	 			<input type="text" name="productorder[description]" style="width:350px;" value="<%= @productorder.description if !@productorder.description.nil?%>" />	 		
+	 		</div>			
+		</div> 
+	 	
+		<table class="row-view">
+ 			<tr>
+ 				<th width="30">No.</th>
+ 				<th>Nama Barang</th>
+ 				<th width="110">Jumlah</th> 				
+ 				<th width="80">Supplier</th>
+ 				<th width="40">Harga Satuan</th>
+ 				<th width="80">Sub Total</th> 				
+ 				<th width="30">Bon</th>
+ 			</tr>
+ 			<% i = 1 %>
+ 			<% total = 0 %>
+ 			
+			<% @productorderitems.each_with_index do |productorderitem| %>
+ 			<tr>
+ 				<td><%=i%></td>
+ 				<td>
+ 					<%=productorderitem.product.name%> 					
+ 				</td>
+ 				<td>
+ 					<input type="text" maxlength="4" name="productorder[quantity_<%=productorderitem.id%>]" id="po_quantity_<%=productorderitem.id%>" value="<%=to_currency_bank(productorderitem.quantity)%>" 
+ 					style="text-align:right;width:35px;" onkeypress="javascript:return isDecimalKey(this);" onchange='javascript:changeSubTotalProductOrder(<%=productorderitem.id%>);'/>
+ 					@ <%=productorderitem.product.unit_name%>
+ 				</td>
+ 				<td>
+ 					<%= select("productorder", "productorderitems",options_for_select(Supplier.active.collect{|p| [p.name, p.id]}, productorderitem.supplier_id), {:include_blank => "- Supplier -"}, :class => 'half', :name => "productorder[supplierid_#{productorderitem.id}]")%>
+ 				</td>
+ 				<td>
+ 					<input type="text" class="short" id="po_priceper_<%=productorderitem.id%>" name="productorder[priceper_<%=productorderitem.id%>]" style="text-align:right;" value="<%=productorderitem.price_per.to_i%>" onkeypress="javascript:return isNumberKey(this);" onchange='javascript:changeSubTotalProductOrder(<%=productorderitem.id%>);'/>
+ 				</td>
+ 				<td>
+ 					<input type="text" id="po_total_<%=productorderitem.id%>" style="text-align:right;" name="productorder[subtotal_<%=productorderitem.id%>]" class="short none" value="<%=to_currency(productorderitem.total)%>" readonly="readonly"/>
+ 				</td>
+ 				<td>
+ 					<input type="checkbox" id="po_bon_<%=productorderitem.id%>" name="productorder[bon_<%=productorderitem.id%>]" <%if productorderitem.bon == true %> checked="checked"<% end %>/> 
+ 				</td>
+				
+ 				<% total += productorderitem.total.to_i %>
+ 				<% i +=1 %>
+			</tr> 
+ 			<% end %>
+ 			
+ 			<tr>
+ 				<td></td>
+ 				<td></td>
+ 				<td></td>
+ 				<td></td>
+ 				<td class="total">TOTAL</td>
+ 				<td><input type="text" class="short none" id="po_total" name="productorder[total]" style="text-align:right;" value="<%=to_currency(total)%>"/></td>
+ 				<td></td>
+ 			</tr>
+ 		</table>
+		<div class="actions">
+			<a class="back right" href="<%=productorders_path%>">Kembali ke Index</a>
+			<input type="submit" class="btn right" value="Tambah Data" %>
+		</div>
+
+	<% end %>
+<% end %>

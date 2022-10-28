@@ -1,0 +1,82 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+		<h1 class="header-hide">Truk Check / Tanggal Penting</h1>
+		<h1 class="showprint">Tanggal Penting Truk</h1>
+
+		
+		<br class="clearfix" />
+
+		<table class="row-view truck-logs tablesorter">
+			<thead>
+			<tr>
+				<th>Kendaraan</th>
+				<th width="80" style="text-align:center;">Kir</th>
+				<th width="80" style="text-align:center;">Kir 2</th>
+				<th width="80" style="text-align:center;">STNK</th>
+				<th width="80" style="text-align:center;">Pajak</th>
+				<th width="80" style="text-align:center;">SIUP</th>
+				<th width="80" style="text-align:center;">TERA</th>
+			</tr>
+			</thead>
+			
+			<tbody>
+			<% days = 0 %>
+			<% @vehicles.each do |vehicle| %>
+			<tr>
+				<td><%=vehicle.current_id%><%=" (#{vehicle.previous_id})" unless vehicle.previous_id.blank?%></td>
+				<td align="center">
+					<% if !vehicle.next_checkup_date.blank? %>
+					<% days = (vehicle.next_checkup_date.to_date - Date.today).to_i %>
+					<span title="Tanggal Kir: <%=vehicle.next_checkup_date.strftime('%d-%m-%Y')%>" class="<%= days <= 5 ? 'red' : '' %>"><%=days%></span>
+					<% end %>
+				</td>
+				<td align="center">
+					<% if !vehicle.next_checkup_date_second.blank? %>
+					<% days = (vehicle.next_checkup_date_second.to_date - Date.today).to_i %>
+					<span title="Tanggal Kir: <%=vehicle.next_checkup_date_second.strftime('%d-%m-%Y')%>" class="<%= days <= 5 ? 'red' : '' %>"><%=days%></span>
+					<% end %>
+				</td>
+				<td align="center">
+					<% if !vehicle.next_registration_date.blank? %>
+					<% days = (vehicle.next_registration_date.to_date - Date.today).to_i %>
+					<span title="Tanggal STNK: <%=vehicle.next_registration_date.strftime('%d-%m-%Y')%>" class="<%= days <= 5 ? 'red' : '' %>"><%=days%></span>
+					<% end %>
+				</td>
+				<td align="center">
+					<% if !vehicle.next_tax_date.blank? %>
+					<% days = (vehicle.next_tax_date.to_date - Date.today).to_i %>
+					<span title="Tanggal Pajak: <%=vehicle.next_tax_date.strftime('%d-%m-%Y')%>" class="<%= days <= 5 ? 'red' : '' %>"><%=days%></span>
+					<% end %>
+				</td>
+				<td align="center">
+					<% if !vehicle.siup.blank? %>
+					<% days = (vehicle.siup.to_date - Date.today).to_i %>
+					<span title="Tanggal SIUP: <%=vehicle.siup.strftime('%d-%m-%Y')%>" class="<%= days <= 5 ? 'red' : '' %>"><%=days%></span>
+					<% end %>
+				</td>
+				<td align="center">
+					<% if !vehicle.next_tera_date.blank? %>
+					<% days = (vehicle.next_tera_date.to_date - Date.today).to_i %>
+					<span title="Tanggal SIUP: <%=vehicle.next_tera_date.strftime('%d-%m-%Y')%>" class="<%= days <= 5 ? 'red' : '' %>"><%=days%></span>
+					<% end %>
+				</td>
+			</tr>
+			<% end %>	
+			</tbody>
+		
+		</table>
+
+		
+		<br class="clearfix" />
+
+	</div>
+
+</div>

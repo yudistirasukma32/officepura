@@ -1,0 +1,23 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="/events/<%=@event_id%>/edit"><i class="icon-remove"></i> Batal</a>
+		<a class="print btn" href="<%= print_eventmemo_url(params[:id]) %>"><i class="icon-print"></i> Print</a>
+
+		<h1><a href="<%=events_path%>">Kalendar Event</a> / DO <%=@event_id%> / Memo / Edit</h1>
+
+		<br class="clearfix" />
+		
+		<%= render "form" %>
+		
+		<br class="clearfix" />
+		
+	</div>
+
+</div>

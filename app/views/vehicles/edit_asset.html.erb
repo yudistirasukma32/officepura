@@ -1,0 +1,22 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="btn-txt cancel" href="/vehicles/index_asset"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Master / <a href="/vehicles/index_asset">Aktiva Kendaraan</a> / Edit <strong title="<%=@vehicle.current_id%>"><%= @vehicle.current_id %></strong></h1>
+
+		<br class="clearfix" />
+
+		<%= render "form_asset" %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

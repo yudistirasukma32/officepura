@@ -1,0 +1,593 @@
+<%= render "shared/header" %>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="btn-txt cancel hideprint" href="/reports/indexannualreport_vehicle"><i class="icon-remove"></i> Kembali</a>
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Laba Rugi Kendaraan : <%="<span class='red'>'#{@vehicle.current_id}'</span>".html_safe if @vehicle %></span> - <span class="red"><%=@year%></span></h1>
+
+		<input type="hidden" id="vehicle_id" value="<%= @vehicle_id%>" />
+
+		<ul class="rounded" id="tabbed">
+			<li><a id="link_1" class="finger">Januari - Juni</a></li>
+			<li><a id="link_2" class="finger">Juli - Desember</a></li>
+			<li><a id="link_3" class="finger">Grafik Pemasukan dan Pengeluaran</a></li>
+		</ul>
+
+		<div id="sliding_window" style="margin-top:10px;">
+			<div class="sliding_container">
+				<div class="sliding_tab" id="tab_1">
+					<br class="clearfix" />
+					<div id="jan_jun">
+						<% if @vehicle %>
+							<table class="row-view">
+								<tr>
+									<th></th>
+									<th width="90" class="right">Januari</th>
+									<th width="90" class="right">Februari</th>
+									<th width="90" class="right">Maret</th>
+									<th width="90" class="right">April</th>
+									<th width="90" class="right">Mei</th>
+									<th width="90" class="right">Juni</th>
+								</tr>
+								<tr class="subheading">
+									<th colspan="7" style="color:#000;">Pemasukan</th>
+								</tr>
+								
+								<% inc_jan = inc_feb = inc_mar = inc_apr = inc_mei = inc_jun = 0 %>
+								<!-- Pemasukan Minyak -->
+								<tr>
+									<td>Surat jalan Sudah Tertagih</td>
+									<% (1..6).each do |i| %>
+										<% total = Taxinvoiceitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<% totalGeneric = Taxgenericitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{@vehicle_id}").sum(:total) %>
+										<td align="right"><%= to_currency(total.to_i + totalGeneric.to_i) %></td>
+										<% case i
+											when 1 
+												inc_jan += total.to_i + totalGeneric.to_i
+											when 2 
+												inc_feb += total.to_i + totalGeneric.to_i
+											when 3 
+												inc_mar += total.to_i + totalGeneric.to_i
+											when 4 
+												inc_apr += total.to_i + totalGeneric.to_i
+											when 5 
+												inc_mei += total.to_i + totalGeneric.to_i
+											when 6 
+												inc_jun += total.to_i + totalGeneric.to_i
+											end%>
+									<% end %>
+								</tr>
+
+								<tr>
+									<td>Surat jalan Belum Tertagih</td>
+									<% (1..6).each do |i| %>
+										<% total = Taxinvoiceitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NULL and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<td align="right"><%= to_currency(total.to_i) %></td>
+										<% case i
+											when 1 
+												inc_jan += total.to_i 
+											when 2 
+												inc_feb += total.to_i 
+											when 3 
+												inc_mar += total.to_i 
+											when 4 
+												inc_apr += total.to_i 
+											when 5 
+												inc_mei += total.to_i 
+											when 6 
+												inc_jun += total.to_i
+											end%>
+									<% end %>
+								</tr>
+
+								<tr>
+									<td>Surat jalan Generic Sudah Tertagih</td>
+									<% (1..6).each do |i| %>
+										<% total = Taxgenericitem.where("extract(year from date) = #{@year} and deleted = false and vehicle_id = #{@vehicle.id}").sum(:total) %>
+										<td align="right"><%= to_currency(total.to_i) %></td>
+										<% case i
+											when 1 
+												inc_jan += total.to_i 
+											when 2 
+												inc_feb += total.to_i 
+											when 3 
+												inc_mar += total.to_i 
+											when 4 
+												inc_apr += total.to_i 
+											when 5 
+												inc_mei += total.to_i 
+											when 6 
+												inc_jun += total.to_i
+											end%>
+									<% end %>
+								</tr>
+
+								<tr>
+									<td>Lain-Lain / Koreksi Debit</td>
+									<% (1..6).each do |i| %>
+										<% total = Receiptexpense.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and expensetype = 'Debit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<td align="right"><%= to_currency(total) %></td>
+										<% case i
+										when 1 
+											inc_jan += total.to_i 
+										when 2 
+											inc_feb += total.to_i  
+										when 3 
+											inc_mar += total.to_i  
+										when 4 
+											inc_apr += total.to_i  
+										when 5 
+											inc_mei += total.to_i  
+										when 6 
+											inc_jun += total.to_i  
+										end%>
+									<% end %>
+								</tr>
+
+								<tr class="footer">
+									<td>TOTAL PEMASUKAN</td>
+									<td align="right" class="green"><%= to_currency(inc_jan)%></td>
+									<td align="right" class="green"><%= to_currency(inc_feb)%></td>
+									<td align="right" class="green"><%= to_currency(inc_mar)%></td>
+									<td align="right" class="green"><%= to_currency(inc_apr)%></td>
+									<td align="right" class="green"><%= to_currency(inc_mei)%></td>
+									<td align="right" class="green"><%= to_currency(inc_jun)%></td>
+								</tr>
+
+								<% out_jan = out_feb = out_mar = out_apr = out_mei = out_jun = 0 %>
+
+								<tr class="subheading">
+									<th colspan="7" style="color:#000;">Pengeluaran</th>
+								</tr>
+								<!-- Pengeluaran Sangu -->
+								<tr>
+									<td>Uang Makan</td>
+									<% (1..6).each do |i| %>
+										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance") 
+											receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id}) and deleted = false").sum("driver_allowance + helper_allowance") %>
+										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
+										<% case i
+											when 1 
+												out_jan += total.to_i - receiptreturn.to_i
+											when 2 
+												out_feb += total.to_i - receiptreturn.to_i
+											when 3 
+												out_mar += total.to_i - receiptreturn.to_i
+											when 4 
+												out_apr += total.to_i - receiptreturn.to_i
+											when 5 
+												out_mei += total.to_i - receiptreturn.to_i
+											when 6 
+												out_jun += total.to_i - receiptreturn.to_i
+											end%>
+									<% end %>
+								</tr>
+
+								<!-- LAIN-LAIN -->
+								<tr>
+									<td>Lain-lain</td>
+									<% (1..6).each do |i| %>
+										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee + ferry_fee") %>
+										<% receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id}) and deleted = false").sum("misc_allowance + tol_fee") %>
+										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
+										<% case i
+											when 1 
+												out_jan += total.to_i - receiptreturn.to_i 
+											when 2 
+												out_feb += total.to_i - receiptreturn.to_i  
+											when 3 
+												out_mar += total.to_i - receiptreturn.to_i  
+											when 4 
+												out_apr += total.to_i - receiptreturn.to_i  
+											when 5 
+												out_mei += total.to_i - receiptreturn.to_i  
+											when 6 
+												out_jun += total.to_i - receiptreturn.to_i  
+											end%>
+									<% end %>
+								</tr>
+								
+								<!--SOLAR KONTAN -->
+								<tr>
+									<td>Solar Kontan</td>
+									<% (1..6).each do |i| %>
+										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("gas_allowance") %>
+										<td align="right"><%= to_currency(total) %></td>
+										<% case i
+											when 1 
+												out_jan += total.to_i 
+											when 2 
+												out_feb += total.to_i  
+											when 3 
+												out_mar += total.to_i  
+											when 4 
+												out_apr += total.to_i  
+											when 5 
+												out_mei += total.to_i  
+											when 6 
+												out_jun += total.to_i  
+											end%>
+									<% end %>
+								</tr>
+
+								<!--SOLAR KONTAN -->
+								<tr>
+									<td>Premi</td>
+									<% (1..6).each do |i| %>
+										<% total = Receiptpremi.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<td align="right"><%= to_currency(total) %></td>
+										<% case i
+											when 1 
+												out_jan += total.to_i 
+											when 2 
+												out_feb += total.to_i  
+											when 3 
+												out_mar += total.to_i  
+											when 4 
+												out_apr += total.to_i  
+											when 5 
+												out_mei += total.to_i  
+											when 6 
+												out_jun += total.to_i  
+											end%>
+									<% end %>
+								</tr>
+
+								<!-- Pengeluaran Umum-->
+								<% @officeexpensegroups.each do |group| %>
+									<tr>
+										<td><%= group.name%></td>
+										<% (1..6).each do |i| %>
+											<% total = Receiptexpense.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where officeexpensegroup_id = #{group.id} and vehicle_id = #{@vehicle_id})").sum(:total) %>
+											<td align="right"><%= to_currency(total) %></td>
+											<% case i
+											when 1 
+												out_jan += total.to_i 
+											when 2 
+												out_feb += total.to_i  
+											when 3 
+												out_mar += total.to_i  
+											when 4 
+												out_apr += total.to_i  
+											when 5 
+												out_mei += total.to_i  
+											when 6 
+												out_jun += total.to_i  
+											end%>
+										<% end %>
+									</tr>
+								<% end %>
+								
+								<% @productgroups.each do |group| %>
+									<tr>
+										<td>Inventory: <%= group.name%></td>
+										<% (1..6).each do |i| %>
+											<% total = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and vehicle_id = #{@vehicle_id} and productgroup_id = #{group.id})").sum(:total) %>
+											<td align="right"><%= to_currency(total) %></td>
+											<% case i
+											when 1 
+												out_jan += total.to_i 
+											when 2 
+												out_feb += total.to_i  
+											when 3 
+												out_mar += total.to_i  
+											when 4 
+												out_apr += total.to_i  
+											when 5 
+												out_mei += total.to_i  
+											when 6 
+												out_jun += total.to_i  
+											end%>
+										<% end %>
+									</tr>
+								<% end %>
+								<tr class="footer">
+									<td>TOTAL PENGELUARAN</td>
+									<td align="right" class="red"><%= to_currency(out_jan)%></td>
+									<td align="right" class="red"><%= to_currency(out_feb)%></td>
+									<td align="right" class="red"><%= to_currency(out_mar)%></td>
+									<td align="right" class="red"><%= to_currency(out_apr)%></td>
+									<td align="right" class="red"><%= to_currency(out_mei)%></td>
+									<td align="right" class="red"><%= to_currency(out_jun)%></td>
+								</tr>
+								<tr class="footer">
+									<td>PROFIT</td>
+									<td align="right" class="black"><strong><%= to_currency(inc_jan - out_jan)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_feb - out_feb)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_mar - out_mar)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_apr - out_apr)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_mei - out_mei)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_jun - out_jun)%></strong></td>
+								</tr>
+							</table>
+						<% end %>
+					</div>
+				</div>
+
+				<div class="sliding_tab" id="tab_2">
+					<br class="clearfix" />
+					<div id="jul_des">
+						<% if @vehicle %>
+							<table class="row-view">
+								<tr>
+									<th></th>
+									<th width="90" class="right">Juli</th>
+									<th width="90" class="right">Agustus</th>
+									<th width="90" class="right">September</th>
+									<th width="90" class="right">Oktober</th>
+									<th width="90" class="right">Nopember</th>
+									<th width="90" class="right">Desember</th>
+								</tr>
+								<tr class="subheading">
+									<th colspan="7" style="color:#000;">Pemasukan</th>
+								</tr>
+								
+								<% inc_jul = inc_agu = inc_sep = inc_okt = inc_nop = inc_des = 0 %>
+								<!-- Pemasukan Minyak -->
+								<tr>
+									<td>Minyak Sudah Tertagih</td>
+									<% (7..12).each do |i| %>
+										<% total = Taxinvoiceitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<% totalGeneric = Taxgenericitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{@vehicle_id}").sum(:total) %>
+										<td align="right"><%= to_currency(total.to_i + totalGeneric.to_i) %></td>
+										<% case i
+											when 7 
+												inc_jul += total.to_i + totalGeneric.to_i
+											when 8
+												inc_agu += total.to_i + totalGeneric.to_i
+											when 9 
+												inc_sep += total.to_i + totalGeneric.to_i
+											when 10 
+												inc_okt += total.to_i + totalGeneric.to_i
+											when 11 
+												inc_nop += total.to_i + totalGeneric.to_i
+											when 12 
+												inc_des += total.to_i + totalGeneric.to_i
+											end %>
+									<% end %>
+								</tr>
+
+								<tr>
+									<td>Minyak Belum Tertagih</td>
+									<% (7..12).each do |i| %>
+										<% total = Taxinvoiceitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NULL and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<td align="right"><%= to_currency(total.to_i) %></td>
+										<% case i
+											when 7 
+												inc_jul += total.to_i 
+											when 8
+												inc_agu += total.to_i 
+											when 9 
+												inc_sep += total.to_i 
+											when 10 
+												inc_okt += total.to_i 
+											when 11 
+												inc_nop += total.to_i 
+											when 12 
+												inc_des += total.to_i
+											end %>
+									<% end %>
+								</tr>
+								<!-- Pengeluaran Umum-->
+								
+								<tr>
+									<td>Lain-Lain / Koreksi Debit</td>
+									<% (7..12).each do |i| %>
+										<% total = Receiptexpense.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and expensetype = 'Debit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<td align="right"><%= to_currency(total) %></td>
+										<% case i
+										when 7 
+											inc_jul += total.to_i 
+										when 8 
+											inc_agu += total.to_i  
+										when 9 
+											inc_sep += total.to_i  
+										when 10 
+											inc_okt += total.to_i  
+										when 11 
+											inc_nop += total.to_i  
+										when 12 
+											inc_des += total.to_i  
+										end%>
+									<% end %>
+								</tr>
+								
+								<tr class="footer">
+									<td>TOTAL PEMASUKAN</td>
+									<td align="right" class="green"><%= to_currency(inc_jul)%></td>
+									<td align="right" class="green"><%= to_currency(inc_agu)%></td>
+									<td align="right" class="green"><%= to_currency(inc_sep)%></td>
+									<td align="right" class="green"><%= to_currency(inc_okt)%></td>
+									<td align="right" class="green"><%= to_currency(inc_nop)%></td>
+									<td align="right" class="green"><%= to_currency(inc_des)%></td>
+								</tr>
+
+
+								<tr class="subheading">
+									<th colspan="7" style="color:#000;">Pengeluaran</th>
+								</tr>
+
+								<% out_jul = out_agu = out_sep = out_okt = out_nop = out_des = 0 %>
+								<tr>
+									<td>Uang Makan</td>
+									<% (7..12).each do |i| %>
+										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance") 
+											receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance") %>
+										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
+										<% case i
+											when 7 
+												out_jul += total.to_i - receiptreturn.to_i
+											when 8 
+												out_agu += total.to_i - receiptreturn.to_i  
+											when 9 
+												out_sep += total.to_i - receiptreturn.to_i  
+											when 10 
+												out_okt += total.to_i - receiptreturn.to_i  
+											when 11 
+												out_nop += total.to_i - receiptreturn.to_i  
+											when 12 
+												out_des += total.to_i - receiptreturn.to_i 
+											end%>
+									<% end %>
+								</tr>
+
+								<!-- LAIN-LAIN -->
+								<tr>
+									<td>Lain-lain</td>
+									<% (7..12).each do |i| %>
+										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee + ferry_fee") 
+											receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee") %>
+										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
+										<% case i
+											when 7 
+												out_jul += total.to_i - receiptreturn.to_i 
+											when 8 
+												out_agu += total.to_i - receiptreturn.to_i  
+											when 9 
+												out_sep += total.to_i - receiptreturn.to_i  
+											when 10 
+												out_okt += total.to_i - receiptreturn.to_i  
+											when 11 
+												out_nop += total.to_i - receiptreturn.to_i  
+											when 12 
+												out_des += total.to_i - receiptreturn.to_i  
+											end%>
+									<% end %>
+								</tr>
+								
+								<!--SOLAR KONTAN -->
+								<tr>
+									<td>Solar Kontan</td>
+									<% (7..12).each do |i| %>
+										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("gas_allowance") %>
+										<td align="right"><%= to_currency(total) %></td>
+										<% case i
+											when 7 
+												out_jul += total.to_i 
+											when 8 
+												out_agu += total.to_i  
+											when 9 
+												out_sep += total.to_i  
+											when 10 
+												out_okt += total.to_i  
+											when 11 
+												out_nop += total.to_i  
+											when 12 
+												out_des += total.to_i  
+											end%>
+									<% end %>
+								</tr>
+
+								<!--SOLAR KONTAN -->
+								<tr>
+									<td>Premi</td>
+									<% (7..12).each do |i| %>
+										<% total = Receiptpremi.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<td align="right"><%= to_currency(total) %></td>
+										<% case i
+											when 7 
+												out_jul += total.to_i 
+											when 8 
+												out_agu += total.to_i  
+											when 9 
+												out_sep += total.to_i  
+											when 10 
+												out_okt += total.to_i  
+											when 11 
+												out_nop += total.to_i  
+											when 12 
+												out_des += total.to_i  
+											end%>
+									<% end %>
+								</tr>
+
+								<!-- Pengeluaran Umum-->
+								<% @officeexpensegroups.each do |group| %>
+									<tr>
+										<td><%= group.name%></td>
+										<% (7..12).each do |i| %>
+											<% total = Receiptexpense.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where officeexpensegroup_id = #{group.id} and vehicle_id = #{@vehicle_id})").sum(:total) %>
+											<td align="right"><%= to_currency(total) %></td>
+											<% case i
+											when 7 
+												out_jul += total.to_i 
+											when 8 
+												out_agu += total.to_i  
+											when 9 
+												out_sep += total.to_i  
+											when 10 
+												out_okt += total.to_i  
+											when 11 
+												out_nop += total.to_i  
+											when 12 
+												out_des += total.to_i  
+											end%>
+										<% end %>
+									</tr>
+								<% end %>
+								
+								<% @productgroups.each do |group| %>
+									<tr>
+										<td>Inventory: <%= group.name%></td>
+										<% (7..12).each do |i| %>
+											<% total = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and vehicle_id = #{@vehicle_id} and productgroup_id = #{group.id})").sum(:total) %>
+											<td align="right"><%= to_currency(total) %></td>
+											<% case i
+											when 7 
+												out_jul += total.to_i 
+											when 8 
+												out_agu += total.to_i  
+											when 9 
+												out_sep += total.to_i  
+											when 10 
+												out_okt += total.to_i  
+											when 11 
+												out_nop += total.to_i  
+											when 12 
+												out_des += total.to_i  
+											end%>
+										<% end %>
+									</tr>
+								<% end %>
+								<tr class="footer">
+									<td>TOTAL PENGELUARAN</td>
+									<td align="right" class="red"><%= to_currency(out_jul)%></td>
+									<td align="right" class="red"><%= to_currency(out_agu)%></td>
+									<td align="right" class="red"><%= to_currency(out_sep)%></td>
+									<td align="right" class="red"><%= to_currency(out_okt)%></td>
+									<td align="right" class="red"><%= to_currency(out_nop)%></td>
+									<td align="right" class="red"><%= to_currency(out_des)%></td>
+								</tr>
+
+								
+								<tr class="footer">
+									<td>PROFIT</td>
+									<td align="right" class="black"><strong><%= to_currency(inc_jul - out_jul)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_agu - out_agu)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_sep - out_sep)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_okt - out_okt)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_nop - out_nop)%></strong></td>
+									<td align="right" class="black"><strong><%= to_currency(inc_des - out_des)%></strong></td>
+								</tr>
+							</table>
+						<% end %>
+					</div>
+				</div>
+
+				<div class="sliding_tab" id="tab_3">
+					<br class="clearfix" />
+					<div id="div_annualvehiclegraph" style="height:600px; width:900px;">
+					</div>
+				</div>
+			</div>
+		</div>
+		<% total_income = inc_jan + inc_feb + inc_mar + inc_apr + inc_mei + inc_jun + inc_jul + inc_agu + inc_sep + inc_okt + inc_nop + inc_des %>
+		<% total_outcome = out_jan + out_feb + out_mar + out_apr + out_mei + out_jun + out_jul + out_agu + out_sep + out_okt + out_nop + out_des %>
+		<% profit = total_income - total_outcome %>
+		<h2 class="right" style="text-align:right;">Total Pemasukan: <%=to_currency_bank(total_income, 'Rp. ')%><br/>Total Pengeluaran: <%=to_currency_bank(total_outcome, 'Rp. ')%><br/>Profit: <% if profit < 0 %><span class="red"><% end %><%=to_currency_bank(profit, 'Rp. ')%><% if profit < 0 %></span><% end %></h2>
+	</div>
+
+</div>

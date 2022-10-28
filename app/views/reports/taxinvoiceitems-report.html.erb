@@ -1,0 +1,83 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+		
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Surat Jalan :<span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue">
+					<label for="customer_id">Pelanggan</label>
+					<select name="customer_id" class="third left">
+						<option value="">Semua Pelanggan</option>
+						<% Customer.active.order(:name).each do |customer| %>
+						<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
+						<% end %>
+					</select>
+
+					<label for="startdate">Tanggal Awal</label>
+					<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>" />
+					<label for="enddate" class="middle">Akhir</label>
+					<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+					<input class="submit" type="submit" value="Filter" />
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<table class="row-view report-view">
+			<thead>
+				<tr>
+					<th width="30">No.</th>
+					<th width="80">Tanggal</th>
+                    <th width="80">No. BKK</th>
+					<th width="100">No.SJ</th>
+					<th width="400" >Keterangan INV</th>
+					<th width="300">Pelanggan</th>
+					<th width="80">Nopol</th>
+					<!-- <th width="80" class="right">Total</th> -->
+				</tr>
+			</thead>
+
+			<tbody>
+			<% total = i = 0 %>
+			<% @taxinvoiceitems.each do |taxinvoiceitem| %>
+				<% if taxinvoiceitem.total > 0 %>
+				<% total += taxinvoiceitem.total %>
+				<tr id="<%=taxinvoiceitem.id%>">
+					<td><%=i+=1%>.</td>
+					<td><%=taxinvoiceitem.date.strftime('%d-%m-%Y') rescue nil %></td>
+                    <td><%=taxinvoiceitem.invoice_id %> </td>
+					<td><%=taxinvoiceitem.sku_id %> </td>
+
+					<td><%if taxinvoiceitem.taxinvoice %><%= ''+ taxinvoiceitem.taxinvoice.date.strftime('%d/%m/%Y') + ' - ' + taxinvoiceitem.taxinvoice.long_id %> <%else%> - <%end%> </td>
+					<td><%=taxinvoiceitem.customer.name rescue nil %></td>
+					<td><%=taxinvoiceitem.invoice.vehicle.current_id rescue nil %> </td>
+
+					<!-- <td align="right">
+						<%=to_currency_bank(taxinvoiceitem.total) rescue '0' %>
+					</td> -->
+				</tr>
+				<% end %>				
+			<% end %>
+
+				<!-- <tr class="footer">
+					<td>&nbsp;</td>
+					<td class="total" colspan="5">TOTAL</td>
+					<td class="total" align="right"><%= to_currency(total) %></td>
+				</tr> -->
+			</tbody>
+		</table>
+
+	</div>
+
+</div>

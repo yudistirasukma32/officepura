@@ -1,0 +1,20 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=containermemos_path%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1><a href="<%=containermemos_path%>">MEMO Kontainer</a> / Edit <strong title="<%=@containermemo.container.containernumber%>"><%= @containermemo.container.containernumber %></strong></h1>
+		
+		<%= render "form" %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

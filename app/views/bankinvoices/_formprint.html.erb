@@ -1,0 +1,69 @@
+<%= form_for(@bankinvoice) do |f| %>
+  <div class="actions" style="float:left; padding:0 0 30px 20px;">
+    <input type="hidden" id="printername" value="<%= Setting.find_by_name("Printer Name").value if !Setting.find_by_name("Printer Name").nil? %>" />
+    <a class="left" href="javascript:print();"><i class="icon-print"></i> Print</a>
+    <a class="back left" href="<%=bankinvoices_path({:date => @bankinvoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
+  </div>  
+
+  <div id="bkk-print" class="info-box bkk-paper" onLoad="javascript: LoadAppletPrinter();" style="width:560px; float:left; clear:left;">
+
+    <table class="row-view no-border">
+      <tr valign="top">
+        <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+        <td align="right" class="header">Bukti Bank <%= @bankinvoice.money_in ? "Masuk" : "Keluar" %><br/>#<%=zeropad(@bankinvoice.id)%><input type="hidden" id="strInvoiceId" value="#<%=zeropad(@bankinvoice.id)%>" /></td>
+      </tr>
+    </table>
+    <hr style="width:600px;" />
+    <table class="row-view">
+      <tr>
+        <td width="150">Tanggal</td>
+        <td><span id="strDate"><%=@bankinvoice.date.strftime('%d %B %Y')%></span> &nbsp;(KTR: <span id="strOffice"><%=@bankinvoice.office.name%></span>)</td>
+      </tr>
+      <tr>
+        <td><strong>Pengirim</strong></td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <% if @bankinvoice.money_in %>
+        <% rek = Bankexpensegroup.find(@bankinvoice.debitgroup_id).name if !@bankinvoice.debitgroup_id.nil? %>
+        <% accept = bank = Bankexpensegroup.find(@bankinvoice.creditgroup_id).name if !@bankinvoice.creditgroup_id.nil? %>
+      <% else %>
+      <% accept = Bankexpensegroup.find(@bankinvoice.debitgroup_id).name if !@bankinvoice.debitgroup_id.nil? %>
+      <% rek = bank = Bankexpensegroup.find(@bankinvoice.creditgroup_id).name if !@bankinvoice.creditgroup_id.nil? %>
+      <% end %>
+
+      <tr>
+        <td>No. Rekening</td>
+        <td>
+          <%= rek%>
+         </td>
+      </tr>
+      <tr>
+        <td><strong>Penerima</strong></td>
+        <td>&nbsp;</td>
+      </tr>
+     <tr>
+      
+        <td>No. Rekening</td>
+        <td>
+          <%= accept%>
+
+         </td>
+      </tr>
+      <tr>
+        <td>Jumlah</td>
+        <td><%= to_currency(@bankinvoice.total) %></td>
+      </tr>
+      <% if !@bankinvoice.description.blank? %>
+      <tr>
+        <td>Keterangan</td>
+        <td id="strDescription"><%= @bankinvoice.description %></td>
+      </tr>   
+      <% end %>     
+    </table>
+
+    <p>Dibuat oleh <strong id="strCreator"><%= current_user.username %></strong></p>
+
+  </div>
+
+<% end %>

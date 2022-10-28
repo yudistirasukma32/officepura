@@ -1,0 +1,313 @@
+module ApplicationHelper
+	def nl2br(string)
+		string.gsub("\n\r","<br>").gsub("\r", "").gsub("\n", "<br />")
+	end
+
+	def slugify(string) 
+		string.downcase.gsub(/\W/,"-")
+	end
+
+	def zeropad(num)
+		return "%06d" % num
+	end
+  
+	def show_flash(flash)
+		html = []
+		flash.map do |key, msg|
+		  html << 
+			content_tag(:div, :class => "#{key}", :id => "flash") do
+			  msg
+			end  
+		end
+		html.join("\n").html_safe
+	end
+
+	def getwords(input, len)
+		output = ""
+		if input.length > len.to_i
+			output = input.slice(0, len.to_i) + " ..."
+		end
+		return output.length > 0 ? output : input	
+	end
+
+	def clean_currency number
+		number.gsub('.','').gsub(',','.') if !number.nil?
+	end
+	
+	# def authenticate
+		# if session[:username].nil?
+		# 	redirect_to "/login" and return false
+		# end
+		# return true
+	# end
+
+	def checkadmin
+		if !current_user.adminrole
+			redirect_to "/notauthorized" and return false
+		end
+		return true
+	end
+
+	def checkrole names
+
+		# better put in session than keep querying user roles
+		if session[:roles].nil? or session[:roles].empty?
+			session[:roles] = Userrole.joins(:role).where(:user_id => current_user.id).pluck("roles.name")
+		end
+
+		flag = false
+		roles = names.split(',')
+
+		if current_user.adminrole || current_user.owner
+			flag = true
+		else
+			roles.each do |role|
+				flag = session[:roles].include?role.strip
+				break if flag
+			end
+		end
+
+		return flag
+	end
+
+	def role_exist name
+		Userrole.joins(:role).where("user_id = ? AND roles.name = ?", current_user.id, name).any? rescue false || false
+	end
+
+	def cek_roles role_type
+	    role = checkrole role_type
+	    if !role
+	      return false
+	    else
+	      return true
+	    end
+	end
+
+	def checkroleonly role
+		roles = role.split(',')
+		crole = Role.where(:name => roles).pluck(:id)
+
+		userrole = Userrole.where(:user_id => current_user.id, :role_id => crole)
+		if userrole.any?
+			return true
+		else
+			return false
+		end
+	end	
+
+	def to_currency number, unit=""
+		return number_to_currency(number, :unit => unit, :precision => 0, :separator => ",", :delimiter => ".")
+	end
+
+	def to_currency_bank number, unit=""
+		return number_to_currency(number, :unit => unit, :precision => 2, :separator => ",", :delimiter => ".")
+	end
+
+	def updateproductstock value, product_id
+		product = Product.find(product_id)
+		if !product.nil?
+			product.stock = 0 if product.stock.nil?
+			product.stock += value
+			product.save
+		end
+	end
+
+	def updateofficecash val, date = nil
+		officecash = Setting.find_by_name("Saldo Kas Kantor") rescue nil
+		date = Date.today.strftime('%d-%m-%Y') if date.nil?
+
+		updatecashdailylog val, date.to_date, officecash.value.to_i
+
+		if !officecash.nil?
+		  officecash.value = officecash.value.to_i + val
+		  officecash.save
+		end
+	end	
+
+	# def updatecashdailylogold total, date = nil, officecash = 0
+	# 	date = Date.today.strftime('%d-%m-%Y') if date.nil?
+
+	# 	if date == Date.today.strftime('%d-%m-%Y')
+	# 		cashdailylog = Cashdailylog.where("date = ?", date.to_date).first rescue nil
+	# 		cashdailylog = Cashdailylog.new if cashdailylog.nil?
+			
+	# 		cashdailylog.date = date
+	# 	 	cashdailylog.total = cashdailylog.total + total
+	# 	 	cashdailylog.save
+	# 	else
+	# 		cashdailylog = Cashdailylog.where("date >= ?", date.to_date) 
+	# 		if cashdailylog.any?
+	# 			cashdailylog.each do |log|
+	# 				log.total += total
+	# 		 		log.save
+	# 		 	end
+	# 		end
+	# 	end
+	# end
+
+	def updatecashdailylog total, date = nil, officecash = 0
+		date = Date.today.strftime('%d-%m-%Y') if date.nil?
+
+		cashdailylogs = Cashdailylog.where("date >= ?", date.to_date) 
+
+		todaylog = Cashdailylog.where("date = ?", date.to_date).first rescue nil
+		if todaylog.nil?
+			todaylog = Cashdailylog.new 
+			todaylog.date = date
+			todaylog.total = officecash.to_i
+			todaylog.save
+		 	
+		 	cashdailylogs << todaylog
+	 	end
+
+		cashdailylogs.each do |log|
+			log.total += total
+	 		log.save
+	 	end
+		
+	end 
+
+	def updatebudget val
+		officecash = Setting.find_by_name("Budget Pembelian") rescue nil
+		if !officecash.nil?
+		  officecash.value = officecash.value.to_i + val
+		  officecash.save
+		end
+	end	
+
+	def checkavailableofficecash(val)
+		officecash = Setting.find_by_name("Saldo Kas Kantor") rescue nil
+		if !officecash.nil? and officecash.value.to_i > val
+			return true
+		else
+			return false
+		end	
+	end
+
+	def checkavailablebudget(val)
+		budget = Setting.find_by_name("Budget Pembelian") rescue nil
+		if !budget.nil? and budget.value.to_i > val
+			return true
+		else
+			return false
+		end
+	end	
+
+	def moneytowordsrupiah(val)
+		scaleNumber = ["", "ribu", "juta", "milyar"]
+		currencyText = "rupiah"
+		centText = "koma"
+		fraction = val - val.truncate
+		
+		if val == 0
+			return "nol " + currencyText
+		else
+			positive = (val.truncate).abs
+			digitgroups = Array.new(4)
+			
+			(0..3).each do |i|
+				digitgroups[i] = positive % 1000
+				positive = positive / 1000
+			end
+
+			textgroups = Array.new(4) 
+			(0..3).each do |i|
+				textgroups[i] = ThreeDigitGroupsToWords digitgroups[i].to_i
+			end
+
+			combined = textgroups[0]
+
+			(1..3).each do |i|
+				if digitgroups[i] != 0
+					if i == 1 and digitgroups[i] == 1
+						prefix = "seribu"
+					else
+						prefix = textgroups[i] + " " + scaleNumber[i]
+					end
+
+					if combined.length != 0
+						prefix += " "
+					end
+
+					combined = prefix + combined 
+				end
+			end
+		end
+
+		if fraction > 0
+			cent = (fraction * 100).round
+			cent = ThreeDigitGroupsToWords cent
+
+			return combined + " " + centText + " " + cent + " " + currencyText
+		else
+			return combined + " " + currencyText
+		end 
+	end
+	
+	def ThreeDigitGroupsToWords threeDigit
+		smallNumber = ["nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas", "dua belas", "tiga belas","empat belas", "lima belas", "enam belas", "tujuh belas", "delapan belas", "sembilan belas"]
+		tens = ["", "", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh"]
+		
+		groupText = ""
+
+		hundreds = threeDigit / 100
+		tensUnit = threeDigit % 100
+
+		if hundreds != 0
+			if hundreds == 1
+				groupText = "seratus"
+			else
+				groupText += smallNumber[hundreds] + ' ratus'
+			end
+
+			if tensUnit != 0
+				groupText += " "
+			end
+		end
+
+		itens = tensUnit / 10
+		units = tensUnit % 10
+
+		if itens >= 2
+			groupText += tens[itens]
+			if units != 0
+				groupText += " " + smallNumber[units]
+			end
+		elsif tensUnit != 0
+			groupText += smallNumber[tensUnit]
+		end
+		
+		return groupText
+	end
+
+	def getromenumber (input)
+	    objreturn = ""
+
+	    if input ==  1
+	      objreturn = "I"
+	    elsif input ==  2
+	      objreturn = "II"
+	    elsif input ==  3
+	      objreturn = "III"
+	    elsif input ==  4
+	      objreturn = "IV"
+	    elsif input ==  5
+	      objreturn = "V"
+	    elsif input ==  6
+	      objreturn = "VI"
+	    elsif input ==  7
+	      objreturn = "VII"
+	    elsif input ==  8
+	      objreturn = "VIII"
+	    elsif input ==  9
+	      objreturn = "IX"
+	    elsif input ==  10
+	      objreturn = "X"
+	    elsif input ==  11
+	      objreturn = "XI"
+	    elsif input ==  12
+	      objreturn = "XII"
+	    end
+  	end
+
+end

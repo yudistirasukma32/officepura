@@ -1,0 +1,77 @@
+<% if @officeexpense %>
+<%= form_for(@receiptexpense) do |f| %>
+	<%= f.hidden_field :process, :value => 'create' %>
+  	<%= f.hidden_field :officeexpense_id, :value => @officeexpense_id %>
+
+
+  	<% if @errors.include?'receiptexpense' %>
+	    <div class="field-row red">
+	      <%=@errors['receiptexpense']%>
+	    </div>
+	<% end %>
+ 
+  	<div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
+  		<h3>Kas Harian #<%=zeropad(@officeexpense.id)%></h3>
+  		
+  		<table class="row-view no-border">
+  			<tr>
+				<td width="90">Tanggal</td>
+				<td><%=@officeexpense.created_at.strftime('%d-%m-%Y')%></td>
+			</tr>	
+			<tr>
+				<td width="90">Grup Kas</td>
+				<td><%=@officeexpense.officeexpensegroup.name%></td>
+			</tr>
+			<tr>
+				<td width="90">Tipe</td>
+				<td><%=@officeexpense.expensetype%></td>
+			</tr>
+			<% if !@officeexpense.vehicle_id.blank? %>
+			<tr>
+				<td width="90">No Pol</td>
+				<td><%=@officeexpense.vehicle.current_id%></td>
+			</tr>
+			<% end %>
+            <% if !@officeexpense.container_id.blank? && @officeexpense.container_id != 0%>
+			<tr>
+				<td width="90">No Kontainer</td>
+				<td><%=@officeexpense.container.containernumber %></td>
+			</tr>
+			<% end %>
+            <% if !@officeexpense.isotank_id.blank? && @officeexpense.isotank_id != 0%>
+			<tr>
+				<td width="90">No Isotank</td>
+				<td><%=@officeexpense.isotank.isotanknumber%></td>
+			</tr>
+			<% end %>
+			<tr>
+				<td width="90">Keterangan</td>
+				<td><%=@officeexpense.description%></td>
+			</tr>
+  		</table>
+
+  		<table class="row-view">
+  				<tr>
+	  				<th width="90">Keterangan</th>
+			        <th>&nbsp;</th>
+			        <th width="160" class="right" style="padding-right:5px;">Total</th>
+		    	</tr>
+		    	<tr>
+		    		<td>Total</td>
+		    		<td>&nbsp;</th>
+		    		<td class="half allowance-field"><%= to_currency(@officeexpense.total)%></td>
+		    	</tr>
+		    	<tr class="total-row">
+			        <td><%= f.label :total, "Total" %></td>
+			        <td>&nbsp;</th>
+					<td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@officeexpense.total), :readOnly => 'true' %></td>
+			    </tr>
+  			</table>
+
+      	<div class="field-row continue">
+		    <%= f.submit "Tambah Data", :class => 'submit right' %>      
+		  </div>
+  	</div>
+
+<% end %>
+<% end %>

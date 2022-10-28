@@ -1,0 +1,78 @@
+<% if @productorder %>
+<%= form_for(@receiptorder) do |f| %>
+	<%= f.hidden_field :process, :value => 'create' %>
+  	<%= f.hidden_field :productorder_id, :value => @productorder_id %>
+
+    <% if @errors.include?'receiptorder' %>
+      <div class="field-row red">
+        <%=@errors['receiptorder']%>
+      </div>
+    <% end %>
+
+  	<div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
+  		<h3>Order Pembelian #<%=zeropad(@productorder.id)%></h3>
+  		
+  		<table class="row-view no-border">
+  			<tr>
+				<td width="90">Tanggal</td>
+				<td><%=@productorder.date.strftime('%d-%m-%Y')%></td>
+			</tr>
+			<tr>
+				<td width="90">Keterangan</td>
+				<td><%=@productorder.description%></td>
+			</tr>
+  		</table>
+
+      <% if @ordercash.any? %>
+      <table class="row-view">        
+        <tr>
+          <th>Pembelian Tunai</th>
+          <th width="160"></th> 
+        </tr>
+        <tr>
+          <th>Nama Barang</th>
+            <th width="160" class="right" style="padding-right:5px;">Total</th> 
+        </tr>
+        <% @ordercash.order(:id).each_with_index do |productorderitem| %>
+        <tr>
+          <td><%=to_currency_bank(productorderitem.quantity)%>x&nbsp;<%=productorderitem.product.name%></td>
+          <td class="half allowance-field"><%=to_currency(productorderitem.total)%></td>
+        </tr>
+        <% end %>
+        <tr class="total-row">
+            <td><%= f.label :total, "Total" %></td>
+            <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@totalcash), :readOnly => 'true' %></td>
+        </tr>
+      </table>
+      <% end %>
+
+
+      <% if @orderbon.any? %>
+      <table class="row-view">
+        <tr>
+          <th>Pembelian Bon</th>
+          <th width="160"></th> 
+        </tr>        
+        <tr>
+          <th>Nama Barang</th>
+            <th width="160" class="right" style="padding-right:5px;">Total</th> 
+        </tr>
+        <% @orderbon.order(:id).each_with_index do |productorderitem| %>
+        <tr>
+          <td><%=productorderitem.quantity%>x&nbsp;<%=productorderitem.product.name%></td>
+          <td class="half allowance-field"><%=to_currency(productorderitem.total)%></td>
+        </tr>
+        <% end %>
+        <tr class="total-row">
+            <td><%= f.label :total, "Total" %></td>
+            <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@totalbon), :readOnly => 'true' %></td>
+      </tr>
+      </table>  
+      <% end %>
+  		
+  		<div class="field-row continue">
+		    <%= f.submit "Tambah Data", :class => 'submit right' %>      
+		  </div>
+  	</div>
+<% end %>
+<% end %>

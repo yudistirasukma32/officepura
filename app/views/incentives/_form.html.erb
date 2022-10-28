@@ -1,0 +1,60 @@
+<%= form_for(@incentive) do |f| %>
+  <%= f.hidden_field :invoice_id, :value => @invoice.id %>
+  <%= f.hidden_field :office_id, :value => @invoice.office_id %>
+
+  <div class="info-box" style="margin-bottom:30px;">  
+
+    <h3>Bukti Kas Keluar #<%=zeropad(@invoice.id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Tanggal</td>
+        <td><%=@invoice.created_at.strftime('%d-%m-%Y')%> &nbsp;(KTR: <%=@invoice.office.name%>)</td>
+      </tr>
+      <tr>
+        <td>Pelanggan</td>
+        <td><%=@invoice.customer.name%></td>
+      </tr>
+      <tr>
+        <td>Jurusan</td>
+        <td><strong><%=@invoice.quantity%></strong> Rit: <%=@invoice.route.name%></td>
+      </tr>
+      <tr>
+        <td>Tipe</td>
+        <td><%=@invoice.route.routegroup.name%></td>
+      </tr>
+      <tr>
+        <td>Kendaraan</td>
+        <td><%=@invoice.vehicle.current_id%>&nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+      </tr>
+      <tr>
+        <td>Supir</td>
+        <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="field-row first">
+    <%= f.label :quantity, "Jumlah" %>
+    <%= f.label :quantity_text, "#{@incentive.quantity} Rit" %>
+    <%= f.label :quantity_a, "@ #{to_currency_bank(@invoice.incentive, 'Rp. ')}" %>
+    <%= f.hidden_field :quantity, :value => @incentive.quantity %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :total, "Total Insentif", :style => 'font-weight:bold;' %>
+    <%= f.label :total_text, to_currency_bank(@incentive.total, "Rp. "), :style => 'font-weight:bold;' %>
+    <%= f.hidden_field :total, :value => @incentive.total %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Keuangan, Admin Operasional' %>
+    <a class="back left" href="<%=incentives_path%>">Kembali ke Index</a>
+  </div>
+
+<% end %>

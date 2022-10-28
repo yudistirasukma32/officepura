@@ -1,0 +1,74 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Solar Kontan: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%></span> - <span class="red"><%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />&nbsp; &nbsp;
+				<label for="vehicle_id" class="middle short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />&nbsp; &nbsp;
+				<label for="office_id" class="" style="float:none">Kantor</label>
+				<select name="office_id" class="half">
+					<option value="">All</option>
+					<% Office.all.each do |office| %>
+					<option value="<%=office.id%>"<% if office.id == @office.id %> selected="selected"<% end %>><%=office.name%></option>
+					<% end %>
+				</select>
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<% if @receipts.any? %>
+
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th width="30">KTR.</th>
+				<th width="80">No Pol</th>
+				<th width="80">Supir</th>
+				<th>Jurusan</th>
+				<th width="30" class="right">Rit</th>
+				<th width="110" class="right">Sangu</th>
+			</tr>
+
+			<% @receipts.each_with_index do |receipt, i| %>
+			<tr>
+				<td><%=i+1%></td>
+				<td><%=receipt.invoice.office.abbr%></td>
+				<td><%=receipt.invoice.vehicle.current_id%><br/><%=receipt.invoice_id%></td>
+				<td><%=receipt.invoice.driver.name%></td>
+				<td><%=receipt.invoice.route.name%></td>
+				<td align="right"><%=receipt.quantity%></td>
+				<td align="right"><%=to_currency(receipt.gas_allowance)%></td>
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<td colspan="5" class="total">TOTAL</td>
+				<td align="right"><%=@receipts.sum(:quantity)%></td>
+				<td align="right" class="total red"><%=to_currency(@receipts.sum(:gas_allowance))%></td>
+			</tr>
+		
+		</table>
+
+		<% end %>
+
+	</div>
+
+</div>

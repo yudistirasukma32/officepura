@@ -1,0 +1,42 @@
+<% if @taxinvoiceitems.any? %>
+<table class="row-view" id="tbAdditional">
+  <tr>
+    <th width="30">&nbsp;</th>
+    <th width="30">No</th>
+    <th width="85">Tanggal</th>
+    <th width="70">No. Pol</th>
+    <th width="110">Surat Jalan</th>
+    <th>Jurusan</th>
+    <th width="30">MUAT (Kg)</th>
+    <th width="30">BKR (Kg)</th>
+    <th width="110" class="right">Total</th>
+    <th width="30" style="display:none">&nbsp;</th>
+  </tr>
+
+  <% @taxinvoiceitems.each_with_index do |taxinvoiceitem, i| %>
+  <tr id="<%=taxinvoiceitem.id%>">
+    <td >
+      <% if @process !='edit'%><input type="checkbox" id="cb_<%=taxinvoiceitem.id%>" name="cb_<%=taxinvoiceitem.id%>" onclick="javascript: countTotalTaxInvoiceItems();"/> <% end %>
+    </td>  
+    <td><%=i+1%>.</td>
+    <td><%=taxinvoiceitem.date.strftime('%d-%m-%Y') if !taxinvoiceitem.date.nil?%></td>
+    <td><%= taxinvoiceitem.invoice.vehicle.current_id %></td>
+    <td><%=taxinvoiceitem.sku_id%></td>
+    <td><%=taxinvoiceitem.invoice.route.name%></td>
+    <td align="right">
+      <input type="text" id="gross_<%=taxinvoiceitem.id%>" name="gross_<%=taxinvoiceitem.id%>" class="short right none" value="<%=taxinvoiceitem.weight_gross%>" readobly="readonly"/>
+    </td>
+    <td align="right">
+      <input type="text" id ="qty_<%=taxinvoiceitem.id%>" name="qty_<%=taxinvoiceitem.id%>" class="short right none" value="<%=taxinvoiceitem.weight_net%>" readobly="readonly" />
+      <input type="hidden" id="priceper_<%=taxinvoiceitem.id%>" value="<%=taxinvoiceitem.price_per%>" />
+    </td>
+    <td align="right"><label id="total_<%=taxinvoiceitem.id%>"><%=to_currency(taxinvoiceitem.total)%></label></td>
+    <td style="display:none">
+      <input type="checkbox" id="cbwholesale_<%=taxinvoiceitem.id%>" name="cbwholesale_<%=taxinvoiceitem.id%>" value="Yes" <% if taxinvoiceitem.is_wholesale %> checked = "checked"<% end %> onchange="javascript: changeWholesalePriceTaxinvoiceitem(<%=taxinvoiceitem.id%>);" />
+    </td>
+  </tr>
+  <% end %>
+</table>
+<% else %>
+<h2 class="warning">Maaf, tidak ada data untuk pelanggan <%= @customer.name%><br /></h2>
+<% end %>

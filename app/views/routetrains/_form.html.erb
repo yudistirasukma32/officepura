@@ -1,0 +1,58 @@
+<%= form_for(@routetrain) do |f| %>
+
+
+  <div class="field-row first">
+    <%= f.label :operator_id, "Operator" %>
+    <select id="routetrain_operator_id" name="routetrain[operator_id]" class="chzn-select half">
+      <option value="0">- Operator -</option>
+      <% Operator.active.order(:abbr).each do |operator| %>
+      <option value="<%=operator.id%>"<%= operator.id == @routetrain.operator_id ? ' selected="selected"' : '' %>><%=operator.abbr%></option>
+      <% end %>
+    </select>
+  </div>
+
+	<div class="field-row">
+    <%= f.label :name, "Nama Jurusan" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :container_type, "Tipe Kontainer"  %>
+    <%= f.select :container_type, options_for_select(@contype.collect {|w| [w, w]}, (params[:container_type].present? ? params[:type] : @routetrain.container_type)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :size, "Ukuran"  %>
+    <%= f.select :size, options_for_select(@consize.collect {|w| [w, w]}, (params[:size].present? ? params[:type] : @routetrain.size)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row first">
+    <%= f.label :origin_station_id, "Stasiun Awal" %>
+    <select id="routetrain_origin_station_id" name="routetrain[origin_station_id]" class="chzn-select half">
+      <option value="0">- Stasiun Awal -</option>
+      <% Station.active.each do |station| %>
+      <option value="<%=station.id%>"<%= station.id == @routetrain.origin_station_id ? ' selected="selected"' : '' %>><%=station.name%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row first">
+    <%= f.label :destination_station_id, "Stasiun Tujuan" %>
+    <select id="routetrain_destination_station_id" name="routetrain[destination_station_id]" class="chzn-select half">
+      <option value="0">- Stasiun Tujuan -</option>
+      <% Station.active.each do |station| %>
+      <option value="<%=station.id%>"<%= station.id == @routetrain.destination_station_id ? ' selected="selected"' : '' %>><%=station.name%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :price_per, "Tarif" %>
+    <%= f.text_field :price_per, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Jurusan' %>
+    <a class="back left" href="<%=routetrains_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

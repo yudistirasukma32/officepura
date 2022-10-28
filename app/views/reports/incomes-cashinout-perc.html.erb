@@ -1,0 +1,201 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+    <%= render "shared/nav" %>
+</div>
+
+<div id="main">
+    <div id="content-full">
+      <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+      <h1><%=Setting.find_by_name("Client Name").value%> / Rekapitulasi Pemasukan dan Pengeluaran <span class="red"> <%=@year%></span></h1>
+
+      <br class="clearfix" />
+
+      <div id="filter">
+        <form id="filterform" name="filterform" action="" method="get">
+        <div class="field-row continue">
+          <label class="middle">Tahun</label>
+          <select name="year" class="half left combo_route">
+            <% 2012.upto(Date.today.year) do |year| %>
+            <option value="<%=year%>"<% if year == @year.to_i %> selected="selected"<% end %>><%=year%></option>
+            <% end %>
+          </select>
+          <input class="submit" type="submit" value="Filter" />
+        </div>
+        </form>
+      </div>
+      <br />
+        <table class="row-view report-view">
+            <tr>
+                <th>Bulan</th>
+                <th>Saldo</th>
+                <th width="120" class="right">Total</th>
+            </tr>
+
+            <% income = outcome = running = i = 0 %>
+            <tr>
+              <th colspan="2"><strong class="green">SALDO AWAL</strong></th>
+              <th class="right"><%=running%></th>
+            </tr>
+
+          <% (1.upto(12)).each_with_index do |m| %>
+            <% income = outcome = i = 0 %>
+
+            <% @month_name = Date::MONTHNAMES[m]
+              @month = Date::MONTHNAMES.index(@month_name) 
+             %>
+
+            <% 
+            #INCOMES
+                @incomeexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+                                              FROM bankexpensegroups a
+                                              LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
+                                              WHERE a.ID IN (6,21) AND a.deleted = false AND b.deleted = false
+                                              GROUP BY a.id, a.name
+                                              ORDER BY a.id")
+
+               income += @incomeexpense.to_a.sum { |e| e.total.to_i }
+
+                @debtincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+                                                        FROM bankexpensegroups a
+                                                        LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
+                                                        WHERE a.name like 'Hutang Direksi%' AND a.deleted = false AND b.deleted = false
+                                                        GROUP BY a.id, a.name
+                                                        ORDER BY a.id")
+               income += @debtincomes.to_a.sum { |e| e.total.to_i }
+
+                @creditincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+                                                  FROM bankexpensegroups a
+                                                  LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
+                                                  WHERE a.ID IN (112) AND a.deleted = false AND b.deleted = false
+                                                  GROUP BY a.id, a.name
+                                                  ORDER BY a.id")
+
+               income += @creditincomes.to_a.sum { |e| e.total.to_i }
+
+                @assetsales = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+                                                  FROM bankexpensegroups a
+                                                  LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
+                                                  WHERE a.ID IN (89) AND a.deleted = false AND b.deleted = false
+                                                  GROUP BY a.id, a.name
+                                                  ORDER BY a.id")
+
+               income += @assetsales.to_a.sum { |e| e.total.to_i }
+
+                @kmkfacilities = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+                                                  FROM bankexpensegroups a
+                                                  LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
+                                                  WHERE a.name like 'Fasilitas KMK%' AND a.deleted = false AND b.deleted = false AND b.description like 'Pindah%'
+                                                  GROUP BY a.id, a.name
+                                                  ORDER BY a.id")
+               income += @kmkfacilities.to_a.sum { |e| e.total.to_i }
+
+                @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+                                                        FROM bankexpensegroups a
+                                                        LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
+                                                        WHERE a.name like 'Biaya%' AND a.deleted = false AND b.deleted = false
+                                                        GROUP BY a.id, a.name
+                                                        ORDER BY a.id")
+
+               outcome += @bankexpense.to_a.sum { |e| e.total.to_i }
+
+                @capitalexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+                                                        FROM bankexpensegroups a
+                                                        LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
+                                                        WHERE a.name like 'Modal%' AND a.deleted = false AND b.deleted = false
+                                                        GROUP BY a.id, a.name
+                                                        ORDER BY a.id")
+
+               outcome += @capitalexpense.to_a.sum { |e| e.total.to_i }
+
+                @debtexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+                                                        FROM bankexpensegroups a
+                                                        LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
+                                                        WHERE a.name like 'Hutang%' AND a.deleted = false AND b.deleted = false
+                                                        GROUP BY a.id, a.name
+                                                        ORDER BY a.id")
+               outcome += @debtexpense.to_a.sum { |e| e.total.to_i }
+
+                @receiptpayrollsupir = Receiptpayroll.joins(:payroll)
+                .where("to_char(receiptpayrolls.created_at, 'MM-YYYY')='#{@month}-#{@year}' AND receiptpayrolls.deleted = false")
+                .where("payrolls.driver_id IS NOT NULL")
+
+                outcome += @receiptpayrollsupir.sum(:total)
+
+                @receiptpayrollkernet = Receiptpayroll.joins(:payroll)
+                .where("to_char(receiptpayrolls.created_at, 'MM-YYYY')='#{@month}-#{@year}' AND receiptpayrolls.deleted = false")
+                .where("payrolls.driver_id IS NULL")
+
+                outcome += @receiptpayrollkernet.sum(:total)
+             %>
+
+             <% sangu = Receipt.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:driver_allowance)%>
+              <% sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:driver_allowance)%>
+              <% sangutotal = sangu.to_i - sangumasuk.to_i
+              outcome += sangutotal
+               %>
+
+              <% sangu = Receipt.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:helper_allowance)%>
+        <% sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:helper_allowance)%>
+        <% sangutotal = sangu.to_i - sangumasuk.to_i
+            outcome += sangutotal
+         %>
+
+        <% sangu = Receipt.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:gas_allowance)%>
+        <% sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:gas_allowance)%>
+        <% sangutotal = sangu.to_i - sangumasuk.to_i 
+            outcome += sangutotal
+
+        %>
+
+        <% sangu = Receipt.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum("misc_allowance + tol_fee + ferry_fee")%>
+        <% sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum("misc_allowance + tol_fee")%>
+        <% sangutotal = sangu.to_i - sangumasuk.to_i
+            outcome += sangutotal
+         %>
+
+        <% officeumumcredit = Receiptexpense.where("expensetype = 'Kredit' and officeexpensegroup_id = 1 and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total) 
+          officeumumdebit = Receiptexpense.where("expensetype = 'Debit' and officeexpensegroup_id = 1 and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+          officetotal = officeumumcredit - officeumumdebit
+          outcome += officetotal
+          %>
+
+      <% @groupumum.each do |group| %>
+        <%  outcomegroupcredit = group.receiptexpenses.where("expensetype = 'Kredit' and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+          if group.id == 8 
+            premi = Receiptpremi.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+            outcomegroupcredit += premi
+          end 
+          outcomegroupdebet = group.receiptexpenses.where("expensetype = 'Debit' and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+            outcomegrouptotal = outcomegroupcredit - outcomegroupdebet
+            outcome +=  outcomegrouptotal%>
+      <% end %> 
+
+      <% productrequestitems = Productrequestitem.where("productrequest_id in (select id from productrequests where vehicle_id is NULL AND deleted = false and to_char(date, 'MM-YYYY') = ?)", "#{@month}-#{@year}").sum(:total)
+
+        outcome += productrequestitems
+       %>
+
+      <% @groupkantor.each do |group| %>
+        <% outcomegroupcredit = group.receiptexpenses.where("expensetype = 'Kredit' and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total) 
+           outcomegroupdebit = group.receiptexpenses.where("expensetype = 'Debit' and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+           outcomegrouptotal = outcomegroupcredit - outcomegroupdebit
+           outcome += outcomegrouptotal %>
+      <% end %> 
+
+      <% running += (income - outcome) %>
+
+            <tr>
+                <td><%= link_to @month_name,incomes_cashinoutdetail_path(@year,Date::MONTHNAMES.index(@month_name) ) %></td>
+                <td><%= to_currency(income - outcome) %></td>
+                <td align="right" class="green"><%= to_currency(running)%></td> 
+            </tr>
+            <% end %>
+            <tr class="footer">
+              <td class="total" align="right" colspan="2">SALDO AKHIR</td>
+              <td align="right" class="total <%= running.to_i < 0 ? 'red' : 'green'%>"><%=to_currency(running)%></td>
+            </tr>
+        </table>
+    </div>
+</div>

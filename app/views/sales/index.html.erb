@@ -1,0 +1,28 @@
+<%= render "shared/header" %>
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn print" href="<%=new_sale_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<h1>Transaksi / <a href="<%=sales_path%>">Penjualan Barang Bekas</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date">Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
+			</div>
+			</form>
+		</div>
+		<br class="clearfix" />
+			<%= render "showtable" %>
+		<br class="clearfix" />
+		<div class="actions">
+			<a class="btn-txt right" href="<%=new_sale_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		</div>
+	</div>	
+</div>

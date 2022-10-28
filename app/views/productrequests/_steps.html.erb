@@ -1,0 +1,5 @@
+<ul id="steps">
+  <li style="width:250px;" <% if step == 1 %> class="on"<% end %>><% if !@productrequest.id.nil? %><a href="<%=edit_productrequest_url(@productrequest)%>" ><% end %><span>1</span> Permintaan Stok<% if !@productrequest.id.nil? %></a><% end %></li>
+  <li class="separator"><i class="icon-chevron-right"></i></li>
+  <li<% if step == 2 %> class="on"<% end %>><% if !@productrequest.id.nil? %><a href="<%=confirmation_productrequest_url(@productrequest)%>"><% end %><span>2</span> Konfirmasi<% if !@productrequest.id.nil? %></a><% end %></li>
+</ul>

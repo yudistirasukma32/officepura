@@ -1,0 +1,264 @@
+<table id="indextaxinvoices" class="row-view tablesorter sortable tablesorterFilters">
+	<thead>
+	<tr>
+		<th class="{sorter:false, filter: false}"width="20"> 
+			<input type="checkbox" id="is_all_paid" <% if @taxinvoices.where("paiddate IS NULL").count() == 0 %> checked="checked" <% end %> onchange="javascript: checkAllTaxinvoices();" />
+		</th> 
+		<th class="{sorter:true, filter: false}" width="80">Tgl Dibuat</th>
+		<th class="{sorter:true, filter: true}" width="50">INV</th>
+		<th class="{sorter:true, filter: true}" >Pelanggan</th>
+		<th class="{sorter:true, filter: false}" width="90">Kirim</th>
+		<th class="{sorter:true, filter: false}" width="90">Konfirm</th>
+		<th class="{sorter:true, filter: false}" width="120">Jatuh Tempo</th>
+		<th class="right {sorter:false, filter: false}" width="80">DPP</th>
+		<th class="right {sorter:false, filter: false}" width="80">PPN</th>
+		<th class="right {sorter:false, filter: false}" width="80">PPh</th>
+		<th class="right {sorter:false, filter: false}" width="80">Total</th>
+		<th class="{sorter:true, filter: false}" width="100">Lunas</th>
+		<th class="{sorter:false, filter: false}" width="40">&nbsp;</th>
+		<th class="{sorter:false, filter: false}" width="90">&nbsp;</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	<% total = 0 %>
+	<% totalGeneric = 0 %>
+	<% @taxinvoices.each do |taxinvoice| %>
+		<% customer = taxinvoice.customer %>
+
+	<% if taxinvoice.deleted %>
+	
+	<% if current_user.adminrole %>
+	<tr class="deleted" id="<%=taxinvoice.id%>">
+		<td width="20"> <input type="checkbox" id="cb_<%=taxinvoice.id%>" name="cb_<%=taxinvoice.id%>" <% if !taxinvoice.paiddate.nil? %> checked="checked" disabled="disabled" <% end %> /></td>
+		<td><%=taxinvoice.created_at.strftime('%d-%m-%y')%></td>
+		<td><%=taxinvoice.long_id[0,4].gsub(' /', '')%> </td>
+		<td><%=taxinvoice.customer.name%> <% if !taxinvoice.ship_name.blank? %> (<%=taxinvoice.ship_name%>) <% end %> <% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
+		<td><%=taxinvoice.sentdate.strftime('%d-%m-%y') rescue nil%></td>
+		<td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td>
+		<% different = (taxinvoice.duedate - Date.today).to_i %> 
+		<td<% if different < 0 %> class="red"<% end %>><%=taxinvoice.duedate.strftime('%d-%m-%y')%> (<%=different%>)</td>
+		<td align="right">
+		<% if !taxinvoice.generic %>
+			<%=to_currency_bank(taxinvoice.taxinvoiceitems.sum(:total))%>
+		<% else %>
+			<%=to_currency_bank(taxinvoice.taxgenericitems.sum(:total))%>
+		<% end %>
+		</td>
+		<td align="right">
+			<%=to_currency_bank(taxinvoice.gst_tax)%>
+		</td>
+		<td align="right">
+			<%=to_currency_bank(taxinvoice.price_tax)%>
+		</td>
+		<td align="right"><%=to_currency_bank(taxinvoice.total)%>
+			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment)%>)<% end %>
+		</td>
+		<td><% if !taxinvoice.paiddate.nil? %><%=taxinvoice.paiddate.strftime('%d-%m-%y')%> (<%=(taxinvoice.paiddate - taxinvoice.date).to_i%>) <% end %></td>
+		<td class="right" width="60">&nbsp;</td>
+	</tr>
+	<% end %>
+	
+	<% else %>
+	
+		<% if !taxinvoice.generic %>
+			<% total += taxinvoice.total %>
+		<% else %>
+			<% totalGeneric += taxinvoice.total %>
+		<% end %>
+
+	<tr id="<%=taxinvoice.id%>">
+		<td width="20"> <% if taxinvoice.paiddate.nil? %> <input type="checkbox" id="cb_<%=taxinvoice.id%>" name="cb_<%=taxinvoice.id%>" /><% end %></td>
+		<td><%=taxinvoice.created_at.strftime('%d-%m-%y')%></td>
+		<td><%=taxinvoice.long_id[0,4].gsub(' /', '')%> </td>
+		<td><%=taxinvoice.customer.name rescue nil%> <% if !taxinvoice.ship_name.blank? %>(<%=taxinvoice.ship_name%>) <% end %><% if taxinvoice.generic %>&nbsp;<i class="icon-star grey"></i><% end %> 
+			<% if taxinvoice.downpayment > 0 %><br />Deposit <%=to_currency_bank(taxinvoice.downpayment_date.strftime('%d-%m-%y'))%><% end %>
+		</td>
+		<td><%=taxinvoice.sentdate.strftime('%d-%m-%y') rescue nil%></td>
+		<td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td>
+        
+        <%
+            if taxinvoice.sentdate 
+                different = ((taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
+            else
+                different = ((taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
+            end
+        %>
+        
+		<td<% if taxinvoice.paiddate.nil? and different < 0 %> class="red"<% end %>>
+            <% if taxinvoice.sentdate %>
+                <%=(taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+            <% else %>
+                <%=(taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+            <% end %>
+        </td>
+        
+		<td align="right">
+		<% if !taxinvoice.generic %>
+			<%=to_currency_bank(taxinvoice.taxinvoiceitems.sum(:total))%>
+		<% else %>
+			<%=to_currency_bank(taxinvoice.taxgenericitems.sum(:total))%>
+		<% end %>
+		</td>
+		<td align="right">
+			<%=to_currency_bank(taxinvoice.gst_tax)%>
+		</td>
+		<td align="right">
+			<%=to_currency_bank(taxinvoice.price_tax)%>
+		</td>
+		<td align="right">
+			<%=to_currency_bank(taxinvoice.total)%>
+			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment)%>)<% end %>
+		</td>
+
+		<% if taxinvoice.paiddate.nil? %>
+		<td>
+			<a class="cta" href="/taxinvoices/payment/<%=taxinvoice.id%>">Bayar</a>
+		</td>
+		<% else %>
+		<td><%=taxinvoice.paiddate.strftime('%d-%m-%y')%> (<%=(taxinvoice.paiddate - taxinvoice.date).to_i%>)</td>
+		<% end %>
+        <td class="right" width="30">
+		<% if taxinvoice.paiddate.nil? %>
+			<% if taxinvoice.remarks.nil? %>
+			<% remarks = '' %>
+			<% else %>
+			<% remarks = taxinvoice.remarks %>
+			<% end %>
+            <%= link_to 'Edit'.html_safe, "#", :class => "cta btn-edit-tax", :style => "background: #000f64;", data: { customer: customer.name, long_id: taxinvoice.long_id, remarks: remarks, insurance_cost: taxinvoice.insurance_cost.to_i, claim_cost: taxinvoice.claim_cost.to_i, date: taxinvoice.date.strftime("%d-%m-%Y"), subtotal: (!taxinvoice.generic ? taxinvoice.taxinvoiceitems.sum(:total).to_i : taxinvoice.taxgenericitems.sum(:total).to_i), gst_tax: taxinvoice.gst_tax.to_f, price_tax: taxinvoice.price_tax.to_f, extra_cost: taxinvoice.extra_cost.to_i, id: taxinvoice.id, sentdate: (taxinvoice.sentdate.strftime("%d-%m-%Y") rescue nil), confirmeddate: (taxinvoice.confirmeddate.strftime("%d-%m-%Y") rescue nil), gst_percentage: taxinvoice.gst_percentage.to_f, code: (taxinvoice.long_id[0,4].gsub(' /', '') rescue nil) }, :title => 'Edit Cepat' %>
+        <% end %>
+		</td>
+		<td class="right" width="120">
+			<% if taxinvoice.paiddate.nil? %>
+			<% edit_url = taxinvoice.generic ? "/taxinvoices/generic/#{taxinvoice.id}" : edit_taxinvoice_path(taxinvoice) %>
+			
+			<%= link_to '&#xf044;'.html_safe, edit_url, :class => "edit tipsy", :title => 'Edit Data / Masuk Detail' %> 
+			<% end %>
+			<a href="<%=print_taxinvoice_path(taxinvoice)%>" class="delete tipsy" title="Print Invoice"><i class="icon-print"></i></a>
+			<% if (!taxinvoice.paiddate.nil? and session[:adminrole]) or (taxinvoice.paiddate.nil?) %>
+			<%= link_to '&#xf00d;'.html_safe, taxinvoice, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+			<% end %>
+			<% if !taxinvoice.paiddate.nil? && current_user.owner %>
+				<a class="tipsy delete" title="Batal Pembayaran" href="<%=cancelpayment_taxinvoice_url(taxinvoice.id)%>"><i class="icon-ban"></i></a>
+			<% end %>
+		</td>
+	</tr>
+	
+	<% end %>
+	<% end %>
+	</tbody>
+
+	<% if @taxinvoices.any? %>
+	<tbody class="tablesorter-no-sort">
+	<!-- <tr class="footer">
+		<td colspan="5" class="total" style="padding-left:5px;">TOTAL INVOICE&nbsp; <span class="red"><%=@customer.name + ', ' if @customer%><%=Date::MONTHNAMES[@month.to_i] + ' ' + @year.to_s%></span></td>
+		<td class="total" align="right"><%=to_currency_bank(total)%></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr class="footer">
+		<% 	paid = @taxinvoices.where("generic = false AND paiddate is not null").sum(:total) %>
+		<td colspan="5" class="total" style="padding-left:5px;">INVOICE LUNAS </td>
+		<td class="total green" align="right"><%= to_currency_bank(paid) %></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr class="footer">
+		<td colspan="5" class="total" style="padding-left:5px;">TOTAL INVOICE GENERIC&nbsp; <span class="red"><%=@customer.name + ', ' if @customer%><%=Date::MONTHNAMES[@month.to_i] + ' ' + @year.to_s%></span></td>
+		<td class="total" align="right"><%=to_currency_bank(totalGeneric)%></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr class="footer">
+		<% 	paid = @taxinvoices.where("generic = true AND paiddate is not null").sum(:total) %>
+		<td colspan="5" class="total" style="padding-left:5px;">INVOICE GENERIC LUNAS </td>
+		<td class="total green" align="right"><%= to_currency_bank(paid) %></td>
+		<td></td>
+		<td></td>
+	</tr> -->
+	<tr class="footer">
+		<td colspan="5" class="total" style="padding-left:5px;">RINGKASAN TAGIHAN : <span class="red"><% if @customer %><%=@customer.name + ', '%><% else %> Semua Pelanggan, <% end %><%=Date::MONTHNAMES[@month.to_i] + ' ' + @year.to_s%> </span> </td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	</tbody>
+	<% end %>
+
+	
+	</table>
+
+	<% if @taxinvoices.any? %>
+		<div class="dashboard">
+			<div id="content-full">
+				<div class="row">
+					<div class="widget medium-widget">
+						<ul>
+							<li class="head"><h3 style="color: #010101;">Non Generic</h3></li>
+							<% 	paid = @taxinvoices.where("generic = false AND paiddate is not null").sum(:total) 
+								if total > 0
+								  persentase = (paid.to_f / total.to_f) * 100
+								else
+								  persentase = 0
+								end
+							%>
+							<li>
+								Omset
+								<strong><%=to_currency_bank(total)%></strong>
+							</li>
+							<li>
+								Piutang
+								<strong><span class="red"><%=to_currency_bank(total-paid) %></span></strong>
+							</li>
+							<li>
+								Lunas
+								<strong><span class="green"><%= to_currency_bank(paid) %></span></strong>
+							</li>
+							<li  <% if persentase > 50 %> class="footer green" <%else%> class="footer red" <%end%> >
+								<% if (persentase - persentase.to_i) == 0 %>
+									<%=persentase.to_i %>
+								<% else %>
+									<%=number_with_precision(persentase, :precision => 2)%>
+								<% end %>
+								%
+							</li>
+						</ul>
+					</div>
+
+					<div class="widget medium-widget">
+						<ul>
+							<li class="head"><h3 style="color: #010101;">Generic</h3></li>
+							<% 	paid = @taxinvoices.where("generic = true AND paiddate is not null").sum(:total) 
+								if totalGeneric > 0
+								  persentase = (paid.to_f / totalGeneric.to_f) * 100
+								else
+								  persentase = 0
+								end
+							%>
+							<li>
+								Omset
+								<strong><%=to_currency_bank(totalGeneric)%></strong>
+							</li>
+							<li>
+								Piutang
+								<strong><span class="red"><%=to_currency_bank(totalGeneric-paid)%></span></strong>
+							</li>
+							<li>
+								Lunas
+								<strong><span class="green"><%=to_currency_bank(paid)%></span></strong>
+							</li>
+							<li  <% if persentase >50 %> class="footer green" <%else%> class="footer red" <%end%> >
+								<% if (persentase - persentase.to_i) == 0 %>
+									<%=persentase.to_i %>
+								<% else %>
+									<%=number_with_precision(persentase, :precision => 2)%>
+								<% end %>
+								%
+							</li>
+						</ul>
+					</div>
+
+				</div>
+			</div>	
+		</div>
+	<% end %>

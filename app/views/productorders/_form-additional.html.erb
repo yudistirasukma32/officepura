@@ -1,0 +1,63 @@
+<% if @productorder %>
+<form id="productorder" name="productorder" action="/productorders/updateitem/" method="post">
+	<% if @errors.include?'receiptpremi' %>
+      <div class="field-row red">
+        <%=@errors['productorder']%>
+      </div>
+    <% end %>
+
+	<div class="field-row first">
+		 <label for="date">Tanggal</label>
+		 <input type="text" name="productorder[date]" class="half date-picker" value="<%= @productorder.date.strftime('%d-%m-%Y') if !@productorder.date.nil? %>" />
+	</div> 
+	<div class="field-row">
+		<label for="productgrop_id">Group</label>
+		<select id="productorder_productgroupid" name="productorder[productgroup_id]" class="half" onchange="javascript: getProductByGroupPO();">
+			<option value="">- Group -</option>
+			<% Productgroup.active.order(:name).each do |productgroup| %>
+	        	<option value="<%=productgroup.id%>"><%=productgroup.name%></option>
+	        <% end %>
+		</select>	 		
+	</div>
+	<div class="field-row">
+		<label for="product_id">Nama Barang</label>
+		<select id="productorder_productid" name="productorder[product_id]" class="half" onchange="javascript: getProductByIdPO();">
+			<option value="">- Barang -</option>
+		</select>
+	</div>
+	 <div class="field-row">
+		<label for="supplier_id">Supplier</label>
+		<select id="productorder_supplierid" name="productorder[supplier_id]" class="half">
+			<option value="">- Supplier -</option>
+			<% Supplier.active.order(:name).each do |supplier| %>
+	        	<option value="<%=supplier.id%>"><%=supplier.name%></option>
+	        <% end %>
+		</select>	 		
+	</div>
+	<div class="field-row">
+		<label for="bon">Bon</label>
+		<input type="checkbox" id="productorder_bon" name="productorder[bon]" />  	
+	</div>	
+	<div class="field-row">
+		<label for="quantity">Jumlah</label>
+		<input type="text" id="productorder_quantity" name="productorder[quantity]" style="text-align:right;" class="short" value="0" onchange="javascript: changeTotalOrderPO();" onkeypress="javascript:return isDecimalKey(this);"/> @ 
+		<input type"text" id="productorder_unitname" class="short disabled" />	 		
+	</div>	
+	<div class="field-row">
+		<label for="price_per">Harga Satuan</label>
+		<input type="text" id="productorder_priceper" name="productorder[price_per]" style="text-align:right;" class="half" value="0" onchange="javascript: changeTotalOrderPO();"/>	 		
+	</div>	
+	<div class="field-row">
+		<label for="total">Total</label>
+		<input type="text" id="productorder_total" name="productorder[total]" style="text-align:right;" class="half disabled" value="0" />	 		
+	</div>		
+	<div class="field-row">
+		<label for="description">Keterangan</label>
+		<input type="text" name="productorder[description]" style="width:350px;" />	 		
+	</div>
+	<div class="actions">
+    	<input type="submit" value="Tambah Data" class="left"/>
+    	<a class="back left" href="<%=productorders_path%>">Kembali ke Index</a>
+  	</div>
+</form>
+<% end %>

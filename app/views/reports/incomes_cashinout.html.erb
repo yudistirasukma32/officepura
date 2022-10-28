@@ -1,0 +1,481 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Rekapitulasi Pemasukan dan Pengeluaran <span class="red"> <%=Date::MONTHNAMES[@month.to_i]%> <%=@year%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label>Pilih Bulan</label>
+				<select name="month" class="half left combo_route">
+					<% if current_user.owner %>
+					<option value="0">Semua Bulan</option>
+					<% end %>
+					<% (1.upto(12)).each do |m| %>
+					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+					<% end %>
+				</select>
+				<label class="middle">Tahun</label>
+				<select name="year" class="half left combo_route">
+					<% 2012.upto(Date.today.year) do |year| %>
+					<option value="<%=year%>"<% if year == @year.to_i %> selected="selected"<% end %>><%=year%></option>
+					<% end %>
+				</select>
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br />
+		<table class="row-view report-view">
+
+			<!-- PEMASUKAN -->
+			<% income = outcome = running = i = 0 %>
+
+			<tr>
+				<th width="30">No.</th>
+				<th>Keterangan</th>
+				<th width="120" class="right">Total</th>
+			</tr>
+		<% if @month != 0 %>
+			<tr>
+				<th colspan="3"><strong class="green">PENDAPATAN</strong></th>
+			</tr>
+
+			<tr>
+				<td>-</td>
+				<td>( Omzet <%= @three_month_before.strftime("%b %Y") %> )</td>
+				<td align="right">( <%= to_currency(@invoice_incomes.sum(:total)) %> )</td>
+			</tr>
+			<tr>
+				<td>-</td>
+				<td>( Target Omzet bulan ini )</td>
+				<% total_incomeexpense = 0
+				   @incomeexpense.each do |incomeexpense| 
+				   	total_incomeexpense += incomeexpense.total
+				   end
+				   target = (@invoice_incomes.sum(:total) * -1) + total_incomeexpense
+				%>
+				<td align="right" class="<% if target >= 0%> green <% else %> red <% end %>">( <%= to_currency(target) %> )</td>
+			</tr>
+		<% end %>
+
+			<% operasional = 0 %>
+			<% @incomeexpense.each do |incomeexpense| %>
+			<tr>
+				<% operasional += incomeexpense.total %>
+				<td><%=i+=1%>.</td>
+				<td><%= incomeexpense.name %></td>
+				<td align="right" class="<% if incomeexpense.total > 0 %> green <% else %> green <% end %>"><%= to_currency(incomeexpense.total)%></td>	
+			</tr>
+			<% end %>
+
+			<% @assetsales.each do |assetsale| %>
+			<tr>
+				<% operasional += assetsale.total %>
+				<td><%=i+=1%>.</td>
+				<td>Penjualan Aset</td>
+				<td align="right" class="<% if assetsale.total > 0 %> green <% else %> green <% end %>"><%= to_currency(assetsale.total)%></td>	
+			</tr>
+			<% end %>
+
+			<% @creditincomes.each do |creditincome| %>
+			<tr>
+				<% operasional += creditincome.total %>
+				<td><%=i+=1%>.</td>
+				<td><%= creditincome.name %></td>
+				<td align="right" class="<% if creditincome.total >= 0%> green <% else %> red <% end %>"><%= to_currency(creditincome.total)%></td>	
+			</tr>
+			<% end %>
+
+			<% @creditInti.each do |creditincome| %>
+			<tr>
+				<% operasional += creditincome.total %>
+				<td><%=i+=1%>.</td>
+				<td><%= creditincome.name %></td>
+				<td align="right" class="<% if creditincome.total >= 0%> green <% else %> red <% end %>"><%= to_currency(creditincome.total)%></td>	
+			</tr>
+			<% end %>
+
+			<% @creditPura.each do |creditincome| %>
+			<tr>
+				<% operasional += creditincome.total %>
+				<td><%=i+=1%>.</td>
+				<td><%= creditincome.name %></td>
+				<td align="right" class="<% if creditincome.total >= 0%> green <% else %> red <% end %>"><%= to_currency(creditincome.total)%></td>	
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<% income += operasional %>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(operasional)%></td>
+			</tr>
+
+			<% operasional = 0 %>
+			<tr>
+				<th colspan="3"><strong class="green">SETORAN MODAL DIREKSI</strong></th>
+			</tr>
+
+			<% @debtincomes.each do |debtincomes| %>
+			<tr>
+				<% operasional += debtincomes.total %>
+				<td><%=i+=1%>.</td>
+				<td><%= debtincomes.name %></td>
+				<td align="right" class="<% if debtincomes.total > 0 %> green <% else %> green <% end %>"><%= to_currency(debtincomes.total)%></td>	
+			</tr>
+			<% end %>
+
+			<!-- Fasilitas KMK -->
+			<% @kmkfacilities.each do |kmkfacility| %>
+			<tr>
+				<% operasional += kmkfacility.total %>
+				<td><%=i+=1%>.</td>
+				<td><%= kmkfacility.name %></td>
+				<td align="right" class="<% if kmkfacility.total >= 0%> green <% else %> red <% end %>"><%= to_currency(kmkfacility.total)%></td>	
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<% income += operasional %>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(operasional)%></td>
+			</tr>
+
+			<!-- MODAL DARI JURNAL KEUANGAN -->
+			<% operasional = 0 %>
+			<tr>
+				<th colspan="3"><strong class="red">PENEMPATAN MODAL</strong></th>
+			</tr>
+
+			<% @capitalexpense.each do |capitalexpense| %>
+			<tr>
+				<% operasional += capitalexpense.total %>
+				<td><%=i+=1%>.</td>
+				<td><%= capitalexpense.name %></td>
+				<td align="right" class="<% if capitalexpense.total >= 0%> red <% else %> green <% end %>"><%= to_currency(capitalexpense.total)%></td>	
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<% outcome += operasional %>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(operasional)%></td>
+			</tr>
+
+			<!-- BIAYA DARI JURNAL KEUANGAN -->
+			<% operasional = 0 %>
+			<tr>
+				<th colspan="3"><strong class="red">BIAYA DARI JURNAL KEUANGAN</strong></th>
+			</tr>
+
+			<% @bankexpense.each do |bankexpense| %>
+			<tr>
+				<% operasional += bankexpense.total %>
+				<td><%=i+=1%>.</td>
+				<td><%= bankexpense.name %></td>
+				<td align="right" class="<% if bankexpense.total >= 0%> red <% else %> green <% end %>"><%= to_currency(bankexpense.total)%></td>	
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<% outcome += operasional %>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(operasional)%></td>
+			</tr>
+
+			<!-- HUTANG DARI JURNAL KEUANGAN -->
+			<% operasional = 0 %>
+			<tr>
+				<th colspan="3"><strong class="red">PELUNASAN HUTANG</strong></th>
+			</tr>
+
+			<% @debtexpense.each do |debtexpense| %>
+				<tr>
+					<% operasional += debtexpense.total%>
+					<td><%=i+=1%>.</td>
+					<td><%= debtexpense.name %></td>
+					<td align="right" class="<% if debtexpense.total >= 0%> red <% else %> green <% end %>"><%= to_currency(debtexpense.total)%></td>	
+				</tr>
+			<% end %>
+
+			<tr class="footer">
+				<% outcome += operasional %>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(operasional)%></td>
+			</tr>
+
+		
+			<% operasional = 0 %>
+			<!-- PENGELUARAN BEBAN OPERASIONAL TRUK -->
+			<tr>
+				<th colspan="3"><strong class="red">BEBAN OPERASIONAL TRUK</strong></th>
+			</tr>
+
+			<tr>
+				<%
+				if @month == "0"
+					sangu = Receipt.where("deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:driver_allowance)
+					sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:driver_allowance)
+				else
+					sangu = Receipt.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:driver_allowance)
+					sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:driver_allowance)
+				end 
+				%>
+
+				<% sangutotal = sangu.to_i - sangumasuk.to_i %>
+				<% operasional += sangutotal%>
+				<td><%=i+=1%>.</td>
+				<td>SANGU SUPIR</td>
+				<td align="right" class="<% if sangutotal >= 0%> red <% else%> green <% end %>"><%= to_currency(sangutotal.abs)%></td>
+			</tr>
+
+			<tr>
+				<% 
+				if @month == "0"
+					sangu = Receipt.where("deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:helper_allowance)
+					sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:helper_allowance)
+				else
+					sangu = Receipt.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:helper_allowance)
+					sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:helper_allowance)
+				end
+				%>
+				<% sangutotal = sangu.to_i - sangumasuk.to_i %>
+				<% operasional += sangutotal%>
+				<td><%=i+=1%>.</td>
+				<td>SANGU KERNET</td>
+				<td align="right" class="<% if sangutotal >= 0%> red <% else%> green <% end %>"><%= to_currency(sangutotal.abs)%></td>
+			</tr>
+
+			<tr>
+				<% 
+				if @month == "0"
+					sangu = Receipt.where("deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:gas_allowance)
+					sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:gas_allowance)
+				else
+					sangu = Receipt.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:gas_allowance)
+					sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:gas_allowance)
+				end
+				%>
+				<% sangutotal = sangu.to_i - sangumasuk.to_i %>
+				<% operasional += sangutotal%>
+				<td><%=i+=1%>.</td>
+				<td>SOLAR</td>
+				<td align="right" class="<% if sangutotal >= 0%> red <% else%> green <% end %>"><%= to_currency(sangutotal.abs)%></td>
+			</tr>
+
+			<tr>
+				<%
+				if @month == "0"
+					sangu = Receipt.where("deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum("misc_allowance + tol_fee + ferry_fee")
+					sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum("misc_allowance + tol_fee")
+				else
+					sangu = Receipt.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum("misc_allowance + tol_fee + ferry_fee")
+					sangumasuk = Receiptreturn.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum("misc_allowance + tol_fee")
+				end
+				%>
+				<% sangutotal = sangu.to_i - sangumasuk.to_i %>
+				<% operasional += sangutotal%>
+				<td><%=i+=1%>.</td>
+				<td>LAIN - LAIN</td>
+				<td align="right" class="<% if sangutotal >= 0%> red <% else%> green <% end %>"><%= to_currency(sangutotal.abs)%></td>
+			</tr>
+
+			<tr>
+				<% if @month == "0"
+						officeumumcredit = Receiptexpense.where("expensetype = 'Kredit' and officeexpensegroup_id = 1 and deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:total) 
+						officeumumdebit = Receiptexpense.where("expensetype = 'Debit' and officeexpensegroup_id = 1 and deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:total)
+					else
+						officeumumcredit = Receiptexpense.where("expensetype = 'Kredit' and officeexpensegroup_id = 1 and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total) 
+						officeumumdebit = Receiptexpense.where("expensetype = 'Debit' and officeexpensegroup_id = 1 and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+					end
+					officetotal = officeumumcredit - officeumumdebit%>
+				<% operasional +=  officetotal%>
+				<td><%=i+=1%>.</td>
+				<td>UMUM</td>
+				<td align="right" class="<% if officetotal >= 0%> red <% else%> green <% end %>"><%= to_currency(officetotal.abs)%></td>
+			</tr>
+
+			<!-- <tr>
+				<%# productrequestitemvehicles = Productrequestitem.where("productrequest_id in (select id from productrequests where vehicle_id is NOT NULL AND deleted = false and to_char(date, 'MM-YYYY') = ?)", "#{@month}-#{@year}").sum(:total) %>
+				<%# operasional += productrequestitemvehicles %>
+				<td><%#=i+=1%>.</td>
+				<td>PERMINTAAN STOK BARANG TRUK</td>
+				<td align="right" class="red"><%#=to_currency(productrequestitemvehicles)%></td>
+			</tr> -->
+
+			<% @groupumum.each do |group| %>
+			<tr>
+				<%  if @month == "0"
+					outcomegroupcredit = group.receiptexpenses.where("expensetype = 'Kredit' and deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:total)
+					if group.id == 8
+						premi = Receiptpremi.where("deleted = false and to_char(created_at, 'YYYY') = ?", "##{@year}").sum(:total)
+						outcomegroupcredit += premi
+					end 
+					outcomegroupdebet = group.receiptexpenses.where("expensetype = 'Debit' and deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:total)
+				else
+					outcomegroupcredit = group.receiptexpenses.where("expensetype = 'Kredit' and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+					if group.id == 8
+						premi = Receiptpremi.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+						outcomegroupcredit += premi
+					end 
+					outcomegroupdebet = group.receiptexpenses.where("expensetype = 'Debit' and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+				end
+				  	outcomegrouptotal = outcomegroupcredit - outcomegroupdebet
+				  	operasional +=  outcomegrouptotal%>
+				<td><%=i+=1%>.</td>
+				<td><%= group.name.upcase %></td>
+				<td align="right" class="<% if outcomegrouptotal >= 0%> red <% else%> green <% end %>"><%= to_currency(outcomegrouptotal.abs)%></td>
+			</tr>
+			<% end %> 
+
+			<tr class="footer">
+				<% outcome += operasional %>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(operasional)%></td>
+			</tr>
+
+			<!-- PENGELUARAN BEBAN OPERASIONAL LAIN-LAIN -->
+			<% operasionallain = 0 %>
+			<tr>
+				<th colspan="3"><strong class="red">BEBAN OPERASIONAL LAIN-LAIN</strong></th>
+			</tr>
+
+			<!-- <tr>
+				<td><#%=i+=1%>.</td>
+				<td>SOLAR LAIN-LAIN</td>
+				<td align="right" class="red">0</td>
+			</tr> -->
+
+			<tr>
+				<% 
+				if @month == "0"
+					productrequestitems = Productrequestitem.where("productrequest_id in (select id from productrequests where vehicle_id is NULL AND deleted = false and to_char(date, 'YYYY') = ?)", "#{@year}").sum(:total)
+				else
+					productrequestitems = Productrequestitem.where("productrequest_id in (select id from productrequests where vehicle_id is NULL AND deleted = false and to_char(date, 'MM-YYYY') = ?)", "#{@month}-#{@year}").sum(:total)
+				end
+				 %>
+				<% operasionallain += productrequestitems %>
+				<td><%=i+=1%>.</td>
+				<td>PERMINTAAN STOK BARANG</td>
+				<td align="right" class="red"><%=to_currency(productrequestitems)%></td>
+			</tr>
+
+			<tr class="footer">
+				<% outcome += operasionallain %>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(operasionallain)%></td>
+			</tr>
+
+			<!-- PENGELUARAN BEBAN GAJI -->
+			<% bebangaji = 0 %>
+			<tr>
+				<th colspan="3"><strong class="red">BEBAN GAJI</strong></th>
+			</tr>
+
+			<tr>
+				<% bebangaji += @receiptpayrollsupir.sum(:total) %>
+				<td><%=i+=1%>.</td>
+				<td>Gaji Supir</td>
+				<td align="right" class="red"><%=to_currency(@receiptpayrollsupir.sum(:total))%></td>
+			</tr>
+
+			<tr>
+				<% bebangaji += @receiptpayrollkernet.sum(:total) %>
+				<td><%=i+=1%>.</td>
+				<td>Gaji Kernet</td>
+				<td align="right" class="red"><%=to_currency(@receiptpayrollkernet.sum(:total))%></td>
+			</tr>
+
+			<tr class="footer">
+				<% outcome += bebangaji %>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(bebangaji)%></td>
+			</tr>
+
+			<!-- PENGELUARAN ADMMINISTRASI DAN UMUM -->
+			<% administrasi = 0 %>
+			<tr>
+				<th colspan="3"><strong class="red">BEBAN ADMINISTRASI DAN UMUM</strong></th>
+			</tr>
+
+			<% @groupkantor.each do |group| %>
+			<tr>
+				<td><%=i+=1%>.</td>
+				<td><%= group.name.upcase %></td>
+				<% if @month == "0"
+					outcomegroupcredit = group.receiptexpenses.where("expensetype = 'Kredit' and deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:total) 
+				   outcomegroupdebit = group.receiptexpenses.where("expensetype = 'Debit' and deleted = false and to_char(created_at, 'YYYY') = ?", "#{@year}").sum(:total)
+				else
+					outcomegroupcredit = group.receiptexpenses.where("expensetype = 'Kredit' and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total) 
+				   outcomegroupdebit = group.receiptexpenses.where("expensetype = 'Debit' and deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
+				end
+				   outcomegrouptotal = outcomegroupcredit - outcomegroupdebit
+				   administrasi += outcomegrouptotal %>
+				<td align="right" class="<% if outcomegrouptotal >= 0%> red <% else%> green <% end %>"><%= to_currency(outcomegrouptotal.abs)%></td>
+			</tr>
+			<% end %> 
+
+
+
+			<tr class="footer">
+				<% outcome += administrasi %>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency(administrasi)%></td>
+			</tr>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td class="total" align="right">TOTAL PEMASUKAN</td>
+				<td align="right" class="total green"><%=to_currency(income)%></td>
+			</tr>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td class="total" align="right">TOTAL PENGELUARAN</td>
+				<td align="right" class="total red"><%=to_currency(outcome)%></td>
+			</tr>
+
+			<% profit = income - outcome %>
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td class="total" align="right">TOTAL LABA USAHA</td>
+				<td align="right" class="total <%= profit.to_i < 0 ? 'red' : 'green'%>"><%=to_currency(profit)%></td>
+			</tr>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td class="total" align="right">PERSENTASI LABA BERBANDING BIAYA</td>
+				<%  if outcome > 0
+						persen = (profit / outcome) * 100 
+					else
+						persen = 0
+					end %>
+				<td align="right" class="total <%= persen.to_i < 0 ? 'red' : 'green'%>"><%=persen.to_i%>%</td>
+			</tr>
+		
+		</table>
+		<%# running = @balance + profit %>
+		<!-- <h2 class="right">Saldo Akhir: <% if running < 0 %><span class="red"><% end %><%=to_currency(running, 'Rp. ')%><% if running < 0 %></span><% end %></h2> -->
+
+	</div>
+</div>

@@ -1,0 +1,26 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+  <%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+  <div id="content-full">
+    <a class="btn-txt cancel" href="<%=bankinvoices_path%>"><i class="icon-remove"></i> Batal</a>
+
+    <h1 class="header-hide">Transaksi / <a href="<%=invoices_path%>">Bukti Bank <%= @bankinvoice.money_in ? "Masuk" : "Keluar" %></a> </h1>
+
+    <br class="clearfix" />
+
+    <%= render "formprint" %>
+
+    <br class="clearfix" />
+
+  </div>
+
+</div>
+
+<div id="appletContainer"></div>
+
+

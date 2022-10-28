@@ -1,0 +1,18 @@
+<%= render "shared/header" %>
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+<div id="main">
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=productrequests_path%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1 class="header-hide">Transaksi / <a href="<%=productrequests_path%>">Permintaan Servis</a> / Index</h1>
+
+		<br class="clearfix" />
+
+			<%= render "steps", :step => 2 %>
+			<%= render "form-confirmation" %>
+			
+		<br class="clearfix" />
+	</div>
+</div>

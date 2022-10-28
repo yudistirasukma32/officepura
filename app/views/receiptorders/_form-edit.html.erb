@@ -1,0 +1,80 @@
+<% if @receiptorder %>
+<%= form_for(@receiptorder) do |f| %>
+    <% if @errors.include?'receiptorder' %>
+      <div class="field-row red">
+        <%=@errors['receiptorder']%>
+      </div>
+    <% end %>
+
+  	<div class="info-box" style="margin-bottom:30px;">  
+  		<h3>Order Pembelian #<%=zeropad(@receiptorder.productorder.id)%></h3>
+  		
+  		<table class="row-view no-border">
+  			<tr>
+				<td width="90">Tanggal</td>
+				<td><%=@receiptorder.productorder.date.strftime('%d-%m-%Y')%></td>
+			</tr>
+			<tr>
+				<td width="90">Keterangan</td>
+				<td><%=@receiptorder.productorder.description%></td>
+			</tr>
+  		</table>
+
+      <% if @ordercash.any? %>
+      <table class="row-view">        
+        <tr>
+          <th>Pembelian Tunai</th>
+          <th width="160"></th> 
+        </tr>
+        <tr>
+          <th>Nama Barang</th>
+            <th width="160" class="right" style="padding-right:5px;">Total</th> 
+        </tr>
+        <% @ordercash.order(:id).each_with_index do |productorderitem| %>
+        <tr>
+          <td><%=to_currency_bank(productorderitem.quantity)%>x&nbsp;<%=productorderitem.product.name%></td>
+          <td class="half allowance-field"><%=to_currency(productorderitem.total)%></td>
+        </tr>
+        <% end %>
+        <tr class="total-row">
+            <td><%= f.label :total, "Total" %></td>
+            <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@totalcash), :readOnly => 'true' %></td>
+        </tr>
+      </table>
+      <% end %>
+
+
+      <% if @orderbon.any? %>
+      <table class="row-view">
+        <tr>
+          <th>Pembelian Bon</th>
+          <th width="160"></th> 
+        </tr>        
+        <tr>
+          <th>Nama Barang</th>
+            <th width="160" class="right" style="padding-right:5px;">Total</th> 
+        </tr>
+        <% @orderbon.order(:id).each_with_index do |productorderitem| %>
+        <tr>
+          <td><%=productorderitem.quantity%>x&nbsp;<%=productorderitem.product.name%></td>
+          <td class="half allowance-field"><%=to_currency(productorderitem.total)%></td>
+        </tr>
+        <% end %>
+        <tr class="total-row">
+            <td><%= f.label :total, "Total" %></td>
+            <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@totalbon), :readOnly => 'true' %></td>
+      </tr>
+      </table>  
+      <% end %>
+  	</div>
+    <div class="field-row first" style="margin-bottom:-20px;">
+        <%= f.label :created_at, "Tgl Konfirmasi" %>
+        <%= f.text_field :created_at, :class => 'half date-picker', :value => to_currency(@receiptorder.created_at.strftime('%d-%m-%Y')) %>
+        <%= f.hidden_field :receiptorder_id, :value => @receiptorder.id %>
+    </div>
+    
+    <div class="actions">
+      <%= f.submit "Tambah Data", :class => 'submit' %> 
+    </div>
+<% end %>
+<% end %>

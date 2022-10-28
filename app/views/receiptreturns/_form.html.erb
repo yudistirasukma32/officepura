@@ -1,0 +1,102 @@
+<% if @invoice %>
+
+<%= form_for(@receipt) do |f| %>
+
+  <%= f.hidden_field :action, :value => 'create' %>
+  <%= f.hidden_field :invoice_id, :value => @invoice.invoice_id %>
+  <%= f.hidden_field :invoicereturn_id, :value => @invoice.id %>
+
+  <div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
+
+    <h3>Bukti Kas Masuk #<%=zeropad(@invoice.id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Tanggal</td>
+        <td><%=@invoice.date.strftime('%d-%m-%Y')%>&nbsp;(KTR: <%=@invoice.invoice.office.name%>)</td>
+      </tr>
+      <tr>
+        <td>Jurusan</td>
+        <td><strong><%=@invoice.quantity%></strong> Rit:<%=@invoice.invoice.route.name%></td>
+      </tr>
+      <tr>
+          <td>Tipe</td>
+          <td><%=@invoice.invoice.route.routegroup.name%></td>
+        </tr>
+      <tr>
+        <td>Kendaraan</td>
+        <td><%=@invoice.invoice.vehicle.current_id%>&nbsp;(UP: <%= @invoice.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+      </tr>
+      <tr>
+        <td>Supir</td>
+        <td><%=@invoice.invoice.driver.name%><% if !@invoice.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.invoice.driver.helpers.first.name%>)<% end %></td>
+      </tr>
+    </table>
+
+    <table class="row-view">
+      <tr>
+        <th width="90">Keterangan</th>
+        <th>&nbsp;</th>
+        <th width="160" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr>
+        <td><%= f.label :driver_allowance, "UM Supir" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :driver_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.driver_allowance.to_i), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :helper_allowance, "UM Kernet" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :helper_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.helper_allowance.to_i), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :misc_allowance, "Lain-lain" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :misc_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.misc_allowance.to_i), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :ferry_fee, "Penyebrangan" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :ferry_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.ferry_fee.to_i), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :tol_fee, "Tol" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :tol_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.tol_fee.to_i), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :premi_allowance, "Premi" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :premi_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.premi_allowance.to_i), :readOnly => 'true' %></td>
+      </tr>
+
+      <% total = @invoice.driver_allowance.to_i + @invoice.tol_fee.to_i + @invoice.ferry_fee.to_i + @invoice.misc_allowance.to_i + @invoice.helper_allowance.to_i + @invoice.premi_allowance.to_i %>
+      
+      <tr class="total-row">
+        <td><%= f.label :total, "Total" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(total), :readOnly => 'true' %></td>
+      </tr>
+    </table>
+
+    <div class="">
+    <% if @invoice.office.abbr == 'SDA' || @invoice.office.abbr == 'SMG' %>
+    <em>* Kantor Sidoarjo / Semarang: Nilai konfirmasi kasir <strong>tidak akan mengubah saldo kas.</strong></em>
+    <% end %>
+    <br/><br/>
+    </div>
+
+    <div class="field-row continue">
+      <%= f.submit "Tambah Data", :class => 'submit right' %>      
+    </div>
+  </div>
+
+<% end %>
+
+<% end %>

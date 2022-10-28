@@ -1,0 +1,48 @@
+<%= form_for @user do |f| %>
+	<% if current_user.owner %>
+  <div class="field-row first">
+		<%= f.label :adminrole, "Administrator" %>
+		<%= f.check_box :adminrole, :class => 'half', :checked => @user.adminrole %>
+	</div> 
+	<% end %>
+	
+	<div class="field-row">
+		<%= f.label :username, "Username" %>
+		<%= f.text_field :username, :class => 'half', :readonly => !current_user.owner %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :password, "Password" %>
+		<%= f.password_field :password , :class => 'half'%> &nbsp;
+		<% if @process == 'edit' %>
+			<em style="font-size:11px">* Kosongkan jika tidak ingin merubah password</em>
+		<% end %>
+	</div>
+
+	<% if current_user.owner %>
+	<div class="field-row">
+		<%= f.label :staff_id, "Staff" %>
+		<%= f.select :staff_id, options_for_select(Staff.active.order(:id).collect{|g| [g.name, g.id]},@user.staff_id), {:include_blank => '- Staff -'}, :class => 'double left chzn-select'  %>
+	</div>
+	
+	<div class="field-row">
+		<%= f.label :office_id, "Kantor" %>
+		<%= f.select :office_id, options_for_select(Office.order(:id).collect{|g| [g.name, g.id]},@user.office_id), {:include_blank => '- Kantor -'}, :class => 'half left chzn-select'  %>
+	</div> 
+
+	<div class="field-row">
+		<%= f.label :userroles, "Role" %>
+		<select id="user_userroles" name="userroles[]" multiple="multiple" class="double chzn-select" style="height:100px;">
+			<% Role.active.order('name ASC').each do |r| %>
+     			<option value="<%= r.id %>" <% if @user.userroles.any? and !@user.userroles.where(:role_id=>r.id).first.nil? %>selected=\"selected\"<% end %>><%= r.name %></option>
+			<% end %>
+		</select>
+	</div> 
+	<% end %>
+
+	 <div class="actions">
+	 	<input type="hidden" id="process" value="<%= @process%>" />
+    	<%= f.submit "Simpan Data", :class => 'left', :id => 'user_submit' %>
+    	<%= link_to "Kembali ke Index", users_path, :class => 'back left' if current_user.owner %>
+  	</div>
+<% end %>

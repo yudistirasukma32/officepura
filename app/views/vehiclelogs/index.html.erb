@@ -1,0 +1,59 @@
+<%= render "shared/header" %>
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+		<h1 class="header-hide">Truk Check / Index</h1>
+		<h1 class="showprint">Checklist Truk</h1>
+
+		<br class="clearfix" />
+
+		<% if @vehicles.any? %>
+		Menampilkan total &nbsp;<strong class="green"><%=@vehicles.where(:enabled => true).count%></strong> : <strong class="red"><%=@vehicles.where(:enabled => false).count%></strong>&nbsp; dari <strong><%=@vehicles.count%></strong> kendaraan.<br /><br />
+		<% end %>
+
+		<table class="row-view truck-logs tablesorter">
+			<thead>
+			<tr>
+				<th width="50" class="{sorter: false, filter: false} hideprint"></th>
+				<th class="{sorter: false}">Kendaraan</th>
+				<th width="70" class="{filter: false}">Ready</th>
+				<th width="90" style="text-align:center;" class="{filter: false}">Rusak</th>
+				<th width="110" class="{sorter: false, filter: false} hideprint"></th>
+			</tr>
+			</thead>
+
+			<tbody>
+			<% @vehicles.each do |vehicle| %>
+			<% img = vehicle.images.first rescue nil %>
+			<tr>
+				<td class="hideprint"><%= image_tag img.file.thumb('50x50#').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
+				<td><p><strong><%=vehicle.current_id%><%= " <span class='grey'>(#{vehicle.previous_id})</span>".html_safe if !vehicle.previous_id.blank? %></strong><br />
+					<% lastlog = vehicle.vehiclelogs.order("created_at DESC").where(:ready => false).first %>
+					<% if !lastlog.nil? %> 
+					<em><%=lastlog.created_at.strftime("%d-%m-%Y")%>: <%=lastlog.description%></em>
+					<% else %>
+					<br />
+					<% end %></p></td>
+				<% if vehicle.enabled %>
+				<td><p><span class="showprint">Ya</span><i class="icon-ok-sign enabled hideprint"></i></p></td>
+				<% else %>
+				<td><p><span class="showprint">Tidak</span><i class="icon-remove-sign disabled hideprint"></i></p></td>
+				<% end %>
+				<td align="center"><p><%=vehicle.vehiclelogs.where(:broken => true).count%></p></td>
+				<td class="hideprint"><a class="cta" href="/vehiclelogs/new/<%=vehicle.id%>">Ganti Status</a></td>
+			</tr>
+			<% end %>
+			</tbody>	
+		
+		</table>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

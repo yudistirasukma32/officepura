@@ -1,0 +1,9 @@
+<div class="field-row">
+	<label for="vehiclegroup_id">Grup Kendaraan</label>
+	<% if @vehiclegroup %>
+	  <input type="text" class="double disabled" value="<%=@vehiclegroup.name%>" />
+	  <input type="hidden" name="invoice[vehiclegroup_id]" value ="<%= @vehiclegroup.id %>" />
+	<% else %>
+	   <input type="text" class="double disabled" value="- Pilih Kendaraan terlebih dahulu -" />
+	<% end %>
+</div>

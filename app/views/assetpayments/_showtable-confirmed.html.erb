@@ -1,0 +1,32 @@
+<table class="row-view">
+	<tr>
+		<th width="50">Order</th>
+		<th width="80">Tanggal</th>
+		<th>Nama Aset</th>
+		<th width="100" class="right">Total</th>
+		<th width="80"></th>
+	</tr>
+	<% @assetpayments.each do |assetpayment| %>
+		<% if assetpayment.deleted %>
+			<% if current_user.adminrole %>
+				<tr class="deleted">
+					<td><%= zeropad(assetpayment.id) %></td>
+					<td><%= assetpayment.date.strftime('%d-%m-%Y') %></td>
+					<td><%= assetpayment.assetorder.asset.name %></td>
+					<td class="red" align="right"><%=to_currency(assetpayment.total)%></td>
+					<td class="right">DIHAPUS</td>
+				</tr>
+			<% end %>
+		<% else %>
+			<tr>
+				<td><%= zeropad(assetpayment.id) %></td>
+				<td><%= assetpayment.date.strftime('%d-%m-%Y')%></td>
+				<td><%= assetpayment.assetorder.asset.name %></td>
+				<td class="red" align="right"><%=to_currency(assetpayment.total)%></td>
+					<td class="right">
+					<%= link_to '&#xf00d;'.html_safe, assetpayment, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+				</td>
+			</tr>
+		<% end %>
+	<% end %>
+</table>

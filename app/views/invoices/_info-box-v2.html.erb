@@ -1,0 +1,77 @@
+<div class="info-box">
+  
+  <!--
+  <table class="row-view">
+    <tr style="border:0">
+      <td style="padding:0"><strong><%= f.label :price_per, "Harga Muatan" %></strong></td>
+      <td class="right"><%= f.text_field :price_per, :class => 'half disabled allowance-field', :value => to_currency(@invoice.price_per), :readOnly => 'true' %></td>
+    </tr>
+  </table>
+  -->
+
+  <h3>Estimasi Ongkos</h3>
+
+  <table class="row-view">
+    <tr>
+      <th>Keterangan</th>
+      <th width="100" class="right">Total</th>
+    </tr>
+
+    <tr>
+      <td><%= f.label :driver_allowance, "UM Supir" %></td>
+      <td><%= f.text_field :driver_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.driver_allowance), :readOnly => 'true' %></td>
+    </tr>
+
+     <tr>
+      <td><%= f.label :helper_allowance, "UM Kernet" %></td>
+      <td><%= f.text_field :helper_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.helper_allowance), :readOnly => 'true' %></td>
+    </tr>
+
+    <tr>
+      <td><%= f.label :misc_allowance, "Lain-lain" %></td>
+      <td><%= f.text_field :misc_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.misc_allowance), :readOnly => 'true' %></td>
+    </tr>
+
+    <tr>
+      <td><%= f.label :gas_allowance, "Solar" %></td>
+      <td><%= f.text_field :gas_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.gas_allowance), :readOnly => 'true' %></td>
+      <%= f.hidden_field :gas_litre, :value => @invoice.gas_litre %>
+      <%= f.hidden_field :gas_cost, :value => @gascost %>
+    </tr>
+    
+    <tr>
+      <td>(Solar Tambahan)*</td>
+      <td style="text-align:right; font-family: FontAwesome;">(<span id="invoice_additional_gas_allowance">0</span>)</td>
+    </tr>
+
+    <tr>
+      <td><%= f.label :ferry_fee, "ASDP" %></td>
+      <td><%= f.text_field :ferry_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.ferry_fee), :readOnly => 'true' %></td>
+    </tr>
+
+    <tr>
+      <td><%= f.label :tol_fee, "Tol" %></td>
+      <td><%= f.text_field :tol_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.tol_fee), :readOnly => 'true' %></td>
+    </tr>
+
+    <tr>
+      <td><%= f.label :incentive, "(Insentif)" %></td>
+      <td id="invoice_incentive" align="right" style="font-family: FontAwesome;">(@ <%= to_currency(@invoice.vehicle.vehicleincentivegroup.incentive) rescue 0 %>)</td>
+    </tr>
+
+    <tr>
+      <td><%= f.label :train_fee, "Kereta" %></td>
+      <td><%= f.text_field :train_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.train_fee), :readOnly => 'true' %></td>
+    </tr>
+
+    <tr class="total-row">
+      <td><%= f.label :total, "Total" %></td>
+      <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.total), :readOnly => 'true' %></td>
+    </tr>
+  </table>
+  
+	Ket:<br/>
+	Solar: <span id="invoice_gas_detail">(<%=@invoice.gas_litre%> liter @ <%=@gascost%>)</span><br/>
+	*Solar Tambahan <span id="invoice_additional_gas_detail">0</span> (Sudah otomatis ditambahkan ke data solar diatas).<br/>
+	**Solar Tambahan diperuntukkan untuk kendaraan lohan dengan umur > 15 tahun.<br/>
+</div>

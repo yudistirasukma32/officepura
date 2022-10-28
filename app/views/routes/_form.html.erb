@@ -1,0 +1,299 @@
+<% tab = 0 %>
+
+  <ul class="rounded" id="tabbed">
+    <li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
+    <% if !params[:id].nil? %><li><a id="link_<%=tab+=1%>" href="">Data Sangu + Solar</a></li><% end %>
+    <% if !params[:id].nil? %><li><a id="link_<%=tab+=1%>" href="">Data Lokasi Jurusan</a></li><% end %>
+  </ul>
+
+<br class="clearfix"/>
+
+<% tab = 0 %>
+  <div id="sliding_window">
+    <div class="sliding_container">
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+      <%= form_for(@route) do |f| %>
+      <%= f.hidden_field :customer_id %>
+
+
+      <div class="field-row first">
+        <%= f.label :customer_id, "Pelanggan" %>
+        <%= f.select :customer_id, options_for_select(Customer.active.order(:name).collect {|g| [g.name, g.id]}, @route.customer_id), {}, :class => 'double chzn-select', :disabled => (['edit', 'update'].include?active_node and !current_user.owner) %>
+      </div>
+
+    	<div class="field-row">
+        <%= f.label :name, "Nama Jurusan" %>
+        <%= f.text_field :name, :disabled => (['edit', 'update'].include?active_node and !current_user.adminrole and !current_user.owner and !checkrole 'Admin Jurusan') %>
+        <% if (['edit', 'update'].include?active_node and !current_user.adminrole and !current_user.owner and !checkrole 'Admin Jurusan') %>
+        <i class="icon-lock red"></i>
+        <% end %>
+    	</div>
+
+      <%if @route.office_id %>
+      <div class="field-row">
+        <%= f.label :office_id, "Kantor" %>
+        <%= f.select :office_id, options_for_select(Office.where(:deleted => false).order('id ASC').collect {|g| [g.name, g.id]}, @route.office_id), {}, :class => 'half chzn-select', :required => true%>
+      </div>
+      <% else %>
+      <div class="field-row">
+        <%= f.label :office_id, "Kantor" %>
+        <%= f.select :office_id, options_for_select(Office.where(:deleted => false).order('id ASC').collect {|g| [g.name, g.id]}), {}, :class => 'half chzn-select', :required => true%>
+      </div>
+      <% end %>
+
+      <div class="field-row">
+      <%= f.label :transporttype, "Jenis Moda"  %>
+      <%= f.select :transporttype, options_for_select(@transporttypes.collect {|w| [w, w]}, @route.transporttype), {}, { :class => 'half chzn-select' } %>
+			</div>
+
+      <!--
+      <div class="field-row">
+        <%= f.label :enabled, "Aktif" %>
+        <%= f.check_box :enabled %>
+      </div>
+      -->
+
+      <div class="field-row">
+        <%= f.label :estimated_hour, "Target (Jam)", :class => '' %>
+        <%= f.text_field :estimated_hour, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+        <%= f.label :routegroup_id, "Rute", :class => 'middle' %>
+        <%= f.select :routegroup_id, options_for_select(Routegroup.active.order(:name).collect {|g| [g.name, g.id]}, @route.routegroup_id), {}, :class => 'half chzn-select half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :commodity_id, "Komoditas" %>
+        <select id="route_commodity_id" name="route[commodity_id]" class="half left">
+          <option value="0">- Pilih Komoditas -</option>
+          <% Commodity.active.order(:name).each do |commodity| %>
+          <option value="<%=commodity.id%>"
+            <% if commodity.id == @route.commodity_id %> selected="selected"<% end %>><%=commodity.name%></option>
+          <% end %>
+        </select>
+        <%= f.label :distance, "Jarak", :class => 'middle' %>
+        <%= f.text_field :distance, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      </div>
+
+      <% if current_user.owner or checkrole 'Marketing, Admin Marketing' %>
+    
+      <div class="field-row">
+        <%= f.label :price_per, "Tarif Muatan" %>
+        <%= f.text_field :price_per, :class => 'half left', :onkeypress => 'javascript:return isMoneyKey(this);', :value => to_currency_bank(@route.price_per)  %>
+        <%= f.label :price_per_type, "per", :class => 'middle' %>
+        <%= f.select :price_per_type, options_for_select(@price_per_types.collect {|w| [w, w]}, @route.price_per_type), {}, { :class => 'half chzn-select' } %>
+      </div>
+
+      <% end %>
+
+      <div class="field-row" style="margin-bottom:16px;">
+        <%= f.label :description, "Keterangan" %>
+        <%= f.text_field :description %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :ferry_fee, "ASDP" %>
+        <%= f.text_field :ferry_fee, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+        <%= f.label :tol_fee, "Tol", :class => 'middle' %>
+        <%= f.text_field :tol_fee, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :bonus, "Premi" %>
+        <%= f.text_field :bonus, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      </div>
+
+      <div class="actions">
+        <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Operasional, Marketing, Admin Marketing' %>
+        <a class="back left" href="<%=edit_customer_path(@customer)%>/#2">Kembali ke Pelanggan</a>
+      </div>
+
+      <% end %>  
+
+    </div>
+
+    <% if !params[:id].nil? %>
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+      <form action="/allowances/updateitems" method="post">
+        <input type="hidden" name="route_id" value="<%=@route.id%>" />
+
+        <div class="field-row">
+          <label style="float:none;">Nama Jurusan</label>
+          <strong><%=@route.name%></strong>
+        </div>
+        <br />
+
+        <table class="row-view">
+          <tr>
+            <th width="110">&nbsp;</th>
+            <th width="150" class="right">UM Supir (Rp.)</th>
+            <th width="150" class="right">UM Kernet (Rp.)</th>
+            <th width="150" class="right">Solar (Liter)</th>
+            <th width="150" class="right">Lain - lain (Rp.)</th>
+            <th width="150" class="right">Biaya Kereta (Rp.)</th>
+            <th></th>
+          </tr>
+
+          <% @route.allowances.order(:vehiclegroup_id).each do |allowance| %>
+          <tr>
+            <td><%=allowance.vehiclegroup.name%></td>
+            <td><input type="text" name="driver_trip[<%=allowance.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=allowance.driver_trip.to_i%>" /></td>
+            <td><input type="text" name="helper_trip[<%=allowance.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=allowance.helper_trip.to_i%>" /></td>
+            <td><input type="text" name="gas_trip[<%=allowance.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=allowance.gas_trip.to_i%>" /></td>
+            <td><input type="text" name="misc_allowance[<%=allowance.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=allowance.misc_allowance.to_i%>" /></td>
+						<td><input type="text" name="train_trip[<%=allowance.id%>]" class="half left allowance-field" onkeypress="javascript:return isNumberKey(this);" value="<%=allowance.train_trip.to_i%>" /></td>
+            <td></td>
+          </tr>
+          <% end %>
+
+        </table>
+
+        <div class="actions">
+          <% if checkrole 'Admin Operasional, Marketing, Admin Marketing' %>
+          <input type="submit" value="Simpan Sangu + Solar" />
+          <% end %>
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+    
+    <%= form_for(@routelocation) do |r| %>
+
+    <input type="hidden" name="routelocation[route_id]" value="<%= @route.id %>">
+    <input type="hidden" name="routelocation[customer_id]" value="<%= @route.customer_id %>">
+
+    <div class="field-row">
+      <label style="float:none;">Nama Jurusan</label>
+      <strong><%=@route.name%></strong>
+      <br />
+      <p>*Pengisian Longitude & Latitude harap menggunakan format Longitude/Latitude bukan GPS. <br/>Format Longitude dan latitude yg benar seperti : -7.329603 atau 112.752704</p>
+    </div>
+          
+    <div class="field-row">
+      <div class="pac-card" id="pac-card">
+        <div>
+        <div id="title">Address Search</div>
+          <div id="type-selector" class="pac-controls" style="opacity: 0;">
+            <input type="radio" name="type" id="changetype-all" checked="checked"/>
+            <label for="changetype-all">All</label>
+          </div>
+        </div>
+      <div id="pac-container">
+        <input id="pac-input" type="text" placeholder="Enter a location" />
+        <br/>
+      </div>
+    </div>
+
+      <div id="map" style="height: 420px; width: 100%;"></div>
+
+      <div id="infowindow-content">
+        <span id="place-name" class="title"></span><br />
+        <span id="place-address"></span>
+      </div>
+    </div>
+
+
+    <div class="field-row">
+      <p><b>Titik Finish / Bongkar</b></p>
+      <%= r.label :longitude_end, "Longitude" %>
+      <%= r.text_field :longitude_end, :class => 'half left', :readonly => true %>
+      <%= r.label :latitude_end, "Latitude", :class => 'middle' %>
+      <%= r.text_field :latitude_end, :class => 'half', :readonly => true %>
+    </div>
+
+    <div class="field-row" style="margin-bottom:30px;">
+      <%= r.label :address_end, "Alamat Titik Akhir" %>
+      <%= r.text_field :address_end %>
+    </div>
+
+    <div class="actions">
+      <input type="submit" value="Simpan Lokasi Jurusan" />
+    </div>
+    <% end %>  
+
+  </div>
+
+    <% end %>
+
+    
+
+  </div>
+</div>
+
+<style>
+#description {
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+}
+
+#infowindow-content .title {
+  font-weight: bold;
+}
+
+#infowindow-content {
+  display: none;
+}
+
+#map #infowindow-content, #mapFinish #infowindow-content {
+  display: inline;
+}
+
+.pac-card, .pac-card2 {
+  background-color: #fff;
+  border: 0;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+  margin: 10px;
+  padding: 0 0.5em;
+  font: 400 18px Roboto, Arial, sans-serif;
+  overflow: hidden;
+  font-family: Roboto;
+  padding: 0;
+}
+
+#pac-container, #pac-container2 {
+  margin-top: -24px;
+  padding-bottom: 16px;
+  margin-right: 12px;
+}
+
+.pac-controls {
+  display: inline-block;
+  padding: 5px 11px;
+}
+
+.pac-controls label {
+  font-family: Roboto;
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#pac-input, #pac-input2 {
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 400px;
+}
+
+#pac-input:focus, #pac-input2:focus {
+  border-color: #4d90fe;
+}
+
+#title {
+  color: #fff;
+  background-color: #4d90fe;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 6px 12px;
+}
+</style>

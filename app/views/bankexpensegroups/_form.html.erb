@@ -1,0 +1,28 @@
+<%= form_for(@bankexpensegroup) do |f| %>
+	<div class="field-row">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :bankexpensegroup_id, "Tipe Group" %>
+    <%= f.select :bankexpensegroup_id, options_for_select(Bankexpensegroup.active.where("bankexpensegroup_id IS NULL").order(:name).collect {|g| [g.name, g.id]}, @bankexpensegroup.bankexpensegroup_id), {:include_blank => '- Tipe Group Jurnal -'}, :class => 'double chzn-select'  %>
+  </div>
+  <% if (!@bankexpensegroup.bankexpensegroup_id.nil?) && (active_node == "edit")%>
+  <div class="field-row">
+    <%= f.label :total, "Jumlah" %>
+    <%= f.text_field :total, :class => 'half', :style => 'text-align:right;', :onkeypress => 'javascript:return isMoneyKey(this);', :value => to_currency_bank(@bankexpensegroup.total), :readonly => current_user.owner ? false : true %>
+    <strong>Rupiah</strong>
+  </div>
+  <% end %>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' %>
+    <a class="back left" href="<%=bankexpensegroups_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

@@ -1,0 +1,80 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+		
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Utilisasi Kontainer: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue" style="display: flex;">
+					<div>
+						<label class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
+						<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+					</div>
+					<div>
+						&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
+					<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+					</div>
+					<div>
+						<input class="submit" type="submit" value="Filter" style="margin-top: 0;" />
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<table class="row-view report-view">
+			<thead>
+				<tr>
+					<th width="30">No.</th>
+					<th>No. Isotank</th>
+					<th style="text-align: right;">Truk</th>
+					<th style="text-align: right;">Kereta</th>
+					<th style="text-align: right;">Total</th>
+				</tr>
+			</thead>
+
+			<tbody>
+			<% totalall = totaltruck = totaltrain = i = 0 %>
+			<% @containers.each do |container| %>
+				<%
+					getTruckInvoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND tanktype = 'KONTAINER' AND invoicetrain = false AND container_id = ?)", @startdate.to_date, @enddate.to_date + 1, container.id).order(:date)
+					getTrainInvoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND tanktype = 'KONTAINER' AND invoicetrain = true AND container_id = ?)", @startdate.to_date, @enddate.to_date + 1, container.id).order(:date)
+					getTotalInvoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND tanktype = 'KONTAINER' AND container_id = ?)", @startdate.to_date, @enddate.to_date + 1, container.id).order(:date)
+				%>
+				<tr id="<%=container.id%>">
+					<td><%=i+=1%>.</td>
+					<td><%=container.containernumber rescue nil%></td>
+					<td align="right"><%=getTruckInvoices.count%></td>
+					<td align="right"><%=getTrainInvoices.count%></td>
+					<td align="right"><%=getTotalInvoices.count%></td>
+				</tr>
+				<% 
+					totaltruck += getTruckInvoices.count 
+					totaltrain += getTrainInvoices.count 
+					totalall += getTotalInvoices.count 
+				%>
+			<% end %>
+
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td class="total">TOTAL</td>
+					<td class="total" align="right"><%= totaltruck %></td>
+					<td class="total" align="right"><%= totaltrain %></td>
+					<td class="total" align="right"><%= totalall %></td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+</div>

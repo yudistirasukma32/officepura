@@ -1,0 +1,47 @@
+<table class="row-view">
+	<tr>
+		<th width="50">Premi</th>
+		<th width="50">TGL</th>
+		<th>BKK, Jurusan</th>
+		<th width="40">Ktr</th>
+		<th width="80">Nopol</th>
+		<th width="100" class="right">Premi</th>
+		<th width="80"></th>
+	</tr>
+
+	<tr class="subheading">
+		<th colspan="7" style="color:#000;">Bukti Kas Premi <span class="red"><%=@startdate%> - <%=@enddate%> (<%=@bonusreceipts.count%>)</span></th>
+	</tr>
+
+	<% @bonusreceipts.each do |bonusreceipt| %>
+	<% if bonusreceipt.deleted %>
+	<tr class="deleted">
+		<td><%=zeropad(bonusreceipt.id)%></td>
+		<td><strong><%=bonusreceipt.created_at.strftime('%d')%></strong>.<%=bonusreceipt.created_at.strftime('%m')%></td>
+		<td>#<%=zeropad(bonusreceipt.invoice.id)%> (<%=bonusreceipt.invoice.date.strftime('%d.%m')%>), <%=bonusreceipt.quantity%> Rit: <%=bonusreceipt.invoice.route.name%> (<%=bonusreceipt.invoice.driver.name%>)</td>
+		<td><%=bonusreceipt.invoice.office.abbr%></td>
+		<td><%=bonusreceipt.invoice.vehicle.current_id%></td>	
+		<td align="right"><%= to_currency(bonusreceipt.total) %></td>
+		<td class="right">DIHAPUS</td>
+	</tr>
+	<% else %>
+	<tr>
+		<td><%=zeropad(bonusreceipt.id)%></td>
+		<td><strong><%=bonusreceipt.created_at.strftime('%d')%></strong>.<%=bonusreceipt.created_at.strftime('%m')%></td>
+		<td>#<%=zeropad(bonusreceipt.invoice.id)%> (<%=bonusreceipt.invoice.date.strftime('%d.%m')%>), <%=bonusreceipt.quantity%> Rit: <%=bonusreceipt.invoice.route.name%> (<%=bonusreceipt.invoice.driver.name%>)</td>
+		<td><%=bonusreceipt.invoice.office.abbr%></td>
+		<td><%=bonusreceipt.invoice.vehicle.current_id%></td>		
+		<td align="right"><%= to_currency(bonusreceipt.total) %></td>
+		<td class="right">
+			<% if bonusreceipt.invoice.receiptpremis.active.count == 0 %>
+			<%= link_to '&#xf044;'.html_safe, new_bonusreceipt_path+"/"+bonusreceipt.invoice.id.to_s, :class => "edit tipsy", :title => 'Edit' %> 
+			<% end %>
+			<a href="/bonusreceipts/<%=bonusreceipt.id%>/confirmation" class="delete tipsy" title="Print BKK"><i class="icon-print"></i></a>
+			<%= link_to '&#xf00d;'.html_safe, bonusreceipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+		</td>
+	</tr>
+	<% end %>
+	<% end %>	
+
+
+</table>

@@ -1,0 +1,191 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>		
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="<%=new_event_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		
+        <h1><a href="<%=events_path%>">Kalendar Event</a> / Index Report</h1>
+		
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="startdate" class="middle">Tanggal</label>
+				<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+				<label for="enddate" class="tiny">s/d</label>
+				<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+
+				<label for="customer_id" class="middle">Pelanggan</label>
+				<select name="customer_id" class="third left">
+					<option value="">Semua Pelanggan</option>
+					<% Customer.active.order(:name).each do |customer| %>
+					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
+					<% end %>
+				</select>
+
+				<label for="id" class="tiny">DO:</label>
+				<input type="text" name="id" class="short left" value="<%=params[:id]%>" />
+ 
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		
+		<table id="reportevent" class="row-view tablesorter sortable tablesorterFilters">
+		<thead>
+		<tr>
+			<th class="{sorter:true, filter: true}">No</th>
+			<th class="{sorter:true, filter: true}">Tanggal</th>
+			<th class="{sorter:true, filter: true}">Pelanggan</th> 
+			<th class="{sorter:true, filter: true}">Jurusan DO</th>
+			<th class="{sorter:true, filter: true}">Moda</th>
+			<th class="{sorter:true, filter: true}">KTR</th>
+			<th class="{sorter:true, filter: true}">ST</th>
+			<th class="{sorter:false, filter: false}">Progress</th>
+			<th class="{sorter:true, filter: true}">Status</th>
+			<th class="{sorter:false, filter: false}"></th>
+		</tr>
+		</thead>
+		
+		<tbody>
+
+		<% @events.each do |event| %>
+
+		<%
+			half_completed = false
+			completed = false
+			invoiced = false
+			train = false
+            completed_by_vendor = false
+			status = "Blm Muat"
+			color = "3a87ad"
+	  
+			bkk = ''
+			taxinvoice = ''
+            event_qty = 1      
+
+            if event.qty
+                event_qty = event.qty
+            end
+ 
+			if @invoices.index(event.id)
+				
+				bkk = Invoice.active.select('event_id').where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns)').pluck(:id) rescue nil
+				
+				if bkk.count > 0
+					
+					this_bkk = Invoice.active.select('id, invoicetrain, quantity').find(bkk[0])
+					
+					if this_bkk.invoicetrain
+						
+						train = true
+
+						event_qty = event_qty.to_i*2
+						
+						if bkk.count >= event_qty.to_i*2
+							
+							completed = true
+							status = "Lunas ST"
+							color = "008000"
+                            
+                            taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
+
+                            if taxinvoices.count >= bkk.count / 2
+
+                                invoiced = true
+                                status = "Surat Jalan"
+                                color = "b38e1d"
+
+                            end
+							
+						else
+							
+							half_completed = true
+							completed = false
+							status = "Muat ST"
+							color = "8bc34a"
+                            
+                            if event.vendor_name != ""
+                                completed_by_vendor = true
+                                status = "Bgkr Vendor"
+                                color = "009688"
+                            end
+							
+						end
+						
+					else
+						
+                        train = false
+                        completed = false
+                        half_completed = true
+                        status = "Muat ST"
+                        color = "8bc34a"
+                        
+                        if bkk.count >= event_qty.to_i
+                        
+                            completed = true
+                            status = "Muat"
+                            color = "008000"
+                            
+                            taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
+
+                            if taxinvoices.count >= bkk.count
+
+                                invoiced = true
+                                status = "Surat Jalan"
+                                color = "b38e1d"
+
+                            end
+                            
+                        end
+						
+					end
+					
+				else
+					
+					completed = false
+					status = "Blm Muat"
+					color = "3a87ad"
+	 
+				end
+			
+			end
+
+        %>
+
+			<tr class="">
+				<td><%= event.id %></td>
+				<td><%= event.start_date %></td>
+				<td><%= event.customer.name %></td>
+				<td><%= event.summary %></td>
+				<td><%= event.invoicetrain ? 'KERETA' : 'TRUK' %></td>
+				<td><%= event.office.abbr rescue nil%></td>
+				<td><%= event.station.abbr rescue nil%></td>
+				<td style="text-align:center;">
+				
+					<%= bkk.count rescue 0 %> / <%= event.invoicetrain ? event.qty.to_i*2 : event.qty.to_i %>
+				
+				</td>
+				<td><span style="background-color: #<%= color %>; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;"><%= status %></span></td>
+				<td class="right" width="60">
+					<%= link_to '&#xf044;'.html_safe, edit_event_path(event, origin: 'report'), :class => "edit tipsy", :title => 'Edit' %> 
+					<%= link_to '&#xf00d;'.html_safe, event, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+				</td>
+			</tr>
+		<% end %>
+
+		</tbody>
+		</table>
+		
+		<br class="clearfix" /> 
+	</div>
+
+</div>

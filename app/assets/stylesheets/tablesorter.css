@@ -1,0 +1,80 @@
+/* tables */
+table.tablesorter {
+}
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+}
+table.tablesorter thead tr .header {
+	background-image: url("/assets/tablesorter/bg.gif");
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+
+table.tablesorter thead tr .sorter-false {
+  background-image: none;
+}
+
+table.tablesorter tbody td {
+}
+table.tablesorter tbody tr.odd td {
+}
+table.tablesorter thead tr .headerSortUp {
+	background-image: url(/assets/tablesorter/asc.gif);
+  background-repeat: no-repeat;
+  background-position: center right;
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url(/assets/tablesorter/desc.gif);
+  background-repeat: no-repeat;
+  background-position: center right;
+}
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+}
+
+input.tablesorter-filter{
+  font-family:MuseoSans,sans-serif; 
+  font-size:13px; 
+  color:#333;  
+  padding:5px; 
+  -moz-border-radius:5px; 
+  -webkit-border-radius:5px; 
+  border-radius:5px; 
+  border:0; 
+  border-top:2px 
+  solid #d9d9d9; 
+  border-left:2px 
+  solid #d7d7d7;
+}
+
+.tablesorter-filter-row {
+  background: #f5e6e7;
+  line-height: normal;
+  text-align: left;
+  -webkit-transition: line-height 0.1s ease;
+  -moz-transition: line-height 0.1s ease;
+  -o-transition: line-height 0.1s ease;
+  transition: line-height 0.1s ease;
+}
+
+.tablesorter-filter {
+  width: 85%;
+  height: inherit;
+  padding: 4px;
+  background-color: #fff;
+  border: 1px solid #bbb;
+  color: #333;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-transition: height 0.1s ease;
+  -moz-transition: height 0.1s ease;
+  -o-transition: height 0.1s ease;
+  transition: height 0.1s ease;
+}
+
+.tablesorter-filter-row .disabled {
+  display: none;
+}
+
+
+

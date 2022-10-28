@@ -1,0 +1,57 @@
+<%= render "shared/header" %>
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+		<h1 class="header-hide">Supir Check / Index</h1>
+		<h1 class="showprint">Checklist Supir</h1>
+
+		<br class="clearfix" />
+		<% if @drivers.any? %>
+		Menampilkan total &nbsp;<strong class="green"><%=@drivers.where(:enabled => true).count%></strong> : <strong class="red"><%=@drivers.where(:enabled => false).count%></strong>&nbsp; dari <strong><%=@drivers.count%></strong> supir.<br /><br />
+		<% end %>
+		<table class="row-view tablesorter">
+			<thead>
+			<tr>
+				<th width="50" class="{sorter: false} hideprint"></th>
+				<th class="{sorter: false}">Nama Supir</th>
+				<th width="70">Ready</th>
+				<th width="90" style="text-align:center;">Absen</th>
+				<th width="110" class="{sorter: false} hideprint"></th>
+			</tr>
+			</thead>
+
+			<tbody>
+			<% @drivers.each do |driver| %>
+			<tr>
+				<td class="hideprint"></td>
+				<td><p><strong><%= driver.name %></strong><br />
+					<% lastlog = driver.driverlogs.order("created_at DESC").where(:ready => false).first %>
+					<% if !lastlog.nil? %> 
+					<em><%=lastlog.created_at.strftime("%d-%m-%Y")%>: <%=lastlog.description%></em>
+					<% else %>
+					<br />
+					<% end %>
+					</p>
+				</td>
+				<% if driver.enabled %>
+				<td><p><span class="showprint">Ya</span><i class="icon-ok-sign enabled hideprint"></i></p></td>
+				<% else %>
+				<td><p><span class="showprint">Tidak</span><i class="icon-remove-sign disabled hideprint"></i></p></td>
+				<% end %>
+				<td align="center"><p><%=driver.driverlogs.where(:absent => true).count%></p></td>
+				<td class="hideprint"><a class="cta" href="/driverlogs/new/<%=driver.id%>">Ganti Status</a></td>
+			</tr>
+			<% end %>
+			</tbody>
+
+		</table>
+		
+		<br class="clearfix" />
+
+	</div>
+</div>

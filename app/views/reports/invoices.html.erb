@@ -1,0 +1,117 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+	
+	<h1><%=Setting.find_by_name("Client Name").value%> / BKK: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+	<br class="clearfix" />
+
+	<div id="filter" style="padding: 5px 10px 5px 10px;">
+		<form id="filterform" name="filterform" action="" method="get">
+		<div class="field-row continue">
+
+			<label for="transporttype" style="float:none">Tipe BKK</label>
+			<select name="transporttype" class="half combo_route" style="margin-top: 0.25rem;">
+			<option value="">Semua Tipe</option>
+				<% ["TRUK", "KERETA"].each do |type| %>
+				<option <%= type == params[:transporttype] ? 'selected' : '' %>><%=type%></option>
+				<% end %>
+			</select> 
+			&nbsp; &nbsp; <label class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
+			<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+			&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
+			<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+			<input class="submit" type="submit" value="Filter" />
+		</div>
+		</form>
+	</div>
+
+	<br class="clearfix" />
+
+	<% if @invoices.any? %>
+		<table class="tablesorter row-view tablesorterFilters">
+		<tr>
+			<th width="40">No.</th>
+			<th width="40">Tgl</th>
+			<th>Keterangan</th>
+            <th width="80">No. DO</th>
+            <th width="40">Tgl Buat</th>
+			<th>BKK</th>
+			<th>ISO/KONTAINER</th>
+			<th>NOPOL</th>
+			<th width="80" class="right {sorter:true, filter: false}">Sangu</th>
+			<th width="80" class="right {sorter:true, filter: false}">Solar</th>
+			<th width="80" class="right {sorter:true, filter: false}">Tambahan</th>
+			<th width="80" class="right {sorter:true, filter: false}">Tol</th>
+			<th width="80" class="right {sorter:true, filter: false}">Ferry</th>
+			<th width="100" class="right sorter:true, filter: false">Total (Rp.)</th>
+		</tr>
+
+		<% total_header, driver_allowance_total, gas_allowance_total, misc_allowance_total, tol_fee_total, ferry_fee_total = 0, 0, 0, 0, 0, 0 %>
+		<% @invoices.each_with_index do |invoice, i| %>
+			<% if invoice.invoicereturns.any?
+				driver_allowance = invoice.driver_allowance - invoice.invoicereturns.first.driver_allowance
+				gas_allowance = invoice.gas_allowance - invoice.invoicereturns.first.gas_allowance
+				misc_allowance = invoice.misc_allowance - invoice.invoicereturns.first.misc_allowance
+				tol_fee = invoice.tol_fee - invoice.invoicereturns.first.tol_fee
+				ferry_fee = invoice.ferry_fee - invoice.invoicereturns.first.ferry_fee
+			else
+				driver_allowance = invoice.driver_allowance
+				gas_allowance = invoice.gas_allowance
+				misc_allowance = invoice.misc_allowance
+				tol_fee = invoice.tol_fee
+				ferry_fee = invoice.ferry_fee
+			end 
+				total = driver_allowance + gas_allowance + misc_allowance + tol_fee + ferry_fee
+
+				driver_allowance_total += driver_allowance
+				gas_allowance_total += gas_allowance
+				misc_allowance_total += misc_allowance
+				tol_fee_total += tol_fee
+				ferry_fee_total += ferry_fee
+				total_header += total
+			%>
+		<tr<% if i % 2 == 0 %> class="even"<% end %>>
+			<td><%=i+1%></td>
+			<td><%=invoice.date.strftime('%d/%m/%y')%></td>
+			<td><%=invoice.quantity%> Rit #<%= invoice.id %>: <%=invoice.route.name rescue nil%></td>
+            <td><%=invoice.event.id rescue nil%><br/><%=invoice.event.summary rescue nil%></td>
+            <td><%=invoice.created_at.strftime('%d/%m/%y')%></td>
+			<td><%= invoice.invoicetrain ? 'KERETA' : 'TRUK' %></td>
+			<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %>
+			<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %></td>
+			<td><%=invoice.vehicle.current_id rescue nil%></td>
+			<td class="<%= (invoice.driver_allowance + invoice.helper_allowance) > 1000000 ? "red" : ""%>" align="right"><%=to_currency(invoice.driver_allowance + invoice.helper_allowance)%></td>
+			<td class="<%= gas_allowance > 1000000 ? "red" : ""%>" align="right"><%=to_currency(gas_allowance)%></td>
+			<td class="<%= misc_allowance > 1000000 ? "red" : ""%>" align="right"><%=to_currency(misc_allowance)%></td>
+			<td class="<%= tol_fee > 1000000 ? "red" : ""%>" align="right"><%=to_currency(tol_fee)%></td>
+			<td class="<%= ferry_fee > 1000000 ? "red" : ""%>" align="right"><%=to_currency(ferry_fee)%></td>
+			<td align="right"><%=to_currency(total)%></td>
+		</tr>
+			
+		<% end %>	
+
+		<% if @invoices %>
+		<tr class="footer">
+			<td class="total" colspan="8">TOTAL</td>
+			<td align="right"><%=to_currency(@invoices.sum('driver_allowance + helper_allowance'))%></td>
+			<td align="right"><%=to_currency(gas_allowance_total)%></td>
+			<td align="right"><%=to_currency(misc_allowance_total)%></td>
+			<td align="right"><%=to_currency(tol_fee_total)%></td>
+			<td align="right"><%=to_currency(ferry_fee_total)%></td>
+			<td class="total" align="right"><%=to_currency(total_header)%></td>
+		</tr>
+		<% end %>
+	
+		</table>
+	<% end %>
+</div>
+
+

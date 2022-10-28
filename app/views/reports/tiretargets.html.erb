@@ -1,0 +1,151 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+		<h1><%=Setting.find_by_name("Client Name").value%> / Target Ban Tahunan: <span class="red"><%=@year%></span></h1>
+
+		<br class="clearfix" />
+		
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue" style="width:100%;">
+					&nbsp; &nbsp; Tahun Laporan &nbsp; &nbsp;
+					<% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+					<select id="year" name="year" class="half">
+						<% (Date.today.year.downto(year_to)).each do |y| %>
+						<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+						<% end %>
+					</select>
+					<label for="productgroup_id">Group Ban</label>
+					<select name="productgroup_id" class="third left">
+						<% @productgroups.each do |productgroup| %>
+						<option value="<%=productgroup.id%>"<% if productgroup.id == @productgroup_id %> selected='selected'<% end %>><%=productgroup.name%></option>
+						<% end %>
+					</select>
+					<input class="submit" type="submit" value="Filter" />
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<ul class="rounded" id="tabbed">
+			<li><a id="link_1" class="finger">Januari - Juni</a></li>
+			<li><a id="link_2" class="finger">Juli - Desember</a></li>
+			<!-- <li><a id="link_3" class="finger">Grafik Omset Pelanggan</a></li> -->
+		</ul>
+
+		<div id="sliding_window" style="margin-top:10px;">
+			<div class="sliding_container">
+				<div class="sliding_tab" id="tab_1">
+					<br class="clearfix" />
+					<div id="jan_jun">
+						<% if @vehicles.any? %>
+							<table class="row-view tablesorter">
+								<thead>
+									<tr>
+										<th class="{sorter:false, filter: false}">Nopol</th>
+										<th class="center {sorter:true, filter: false}">TTL Ban</th>
+										<th width="90" class="center {sorter:true, filter: false}">Januari</th>
+										<th width="90" class="center {sorter:true, filter: false}">Februari</th>
+										<th width="90" class="center {sorter:true, filter: false}">Maret</th>
+										<th width="90" class="center {sorter:true, filter: false}">April</th>
+										<th width="90" class="center {sorter:true, filter: false}">Mei</th>
+										<th width="90" class="center {sorter:true, filter: false}">Juni</th>
+									</tr>
+								</thead>
+
+								<% 
+									# stock_request = Productrequestitem.joins(:productrequest)
+									# .where("productrequests.date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
+									# .where("productrequests.productgroup_id IN (#{params[:productgroup_id]})").sum(:quantity)
+									
+								 %>
+								
+								<% i = 0 %>
+								<tbody>
+									<% @vehicles.each do |vehicle| %>
+										<tr>
+											<td><%= vehicle.current_id%></td>
+											<td align="right"><%= to_currency(Productrequestitem.joins(:productrequest).joins(:product).where("extract(year from productrequests.date) = #{@year} and productrequests.deleted = false and products.productgroup_id = #{@productgroup_id} and productrequests.vehicle_id = #{vehicle.id}").sum(:quantity)) %></td>
+											<% (1..6).each do |i| %>
+												<% stock_requests = Productrequestitem.joins(:productrequest).joins(:product).where("extract(month from productrequests.date) = #{i} and extract(year from productrequests.date) = #{@year} and productrequests.deleted = false and products.productgroup_id = #{@productgroup_id} and productrequests.vehicle_id = #{vehicle.id}").sum(:quantity) %>
+												<td align="right"><%=to_currency(stock_requests.to_i)%></td>
+											<% end %>
+										</tr>
+										<% i += 1 %>
+									<% end %>
+								</tbody>
+								
+								<tfoot>
+		                        <tr>
+		                            <td colspan="2"><strong>Total</strong></td>
+		                            <% 1.upto(6) do |i| %>
+		                            <td align="right"><strong><%= Productrequestitem.joins(:productrequest).joins(:product).where("extract(month from productrequests.date) = #{i} and extract(year from productrequests.date) = #{@year} and productrequests.deleted = false and productrequests.vehicle_id IS NOT NULL and products.productgroup_id = #{@productgroup_id}").sum(:quantity) %></strong></td>
+		                            <% end %>
+		                        </tr>
+		                      </tfoot>
+							</table>
+						<% end %>
+					</div>
+				</div>
+				<div class="sliding_tab" id="tab_2">
+					<br class="clearfix" />
+					<div id="jul_des">
+						<% if @vehicles.any? %>
+							<table class="row-view tablesorter">
+								<thead>
+									<tr>
+										<th class="{sorter:false, filter: false}">Pelanggan</th>
+										<th class="center {sorter:true, filter: false}">TTL Ban</th>
+										<th width="90" class="center {sorter:true, filter: false}">Juli</th>
+										<th width="90" class="center {sorter:true, filter: false}">Agustus</th>
+										<th width="90" class="center {sorter:true, filter: false}">September</th>
+										<th width="90" class="center {sorter:true, filter: false}">Oktober</th>
+										<th width="90" class="center {sorter:true, filter: false}">Nopember</th>
+										<th width="90" class="center {sorter:true, filter: false}">Desember</th>
+									</tr>
+								</thead>
+
+								<% i = 0 %>
+								<tbody>
+									<% @vehicles.each do |vehicle| %>
+										<tr>
+											<td><%= vehicle.current_id%></td>
+											<td align="right"><%= to_currency(Productrequestitem.joins(:productrequest).joins(:product).where("extract(year from productrequests.date) = #{@year} and productrequests.deleted = false and products.productgroup_id = #{@productgroup_id} and productrequests.vehicle_id = #{vehicle.id}").sum(:quantity)) %></td>
+											<% (7..12).each do |i| %>
+												<% stock_requests = Productrequestitem.joins(:productrequest).joins(:product).where("extract(month from productrequests.date) = #{i} and extract(year from productrequests.date) = #{@year} and productrequests.deleted = false and products.productgroup_id = #{@productgroup_id} and productrequests.vehicle_id = #{vehicle.id}").sum(:quantity) %>
+												<td align="right"><%=to_currency(stock_requests.to_i)%></td>
+											<% end %>
+										</tr>
+										<% i += 1 %>
+									<% end %>
+								</tbody>
+								
+								<tfoot>
+		                        <tr>
+		                            <td colspan="2"><strong>Total</strong></td>
+		                            <% 7.upto(12) do |i| %>
+		                            <td align="right"><strong><%= to_currency(Productrequestitem.joins(:productrequest).joins(:product).where("extract(month from productrequests.date) = #{i} and extract(year from productrequests.date) = #{@year} and productrequests.deleted = false and productrequests.vehicle_id IS NOT NULL and products.productgroup_id = #{@productgroup_id}").sum(:quantity)) %></strong></td>
+		                            <% end %>
+		                        </tr>
+		                      </tfoot>
+							</table>
+						<% end %>
+					</div>
+				</div>
+<!-- 				<div class="sliding_tab" id="tab_3">
+					<br class="clearfix" />
+					<div id="chartcustomer" style="height:1400px; width:980px;"></div>
+				</div> -->
+			</div>
+		</div>
+	</div>
+
+</div>

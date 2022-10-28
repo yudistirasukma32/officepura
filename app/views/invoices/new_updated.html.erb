@@ -1,0 +1,35 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+	<%
+		if params[:type] == 'KERETA'
+			url = invoice_train_url
+		elsif params[:type] == 'ISOTANK'
+			url = invoice_isotank_url
+		elsif params[:type] == 'KAPAL (TOL LAUT)'
+			url = invoice_ship_url
+		else
+			url = invoices_url
+		end
+		
+	%>
+		<a class="btn-txt cancel" href="<%=url%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Transaksi / <a href="<%=invoices_path%>">Bukti Kas Keluar (Beta V.2)</a> / Tambah</h1>
+
+		<br class="clearfix" />
+
+		<%= render "steps", :step => 1 %>
+		<%= render "form-v2" %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

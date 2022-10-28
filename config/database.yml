@@ -1,0 +1,17 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: officepura_dev
+  pool: 5
+  username: pura
+  password: puratrans123
+  host: localhost
+  port: 5433
+  
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: officepura_prod
+  pool: 5
+  username: rajawali
+  password: r4j4w4l1_SBY

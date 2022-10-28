@@ -1,0 +1,131 @@
+<% if @payroll %>
+	<%=form_for(@payroll) do |f| %>
+		<%= render "info-box", :f => f %>
+		
+		<div class="field-row first">
+			<%= f.label :office_id, "Kantor" %>
+    		<%= f.select :office_id, options_for_select(Office.where(:deleted => false).collect {|g| [g.name, g.id]}, @payroll.office_id), {}, :class => 'half chzn-select'%>
+		</div>
+		
+		<div class="field-row">
+			<%= f.label :date, "Tanggal" %>
+   			<%= f.text_field :date, :class => 'half date-picker', :value => @payroll.date.strftime('%d-%m-%Y') %>
+		</div>
+
+		<div id="div-driver" class="field-row">
+			<label>Tipe Supir</label>
+			<select id="type_driver" name="payroll[type_driver]" class="half" onchange="javascript: getDriverforPayroll();">
+				<option value="">-- Pilih --</option>
+				<option value="d" <% if !@payroll.driver_id.nil? %> selected="selected" <%end%>>Supir</option>
+				<option value="h" <% if !@payroll.helper_id.nil? %> selected="selected" <%end%>>Kernet</option>
+			</select>
+			
+			<select id="driver_id" name="payroll[driver_id]" class="half" onchange="javascript: getDriverforPayroll();">
+				<% if !@payroll.driver_id.nil? %>
+					<option value="">-- Pilih Supir --</option>
+				 		<% Driver.where(:deleted => false).order(:name).each do |d| %>
+				 		<% if !d.name.blank? %>
+				 			<option value="<%=d.id%>" <% if d.id == @payroll.driver_id %> selected="selected" <% end %>><%=d.name%></option>
+				 		<% end %>
+				 	<% end %>
+				<% elsif !@payroll.helper_id.nil? %>
+				<option value="">-- Pilih Kernet --</option>
+			 	<% Helper.where(:deleted => false).order(:name).each do |d| %>
+			 		<% if !d.name.blank? %>
+			 			<option value="<%=d.id%>" <% if d.id == @payroll.helper_id %> selected="selected" <% end %>><%=d.name%></option>
+			 		<% end %>
+			 	<% end %>
+				<% else %>
+					<option>-- Kosong --</option>
+				<% end %>
+			</select>
+		</div>
+	
+		<div class="field-row" style="padding:5px 0 0 0;">
+			<label class="left">&nbsp;</label>
+			<label class="payroll"><strong style="padding-left:0px;">NON HLN</strong></label>
+			<label class="payroll"><strong style="padding-left:0px;">HLN</strong></label>
+		</div>
+
+		<div class="field-row continue" style="padding-bottom:15px;">
+		    <%= f.label :non_holidays, "Hari Kerja" %>    
+		    <select id="payroll_non_holidays" name="payroll[non_holidays]" class="short payroll" onchange="javascript: countPayrollDriverExpense();">
+		    	<% 0.upto(31).each do |i|%>
+		    		<option value="<%=i%>" <%if @payroll.non_holidays.to_i == i%> selected="selected"<% end %>><%=i.to_i%></option>
+		    	<% end %>
+			</select>
+			<select id="payroll_holidays" name="payroll[holidays]" class="short payroll" onchange="javascript: countPayrollDriverExpense();">
+		    	<% 0.upto(10).each do |i|%>
+		    		<option value="<%=i%>" <%if @payroll.holidays.to_i == i%> selected="selected"<% end %>><%=i.to_i%></option>
+		    	<% end %>
+			</select>
+		</div>
+
+		<div class="field-row" style="padding:5px 0 0 0;">
+			<label class="left">&nbsp;</label>
+			<label class="payroll"><strong style="padding-left:0px;">SUSUT</strong></label>
+			<label class="payroll"><strong style="padding-left:0px;">KECELAKAAN</strong></label>
+			<label class="payroll"><strong style="padding-left:0px;">ONDERDIL</strong></label>
+		</div>
+
+		<div class="field-row continue" style="padding-bottom:15px;">
+		    <%= f.label :weight_loss, "Klaim" %>    
+		    <%= f.text_field :weight_loss, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.weight_loss.to_i%>
+		    <%= f.text_field :accident, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.accident.to_i%>
+		    <%= f.text_field :sparepart, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.sparepart.to_i%>
+		</div>
+
+		<div class="field-row" style="padding:5px 0 0 0;">
+			<label class="left">&nbsp;</label>
+			<label class="payroll"><strong style="padding-left:0px;">PINJAMAN</strong></label>
+			<label class="payroll"><strong style="padding-left:0px;">G. SANGU</strong></label>
+			<label class="payroll"><strong style="padding-left:0px;">B. PREMI</strong></label>
+		</div>
+
+		<div class="field-row continue" style="padding-bottom:15px;">
+			<%= f.label :bon, "Lain-lain" %>    
+			<%= f.text_field :bon, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.bon.to_i%>
+			<%= f.text_field :allowance, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.allowance.to_i%>
+			
+		</div>
+
+		<div class="field-row" style="padding:5px 0 0 0;">
+			<label class="left">&nbsp;</label>
+			<label class="payroll"><strong style="padding-left:0px;">MENABUNG</strong></label>
+			<label class="payroll"><strong style="padding-left:0px;">AMBIL</strong></label>
+		</div>
+
+		<div class="field-row continue" style="padding-bottom:15px;">
+			<%= f.label :saving, "Tabungan" %>    
+			<%= f.text_field :saving, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.saving.to_i%>
+			<%= f.text_field :saving_reduction, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.saving_reduction.to_i%>
+		</div>
+
+		<div class="field-row">
+			<%= f.label :bonus, "Premi Hadir"%>
+			<%= f.text_field :bonus, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.bonus.to_i%>
+		</div>
+
+		<div class="field-row">
+			<%= f.label :helper_fee, "Uang Hadir Kernet"%>
+			<%= f.text_field :helper_fee, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.helper_fee.to_i%>
+		</div>
+
+		<div class="field-row">
+			<%= f.label :total, "Total"%>    
+			<%= f.text_field :total, :class => 'half none', :value => to_currency(@payroll.total.to_i), :style => "font-weight:700", :readonly => "readonly"%>
+		</div>
+
+		<% confirmed = @payroll.receiptpayrolls.active.count > 0 and @payroll.payrollreturns.active.count > 0 %>
+		<% if confirmed %>
+			<span class="red">BKK tidak bisa dirubah karena sudah dikonfirmasi atau sudah memiliki BKM.</span>
+		<% end %>
+
+		<div class="actions">
+			<% if !confirmed %>
+		    <%= f.submit "Tambah Data", :class => 'left' %>
+		    <% end %>
+		    <a class="back left" href="<%=payrolls_path%>">Kembali ke Index</a>
+		</div>
+	<% end %>
+<% end %>

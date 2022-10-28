@@ -1,0 +1,22 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=payrolls_path%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Master / <a href="<%=payrolls_path%>">BKK Supir</a> / Tambah</h1>
+
+		<br class="clearfix" />
+		<%= render "steps", :step => 2 %>
+		<%= render "form-confirmation" %>
+		<br class="clearfix" />
+
+	</div>
+
+</div>
+
+<div id="appletContainer"></div>

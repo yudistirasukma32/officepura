@@ -1,0 +1,9 @@
+<div class="field-row">
+	<label for="customer_id">Pelanggan</label>
+	<% if @customer %>
+	  <input type="text" class="double disabled" value="<%=@customer.name%>" />
+	  <input type="hidden" name="invoice[customer_id]" value="<%= @customer.id %>" />
+	<% else %>
+	  <input type="text" class="double disabled" value="- Pilih Jurusan terlebih dahulu -" />
+	<% end %>
+</div>

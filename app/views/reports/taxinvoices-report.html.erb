@@ -1,0 +1,67 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+		
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Invoice :<span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue">
+					<label for="startdate">Tanggal Awal</label>
+					<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>" />
+					<label for="enddate" class="middle">Akhir</label>
+					<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+					<input class="submit" type="submit" value="Filter" />
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<table class="row-view report-view">
+			<thead>
+				<tr>
+					<th width="30">No.</th>
+					<th width="80">Tanggal</th>
+					<th>No.INVOICE</th>
+					<th>Pelanggan</th>
+					<th width="120" class="right">Total</th>
+				</tr>
+			</thead>
+
+			<tbody>
+			<% total = i = 0 %>
+			<% @taxinvoices.each do |taxinvoice| %>
+				<% if taxinvoice.total > 0 %>
+				<% total += taxinvoice.total %>
+				<tr id="<%=taxinvoice.id%>">
+					<td><%=i+=1%>.</td>
+					<td><%=taxinvoice.date.strftime('%d-%m-%Y') rescue nil %></td>
+					<td><%=taxinvoice.long_id %> </td>
+					<td><%=taxinvoice.customer.name rescue nil %></td>
+					<td align="right">
+						<%=to_currency_bank(taxinvoice.total) rescue '0' %>
+					</td>
+				</tr>
+				<% end %>				
+			<% end %>
+
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td class="total" colspan="3">TOTAL</td>
+					<td class="total" align="right"><%= to_currency(total) %></td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+</div>

@@ -1,0 +1,36 @@
+<%= form_for(@invoice) do |f| %>
+
+  <%= render "info-box", :f => f %>
+
+  <input type="hidden" id="process" name="process" value="step2" />
+  <%= f.hidden_field :gas_cost, :value => @invoice.gas_cost %>
+  <%= f.hidden_field :date, :value => @invoice.date %>
+
+  <div class="field-row first">
+    <%= f.hidden_field :gas_litre, :value => @invoice.gas_litre %>
+    <label for="gas_start">Solar Awal</label>
+    <input type="text" id="invoice_gas_start" name="gas_start" class="half disabled gas-field" readonly="true" value="<%=(@invoice.gas_litre + @invoice.gas_leftover + @invoice.gas_voucher rescue 0)%>" />
+    <span>@ <%=@invoice.gas_cost%></span>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :gas_voucher, "Bon Pomp" %>
+    <%= f.text_field :gas_voucher, :class => 'half gas-field',:onkeypress => 'javascript:return isNumberKey(this);', :onkeyup => 'javascript:adjustGas();', :maxlength => '5' , :value => @invoice.gas_voucher > 0 ? @invoice.gas_voucher : '', :placeholder => '0' %>
+    <span>@ <%=@invoice.gas_cost%></span>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :gas_leftover, "Gantungan" %>
+    <%= f.text_field :gas_leftover, :class => 'half gas-field', :onkeypress => 'javascript:return isNumberKey(this);', :onkeyup => 'javascript:adjustGas();', :maxlength => '5' , :value => (@invoice.gas_leftover || 0) > 0 ? @invoice.gas_leftover : '', :placeholder => '0' %>
+    <span>/</span> <span id="max_litre"><%=@invoice.vehicle.gas_leftover%> Liter</span>
+    <input type="hidden" id="invoice_max_litre" name="max_litre" value="<%=@invoice.vehicle.gas_leftover%>" />
+  </div>
+
+  <div class="actions">
+    <% if @invoice.receipts.active.count == 0 %>
+    <%= f.submit "Tambah Data", :id => 'invoice_submit_gas', :class => 'left' %>
+    <% end %>
+    <a class="back left" href="<%=invoices_path%>">Kembali ke Index</a>
+  </div>
+
+<% end %>

@@ -1,0 +1,95 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<% if checkrole 'Admin HRD' %>
+		<a class="btn print" href="<%=new_driver_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<% end %>
+		<h1>Master / <a href="<%=drivers_path%>">Supir</a> / Index</h1>
+
+		<%= render 'default/toggle_deleted_checkbox' %>
+
+		<br class="clearfix" />
+		<br class="clearfix" />
+
+		<table class="row-view tablesorter">
+			<thead>
+			<tr>
+				<th>Nama</th>
+				<th>Kota</th>
+				<th>Telp</th>
+				<th>Rekening</th>
+				<th width="60" class="{sorter: false}">Aktif</th>
+				<th width="60" class="{sorter: false}"></th>
+			</tr>
+			</thead>
+
+			<tbody>
+			<% @drivers.each do |driver| %>
+			<% if driver.deleted %>
+				<% if current_user.adminrole %>
+				<tr class="deleted">
+					<td><%= driver.name %> (<%= zeropad(driver.id)%>)</td>
+					<td><%= driver.city %></td>
+					<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
+					<td><%= driver.bank_account %></td>
+					<% if driver.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe, 'javascript: void();', :class => 'disabled tipsy', :title => 'Tidak Aktif' %></td>
+					<% end %>
+					<td class="right" width="60">&nbsp;</td>
+				</tr>
+				<% end %>
+			<% else %>
+				<% if (checkrole 'Admin HRD, Admin Operasional') %>
+				<tr>
+					<td><%= link_to driver.name, edit_driver_path(driver) %> &nbsp;(<%= zeropad(driver.id)%>)</td>
+					<td><%= driver.city %></td>
+					<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
+					<td><%= driver.bank_account %></td>
+					<% if driver.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, disable_driver_path(driver), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe, enable_driver_path(driver), :class => 'disabled tipsy', :title => 'Aktifkan' %></td>
+					<% end %>
+					<td class="right" width="60">
+						<%= link_to '&#xf044;'.html_safe, edit_driver_path(driver), :class => "edit tipsy", :title => 'Edit' %> 
+						<%= link_to '&#xf00d;'.html_safe, driver, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner || (checkrole 'Admin Operasional') %>
+					</td>
+				</tr>
+				<% else %>
+				<tr>
+					<td><%= driver.name %></td>
+					<td><%= driver.city %></td>
+					<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
+					<td><%= driver.bank_account %></td>
+					<% if driver.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe, 'javascript: void();', :class => 'disabled tipsy', :title => 'Tidak Aktif' %></td>
+					<% end %>
+					<td class="right" width="60">&nbsp;</td>
+				</tr>
+				<% end %>
+			<% end %>
+			<% end %>	
+			</tbody>
+		
+		</table>
+
+		<% if checkrole 'Admin HRD' %>
+		<div class="actions">
+			<a class="btn-txt right" href="<%=new_driver_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		</div>
+		<% end %>
+
+		<br class="clearfix" />
+	</div>
+
+</div>

@@ -1,0 +1,24 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=invoices_path%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Transaksi / <a href="<%=invoices_path%>">BKK Keluar</a> / Edit</h1>
+
+		<br class="clearfix" />
+
+		<%= render "steps", :step => 2 %>
+
+		<%= render "form-step2" %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

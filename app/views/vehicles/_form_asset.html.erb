@@ -1,0 +1,20 @@
+<form action="/vehicles/update_asset/" method="post">
+
+<% if @vehicle %>
+	<h3>Data Asset Kendaraan</h3>
+	<div class="field-row first">
+		<label for="date_purchase">Tgl Beli</label>
+		<input type="text" name="vehicle[date_purchase]" class="half date-picker" value="<%= @vehicle.date_purchase.strftime('%d-%m-%Y') if !@vehicle.date_purchase.nil?%>"/>
+		<input type="hidden" name="vehicle[vehicle_id]" value="<%=@vehicle_id%>" />
+		<div class="field-row continue">
+			<label for="amount">Jumlah</label>
+			<input type="text" name="vehicle[amount]" class="half" value="<%= @vehicle.amount.to_i%>" onkeypress="javascript: return isNumberKey(this);"/>
+		</div>
+	</div>
+	<div class="actions">
+    	<input type="submit" value="Tambah Data" class="left"/>
+    	<a class="back left" href="/vehicles/index_asset">Kembali ke Index</a>
+  	</div>
+<% end %>
+
+</form>

@@ -1,0 +1,47 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+    <%
+        title = ""
+		trainclass = ""
+		url = ""
+        if params[:kosongan] || params[:kosongan] == true
+        	title = "Kosongan" 
+			url = '?kosongan=true'
+        end
+        if params[:train] || params[:train] == true
+			title = "Kereta" 
+			trainclass = "invtrain"
+			url = '?train=true'
+		end
+		
+    %>
+    
+    
+    
+	<div id="content-full" class="<%=trainclass%>">
+	
+		<%  if params[:train] || params[:train] == true %>
+			<a class="btn-txt cancel" href="indexinvoicetrain"><i class="icon-remove"></i> Batal</a>
+		<% else %>
+			<a class="btn-txt cancel" href="<%=invoices_path%>"><i class="icon-remove"></i> Batal</a>
+		<% end %>
+
+		<h1>Transaksi / <a href="<%=invoices_path%>">Bukti Kas Keluar <%=title%></a> / Tambah</h1>
+
+		<br class="clearfix" />
+
+		<%= render "steps", :step => 1 %>
+
+		<%= render "form" %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

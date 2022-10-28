@@ -1,0 +1,86 @@
+<% if @receipt %>
+
+<%= form_for(@receipt) do |f| %>
+
+  <div class="info-box" style="margin-bottom:30px;">  
+
+    <h3>Bukti Kas Masuk #<%=zeropad(@receipt.invoice_id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Tanggal</td>
+        <td><%=@receipt.invoice.date.strftime('%d-%m-%Y')%>&nbsp;(KTR: <%=@receipt.invoice.office.name%>)</td>
+      </tr>
+      <tr>
+        <td>Jurusan</td>
+        <td><strong><%=@receipt.invoice.quantity%></strong> Rit:<%=@receipt.invoice.route.name%></td>
+      </tr>
+      <tr>
+          <td>Tipe</td>
+          <td><%=@receipt.invoice.route.routegroup.name%></td>
+        </tr>
+      <tr>
+        <td>Kendaraan</td>
+        <td><%=@receipt.invoice.vehicle.current_id%>&nbsp;(UP: <%= @receipt.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+      </tr>
+      <tr>
+        <td>Supir</td>
+        <td><%=@receipt.invoice.driver.name%><% if !@receipt.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@receipt.invoice.driver.helpers.first.name%>)<% end %></td>
+      </tr>
+    </table>
+
+    <table class="row-view">
+      <tr>
+        <th width="90">Keterangan</th>
+        <th width="160" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr>
+        <td>UM Supir</td>
+        <td class="right"><%= to_currency(@receipt.driver_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td>UM Kernet</td>
+        <td class="right"><%= to_currency(@receipt.helper_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td>Lain-lain</td>
+        <td class="right"><%= to_currency(@receipt.misc_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td>Penyebrangan</td>
+        <td class="right"><%= to_currency(@receipt.ferry_fee) %></td>
+      </tr>
+
+      <tr>
+        <td>Tol</td>
+        <td class="right"><%= to_currency(@receipt.tol_fee) %></td>
+      </tr>
+
+      <% total = @receipt.driver_allowance + @receipt.tol_fee + @receipt.misc_allowance + @receipt.helper_allowance + @receipt.ferry_fee %>
+
+      <tr class="total-row">
+        <td>Total</td>
+        <td class="right"><%= to_currency(total) %></td>
+      </tr>
+    </table>
+
+  </div>
+
+  <div class="field-row first" style="margin-bottom:-20px;">
+    <%= f.label :created_at, "Tgl Konfirmasi" %>
+    <%= f.text_field :created_at, :class => 'half date-picker', :value => to_currency(@receipt.created_at.strftime('%d-%m-%Y')) %>
+    <%= f.hidden_field :receipt_id, :value => @receipt.id %>
+  </div>
+  
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'submit' %>
+  </div>
+
+
+<% end %>
+
+<% end %>

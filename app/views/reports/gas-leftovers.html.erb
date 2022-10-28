@@ -1,0 +1,115 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Gantungan Solar: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="startdate">Tanggal Awal</label>
+				<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>" />
+				<label for="enddate" class="middle">Akhir</label>
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th>Kendaraan</th>
+				<th width="30" class="right">Rit</th>
+				<th width="70" class="right">Liter</th>
+				<th width="100" class="right">Total</th>
+				<th width="25">&nbsp;</th>
+			</tr>
+
+			<% quantity = total = 0 %>
+			<% @vehicles.each_with_index do |vehicle, i| %>
+			<%
+				@invoices = Invoice.find_by_sql(["
+				  select *
+				  from invoices
+		      where vehicle_id=#{vehicle.id} and gas_leftover > 0 and (date > ? and date < ?) 
+				  order by date DESC", @startdate.to_date, @enddate.to_date])
+
+				@invoicereturns = Invoicereturn.find_by_sql(["
+				  select r.*, i.gas_cost
+				  from invoicereturns r
+				  inner join invoices i on r.invoice_id = i.id
+		      where i.vehicle_id=#{vehicle.id} and r.gas_leftover > 0 and (r.date > ? and r.date < ?) 
+				  order by r.date DESC", @startdate.to_date, @enddate.to_date])
+			%>
+			<% quantity += @invoices.sum(&:quantity).to_i - @invoicereturns.sum(&:quantity).to_i %>
+			<% total += @invoicereturns.sum(&:gas_leftover).to_i - @invoices.sum(&:gas_leftover).to_i %>
+			<tr<% if i % 2 == 0 %> class="even"<% end %>>
+				<td><%=i+1%>.</td>
+				<td><a href="javascript:void(0);" onclick="javascript:toggleDetailBox('<%=i+1%>');" title="Lihat detil"><%=vehicle.current_id%></a></td>
+				<td align="right"><%=@invoices.sum(&:quantity).to_i - @invoicereturns.sum(&:quantity).to_i%></td>
+				<td align="right"><%=@invoicereturns.sum(&:gas_leftover).to_i - @invoices.sum(&:gas_leftover).to_i%></td>
+				<td align="right"><%=@invoicereturns.sum(&:sum_gasleftover) - @invoices.sum(&:sum_gasleftover)%></td>
+				<td><a class="view" href="javascript:void(0);" onclick="javascript:toggleDetailBox('<%=i+1%>');" title="Lihat detil"><i class="icon-list"></i></a></td>
+			</tr>
+
+			<% if @invoices or @invoicereturns %>
+			<tr id="detail-<%=i+1%>" class="hide nohover"><td colspan="5" style="border:0; padding-right:0;">
+				<div class="detail-box">
+					<a class="close" href="javascript:void(0);" onclick="javascript:closeDetailBox('<%=i+1%>');" title="Tutup detail"><i class="icon-remove"></i></a>
+					<table class="detail-row">
+					<% @invoices.each do |invoice| %>
+					<tr>
+						<td width="80"><%=invoice.date.strftime('%d-%m-%Y')%></td>
+						<td width="80"><%=invoice.driver.name%></td>
+						<td><%=invoice.route.name%></td>
+						<td width="30" class="right green">+<%=invoice.quantity%></td>
+						<td width="70" align="right" class="red">-<%=invoice.gas_leftover%></td>
+						<td width="100" align="right" class="red">-<%=invoice.sum_gasleftover%></td>
+					</tr>
+					<% end %>
+
+					<% @invoicereturns.each do |invoicereturn| %>
+					<tr>
+						<td width="80"><%=invoicereturn.date.strftime('%d-%m-%Y')%></td>
+						<td width="80"><%=invoicereturn.invoice.driver.name%></td>
+						<td><%=invoicereturn.invoice.route.name%></td>
+						<td width="30" class="right red">-<%=invoicereturn.quantity%></td>
+						<td width="70" align="right" class="green">+<%=invoicereturn.gas_leftover%></td>
+						<td width="100" align="right" class="green">+<%=invoicereturn.gas_leftover * invoicereturn.invoice.gas_cost%></td>
+					</tr>
+					<% end %>
+				</table>
+				</div>
+			</td></tr>
+			<% end %>
+
+			<% end %>
+
+			<% if @vehicles.any? %>
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right"><%=quantity%></td>
+				<td align="right" class="total"><%=to_currency(total)%></td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+			<% end %>
+		
+		</table>
+
+	</div>
+
+</div>

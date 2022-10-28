@@ -1,0 +1,117 @@
+<% if @receipt %>
+
+<%= form_for(@receipt) do |f| %>
+
+   <% if @errors.include?'receipt' %>
+      <div class="field-row red">
+        <%=@errors['receipt']%>
+      </div>
+    <% end %>
+
+ 
+ <div class="info-box" style="margin-bottom:30px;">  
+
+    <h3>Bukti Kas Keluar #<%=zeropad(@receipt.invoice.id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+          <td width="100">Tanggal</td>
+          <td><%=@receipt.invoice.date.strftime('%d %B %Y')%> &nbsp;(KTR: <%=@receipt.invoice.office.name%>)</td>
+        </tr>
+        <tr>
+          <td>Pelanggan</td>
+          <td><%=@receipt.invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td><strong><%=@receipt.invoice.quantity%></strong> Rit: <%=@receipt.invoice.route.name%></td>
+        </tr>
+        <tr>
+          <td>Tipe</td>
+          <td><%=@receipt.invoice.route.routegroup.name%></td>
+        </tr>
+        <tr>
+          <td>Kendaraan</td>
+          <td><%=@receipt.invoice.vehicle.current_id%> &nbsp;(UP: <%= @receipt.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+        </tr>
+        <tr>
+          <td>Supir</td>
+          <td>
+          <%=@receipt.invoice.driver.name%> (<%=zeropad(@receipt.invoice.driver.id)%>)
+          <% if !@receipt.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@receipt.invoice.driver.helpers.first.name%>)<% end %>
+          </td>
+        </tr>
+        <tr>
+          <td>No. Rek. Supir</td>
+          <td><%=@receipt.invoice.driver.bank_account%></td>
+        </tr>
+        <% if !@receipt.invoice.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td><%= @receipt.invoice.description %></td>
+        </tr>   
+        <% end %>       
+    </table>
+
+    <table class="row-view">
+      <tr>
+        <th>Keterangan</th>
+        <th width="160" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr>
+        <td>UM Supir</td>
+        <td class="right"><%= to_currency(@receipt.driver_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td>UM Kernet</td>
+        <td class="right"><%= to_currency(@receipt.helper_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td>Lain-lain</td>
+        <td class="right"><%= to_currency(@receipt.misc_allowance)%></td>
+      </tr>
+
+      <tr>
+        <td>Solar *</td>
+        <td class="right"><%= to_currency(@receipt.gas_allowance)%></td>
+      </tr>
+
+      <tr>
+        <td>Penyebrangan</td>
+        <td class="right"><%= to_currency(@receipt.ferry_fee)%></td>
+      </tr>
+
+      <tr>
+        <td>Tol</td>
+        <td class="right"><%= to_currency(@receipt.tol_fee)%></td>
+      </tr>
+        
+      <tr>
+        <td>Premi</td>
+        <td class="right"><%= to_currency(@receipt.premi_allowance)%></td>
+      </tr>    
+
+      <tr class="total-row">
+        <td>Total</td>
+        <td class="right"><%=to_currency(@receipt.total)%></td>
+      </tr>
+    </table>
+    <p>* Ket. Solar: <%=@receipt.invoice.gas_litre+@receipt.invoice.gas_voucher+@receipt.invoice.gas_leftover%> (Awal) - <%=@receipt.invoice.gas_voucher%> (B) - <%=@receipt.invoice.gas_leftover%> (G) = <%=@receipt.invoice.gas_litre%> liter @ <%=@receipt.invoice.gas_cost%></p>
+
+  </div>
+
+  <div class="field-row first" style="margin-bottom:-20px;">
+    <%= f.label :created_at, "Tgl Konfirmasi" %>
+    <%= f.text_field :created_at, :class => 'half date-picker', :value => to_currency(@receipt.created_at.strftime('%d-%m-%Y')) %>
+    <%= f.hidden_field :receipt_id, :value => @receipt.id %>
+  </div>
+  
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'submit' %> 
+  </div>
+<% end %>
+
+<% end %>

@@ -1,0 +1,54 @@
+
+	<div class="info-box">
+		<table class="row-view no-border">
+	        <tr valign="top">
+	          <td><strong><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+	          <td align="right" class="header">Pembelian Stok<br/>#<%=zeropad(@productorder.id)%></td>
+	        </tr>
+	      </table>
+	      <hr />	
+		<table class="row-view no-border">
+			<tr>
+				<td width="90">Tanggal</td>
+				<td><%= @productorder.date.strftime('%d-%m-%Y')%></td>
+			</tr>
+			<tr>
+				<td width="90">Keterangan</td>
+				<td><%= @productorder.description.blank? ? '-' : @productorder.description %></td>
+			</tr>
+		</table>
+		<table class="row-view">
+		<% if @productorderitems.any? %>
+			<tr>
+				<th width="30">No.</th>
+ 				<th>Nama Barang</th>
+ 				<th width="80">Jumlah</th> 				
+ 				<th width="60" class="right">Harga</th>
+ 				<th width="80" class="right">Total</th>
+			</tr>
+			<% total = 0 %>
+			<% @productorderitems.each_with_index do |productorderitem, i|%>
+			<tr>
+				<td><%=i+1%>.</td>
+				<td><%=productorderitem.product.name%>&nbsp;<% if productorderitem.bon == true%><strong>(bon)</strong><% end %> <br /><%='('+ productorderitem.supplier.name + ')' if !productorderitem.supplier_id.nil? %></td>
+				<td><%=to_currency(productorderitem.quantity)%> @ <%=productorderitem.product.unit_name%></td>
+				<td style="text-align:right;"><%=to_currency(productorderitem.price_per)%></td>
+				<td style="text-align:right;"><%=to_currency(productorderitem.total)%></td>				
+			</tr>
+			<% total += productorderitem.total.to_i %>
+			<% end %>
+			<tr>
+ 				<td></td>
+ 				<td></td>
+ 				<td></td>
+ 				<td class="total right">TOTAL</td>
+ 				<td style="text-align:right;"><%=to_currency(total)%></td> 				
+ 			</tr>
+		<% else %>
+			<tr>
+				<td><strong>Tidak ada order pembelian</strong></td>
+			</tr>
+		<% end %>
+		</table>
+	</div>
+	

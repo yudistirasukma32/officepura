@@ -1,0 +1,182 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Jurnal Keuangan: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="startdate">Tanggal Awal</label>
+				<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>" />
+				<label for="enddate" class="middle">Akhir</label>
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view report-view">
+			<tr>
+				<th width="30">No.</th>
+				<th width="80">Tanggal</th>
+				<th>Keterangan</th>
+				<th width="110" class="right">Debit</th>
+				<th width="110" class="right">Kredit</th>
+				<th width="120" class="right">Saldo</th>
+			</tr>
+		<% id_group_hutangtoko = 19 %>
+		<% id_group_piutang = 6 %>
+		<% id_group_kas = 1 %>
+
+		<% if @bankexpensegroups.any? %>
+		<% @bankexpensegroups.each do |group| %>
+		<% if group.id == id_group_hutangtoko or group.id == id_group_piutang%>
+			<% expenses = Bankexpense.where("deleted = false and enabled = true and (debitgroup_id = ? or creditgroup_id = ?) and (date >= ? and date <= ?) and id not in (select id from bankexpenses where bankexpense_id IN (select id from bankexpenses where (date >= ? and date <= ?) and deleted = false))", group.id, group.id, @startdate.to_date, @enddate.to_date, @startdate.to_date, @enddate.to_date).order('date') %>
+		
+			<% if expenses.any? %>
+			<% totaldebit = totalcredit = 0 %>
+			<tr class="subheading">
+				<th colspan="6" style="color:#000;"><%=group.name%></th>
+			</tr>		
+
+			<% debitbefore = Bankexpense.where("enabled = true and deleted = false and debitgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+			<% creditbefore = Bankexpense.where("enabled = true and deleted = false and creditgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+			<% running = debitbefore.sum(:total) - creditbefore.sum(:total) %>
+
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>Saldo Awal</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+			</tr>
+
+			<% expenses.each_with_index do |expense, i| %>
+			<% child = expense.bankexpenses.where("deleted = false and (date >= ? and date <= ?)", @startdate.to_date, @enddate.to_date).first rescue nil %>
+			
+			<% running += expense.total if expense.debitgroup_id == group.id %>
+			<% totaldebit += expense.total if expense.debitgroup_id == group.id %>
+			
+			<% running += child.total if child and child.debitgroup_id == group.id %>
+			<% totaldebit += child.total if child and child.debitgroup_id == group.id %>
+
+			<% running -= expense.total if expense.creditgroup_id == group.id %>
+			<% totalcredit += expense.total if expense.creditgroup_id == group.id %>
+
+			<% running -= child.total if child and child.creditgroup_id == group.id %>
+			<% totalcredit += child.total if child and child.creditgroup_id == group.id %>
+			
+			<tr>
+				<td><%=i+1%>.</td>
+				<td><%=expense.date.to_date.strftime('%d-%m-%Y')%></td>
+				
+				<% if group.id == id_group_hutangtoko %>
+					<% if expense.debitgroup_id == group.id %>
+					<td><%=expense.description%> <% if !expense.bankexpense.nil?%> (Dibuat tgl <%= expense.bankexpense.date.strftime('%d-%m-%Y')  %>) <% end %></td>
+					<% else %>
+					<td><%=expense.description%> <% if child%> (Lunas tgl <%= child.date.strftime('%d-%m-%Y')  %>) <% end %></td>
+					<% end %>
+				<% else %>
+					<% if expense.debitgroup_id == group.id %>
+					<td><%=expense.description%> <% if child%> (Lunas tgl <%= child.date.strftime('%d-%m-%Y')  %>) <% end %></td>
+					<% else %>
+					<td><%=expense.description%> <% if !expense.bankexpense.nil?%> (Dibuat tgl <%= expense.bankexpense.date.strftime('%d-%m-%Y')  %>) <% end %></td>
+					<% end %>
+				<% end %>
+				
+				<% if child and child.debitgroup_id == group.id %>
+				<td align="right"><%=to_currency_bank(child.total)%></td>
+				<% else %>
+				<td align="right"><%=expense.debitgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
+				<% end %>
+				
+				<% if child and child.creditgroup_id == group.id %>
+				<td align="right"><%=to_currency_bank(child.total)%></td>
+				<% else %>
+				<td align="right"><%=expense.creditgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
+				<% end %>
+				
+				<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+			</tr>
+
+			<% end %>
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+				<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+				<td align="right">&nbsp;</td>
+			</tr>
+
+			<% end %>
+		<% elsif group.id != 84 %>
+			<% expenses = Bankexpense.where("deleted = false and enabled = true and (debitgroup_id = ? or creditgroup_id = ?) and (date >= ? and date <= ?)", group.id, group.id, @startdate.to_date, @enddate.to_date).order('date') %>
+		
+			<% if expenses.any? %>
+			<% totaldebit = totalcredit = 0 %>
+			<tr class="subheading">
+				<th colspan="6" style="color:#000;"><%=group.name%></th>
+			</tr>		
+
+			<% debitbefore = Bankexpense.where("enabled = true and deleted = false and debitgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+			<% creditbefore = Bankexpense.where("enabled = true and deleted = false and creditgroup_id = ? and date < ?", group.id, @startdate.to_date) %>
+			<% running = debitbefore.sum(:total) - creditbefore.sum(:total) %>
+
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>Saldo Awal</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+			</tr>
+
+			<% expenses.each_with_index do |expense, i| %>
+			<% running += expense.total if expense.debitgroup_id == group.id %>
+			<% totaldebit += expense.total if expense.debitgroup_id == group.id %>
+			<% running -= expense.total if expense.creditgroup_id == group.id %>
+			<% totalcredit += expense.total if expense.creditgroup_id == group.id %>
+
+			<tr>
+				<td><%=i+1%>.</td>
+				<td><%=expense.date.to_date.strftime('%d-%m-%Y')%></td>
+				<td><%=expense.description%><% if !expense.productrequest_id.nil? %><%=" (" + expense.productrequest.vehicle.current_id + ")" if expense.productrequest and !expense.productrequest.vehicle_id.nil? %><% end %><% if !expense.productorder.nil? %><%=" (" + expense.productorder.productrequest.vehicle.current_id + ")" if expense.productorder.productrequest and !expense.productorder.productrequest.vehicle_id.nil? %><% end %></td>
+				<td align="right"><%=expense.debitgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
+				<td align="right"><%=expense.creditgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
+				<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
+			</tr>
+			<% end %>
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="total"><%=to_currency_bank(totaldebit)%></td>
+				<td align="right" class="total"><%=to_currency_bank(totalcredit)%></td>
+				<td align="right">&nbsp;</td>
+			</tr>
+
+			<% end %>
+
+		<% end %>	
+		<% end %>
+		<% end %>		
+
+		</table>
+
+	</div>
+
+</div>

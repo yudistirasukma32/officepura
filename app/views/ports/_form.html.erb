@@ -1,0 +1,35 @@
+<%= form_for(@port) do |f| %>
+  <% if @port.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@port.errors.count, "error") %> prohibited this port from being saved:</h2>
+
+      <ul>
+      <% @port.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name, :class => 'half' %>
+  </div>
+  
+	<div class="field-row">
+    <%= f.label :city, "Kota" %>
+    <%= f.text_field :city %>
+  </div>
+  
+	<div class="field-row">
+    <%= f.label :address, "Alamat" %>
+    <%= f.text_area :address, :class => 'half' %>
+  </div>
+  
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+   
+
+  
+<% end %>

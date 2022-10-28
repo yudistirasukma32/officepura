@@ -1,0 +1,142 @@
+<% if @invoice %>
+<form id="bonusreceipts" name="bonusreceipts" action="/bonusreceipts/updateitems" method="post">
+  <input type="hidden" id="process" name="bonusreceipts[process]" value="create" />
+  <input type="hidden" id="invoice_id" name="bonusreceipts[invoice_id]" value="<%=@invoice.id%>" />
+  <input type="hidden" id="price_per" name="bonusreceipts[price_per]" value="<%=@invoice.price_per%>" />
+  <input type="hidden" id="receipt_new" name="receipt_new" value="<%=@receipt_new%>" />
+  
+  <% @taxinvoices = Taxinvoice.where(:invoice_id => @invoice.id) %>
+  <div class="info-box" style="margin-bottom:30px;">  
+
+      <h3>Bukti Kas Keluar #<%=zeropad(@invoice.id)%></h3>
+
+      <table class="row-view no-border">
+        <tr>
+          <td width="90">Tanggal</td>
+          <td><%=@invoice.created_at.strftime('%d-%m-%Y')%> &nbsp;(KTR: <%=@invoice.office.name%>)</td>
+        </tr>
+        <tr>
+          <td>Pelanggan</td>
+          <td><%=@invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td><strong><%=@invoice.quantity%></strong> Rit: <%=@invoice.route.name%></td>
+        </tr>
+        <tr>
+          <td>Tipe</td>
+          <td><%=@invoice.route.routegroup.name%></td>
+        </tr>
+        <tr>
+          <td>Kendaraan</td>
+          <td><%=@invoice.vehicle.current_id%>&nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+        </tr>
+        <tr>
+          <td>Supir</td>
+          <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
+        </tr>
+      </table>
+  </div>
+
+  <div class="field-row" style="margin-bottom:20px;">
+      <% qty = @invoice.quantity %>
+      <% qty -= @invoice.receiptreturns.where(:deleted => false).sum(:quantity) if @invoice.receiptreturns.where(:deleted => false).any? %>
+      <% bonus_total = qty.to_i * @invoice.route.bonus %>
+
+      <label>Premi</label>
+      <input type="checkbox" id="is_premi" name="is_premi" <% if @receipt.description.blank? %> checked="true" <% end %>  /> 
+      
+      <div class="field-row continue">
+        <label for="bonusreceipt_quantity">Jumlah</label>
+        <input type="text" id="quantity" name="bonusreceipts[quantity]" class="half" readonly="true" value="<%= qty%>" />
+        <span> / &nbsp;@ <%=to_currency(@invoice.route.bonus)%></span>
+      </div>
+      
+      <div class="field-row continue" id="div_totalbonus" style="padding-bottom:20px;">
+        <label for="bonusreceipt_totalbonus">Premi</label>
+        <input type="text" id="totalbonus" name="bonusreceipts[totalbonus]" class="half" onkeypress="javascript:return isNumberKey(this);" <% if @receipt.total > 0 %> value="<%=(@receipt.total).to_i%>" <% else %> value="<%=bonus_total.to_i%>" <% end %> />    
+        <strong>Rupiah</strong>
+        <input type="hidden" id="bonus_route" name="bonus_route" value="<%=@invoice.route.bonus%>" />
+      </div>
+      
+      <div class="field-row">
+        <label>Pemuatan</label>
+      </div>
+
+      <div class="field-row continue">
+         <label for="load_location">Lokasi</label>
+        <input type="text" id="load_location" name="bonusreceipts[load_location]" style="width:350px;" value="<%= @receipt.load_location%>" />
+      </div>
+
+      <div class="field-row continue" style="padding-bottom:20px;">
+         <label for="load_date" class="left">Tanggal</label>
+        <input type="text" id="load_date" name="bonusreceipts[load_date]" class="half date-picker left" value="<%= @receipt.load_date.strftime('%d-%m-%Y') if !@receipt.load_date.nil? %>" />
+        <label for="load_hour" class="middle">Jam</label>
+          <input type="text" id="load_hour" name="bonusreceipts[load_hour]" class="half middle" value="<%= @receipt.load_hour if !@receipt.load_hour.nil?%>" />
+      </div>
+
+       <div class="field-row">
+        <label>Bongkar</label>
+      </div>
+
+      <div class="field-row continue">
+         <label for="unload_location">Lokasi</label>
+        <input type="text" id="unload_location" name="bonusreceipts[unload_location]" style="width:350px;" value="<%= @receipt.unload_location%>" />
+      </div>
+
+      <div class="field-row continue" style="padding-bottom:20px;">
+         <label for="unload_date">Tanggal</label>
+          <input type="text" id="unload_date" name="bonusreceipts[unload_date]" class="half date-picker left" value="<%= @receipt.unload_date.strftime('%d-%m-%Y') if !@receipt.unload_date.nil?%>" />
+          <label for="unload_hour" class="middle">Jam</label>
+          <input type="text" id="unload_hour" name="bonusreceipts[unload_hour]" class="half middle" value="<%= @receipt.unload_hour%>" />
+      </div>
+
+      <div class="field-row" id="div_description">
+        <label for="description">Keterangan</label>
+        <input type="text" id="description" name="bonusreceipts[description]" style="width:350px;" value="<%= @receipt.description%>" />
+      </div>
+      
+  </div>
+
+  <div class="field-row" style="margin-bottom:-20px;">
+    <% if @invoice.taxinvoiceitems.any? %>
+      <table class="row-view">
+        <tr>
+          <th width="30">No.</th>
+          <th width="50">Tanggal</th>
+          <th width="100">Surat Jalan</th>    
+          
+        </tr>
+        <% @invoice.taxinvoiceitems.order(:id).each_with_index do |taxinvoiceitem,i| %>
+        <% if !taxinvoiceitem.date.blank? %>
+        <% date = taxinvoiceitem.date.strftime('%d-%m-%Y') %>
+        <% else %>
+        <% date = ""%>
+        <% end %>
+        <tr>
+          <td><%=i+1%>.</td>
+          <td ><input type="text" name="bonusreceipts[b_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+          <td><input type="text" name="bonusreceipts[b_sku_id_<%=taxinvoiceitem.id%>]" class="half<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.sku_id%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+          <td></td>
+        </tr>
+        
+        
+        <% end %>
+        <tr>
+          <td colspan="3" align="right"><input type="submit" class="btn" value="Simpan Surat Jalan" /></td>
+        </tr>
+      </table>
+
+    <% end %>
+  </div>
+  
+</form>
+
+<% end %>
+  
+  
+
+
+
+
+

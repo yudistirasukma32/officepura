@@ -1,0 +1,212 @@
+<div class="wrapper">
+<ul>
+	<li><i class="icon-th"></i></li>
+
+	<% if @section == 'reports' %>
+		<li class="<%= @where == 'reports' ? 'on' : ''%>"><%= link_to "dashboard", "/dashboard"%></li>
+	<% end %>
+
+	<% if @section == 'masters' %>
+		<li class="<%= @where == 'customers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan, Admin Jurusan'), "Pelanggan", "/customers" %></li>
+		<li class="<%= @where == 'drivers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Operasional BKK'), "Supir", "/drivers" %></li>
+		<li class="<%= @where == 'staffs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "Staf", "/staffs" %></li>
+
+		<li class="<%= @where == 'routes' ? 'on' : '' %>"><%= link_to_if (checkrole 'Master Jurusan, User Jurusan, Admin Operasional'), "Jurusan", "/routes" %></li>
+		<li class="<%= @where == 'vehicles' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Kendaraan", "/vehicles" %></li>
+		<li class="<%= @where == 'isotanks' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Isotank", "/isotanks" %></li>
+		<li class="<%= @where == 'containers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Kontainer", "/containers" %></li>
+
+		<li class="<%= @where == 'assets' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Aktiva", "/assets" %></li>
+		<li class="<%= @where == 'suppliers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang'), "Supplier", "/suppliers" %></li>
+		<li class="<%= @where == 'products' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang, Staf Permintaan Gudang, Staf Pembelian Gudang'), "Stok Barang", "/products" %></li>
+		<% if @where == 'products' || @where == 'productgroups' %>
+			<li class="<%= @where == 'productgroups' ? ' on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang'), "Grup Barang", "/productgroups" %></li>
+		<% end %>
+
+		<% if @where == 'ships' || @where == 'ports' %>
+		<li class="<%= @where == 'ships' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Kapal'), "Kapal", "/ships" %></li>
+		<li class="<%= @where == 'ports' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Pelabuhan'), "Pelabuhan", "/ports" %></li>
+		<% end %>
+    
+		<% if @where == 'assets' || @where == 'vehicles-asset' %>
+			<li class="subpage<%= @where == 'vehicles-asset' ? ' on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Aktiva Kendaraan", "/vehicles/index_asset" %></li>
+		<% end %>
+		<li class="<%= @where == 'productsales' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang, Admin Keuangan'), "Brg Bekas", "/productsales" %></li>
+		<!-- <li class="<%= @where == 'routes' ? 'on' : '' %>"><%= link_to_if (checkrole 'Master Jurusan, User Jurusan'), "Jurusan", "/routes" %></li> -->
+
+		<li class="<%= @where == 'legalities' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Legalitas'), "Legalitas", "/legalities" %></li>
+
+	<% end %>
+
+	<% if @section == 'events' %>
+		<li class="<%= @where == 'events' ? 'on' : '' %>"><%= link_to "Kalender Events", "/events" %></li>
+		<li class="<%= @where == 'events-cancelled' ? 'on' : '' %>"><%= link_to "DO Ditolak", "/events?type=cancelled" %></li>
+		<li class="<%= @where == 'bookings' ? 'on' : '' %>"><%= link_to "Kalender OPS", "/bookings" %></li>
+	<% end %>
+
+	<% if @section == 'cashiers' %>
+		<li class="<%= @where == 'cashiers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Kasir", "/cashiers" %></li>
+	<% end %>
+    
+    <% if @section == 'taxinvoiceitems' %>
+		<li class="<%= @where == 'taxinvoiceitems' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Surat Jalan'), "Pengisian Surat Jalan", "/taxinvoiceitems" %></li>
+	<% end %>
+    
+    <% if @section == 'taxinvoices' %>
+		<li class="<%= @where == 'taxinvoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan'), "Invoice Tagihan", "/taxinvoices" %></li>
+	<% end %>
+
+	<% if @section == 'transactions' or @section == 'transactions2' %>
+		<%# if ["bankinvoices"].include?@where %>
+			<!-- <li class="<%= @where == 'bankinvoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Bukti Bank", "/bankinvoices" %></li> -->
+		<%# end %>
+		
+		<% if ["invoicetests","invoices", "invoices_kosongan", "invoicereturns", "invoiceadd", "bonusreceipts", "invoicereturnadd", "incentives","indexinvoicetrain", "invoicereturntrain",'invoice_isotank','invoice_kapal'].include?@where %>
+    
+            <li class="<%= @where == 'invoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Standart'), "Bukti Kas Keluar", "/invoices" %></li>
+            <li class="<%= @where == 'invoices_kosongan' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan'), "BKK Kosongan", "/invoices/kosongan" %></li>
+			<li class="<%= @where == 'indexinvoicetrain' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Kereta", "/invoices/indexinvoicetrain" %></li>
+    
+			<li class="<%= @where == 'invoicereturns' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Bukti Kas Masuk", "/invoicereturns" %></li>						
+			<li class="<%= @where == 'invoiceadd' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Tambahan", "/invoices/indexadd" %></li>					
+			<li class="<%= @where == 'invoicereturnadd' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKM Tambahan", "/invoicereturns/add" %></li>	
+			<!--<li class="<%= @where == 'invoice_isotank' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Isotank", invoice_isotank_url %></li>-->
+			<!--<li class="<%= @where == 'invoice_kapal' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Kapal", invoice_ship_url %></li>-->
+			
+			<li class="<%= @where == 'bonusreceipts' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Premi", "/bonusreceipts" %></li>
+			<li class="<%= @where == 'incentives' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Insentif", "/incentives" %></li>
+		<% end %>
+
+		<% if ["payrolls", "payrollreturns", "driverexpenses"].include?@where %>
+			<li class="<%= @where == 'payrolls' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "BKK Supir", "/payrolls" %></li>
+			<li class="<%= @where == 'payrollreturns' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "BKM Supir", "/payrollreturns" %></li>
+			<li class="<%= @where == 'driverexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "Kas Supir", "/driverexpenses" %></li>
+		<% end %>
+
+		<% if ["officeexpenses", "officeexpensegroups", "bankexpenses", "bankexpensegroups", "officebankexpenses","bankinvoices"].include?@where %>
+			<li class="<%= @where == 'officeexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional'), "Petty Kas", "/officeexpenses" %></li>
+			<li class="subpage<%= @where == 'officeexpensegroups' ? ' on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Grup Kas", "/officeexpensegroups" %></li>
+			<li class="<%= @where == 'bankexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Jurnal Umum", "/bankexpenses" %></li>
+			<li class="subpage<%= @where == 'bankexpensegroups' ? ' on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Grup Jurnal", "/bankexpensegroups" %></li>
+			<li class="<%= @where == 'bankinvoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Bukti Bank", "/bankinvoices" %></li>
+			<!-- <li class="subpage<%= @where == 'officebankexpenses' ? ' on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Jurnal Petty Kas", "/officebankexpenses" %></li> -->
+		<% end %>
+
+		<% if ["taxinvoiceitems", "taxinvoices", "paymentchecks"].include?@where %>
+			<!-- <li class="<%= @where == 'taxinvoiceitems' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Surat Jalan'), "Pengisian Surat Jalan", "/taxinvoiceitems" %></li> -->
+			<!-- <li class="<%= @where == 'taxinvoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan'), "Invoice Tagihan", "/taxinvoices" %></li> -->
+			<li class="<%= @where == 'paymentchecks' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Pembayaran Bon", "/paymentchecks" %></li>
+		<% end %>
+
+		<% if ["productrequests", "productorders", "sales", "generalexpenses"].include?@where %>
+			<li class="<%= @where == 'productrequests' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang, Staf Permintaan Gudang, Staf Pembelian Gudang'), "Permintaan Stok Barang", "/productrequests" %></li>
+			<li class="<%= @where == 'productorders' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang, Staf Pembelian Gudang'), "Pembelian Stok", "/productorders" %></li>
+			<li class="<%= @where == 'generalexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang'), "Pembelian Non Stok", "/generalexpenses" %></li>
+			<li class="<%= @where == 'sales' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang'), "Penjualan Barang Bekas", "/sales" %></li>
+		<% end %>
+
+		<% if ["assetorders", "assetpayments"].include?@where %>
+			<li class="<%= @where == 'assetorders' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang'), "Pembelian Aset", "/assetorders" %></li>
+			<li class="<%= @where == 'assetpayments' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang'), "Pembayaran Aset", "/assetpayments" %></li>
+		<% end %>
+	<% end %>
+
+	<% if @section == 'reports1' or @section == 'reports2' %>
+	
+		<% if ["taxinvoices-report", "taxinvoiceitems-report","report_invoices","confirmed-invoices"].include?@where %>
+			<% if current_user.owner %>
+				<li class="<%= @where == 'taxinvoices-report' ? 'on' : '' %>"><%= link_to "Laporan Invoice", "/reports/taxinvoices_report" %></li>
+				<li class="<%= @where == 'taxinvoiceitems-report' ? 'on' : '' %>"><%= link_to "Laporan Surat Jalan", "/reports/taxinvoiceitems_report" %></li>
+				<li class="<%= @where == 'report_invoices' ? 'on' : '' %>"><%= link_to "Laporan BKK", "/reports/invoices" %></li>
+				<li class="<%= @where == 'confirmed-invoices' ? 'on' : '' %>"><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>
+				<% else %>
+						<% if checkrole 'Admin Keuangan, Admin Operasional' %>
+							<li class="<%= @where == 'taxinvoiceitems-report' ? 'on' : '' %>"><%= link_to "Laporan Surat Jalan", "/reports/taxinvoiceitems_report" %></li>
+							<li class="<%= @where == 'report_invoices' ? 'on' : '' %>"><%= link_to "Laporan BKK", "/reports/invoices" %></li>
+							<li class="<%= @where == 'confirmed-invoices' ? 'on' : '' %>"><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>
+							
+						<%end%>
+			<%end%>
+		<% end %>
+
+		<% if ["expenses-daily", "expenses-daily-new", "expenses-bank", "reports-invoicereturns", "expenses-office", "isotanks-report", "isotanks-utilization", "containers-report", "containers-utilization"].include?@where %>
+			<li class="<%= @where == 'expenses-daily-new' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Kas Harian", "/reports/expenses-daily-new" %></li>
+			<li class="<%= @where == 'reports-invoicereturns' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Kas Masuk (BKM)", "/reports/invoicereturns" %></li>
+			<li class="<%= @where == 'isotanks-report' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Isotank", "/reports/isotanks_report" %></li>
+			<li class="<%= @where == 'isotanks-utilization' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Utl Isotank", "/reports/isotanks-utilization" %></li>
+			<li class="<%= @where == 'containers-report' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Kontainer", "/reports/containers_report" %></li>
+			<li class="<%= @where == 'containers-utilization' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Utl Kontainer", "/reports/containers-utilization" %></li>
+			<li class="<%= @where == 'expenses-bank' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Jurnal Keuangan", "/reports/expenses-bank" %></li>
+			<li class="<%= @where == 'expenses-office' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Jurnal Petty Kas", "/reports/expenses-office" %></li>
+		<% end %>
+
+		<% if ["expensesdriverdaily", "reports-payroll","bonus-receipts"].include?@where %>
+			<li class="<%= @where == 'expensesdriverdaily' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "Kas Harian Supir", "/reports/expensesdriverdaily" %></li>
+			<li class="<%= @where == 'reports-payroll' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "Gaji Supir", "/reports/payroll" %></li>
+			<li class="<%= @where == 'bonus-receipts' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "Kas Premi", "/reports/bonus-receipts" %></li>
+		<% end %>
+	
+		<% if ["incomes-statement","incomes-cashinout", "incomes-statement-nocharge", "ledger", "balances", "reports-assets", "paymentchecks"].include?@where %>
+			<!-- <li class="<%#= @where == 'paymentchecks' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Pembayaran Bon", "/reports/paymentchecks" %></li> -->
+			<li class="<%= @where == 'incomes-statement' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Laba Rugi Biaya", "/reports/incomes-statement" %></li>
+			<li class="<%= @where == 'incomes-cashinout' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "LR Cash in/out", "/reports/incomes-cashinout" %></li>
+			<li class="<%= @where == 'incomes-statement-nocharge' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "LR non Biaya", "/reports/incomes-statement-nocharge" %></li>
+			<li class="<%= @where == 'ledger' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Buku Besar", "/reports/filterledger" %></li>
+			<li class="<%= @where == 'balances' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Neraca", "/reports/balances" %></li>
+			<li class="<%= @where == 'reports-assets' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Penyusutan Aktiva", "/reports/assets" %></li>			
+		<% end %>
+
+		<% if ["annualreport-vehicle", "incomes-vehicle", "expenses-vehicle", "graph-incomesvehicle", "graph-expensesvehicle", "shrinkreport", "incomeexpenseestimation_vehicle"].include?@where %>
+			<li class="<%= @where == 'expenses-vehicle' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Gudang, Staf Gudang, Operasional BKK'), "Pengeluaran Kendaraan", "/reports/expenses-vehicle" %></li>
+			<li class="<%= @where == 'incomes-vehicle' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin HRD, Operasional BKK'), "Pemasukan Kendaraan", "/reports/incomes-vehicle" %></li>
+			<li class="<%= @where == 'annualreport-vehicle' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin HRD, Operasional BKK'), "Laba Rugi Kendaraan", "/reports/indexannualreport_vehicle" %></li>
+			<li class="<%= @where == 'incomeexpenseestimation_vehicle' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin HRD, Operasional BKK'), "L/R Estimasi Kendaraan", "/reports/incomeexpenseestimation_vehicle" %></li>
+			<li class="<%= @where == 'graph-expensesvehicle' || @where == 'graph-incomesvehicle' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin HRD'), "Grafik Kendaraan", "/dashboards/incomes-vehicle" %></li>
+			<li class="<%= @where == 'shrinkreport' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin HRD'), "Susut", "/reports/shrinkreport" %></li>
+		<% end %>
+
+		<% if ["reports-customers","reports-customercredits","reports-suppliercredits","reports-tiretargets"].include?@where %>
+			<li class="<%= @where == 'reports-customers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Auditor'), "Omset Penjualan", "/reports/customers" %></li>
+			<li class="<%= @where == 'reports-customercredits' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Auditor'), "Piutang Pelanggan", "/reports/customercredits" %></li>
+			<li class="<%= @where == 'reports-suppliercredits' ? 'on' : '' %>"><%= link_to_if (current_user.owner || (checkrole 'Owner Report')), "Hutang Supplier", "/reports/suppliercredits" %></li>
+			<!-- <li class="<%= @where == 'reports-tiretargets' ? 'on' : '' %>"><%= link_to_if (current_user.owner || (checkrole 'Owner Report')), "Target Ban Tahunan", "/reports/tiretargets" %></li> -->
+		<% end %>
+
+		<% if ["product-orders", "productstocks", "suppliers", "reports-sales"].include?@where %>
+			<li class="<%= @where == 'product-orders' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang,  Admin HRD'), "Permintaan / Pembelian Stok", "/reports/product-orders" %></li>			
+			<li class="<%= @where == 'productstocks' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang, Admin HRD'), "Stok Barang", "/reports/productstocks" %></li>
+			<li class="<%= @where == 'suppliers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang, Admin HRD'), "Pembelian Supplier", "/reports/suppliers" %></li>
+			<li class="<%= @where == 'reports-sales' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang, Admin HRD'), "Penjualan Barang", "/reports/sales" %></li>
+		<% end %>
+
+		<% if ["expenses-drivers", "expenses-gas", "gas-vouchers", "gas-leftovers", 'driver-rit'].include?@where %>
+			<li class="<%= @where == 'expenses-drivers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Operasional BKK'), "Sangu Supir", "/reports/expenses-drivers" %></li>
+			<li class="<%= @where == 'expenses-gas' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Operasional BKK'), "Solar Kontan", "/reports/expenses-gas" %></li>
+			<li class="<%= @where == 'gas-vouchers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Operasional BKK'), "Solar Bon", "/reports/gas-vouchers" %></li>
+			<li class="<%= @where == 'gas-leftovers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Operasional BKK'), "Solar Gantungan", "/reports/gas-leftovers" %></li>
+			<li class="<%= @where == 'driver-rit' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin HRD, Admin Operasional' || current_user.owner), "Laporan Rit Sopir", "/reports/driver-rit" %></li>
+		<% end %>
+	<% end %>
+
+	<% if @section == 'estimationreport' %>
+		<li class="<%= @where == 'estimationdashboard' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Dashboard Estimasi", "/reports/estimationdashboard" %></li> 
+		<li class="<%= @where == 'estimation' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Estimasi BKK", "/reports/estimation" %></li> 
+		<li class="<%= @where == 'estimationincomeexpense' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Perbandingan BKK & Estimasi", "/reports/estimation-income-expense" %></li> 
+		<li class="<%= @where == 'estimation_event_invoice' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Perbandingan DO & Estimasi", "/reports/estimation-event-expense" %></li> 
+	<% end %>
+
+	<% if @section == "logs" %> 
+		<li class="<%= @where == 'vehiclelogs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Mekanik'), "Check Kendaraan", "/vehiclelogs" %></li>
+		<li class="<%= @where == 'driverlogs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Mekanik'), "Check Supir", "/driverlogs" %></li>
+		<li class="<%= @where == 'vehicledates' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Mekanik'), "Tanggal Penting", "/vehicledates" %></li>
+		<li class="<%= @where == 'report-events' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Marketing, Auditor, Admin Marketing, Admin Operasional'), "Report DO", "/report-events" %></li>
+		<li class="<%= @where == 'invoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Kalender Event BKK", "/invoices/form_event" %></li>
+	<% end %>
+
+	<% if @section == "settings" %> 
+		<li class="<%= @where == 'settings' ? 'on' : '' %>"><%= link_to_if current_user.adminrole || current_user.owner, "Data System", "/settings" %></li>
+		<li class="<%= @where == 'users' ? 'on' : '' %>"><%= link_to_if current_user.adminrole || current_user.owner, "Data User", "/users" %></li>
+	<% end %>
+
+</ul>
+</div>

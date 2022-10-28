@@ -1,0 +1,42 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Transaksi / <a href="<%=payrollreturns_path%>">BKM Supir</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<%= render "sublink", :sublink => 2 %>
+		
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date">Pilih Periode</label>
+				<select name="month" class="half left" style="margin-right:10px;">
+					<% (1.upto(12)).each do |m| %>
+					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+					<% end %>
+				</select>
+				<% year_to = Asset.order(:date_purchase).first.date.year rescue nil || Date.today.year %>
+				<select name="year" class="short left">
+					<% (Date.today.year.upto(year_to)).each do |y| %>
+					<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+					<% end %>
+				</select>
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<%= render "showtable-confirmed" %>
+		<br class="clearfix" />
+
+	</div>
+
+</div>

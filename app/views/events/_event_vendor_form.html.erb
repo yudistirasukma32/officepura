@@ -1,0 +1,11 @@
+<div class="row nested_field_vendors" style="margin-top: 0.5rem;">
+    <label>Vendor</label>
+    <div style="display: flex; justify-content: space-between;">
+        <input type="text" name="vendor_name[]" class="vendor_name" value="<%= @item.name rescue nil %>" class="" style="width: 80%; " placeholder="Nama Vendor">
+        <input type="text" name="vehicle_current_id[]" class="vendor_vehicle_current_id" value="<%= @item.vehicle_current_id rescue nil %>" class="" style="width: 80%; " placeholder="Nopol Vendor">
+        <input type="text" name="iso_cont_number[]" class="vendor_iso_cont_number" value="<%= @item.iso_cont_number rescue nil %>" class="" style="width: 80%; " placeholder="No. ISO/Kontainer">
+        <input type="text" name="quantity[]" class="vendor_quantity" value="<%= @item.quantity rescue nil %>" class="" style="width: 80%; " placeholder="Jumlah">
+        <button type="button" class="btn-delete-vendor icon-trash"><i class="fa fa-trash"></i></button>
+    </div>
+</div>
+ 

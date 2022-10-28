@@ -1,0 +1,174 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Laba Rugi Kendaraan: <span class="red"><%=@year%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="width:100%;">
+				<!-- Pilih Tahun &nbsp; &nbsp; -->
+				<label for="year">Pilih tahun</label>
+				<select name="year" class="third left">
+					<% 2012.upto(Date.today.year) do |year| %>
+					<option value="<%=year%>"<% if year == @year.to_i %> selected="selected"<% end %>><%=year%></option>
+					<% end %>
+				</select>
+				<label for="vehiclegroup_id" class="middle">Group</label>
+				<select name="vehiclegroup_id" class="half left">
+				<% if current_user.owner %>
+					<option value="0">Semua Group</option>
+					<% end %>
+					<% @vehiclegroups.each do |vehiclegroup| %>
+					<option value="<%=vehiclegroup.id%>"<% if @vehiclegroup and vehiclegroup.id == @vehiclegroup.id %> selected="selected"<% end %>><%=vehiclegroup.name%></option>
+					<% end %>
+		    	</select>
+		    	<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view report-view">
+		<% if @vehiclegroups.any? %>
+			
+			<tr>
+				<th width="30">No.</th>
+				<th>Kendaraan</th>
+				<th width="90" class="right">Pemasukan</th>
+				<th width="90" class="right">Pengeluaran</th>
+				<th width="90" class="right">Profit</th>
+				<th width="60" class="hideprint"></th>
+			</tr>
+			<% totalall_groupincome = 0;
+				totalall_groupoutcome = 0;%>
+		<% if params[:vehiclegroup_id] == "0" %>
+			<% @vehiclegroups.each do |vehiclegroup| %>
+			<% totalgroupincome = 0;
+				totalgroupoutcome = 0;%>
+			<tr class="subheading">
+				<th colspan="6"><span class="red"><%= vehiclegroup.name %></span></th>
+			</tr>
+			<% vehiclegroup.vehicles.each_with_index do |vehicle, i| %>
+			<% 	totalincome = 0;
+				totaloutcome = 0;
+				taxinvoices = Taxinvoiceitem.where("extract(year from date) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+			    inc_others = Receiptexpense.where("extract(year from created_at) = #{@year} and expensetype = 'Debit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+			    taxinvoicesgeneric = Taxgenericitem.where("extract(year from date) = #{@year} and deleted = false and vehicle_id = #{vehicle.id}").sum(:total)
+
+
+				totalincome = taxinvoices.to_i + inc_others.to_i + taxinvoicesgeneric.to_i
+				totalgroupincome += totalincome
+
+				receipts = Receipt.where("extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total) 
+		      	receiptreturns = Receiptreturn.where("extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+		      	receiptpremis = Receiptpremi.where("extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+		      	receiptexpenses = Receiptexpense.where("extract(year from created_at) = #{@year} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+		      	productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and deleted = false and vehicle_id = #{vehicle.id})").sum(:total) 
+
+				totaloutcome = receipts.to_i + receiptpremis.to_i + receiptexpenses.to_i + productrequests.to_i - receiptreturns.to_i
+				totalgroupoutcome += totaloutcome
+			%>	
+			<tr>
+				<td><%= i+1%>.</td>
+				<td><%= vehicle.current_id%></td>
+				<td align="right"><%= to_currency(totalincome)%></td>
+				<td align="right"><%= to_currency(totaloutcome)%></td>
+				<td align="right"><%= to_currency(totalincome - totaloutcome)%></td>
+				<td class="hideprint"><a class="cta" href="/reports/annualreport_vehicle/<%=vehicle.id%>/<%=@year%>">Detail</a></td>
+			</tr>
+			<% end %>
+			
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="green"><%=to_currency(totalgroupincome)%></td>
+				<td align="right" class="red"><%=to_currency(totalgroupoutcome)%></td>
+				<td align="right" class="<% if totalgroupincome >= totalgroupoutcome %> green <% else %> red <% end %>"><%=to_currency(totalgroupincome-totalgroupoutcome)%></td>
+				<td>&nbsp;</td>
+			</tr>
+			<% totalall_groupincome += totalgroupincome %>
+			<% totalall_groupoutcome += totalgroupoutcome %>
+
+			<% end%>
+		<% else %> 
+			<% totalgroupincome = 0;
+				totalgroupoutcome = 0;%>
+			<tr class="subheading">
+				<th colspan="6"><span class="red"><%= @vehiclegroup.name %></span></th>
+			</tr>
+			<% @vehiclegroup.vehicles.each_with_index do |vehicle, i| %>
+			<% 	totalincome = 0;
+				totaloutcome = 0;
+				taxinvoices = Taxinvoiceitem.where("extract(year from date) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+			    inc_others = Receiptexpense.where("extract(year from created_at) = #{@year} and expensetype = 'Debit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+			    taxinvoicesgeneric = Taxgenericitem.where("extract(year from date) = #{@year} and deleted = false and vehicle_id = #{vehicle.id}").sum(:total)
+
+
+				totalincome = taxinvoices.to_i + inc_others.to_i + taxinvoicesgeneric.to_i
+				totalgroupincome += totalincome
+
+				receipts = Receipt.where("extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total) 
+		      	receiptreturns = Receiptreturn.where("extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+		      	receiptpremis = Receiptpremi.where("extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+		      	receiptexpenses = Receiptexpense.where("extract(year from created_at) = #{@year} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+		      	productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and deleted = false and vehicle_id = #{vehicle.id})").sum(:total) 
+
+				totaloutcome = receipts.to_i + receiptpremis.to_i + receiptexpenses.to_i + productrequests.to_i - receiptreturns.to_i
+				totalgroupoutcome += totaloutcome
+			%>	
+			<tr>
+				<td><%= i+1%>.</td>
+				<td><%= vehicle.current_id%></td>
+				<td align="right"><%= to_currency(totalincome)%></td>
+				<td align="right"><%= to_currency(totaloutcome)%></td>
+				<td align="right"><%= to_currency(totalincome - totaloutcome)%></td>
+				<td class="hideprint"><a class="cta" href="/reports/annualreport_vehicle/<%=vehicle.id%>/<%=@year%>">Detail</a></td>
+			</tr>
+			<% end %>
+			
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td class="total">TOTAL</td>
+				<td align="right" class="green"><%=to_currency(totalgroupincome)%></td>
+				<td align="right" class="red"><%=to_currency(totalgroupoutcome)%></td>
+				<td align="right" class="<% if totalgroupincome >= totalgroupoutcome %> green <% else %> red <% end %>"><%=to_currency(totalgroupincome-totalgroupoutcome)%></td>
+				<td>&nbsp;</td>
+			</tr>
+			<% totalall_groupincome += totalgroupincome %>
+			<% totalall_groupoutcome += totalgroupoutcome %>
+			<% end%>
+		<% end%>
+			<tr class="footer">
+				<td class="total" align="right" colspan="4">RATA-RATA PEMASUKAN KENDARAAN:</td>
+				<td class="total" align="right"><%=to_currency(totalall_groupincome / 12) %></td>
+				<td class="hideprint">&nbsp;</td>
+				
+			</tr>
+			<tr class="footer">
+				<td class="total" align="right" colspan="4">RATA-RATA PENGELUARAN KENDARAAN:</td>
+				<td class="total" align="right"><%= to_currency(totalall_groupoutcome / 12) %></td>
+				<td class="hideprint">&nbsp;</td>
+
+			</tr>
+			<tr class="footer">
+				<td class="total" align="right" colspan="4">RATA-RATA PROFIT KENDARAAN:</td>
+
+				<td class="total" align="right"><%= to_currency( (totalall_groupincome - totalall_groupoutcome) / 12) %></td>
+				<td class="hideprint">&nbsp;</td>
+			</tr>
+	</table>
+
+	</div>
+	
+</div>

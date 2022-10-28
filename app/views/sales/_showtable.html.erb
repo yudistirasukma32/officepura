@@ -1,0 +1,45 @@
+<table class="row-view">
+	<tr>
+		<th width="30">No.</th>
+		<th width="50">ID</th>
+		<th>Keterangan</th>
+		<th width="100" class="right">Total</th>
+		<th width="60"></th>
+	</tr>
+
+	<% i = 0 %>
+
+	<% @sales.each do |sale| %>
+	<% items = "" 
+		sale.saleitems.each do |saleitem| 
+			items += saleitem.quantity.to_s + " " + saleitem.productsale.unit_name + ": " + saleitem.productsale.name + ", "
+		end
+		items = items[0...-2]	
+	%>
+	<% if sale.deleted %>
+	<% if current_user.adminrole %>
+	<tr class="deleted">
+		<td><%= i+=1 %>.</td>
+		<td><%= zeropad(sale.id) %></td>
+		<td><%= items %></td>
+		<td class="red" align="right"><%=to_currency(sale.total)%></td>
+		<td class="right">DIHAPUS</td>
+	</tr>
+	<% end %>
+	<% else %>
+	<tr>
+		<td><%= i+=1 %>.</td>
+		<td><%= link_to zeropad(sale.id), edit_sale_path(sale) %></td>
+		<td><%= link_to items, edit_sale_path(sale)%></td>
+		<td class="green" align="right"><%= to_currency(sale.total) %></td>
+		<td class="right">
+			<% if sale.receiptsales.active.count == 0 %>
+			<%= link_to '&#xf044;'.html_safe, edit_sale_path(sale), :class => "edit tipsy", :title => 'Edit' %> 
+			<% end %>
+			<a href="<%= confirmation_sale_path(sale)%>" class="delete tipsy" title="Print Penjualan"><i class="icon-print"></i></a>
+			<%= link_to '&#xf00d;'.html_safe, sale, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+		</td>
+	</tr>
+	<% end %>
+	<% end %>
+</table>

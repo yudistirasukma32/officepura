@@ -1,0 +1,109 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<% if checkrole 'Admin Operasional' %>
+		<a class="btn print" href="<%=new_vehicle_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<% end %>
+		<h1>Master / <a href="<%=vehicles_path%>">Kendaraan</a> / Index</h1>
+
+		<%= render 'default/toggle_deleted_checkbox' %>
+
+		<br class="clearfix" />
+		<br class="clearfix" />
+
+		<table class="row-view tablesorter">
+			<thead>
+			<tr> 
+				<th class="{sorter: false}" width="30"></th>
+				<th>No Pol</th>
+				<th>Tipe</th>
+				<th>Grup</th>
+				<th>Tahun</th>
+				<th>Kantor</th>
+				<th class="{sorter: false}">Insentif</th>
+				<th width="60" class="{sorter: false}">Aktif</th>
+				<th width="60" class="{sorter: false}"></th>
+			</tr>
+			<thead>
+			<tbody>
+			<% @vehicles.each do |vehicle| %>
+			<% img = vehicle.images.first rescue nil %>
+			<% if vehicle.deleted %>
+				<% if current_user.adminrole %>
+				<tr class="deleted">
+					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
+					<td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+					<td><%= vehicle.vehicle_type %></td>
+					<td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+					<td><%= vehicle.year_made %></td>
+					<td><%= vehicle.office.name %></td>
+					<td><%= vehicle.vehicleincentivegroup.nil? ? '' : '<i class="icon-thumbs-up"></i>'.html_safe %></td>
+					<% if vehicle.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+					<% end %>
+					<td class="right" width="60">&nbsp;</td>
+				</tr>
+				<% end %>
+			<% else %>
+				<% if checkrole 'Admin Operasional, Admin Kendaraan, Operasional BKK' %>
+				<tr>
+					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
+					<td><%= link_to vehicle.current_id, edit_vehicle_path(vehicle) %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+					<td><%= vehicle.vehicle_type %></td>
+					<td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+					<td><%= vehicle.year_made %></td>
+					<td><%= vehicle.office.name %></td>
+					<td><%= vehicle.vehicleincentivegroup.nil? ? '' : '<i class="icon-thumbs-up"></i>'.html_safe %></td>
+					<% if vehicle.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, disable_vehicle_path(vehicle), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe, enable_vehicle_path(vehicle), :class => 'disabled tipsy', :title => 'Aktifkan' %></td>
+					<% end %>
+					<td class="right" width="60">
+						<%= link_to '&#xf044;'.html_safe, edit_vehicle_path(vehicle), :class => "edit tipsy", :title => 'Edit' %> 
+						<%= link_to '&#xf00d;'.html_safe, vehicle, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+					</td>
+				</tr>
+				<% else %>
+				<tr>
+					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
+					<td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+					<td><%= vehicle.vehicle_type %></td>
+					<td><%= vehicle.year_made %></td>
+					<td><%= vehicle.office.name %></td>
+					<td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+					<td><%= vehicle.vehicleincentivegroup.nil? ? '' : '<i class="icon-thumbs-up"></i>'.html_safe %></td>
+					<% if vehicle.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+					<% end %>
+					<td class="right" width="60">&nbsp;</td>
+				</tr>
+				<% end %>
+			<% end %>
+			
+			<% end %>	
+			</tbody>
+		
+		</table>
+
+		<% if checkrole 'Admin Operasional, Admin Kendaraan' %>
+		<div class="actions">
+			<a class="btn-txt right" href="<%=new_vehicle_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		</div>
+		<% end %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>
