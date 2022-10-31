@@ -661,5 +661,18 @@ OfficePuraErp::Application.routes.draw do
       end
     end
 
+    scope "api_customers", controller: "api/api_customers" do
+      get "get_all_customers"
+      get "get_detail_customer"
+    end
+
+    scope "api_routes", controller: "api/api_routes" do
+      get "get_detail_route"
+      post "create_route"
+      post "create_route_2"
+      post "create_allowance"
+      post "create_allowance_2"
+    end
+
     root :to => 'application#home'
 end
