@@ -657,7 +657,7 @@
 			<% end %>
 
 			<!-- Kas Umum -->
-			<% umum = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND (officeexpensegroup_id = #{Officeexpensegroup.find_by_name('Umum Operasional').id} OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = #{Officeexpensegroup.find_by_name('Umum Operasional').id}))", @date).order(:id) %>
+			<% umum = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND (officeexpensegroup_id = #{Officeexpensegroup.find_by_name('UMUM OPERASIONAL').id} OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = #{Officeexpensegroup.find_by_name('UMUM OPERASIONAL').id}))", @date).order(:id) %>
 			
 			<% if umum.any? %>
 				<tr class="subheading">
