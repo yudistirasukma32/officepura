@@ -22,7 +22,7 @@
 		</tbody>
 		<tbody>	
 		<% @invoices.each_with_index do |invoice| %>
-		<% if [1,4].include? invoice.office_id %>
+		<% if [99].include? invoice.office_id %>
 			<% invoice.total = 0 %>
 		<% end %>
 		
@@ -35,20 +35,20 @@
                     <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
                 </td>
 
-				<td class="<%= ([1,4].include? invoice.office_id) ? 'red' : '' %>">
+				<td class="<%= ([99].include? invoice.office_id) ? 'red' : '' %>">
 					<%=invoice.office.abbr if !invoice.office_id.nil?%>
 				</td>
 
 				<td><%=invoice.vehicle.current_id rescue nil%></td>
 				<td align="right" class="red">
-				<% if [1,4].include? invoice.office_id %>
+				<% if [99].include? invoice.office_id %>
 					<%=to_currency(0)%>
 				<% else %>
 					<%=to_currency(invoice.total)%>
 				<% end %>
 				</td>
 				<td class="right">
-					<% if [1,4].include? invoice.office_id%>
+					<% if [99].include? invoice.office_id%>
 						<a class="cta" style="background: #2196f3;" href="<%=new_receipt_path%>/<%=invoice.id%>">Konfirm</a>
 					<% else %>
 						<a class="cta" href="<%=new_receipt_path%>/<%=invoice.id%>">Konfirm</a>
@@ -76,7 +76,7 @@
 		</tbody>
 		<tbody>	
 		<% @invoicetrains.each_with_index do |invoice| %>
-		<% if [1,4].include? invoice.office_id %>
+		<% if [99].include? invoice.office_id %>
 			<% invoice.total = 0 %>
 		<% end %>
 		
@@ -89,20 +89,20 @@
                     <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
                 </td>
 
-				<td class="<%= ([1,4].include? invoice.office_id) ? 'red' : '' %>">
+				<td class="<%= ([99].include? invoice.office_id) ? 'red' : '' %>">
 					<%=invoice.office.abbr if !invoice.office_id.nil?%>
 				</td>
 
 				<td><%=invoice.vehicle.current_id rescue nil%></td>
 				<td align="right" class="red">
-				<% if [1,4].include? invoice.office_id %>
+				<% if [99].include? invoice.office_id %>
 					<%=to_currency(0)%>
 				<% else %>
 					<%=to_currency(invoice.total)%>
 				<% end %>
 				</td>
 				<td class="right">
-					<% if [1,4].include? invoice.office_id%>
+					<% if [99].include? invoice.office_id%>
 						<a class="cta" style="background: #2196f3;" href="<%=new_receipt_path%>/<%=invoice.id%>">Konfirm</a>
 					<% else %>
 						<a class="cta" href="<%=new_receipt_path%>/<%=invoice.id%>">Konfirm</a>
@@ -133,7 +133,7 @@
 		<tbody>
 		<% @invoicereturns.each_with_index do |invoicereturn| %>
 
-		<% if [1,4].include? invoicereturn.office_id %>
+		<% if [99].include? invoicereturn.office_id %>
 			<% invoicereturn.total = 0 %>
 		<% end %>
 
@@ -141,12 +141,12 @@
 			<tr>
 				<td><%=zeropad(invoicereturn.invoice.id)%></td>
 				<td><%=invoicereturn.quantity%> Rit: <%=invoicereturn.invoice.route.name%> <%= invoicereturn.invoice.invoicetrain ? '= Kereta =' : '' %></td>
-				<td class="<%= invoicereturn.invoice.office.abbr == 'SUB' || invoicereturn.invoice.office.abbr == 'PRB' ? 'red' : '' %>">
+				<td class="">
 				<%=invoicereturn.invoice.office.abbr if !invoicereturn.invoice.office_id.nil?%>
 				</td>
 				<td><%=invoicereturn.invoice.vehicle.current_id%></td>
 				<td align="right" class="green">
-				<% if [1,4].include? invoicereturn.office_id %>
+				<% if [99].include? invoicereturn.office_id %>
 				<%=to_currency(0)%>
 				<% else %>
 				<%=to_currency(invoicereturn.total)%>
@@ -154,7 +154,7 @@
 				</td>
 				<td class="right">
 
-				<% if [1,4].include? invoicereturn.office_id %>
+				<% if [99].include? invoicereturn.office_id %>
 					<a class="cta" style="background: #2196f3;" href="<%=new_receiptreturn_path%>/<%=invoicereturn.id%>">Konfirm</a>
 				<% else %>
 				<a class="cta" href="<%=new_receiptreturn_path%>/<%=invoicereturn.id%>">Konfirm</a>

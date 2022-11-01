@@ -43,7 +43,7 @@ class ReceiptreturnsController < ApplicationController
       @receipt.user_id = current_user.id
 
       
-      if ([1,4].include? @invoice.office_id)
+      if ([99].include? @invoice.office_id)
 
         @receipt.driver_allowance = 0
         @receipt.helper_allowance = 0

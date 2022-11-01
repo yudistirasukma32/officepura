@@ -46,7 +46,7 @@ class ReceiptsController < ApplicationController
 
         # render json: ([5,3,6,7].include? @invoice.office_id.to_i)
         # return false
-        if ([1,4].include? @invoice.office_id)
+        if ([99].include? @invoice.office_id)
 
           @receipt.driver_allowance = 0
           @receipt.helper_allowance = 0
