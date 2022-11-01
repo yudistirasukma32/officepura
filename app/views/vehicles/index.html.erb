@@ -22,7 +22,7 @@
 			<tr> 
 				<th class="{sorter: false}" width="30"></th>
 				<th>No Pol</th>
-				<th>Tipe</th>
+				<th>Jenis</th>
 				<th>Grup</th>
 				<th>Tahun</th>
 				<th>Kantor</th>
@@ -39,7 +39,7 @@
 				<tr class="deleted">
 					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
 					<td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
-					<td><%= vehicle.vehicle_type %></td>
+					<td><%= vehicle.platform_type %></td>
 					<td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
 					<td><%= vehicle.year_made %></td>
 					<td><%= vehicle.office.name %></td>
@@ -57,7 +57,7 @@
 				<tr>
 					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
 					<td><%= link_to vehicle.current_id, edit_vehicle_path(vehicle) %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
-					<td><%= vehicle.vehicle_type %></td>
+					<td><%= vehicle.platform_type %></td>
 					<td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
 					<td><%= vehicle.year_made %></td>
 					<td><%= vehicle.office.name %></td>
@@ -76,7 +76,7 @@
 				<tr>
 					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
 					<td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
-					<td><%= vehicle.vehicle_type %></td>
+					<td><%= vehicle.platform_type %></td>
 					<td><%= vehicle.year_made %></td>
 					<td><%= vehicle.office.name %></td>
 					<td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>

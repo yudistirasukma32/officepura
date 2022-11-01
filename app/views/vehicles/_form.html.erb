@@ -81,13 +81,15 @@
         <select name="vehicle[platform_type]" class="half left ">
             <option value="">-- Jenis Truk --</option>
             <option value="Platform" <% if @vehicle.platform_type == "Platform"%> selected="selected" <% end %>>Platform</option>
-            <option value="Tangki" <% if @vehicle.platform_type == "Tangki"%> selected="selected" <% end %>>Tangki</option>
+            <option value="Lorry" <% if @vehicle.platform_type == "Lorry"%> selected="selected" <% end %>>Lorry</option>
             <option value="Multifungsi" <% if @vehicle.platform_type == "Multifungsi"%> selected="selected" <% end %>>Multifungsi</option>
             <option value="Box" <% if @vehicle.platform_type == "Box"%> selected="selected" <% end %>>Box</option>
-            <option value="Flatbed" <% if @vehicle.platform_type == "Flatbed"%> selected="selected" <% end %>>Flatbed</option>
             <option value="Threeway" <% if @vehicle.platform_type == "Threeway"%> selected="selected" <% end %>>Threeway</option>
             <option value="DropSide" <% if @vehicle.platform_type == "DropSide"%> selected="selected" <% end %>>DropSide</option>
-            <option value="LossBak" <% if @vehicle.platform_type == "LossBak"%> selected="selected" <% end %>>LossBak</option>
+            <option value="LossBak" <% if @vehicle.platform_type == "LossBak"%> selected="selected" <% end %>>Loss Bak</option>
+            <option value="Gandengan" <% if @vehicle.platform_type == "Gandengan"%> selected="selected" <% end %>>Gandengan</option>
+            <option value="Trailer Platform" <% if @vehicle.platform_type == "Trailer Platform"%> selected="selected" <% end %>>Trailer Platform</option>
+            <option value="Engkel" <% if @vehicle.platform_type == "Engkel"%> selected="selected" <% end %>>Engkel</option>
         </select>
       </div>
         
