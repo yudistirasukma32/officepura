@@ -59,7 +59,7 @@
 					<td><%=zeropad(invoice.id) %></td>
 					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
 					</td>
-                    <% if invoice.office.abbr == 'SDA' || invoice.office.abbr == 'SMG' %>
+                    <% if invoice.office.abbr == '' %>
                     <td class="red"><%=invoice.office.abbr%></td>    
                     <% else %>
                     <td><%=invoice.office.abbr%></td>
@@ -70,7 +70,7 @@
 					<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %></td>
 					<td><%=invoice.event_id rescue nil%></td>
                     <td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
-                    <% if invoice.office.abbr == 'SDA' || invoice.office.abbr == 'SMG' %>
+                    <% if invoice.office.abbr == '' %>
                     <td align="right" class="red">
                         <%=to_currency(0)%>
                     </td>    
@@ -87,7 +87,7 @@
 				<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice) %></td>
 				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> 
                 </td>
-                <% if invoice.office.abbr == 'SDA' || invoice.office.abbr == 'SMG' %>
+                <% if invoice.office.abbr == '' %>
                 <td class="red"><%=invoice.office.abbr%></td>    
                 <% else %>
                 <td><%=invoice.office.abbr%></td>
@@ -101,7 +101,7 @@
                 </td>
 				<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
 				
-                <% if invoice.office.abbr == 'SDA' || invoice.office.abbr == 'SMG' %>
+                <% if invoice.office.abbr == '' %>
                 <td align="right" class="red">
                     <%=to_currency(0)%>
                 </td>    

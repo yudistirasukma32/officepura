@@ -99,7 +99,7 @@
 			<td><%=invoice.date.strftime('%d/%m/%y')%></td>
 			<td>#<%= invoice.id %><br><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%></td>
             <td><%=invoice.event.id rescue nil%><br/><%=invoice.event.summary rescue nil%></td>
-            <% if invoice.office.abbr == 'SDA' || invoice.office.abbr == 'SMG' %>
+            <% if invoice.office.abbr == '' %>
             <td class="red"><%=invoice.office.abbr%></td>    
             <% else %>
             <td><%=invoice.office.abbr%></td>
