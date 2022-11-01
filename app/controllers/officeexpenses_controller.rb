@@ -25,7 +25,7 @@
     @parentgroups = Bankexpensegroup.active.parentgroup.order(:name)
 
     @errors = Hash.new
-    umum = Officeexpensegroup.find_by_name('Umum')
+    umum = Officeexpensegroup.find_by_name('UMUM')
 
     @officeexpense = Officeexpense.new
     @officeexpense.office_id = current_user.office_id rescue nil || 1 
