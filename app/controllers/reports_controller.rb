@@ -1318,6 +1318,15 @@ end
       @balance = @balance + @support 
 
 
+      offsetRunning = Setting.find_by_name("Offset Saldo Akhir 1 Nov").value.to_i
+
+      @sdate = Date.new(2022, 11, 1)
+      
+      if @date.to_i > @sdate.strftime('%d-%m-%Y').to_i
+        @balance = @balance - offsetRunning
+      end
+
+
       render "expenses-daily-new"
     else
       redirect_to root_path()
