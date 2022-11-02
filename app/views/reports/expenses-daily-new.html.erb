@@ -314,6 +314,33 @@
 				</tr>
 			<% end %>
 
+			<!-- bon / uj -->
+			<% bons = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND (officeexpensegroup_id = #{Officeexpensegroup.find_by_name('BON').id} OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = #{Officeexpensegroup.find_by_name('BON').id}))", @date).order(:id) %>
+			
+			<% if bons.any? %>
+				<tr class="subheading">
+					<th colspan="<%= colspan %>"><span class="green">BON</span></th>
+				</tr>
+			<% bons.each_with_index do |expense, i| %>
+			<% running += expense.total %>
+				<tr>
+					<td><%=i+1%>.</td>
+					<td><%=nl2br(expense.officeexpense.description).html_safe%> <%= (expense.officeexpense.isotank_id.present? && expense.officeexpense.isotank_id.to_i != 0) ? ("Isotank = " + expense.officeexpense.isotank.isotanknumber) : '' %><%= (expense.officeexpense.container_id.present? && expense.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + expense.officeexpense.container.containernumber) : '' %> </td>
+					<td><%=expense.officeexpense.office.abbr if !expense.officeexpense.office_id.nil? %></td>
+					<td><%=expense.officeexpense.vehicle.current_id unless expense.officeexpense.vehicle.nil?%></td>
+					<td align="right" class="green"><%=to_currency(expense.total)%></td>
+					<td align="right" <% if running < 0 %> class="red"<% end %>><%=to_currency(running)%></td>
+				</tr>
+			<% end %>
+
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td colspan="3">TOTAL</td>
+					<td align="right" class="green"><%=to_currency(bons.sum(:total))%></td>
+					<td>&nbsp;</td>
+				</tr>
+			<% end %>
+
 			<!-- PENJUALAN BARANG -->
 			<% if @receiptsales.where("money(total) > money(0)").any? %>
 			<tr class="subheading">
