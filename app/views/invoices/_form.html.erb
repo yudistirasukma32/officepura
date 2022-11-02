@@ -80,7 +80,7 @@
 
     if params[:kosongan] || params[:kosongan] == true
 
-        @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%PURA%'").order(:name) 
+        @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%PURA%' OR name LIKE '%RDPI%'").order(:name) 
 
     else
 
