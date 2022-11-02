@@ -703,7 +703,7 @@ function getAllowances() {
 			$('#invoice_misc_allowance').val(data.misc_allowance);
 			$('#invoice_gas_allowance').val(data.gas_allowance);
 			$('#invoice_gas_litre').val(data.gas_litre);
-			$('#invoice_ferry_fee').val(data.ferry_fee * qty);
+			$('#invoice_ferry_fee').val(data.ferry_fee);
 			$('#invoice_tol_fee').val(data.tol_fee);
 			$('#invoice_gas_detail').html(data.gas_detail);
 			$('#invoice_additional_gas_allowance').html(data.additional_gas_allowance);
@@ -769,7 +769,7 @@ function changeDriverAllowance(qty) {
 	$('#invoicereturn_helper_allowance').val(Number($('#invoicereturn_helper_trip').val()) * parseInt(qty));
 	$('#invoicereturn_misc_allowance').val(Number($('#invoicereturn_misc_per').val()) * parseInt(qty));
 	$('#invoicereturn_gas_leftover').val(Number($('#invoicereturn_gas_per').val()) * parseInt(qty));
-	$('#invoicereturn_ferry_fee').val(Number($('#invoicereturn_ferry_per').val()) * parseInt(qty));
+	$('#invoicereturn_ferry_fee').val(Number($('#invoicereturn_ferry_per').val()));
 	$('#invoicereturn_tol_fee').val(Number($('#invoicereturn_tol_per').val()) * parseInt(qty));
 }
 
