@@ -829,6 +829,8 @@
 
 		</table>
 
+		<% offsetRunning = Setting.find_by_name("Offset Saldo Akhir 1 Nov").value.to_i %>
+		<% running = running - offsetRunning %>
 		<h2 class="right">Saldo Akhir: <% if running < 0 %><span class="red"><% end %><%=to_currency(running, 'Rp. ')%><% if running < 0 %></span><% end %></h2>
 
 		<p class="showprint page-breaker"></p> 
