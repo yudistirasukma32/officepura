@@ -8,9 +8,11 @@
 	<div id="content-full">
 
 		<% if params[:operational] || params[:operational] == true %>
-		<a class="btn-txt cancel" href="../../routes"><i class="icon-remove"></i> Kembali Ke Jurusan</a>
+			<a class="btn-txt cancel" href="<%= routes_url %>"><i class="icon-remove"></i> Kembali Ke Jurusan</a>
 		<% else %>
-			<a class="btn-txt cancel" href="<%=edit_customer_path(@customer)%>/#2"><i class="icon-remove"></i> Kembali Ke Pelanggan</a>
+			<% if @customer.present? %>
+				<a class="btn-txt cancel" href="<%=edit_customer_path(@customer)%>/#2"><i class="icon-remove"></i> Kembali Ke Pelanggan</a>
+			<% end %>
 		<% end %>
 
 		<h1>Jurusan / Tambah Jurusan</h1>

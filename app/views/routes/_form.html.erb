@@ -105,7 +105,9 @@
 
       <div class="actions">
         <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Operasional, Marketing, Admin Marketing' %>
-        <a class="back left" href="<%=edit_customer_path(@customer)%>/#2">Kembali ke Pelanggan</a>
+        
+        <a class="back left" href="<%= @customer.present? ? edit_customer_path(@customer)+"/#2" : routes_url%>">Kembali ke <%= @customer.present? ? "Pelanggan" : "Index Jurusan" %></a>
+        
       </div>
 
       <% end %>  

@@ -95,11 +95,14 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
-  get 'routes/addnew' => 'routes#addnew'
+  # get 'routes/addnew' => 'routes#addnew'
   resources :routes do
     member do
       get 'enable'
       get 'disable'
+    end
+    collection do
+      get 'addnew'
     end
   end
 
