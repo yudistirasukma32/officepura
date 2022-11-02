@@ -1307,9 +1307,16 @@ end
       @receiptpayrollsold = Receiptpayroll.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date)
       @receiptpayrollreturnsold = Receiptpayrollreturn.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date)
 
+
+
       @balance =  0
       @balance = @balance + @hiddenexpensedebitold.sum(:total) + @receiptreturnsold.sum(:total) + officepexpenses_debitold.sum(:total) + @receiptsalesold.sum(:total) + @bankexpensedebitold.sum(:total) + @receiptpayrollreturnsold.sum(:total) 
       @balance = @balance - @hiddenexpensecreditold.sum(:total) - @receiptsold.sum(:total) - officepexpenses_creditold.sum(:total) - @receiptpremisold.sum(:total) - @receiptincentivesold.sum(:total) - @receiptordersold.sum(:total) - @bankexpensecreditold.sum(:total) - @receiptdriversold.sum(:total) - @receiptpayrollsold.sum(:total) 
+    
+    
+      @support = Setting.find_by_name("Penyesuaian Saldo Setelah 1 November 2022").value.to_i
+      @balance = @balance + @support 
+
 
       render "expenses-daily-new"
     else
