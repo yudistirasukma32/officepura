@@ -668,11 +668,12 @@ class InvoicesController < ApplicationController
   end
 
   def get_vehicles_by_office_id
-    if params[:office_id] == '3' || params[:office_id] == '5'
+    # Sby, Prb, Smt, CP
+    if params[:office_id] == '3' || params[:office_id] == '5' || params[:office_id] == '6' || params[:office_id] == '7'
         @vehicles = Vehicle.where(:office_id => params[:office_id], :enabled => true, :deleted => false).order('current_id ASC') rescue nil
         render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles_new"), :layout => false }.to_json;
     else  
-        @vehicles = Vehicle.where('enabled = true AND deleted = false AND office_id NOT IN (3,5)').order('current_id ASC') rescue nil
+        @vehicles = Vehicle.where('enabled = true AND deleted = false AND office_id NOT IN (3,5,6,7)').order('current_id ASC') rescue nil
         render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles_new"), :layout => false }.to_json;
     end
   end
