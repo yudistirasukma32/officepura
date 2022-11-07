@@ -80,11 +80,11 @@
 
     if params[:kosongan] || params[:kosongan] == true
 
-        @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%RDPI%' OR LIKE '%PURA%'").order(:name) 
+        @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%RDPI%' OR name LIKE '%PURA%'").order(:name) 
 
     else
 
-        @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%RDPI%' OR LIKE '%PURA%' OR id in (SELECT DISTINCT customer_id as id from events WHERE customer_id is not null AND end_date BETWEEN current_date - interval '30' day AND current_date + interval '45' day)").order(:name) 
+        @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%RDPI%' OR name LIKE '%PURA%' OR id in (SELECT DISTINCT customer_id as id from events WHERE customer_id is not null AND end_date BETWEEN current_date - interval '30' day AND current_date + interval '45' day)").order(:name) 
 
     end
     %>
