@@ -1,44 +1,44 @@
 <%= form_for(@eventmemo, html: { class: "form_ajax", "data-resource" => "eventmemo" }) do |f| %>
 
-    <% if @process == 'new' %>
-    <div class="field-row first">
-      <%= f.label :date, "Tanggal" %> 
-      <%= f.text_field :date, :class => 'left half date-picker', :value => @event.start_date.to_date.strftime('%d-%m-%Y') %> 
-    </div>
-    <% else %>
-    <div class="field-row first">
-      <%= f.label :date, "Tanggal" %> 
-      <%= f.text_field :date, :class => 'left half date-picker' %> 
-    </div>
-    <% end %>
+  <% if @process == 'new' %>
+  <div class="field-row first">
+    <%= f.label :date, "Tanggal" %> 
+    <%= f.text_field :date, :class => 'left half date-picker', :value => @event.start_date.to_date.strftime('%d-%m-%Y') %> 
+  </div>
+  <% else %>
+  <div class="field-row first">
+    <%= f.label :date, "Tanggal" %> 
+    <%= f.text_field :date, :class => 'left half date-picker' %> 
+  </div>
+  <% end %>
 
-    <div class="field-row">
-        <%= f.label :summary, "No. DO" %>
-        <%= f.text_field :event_id, :placeholder => 'No. DO', :value => @event_id, :disabled => true %>
-        <%= f.hidden_field :event_id, :value => @event_id %>
-    </div>
+  <div class="field-row">
+      <%= f.label :summary, "No. DO" %>
+      <%= f.text_field :event_id, :placeholder => 'No. DO', :value => @event_id, :disabled => true %>
+      <%= f.hidden_field :event_id, :value => @event_id %>
+  </div>
 
-    <% if @process == 'new' %>
-    <div class="field-row">
-        <%= f.label :customer_id, "Pelanggan" %>
-        <%= f.text_field :summary, :placeholder => 'Pelanggan', :value => @event.customer.name+"-"+@event.customer.city.upcase, :disabled => true %>
-        <%= f.hidden_field :customer_id, :value => @event.customer_id %>
-    </div>
-    <% else %>
-    <div class="field-row">
-        <%= f.label :customer_id, "Pelanggan" %>
-        <%= f.text_field :summary, :placeholder => 'Pelanggan', :value => @eventmemo.customer.name+"-"+@eventmemo.customer.city.upcase, :disabled => true %>
-        <%= f.hidden_field :customer_id, :value => @eventmemo.customer_id %>
-    </div>
-    <% end %>
+  <% if @process == 'new' %>
+  <div class="field-row">
+      <%= f.label :customer_id, "Pelanggan" %>
+      <%= f.text_field :summary, :placeholder => 'Pelanggan', :value => @event.customer.name+"-"+@event.customer.city.upcase, :disabled => true %>
+      <%= f.hidden_field :customer_id, :value => @event.customer_id %>
+  </div>
+  <% else %>
+  <div class="field-row">
+      <%= f.label :customer_id, "Pelanggan" %>
+      <%= f.text_field :summary, :placeholder => 'Pelanggan', :value => @eventmemo.customer.name+"-"+@eventmemo.customer.city.upcase, :disabled => true %>
+      <%= f.hidden_field :customer_id, :value => @eventmemo.customer_id %>
+  </div>
+  <% end %>
 
-    <div class="field-row">
-      <%= f.label :commodity_id, "Komoditas" %>
-      <%= f.text_field :commodity_id, :placeholder => 'Komoditas', :value => @event.commodity.name, :disabled => true %>
-      <%= f.hidden_field :commodity_id, :value => @event.commodity_id %>
-    </div>
+  <div class="field-row">
+    <%= f.label :commodity_id, "Komoditas" %>
+    <%= f.text_field :commodity_id, :placeholder => 'Komoditas', :value => @event.commodity.name, :disabled => true %>
+    <%= f.hidden_field :commodity_id, :value => @event.commodity_id %>
+  </div>
 
-    <div class="field-row">
+  <div class="field-row">
     <%= f.label :route_id, "Jurusan" %>
     <select id="eventmemo_route_id" name="eventmemo[route_id]" class="double chzn-select" required>
       <option value="0">- Pilih Jurusan -</option>
@@ -49,6 +49,7 @@
     </select>
   </div>
 
+  <% if @event.tanktype == 'ISOTANK' %>
     <div class="field-row">
       <%= f.label :isotank_id, "No. Isotank" %>
       <select id="eventmemo_isotank_id" name="eventmemo[isotank_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
@@ -57,8 +58,10 @@
         <option value="<%=isotank.id%>"<%= isotank.id == @eventmemo.isotank_id ? ' selected="selected"' : '' %>><%=isotank.isotanknumber%></option>
         <% end %>
       </select>
-    </div> 
+    </div>
+  <% end %> 
    
+  <% if @event.tanktype == 'KONTAINER' %>
     <div class="field-row">
       <%= f.label :container_id, "No. Kontainer" %>
       <select id="eventmemo_container_id" name="eventmemo[container_id]" class="chzn-select double combo_route">
@@ -67,7 +70,8 @@
         <option value="<%=container.id%>"<%= container.id == @eventmemo.container_id ? ' selected="selected"' : '' %>><%=container.containernumber%></option>
         <% end %>
       </select>
-    </div> 
+    </div>
+  <% end %>  
 
     <div class="field-row">
         <%= f.label :vehicle_id, "Kendaraan" %>
@@ -79,6 +83,23 @@
         <% end %>
     </select> 
 
+    </div>
+
+    <div class="field-row">
+      <%= f.label :tank_type, "Jenis Truk" %>
+      <select name="eventmemo[platform_type]" class="half left ">
+          <option value="">-- Jenis Truk --</option>
+          <option value="Platform" <% if @eventmemo.platform_type == "Platform"%> selected="selected" <% end %>>Platform</option>
+          <option value="Lorry" <% if @eventmemo.platform_type == "Lorry"%> selected="selected" <% end %>>Lorry</option>
+          <option value="Multifungsi" <% if @eventmemo.platform_type == "Multifungsi"%> selected="selected" <% end %>>Multifungsi</option>
+          <option value="Box" <% if @eventmemo.platform_type == "Box"%> selected="selected" <% end %>>Box</option>
+          <option value="Threeway" <% if @eventmemo.platform_type == "Threeway"%> selected="selected" <% end %>>Threeway</option>
+          <option value="Wings Box" <% if @eventmemo.platform_type == "Wings Box"%> selected="selected" <% end %>>Wings Box</option>
+          <option value="LossBak" <% if @eventmemo.platform_type == "LossBak"%> selected="selected" <% end %>>Loss Bak</option>
+          <option value="Gandengan" <% if @eventmemo.platform_type == "Gandengan"%> selected="selected" <% end %>>Gandengan</option>
+          <option value="Trailer Platform" <% if @eventmemo.platform_type == "Trailer Platform"%> selected="selected" <% end %>>Trailer Platform</option>
+          <option value="Engkel" <% if @eventmemo.platform_type == "Engkel"%> selected="selected" <% end %>>Engkel</option>
+      </select>
     </div>
 
     <div class="field-row">

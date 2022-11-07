@@ -65,6 +65,7 @@ class TaxinvoicesController < ApplicationController
     @taxinvoice.period_start = Date.today.strftime('%d-%m-%Y')
     @taxinvoice.period_end = Date.today.strftime('%d-%m-%Y')
     @taxinvoice.price_by = 'is_net'
+    @taxinvoice.user_id = current_user.id
     @needupdate = false
     @taxinvoice.sentdate = params[:sentdate]
 
@@ -155,6 +156,7 @@ class TaxinvoicesController < ApplicationController
       
       @taxinvoice.total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f
 
+      @taxinvoice.user_id = current_user.id
       @taxinvoice.save
 
     end
@@ -230,7 +232,7 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.insurance_cost = params[:insurance_cost]
       @taxinvoice.remarks = params[:remarks]
       @taxinvoice.claim_cost = params[:claim_cost]
-      
+      @taxinvoice.user_id = current_user.id
       @taxinvoice.save
       
       @taxinvoiceitems.each do |taxinvoiceitem|

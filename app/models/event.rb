@@ -7,6 +7,8 @@ class Event < ActiveRecord::Base
     belongs_to :route
     belongs_to :commodity
     belongs_to :company
+    belongs_to :routetrain
+	belongs_to :operator
     
     has_many :invoices
     has_many :eventsalesorders
@@ -20,7 +22,7 @@ class Event < ActiveRecord::Base
     :deleted, :cancelled, :authorised, :authorised_dated, :payments_by, 
     :qty, :invoicetrain, :cargo_number, :cargo_type, :volume, :office_id, :pos_sby, :pos_smg, :pos_jkt, :pos_smt, :pos_lorry, 
     :vendor_name, :long_id, :station_id, :route_summary, :need_vendor, :user_id, :commodity_id, :route_id, :truck_quantity,
-    :company_id, :estimated_tonage, :tanktype, :load_date, :unload_date
+    :company_id, :estimated_tonage, :tanktype, :load_date, :unload_date, :routetrain_id, :operator_id
 
     scope :active, lambda {where(:deleted => false)}
 

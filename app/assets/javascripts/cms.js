@@ -321,7 +321,7 @@ function print_whitespace(len){
 	return objReturn;
 }
 
-function fixHTML(html) { return html.replace(/ /g, "&nbsp;").replace(/’/g, "'").replace(/-/g,"&#8209;"); }
+function fixHTML(html) { return html.replace(/ /g, "&nbsp;").replace(/â€™/g, "'").replace(/-/g,"&#8209;"); }
 
 function monitorFinding() 
 {
@@ -553,6 +553,22 @@ function getRouteTrain(operator_id) {
 	});
 }
 
+function getRouteTrain2(operator_id) {
+	$.ajax({
+		type: "GET",
+		url: "/invoices/get_trainroute2/" + operator_id,
+		success: function(data) {
+			console.log("/invoices/get_trainroute2/" + operator_id);
+			$('#div_routetrains').html(data.html);
+			$(".chzn-select").chosen();
+		},
+		request: function() {
+			$('#div_routetrains').html('<em>Mengunduh Data</em>');			
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
+}
+
 function getRoutes(customer_id) {
     
     if (document.getElementById('invoice_invoicetrain_true').checked) {
@@ -769,7 +785,7 @@ function changeDriverAllowance(qty) {
 	$('#invoicereturn_helper_allowance').val(Number($('#invoicereturn_helper_trip').val()) * parseInt(qty));
 	$('#invoicereturn_misc_allowance').val(Number($('#invoicereturn_misc_per').val()) * parseInt(qty));
 	$('#invoicereturn_gas_leftover').val(Number($('#invoicereturn_gas_per').val()) * parseInt(qty));
-	$('#invoicereturn_ferry_fee').val(Number($('#invoicereturn_ferry_per').val()));
+	$('#invoicereturn_ferry_fee').val(Number($('#invoicereturn_ferry_per').val()) * parseInt(qty));
 	$('#invoicereturn_tol_fee').val(Number($('#invoicereturn_tol_per').val()) * parseInt(qty));
 }
 
@@ -2184,19 +2200,18 @@ $(document).ready(function() {
 		return false;
 	});	
 
-    // $("input:radio[name='invoice[invoicetrain]']").change(function(){  
-	// 	if(this.value == 'true' && this.checked){
-	// 		$("#isonumber").show();
-	// 		$(".isotank_id").show();
-	// 		$("#contnumber").show();
-	// 		$(".container_id").show();
-	// 	}else{
-	// 		$("#isonumber").hide();
-	// 		$(".isotank_id").hide();
-	// 		$("#contnumber").hide();
-	// 		$(".container_id").hide();
-	// 	}
-    // });
+	$("input:radio[name='event[invoicetrain]']").change(function(){  
+	if(this.value == 'true' && this.checked){
+		$("#div_opstrains").show();
+		$("#div_routetrains").show();
+		$("#div_stationtrains").show();
+
+	}else{
+		$("#div_opstrains").hide();
+		$("#div_routetrains").hide();
+		$("#div_stationtrains").hide();
+	}
+	});
 
 	$("#invoice_transporttype").change(function(){
 	if($(this).val() == 'KAPAL (TOL LAUT)'){ 

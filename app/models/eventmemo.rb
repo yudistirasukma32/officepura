@@ -19,7 +19,7 @@ class Eventmemo < ActiveRecord::Base
 
     # Setup accessible (or protected) attributes for your model
     attr_accessible :date, :event_id, :driver_id, :customer_id, :vehicle_id, :commodity_id, 
-    :quantity, :route_id, :route_summary, :container_id, :isotank_id, :description, :enabled, :deleted, :driver_phone 
+    :quantity, :route_id, :route_summary, :container_id, :isotank_id, :description, :enabled, :deleted, :driver_phone, :platform_type 
  
     scope :active, lambda {where(:deleted => false)}
     

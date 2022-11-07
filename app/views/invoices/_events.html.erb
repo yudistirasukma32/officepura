@@ -1,6 +1,6 @@
 <% if !@events.first.nil? %>
 <div class="field-row">
-  <label for="event_id">DO Kalender Event</label>
+  <label for="event_id">DO Kal. Event</label>
   <select id="invoice_event_id" name="invoice[event_id]" class="chzn-select double combo_route">
     <option value="0">- Pilih DO -</option>
     <% @events.each do |event| %>
@@ -31,5 +31,6 @@
         <% end %>
     <% end %>
   </select>
+  <small>*DO Event yang ditampilkan diatas berdasarkan Pilihan Pelanggan.</small>
  </div>
 <% end %>

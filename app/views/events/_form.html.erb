@@ -1,26 +1,145 @@
 <%= form_for(@event) do |f| %>
-    <div class="field-row first">
-      <%= f.label :start_date, "Tanggal" %> 
-      <%= f.text_field :start_date, :class => 'left half date-picker' %>
-      <%= f.label :start_date, "s/d", :class => 'middle' %> 
-      <%= f.text_field :end_date, :class => 'left half date-picker' %>
-    </div>
+	<div class="field-row first">
+		<%= f.label :start_date, "Tanggal" %> 
+		<%= f.text_field :start_date, :class => 'left half date-picker' %>
+		<%= f.label :start_date, "s/d", :class => 'middle' %> 
+		<%= f.text_field :end_date, :class => 'left half date-picker' %>
+	</div>
 
-    <div class="field-row">
-      <%= f.label :customer_id, "Pelanggan" %>
-      <select id="event_customer_id" name="event[customer_id]" class="double chzn-select" onchange="javascript:getRoutesOnly2(this.value);">
-        <option value="0">- Pilih Pelanggan -</option>
-        <% Customer.active.order(:name).each do |customer| %>
-        <option value="<%=customer.id%>"
-          <% if customer.id == @event.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase%></option>
+	<div class="field-row">
+		<%= f.label :company_id, "Perusahaan" %>
+
+		<select id="event_company_id" name="event[company_id]" class="double chzn-select">
+		<option value="0">- Pilih Perusahaan -</option>
+		<% Company.active.order(:name).each do |company| %>
+		<option value="<%=company.id%>"
+			<% if company.id == @event.company_id %> selected="selected"<% end %>><%=company.abbr%></option>
+		<% end %>
+		</select>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :office_id, "Kantor" %>
+    <select id="event_office_id" name="event[office_id]" class="half chzn-select">
+    <option value="0">- Pilih Kantor -</option>
+    <% Office.active.order(:name).each do |office| %>
+    <option value="<%=office.id%>"
+      <% if office.id == @event.office_id %> selected="selected"<% end %>><%=office.name%></option>
+    <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :customer_id, "Pelanggan" %>
+    <select id="event_customer_id" name="event[customer_id]" class="double chzn-select" onchange="javascript:getRoutesOnly2(this.value);">
+      <option value="0">- Pilih Pelanggan -</option>
+      <% Customer.active.order(:name).each do |customer| %>
+      <option value="<%=customer.id%>"
+        <% if customer.id == @event.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+      <%= f.label :summary, "Berita Acara" %>
+      <%= f.text_field :summary, :placeholder => 'Berita Acara' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :invoicetrain, "Moda" %>
+    <% if active_node == "edit" %>
+        <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, false, :checked => (@event.invoicetrain == false ? true : false), class: "moda-standart" %> Standart
         <% end %>
-      </select>
+        <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, true, :checked => (@event.invoicetrain == true ? true : false),  class: "moda-kereta" %> Kereta
+        <% end %>
+    <% else %>
+        <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, false, :checked => true, class: "moda-standart"  %> Standart
+        <% end %>
+        <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, true, class: "moda-kereta" %> Kereta
+        <% end %>
+    <% end %>
+  </div>
+
+    <% if @process == 'new' %>
+    <div id="div_opstrains" style="display: none;">
+      <div class="field-row ">
+        <%= f.label :operator_id, "Operator Kereta" %>
+        <select id="event_operator_id" name="event[operator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteTrain2(this.value);">
+          <option value="0">- Operator -</option>
+          <% Operator.active.each do |operator| %>
+          <option value="<%=operator.id%>"
+            <% if operator.id == @event.operator_id %> selected="selected"<% end %>><%=operator.name%> (<%=operator.abbr%>)</option>
+          <% end %>
+        </select>
+      </div>
     </div>
 
-    <div class="field-row">
-        <%= f.label :summary, "Berita Acara" %>
-        <%= f.text_field :summary, :placeholder => 'Berita Acara' %>
+    <div id="div_routetrains" style="display: none;">
+      <div class="field-row">
+        <%= f.label :routetrain_id, "Jurusan Kereta" %>
+        <input type="text" class="double disabled" value="<%= !@event.routetrain.nil? ? @event.routetrain.name : 'Harap memilih operator terlebih dahulu.' %>" />
+        <%= f.hidden_field :routetrain_id, :value => @event.routetrain_id %>
+      </div>
     </div>
+
+    <div id="div_stationtrains" style="display: none;">
+      <div class="field-row">
+        <%= f.label :station_id, "Stasiun" %>
+        <select id="event_station_id" name="event[station_id]" class="half chzn-select">
+        <option value="0">- Pilih Stasiun -</option>
+        <% Station.active.order(:name).each do |station| %>
+        <option value="<%=station.id%>"
+          <% if station.id == @event.station_id %> selected="selected"<% end %>><%=station.name%></option>
+        <% end %>
+        </select>
+      </div>
+    </div>
+
+    <% else %>
+
+      <% if @event.invoicetrain %>
+
+      <div id="div_opstrains">
+        <div class="field-row ">
+          <%= f.label :operator_id, "Operator Kereta" %>
+          <select id="event_operator_id" name="event[operator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteTrain2(this.value);">
+            <option value="0">- Operator -</option>
+            <% Operator.active.each do |operator| %>
+            <option value="<%=operator.id%>"
+              <% if operator.id == @event.operator_id %> selected="selected"<% end %>><%=operator.name%> (<%=operator.abbr%>)</option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+
+      <div id="div_routetrains">
+        <div class="field-row">
+          <%= f.label :routetrain_id, "Jurusan Kereta" %>
+          <input type="text" class="double disabled" value="<%= !@event.routetrain.nil? ? @event.routetrain.name : 'Harap memilih pelanggan terlebih dahulu.' %>" />
+          <%= f.hidden_field :routetrain_id, :value => @event.routetrain_id %>
+        </div>
+      </div>
+
+      <div id="div_stationtrains">
+        <div class="field-row">
+          <%= f.label :station_id, "Stasiun" %>
+          <select id="event_station_id" name="event[station_id]" class="half chzn-select">
+          <option value="0">- Pilih Stasiun -</option>
+          <% Station.active.order(:name).each do |station| %>
+          <option value="<%=station.id%>"
+            <% if station.id == @event.station_id %> selected="selected"<% end %>><%=station.name%></option>
+          <% end %>
+          </select>
+        </div>
+      </div>
+
+      <% end %>
+
+    <% end %>
 
     <% if @process == 'new' %>
 
@@ -56,7 +175,7 @@
 
     <% end %>
 
-    <div class="field-row">
+  <div class="field-row">
     <%= f.label :commodity_id, "Komoditas" %>
     <select id="event_commodity_id" name="event[commodity_id]" class="double chzn-select">
       <option value="0">- Pilih Komoditas -</option>
@@ -65,7 +184,7 @@
         <% if commodity.id == @event.commodity_id %> selected="selected"<% end %>><%=commodity.name%></option>
       <% end %>
     </select>
-    </div>
+  </div>
 
   <div class="field-row">
 		<%= f.label :load_date, "Tgl Muat" %> 
@@ -83,108 +202,66 @@
     <span style="position: absolute; margin-top: 0.5rem;"><strong>kg</strong></span>
   </div>
 
-    <div class="field-row">
-        <%= f.label :cargo_type, "Tipe Kargo" %>
-        <% if active_node == "edit" %>
+  <div class="field-row">
+      <%= f.label :cargo_type, "Tipe Kargo" %>
+      <% if active_node == "edit" %>
 
-            <% if @event.cargo_type != "" %>
+          <% if @event.cargo_type != "" %>
 
-                <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
-                  <%= f.radio_button :cargo_type, "padat", :checked => @event.cargo_type == "padat" ? true : false %> Padat
-                <% end %>
-                <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
-                  <%= f.radio_button :cargo_type, "cair", :checked => @event.cargo_type == "cair" ? true : false %> Cair
-                <% end %>
+              <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+                <%= f.radio_button :cargo_type, "padat", :checked => @event.cargo_type == "padat" ? true : false %> Padat
+              <% end %>
+              <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+                <%= f.radio_button :cargo_type, "cair", :checked => @event.cargo_type == "cair" ? true : false %> Cair
+              <% end %>
 
-            <% else %>
+          <% else %>
 
-                <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
-                  <%= f.radio_button :cargo_type, "padat", :checked => true  %> Padat
-                <% end %>
-                <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
-                  <%= f.radio_button :cargo_type, "cair" %> Cair
-                <% end %>
+              <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+                <%= f.radio_button :cargo_type, "padat", :checked => true  %> Padat
+              <% end %>
+              <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+                <%= f.radio_button :cargo_type, "cair" %> Cair
+              <% end %>
 
-            <% end %>
+          <% end %>
 
-        <% else %>
+      <% else %>
 
-            <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
-              <%= f.radio_button :cargo_type, "padat", :checked => true  %> Padat
-            <% end %>
-            <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
-              <%= f.radio_button :cargo_type, "cair" %> Cair
-            <% end %>
+          <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "padat", :checked => true  %> Padat
+          <% end %>
+          <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "cair" %> Cair
+          <% end %>
 
-        <% end %>
+      <% end %>
 
-    </div>
+  </div>
 
-    <div class="field-row" id="event_tanktype">
+  <div class="field-row" id="event_tanktype">
     <%= f.label :tanktype, "Tipe Tangki"  %>
     <%= f.select :tanktype, options_for_select(@tanktype.collect {|w| [w, w]}, (params[:tanktype].present? ? params[:tanktype] : @event.tanktype)), {}, { :class => 'half chzn-select' } %>
   </div>
 
-    <div class="field-row">
-        <% @quant = Array(0..50) %>
-        <%= f.label :qty, "Jumlah" %>   
-        <%= f.select :qty, options_for_select(@quant.collect {|w| [w, w]}, (params[:qty].present? ? params[:qty] : @event.qty)), {}, { :class => 'half' } %>
-        <span style="position: absolute; margin-top: 0.5rem;"><strong>RIT</strong></span>
-    </div>
+  <div class="field-row">
+    <% @quant = Array(0..50) %>
+    <%= f.label :qty, "Jumlah" %>   
+    <%= f.select :qty, options_for_select(@quant.collect {|w| [w, w]}, (params[:qty].present? ? params[:qty] : @event.qty)), {}, { :class => 'half' } %>
+    <span style="position: absolute; margin-top: 0.5rem;"><strong>RIT</strong></span>
+  </div>
 
   <div class="field-row">
     <% @quant = Array(0..50) %>
     <%= f.label :truck_quantity, "Jumlah Truk" %>   
     <%= f.select :truck_quantity, options_for_select(@quant.collect {|w| [w, w]}, (params[:qty].present? ? params[:qty] : @event.truck_quantity)), {}, { :class => 'half' } %>
     <span style="position: absolute; margin-top: 0.5rem;"><strong>Truk</strong></span>
-</div>
+  </div>
 
 	<div class="field-row">
  		<%= f.label :volume, "Volume" %>
  		<%= f.text_field :volume, :placeholder => '20000' %>
 	</div>
-
-    <div class="field-row">
-      <%= f.label :invoicetrain, "Moda" %>
-      <% if active_node == "edit" %>
-          <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
-            <%= f.radio_button :invoicetrain, false, :checked => (@event.invoicetrain == false ? true : false), class: "moda-standart" %> Standart
-          <% end %>
-          <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
-            <%= f.radio_button :invoicetrain, true, :checked => (@event.invoicetrain == true ? true : false),  class: "moda-kereta" %> Kereta
-          <% end %>
-      <% else %>
-          <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
-            <%= f.radio_button :invoicetrain, false, :checked => true, class: "moda-standart"  %> Standart
-          <% end %>
-          <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
-            <%= f.radio_button :invoicetrain, true, class: "moda-kereta" %> Kereta
-          <% end %>
-      <% end %>
-    </div>
-
-    <div class="field-row">
-		<%= f.label :office_id, "Kantor" %>
-		<select id="event_office_id" name="event[office_id]" class="half chzn-select">
-		<option value="0">- Pilih Kantor -</option>
-		<% Office.active.order(:name).each do |office| %>
-		<option value="<%=office.id%>"
-			<% if office.id == @event.office_id %> selected="selected"<% end %>><%=office.name%></option>
-		<% end %>
-		</select>
-	  </div>
-
-    <div class="field-row">
-		<%= f.label :station_id, "Stasiun" %>
-		<select id="event_station_id" name="event[station_id]" class="half chzn-select">
-		<option value="0">- Pilih Stasiun -</option>
-		<% Station.active.order(:name).each do |station| %>
-		<option value="<%=station.id%>"
-			<% if station.id == @event.station_id %> selected="selected"<% end %>><%=station.name%></option>
-		<% end %>
-		</select>
-	  </div>
-
 
 	<div class="field-row">
  		<%= f.label :need_vendor, "Pakai Vendor" %>

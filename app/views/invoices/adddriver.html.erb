@@ -9,7 +9,18 @@
 	<div id="content-full">
 		<a class="btn-txt cancel" href="/invoices/indexadd"><i class="icon-remove"></i> Batal</a>
 
-		<h1>Transaksi / <a href="/invoices/indexadd">BKK Train</a> / Tambah Supir</h1>
+		<h1>Transaksi / <a href="/invoices/indexinvoicetrain">Bukti Kas Keluar Kereta</a> / Tambah Supir (Bongkar)</h1>
+
+		<br class="clearfix" />
+
+		<div style="background: #fff; padding: 1rem 1rem 0;">
+			<strong>Perhatian.</strong>
+			<p>Anda membuat BKK Bongkar dari BKK Kereta 
+			<a href="../../invoices/<%=@invoice_ori.id%>/edit" target="_blank" style="text-decoration: underline; color: #2c92b3;"><strong>#<%= @invoice_ori.id %></strong></a> 
+			(No. Do <%= @invoice_ori.event_id %>)
+			<%= @invoice_ori.route.name %>
+			</p>
+		</div>
 
 		<br class="clearfix" />
 

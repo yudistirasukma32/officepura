@@ -59,10 +59,16 @@
 					<input type="text" class="disabled left" value=":  <%= @eventmemo.vehicle.current_id rescue nil%>" style="font-weight:700;" />
 				</div>			  
 			<% end %>
+			<% if @eventmemo.platform_type.present?%>
+				<div class="field-row continue">
+					<label class="left">Jenis</label>
+					<input type="text" class="disabled left" value=":  <%= @eventmemo.platform_type %>" style="font-weight:700;" />
+				</div>			  
+			<% end %>
 			<% if @eventmemo.driver_id.present? && @eventmemo.driver_id.to_i != 0 %>
 				<div class="field-row continue">
 					<label class="left">Sopir</label>
-					<input type="text" class="disabled left" value=":  <%= @eventmemo.driver.name rescue nil%>" style="font-weight:700;" />
+					<input type="text" class="disabled left" value=": <%= @eventmemo.driver.name rescue nil%>" style="font-weight:700;" />
 				</div>
 			<% end %>
 			<% if @eventmemo.driver_phone.present? %>

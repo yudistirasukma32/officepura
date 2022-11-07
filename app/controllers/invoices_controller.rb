@@ -1,7 +1,7 @@
 class InvoicesController < ApplicationController
   include ApplicationHelper
   include ActionView::Helpers::NumberHelper
-	layout "application", :except => [:get_routes, :get_allowances, :get_vehicles, :get_vehicle, :get_vehiclegroupid, :get_trainroute]
+	layout "application", :except => [:get_routes, :get_allowances, :get_vehicles, :get_vehicle, :get_vehiclegroupid, :get_trainroute, :get_trainroute2, :get_routesbyoffice]
   protect_from_forgery :except => [:add, :updateinvoice]
   before_filter :authenticate_user!, :set_section
 
@@ -178,8 +178,8 @@ class InvoicesController < ApplicationController
 #    @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
 
     if params[:train] || params[:train] == true 
-        @where = "indexinvoicetrain"
-        @tanktypes = ["ISOTANK", "KONTAINER"]
+      @where = "indexinvoicetrain"
+      @tanktypes = ["ISOTANK", "KONTAINER"]
     end
 		
     @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
@@ -189,11 +189,11 @@ class InvoicesController < ApplicationController
     @invoice.enabled = true
     @invoice.date = Date.today
       
-    @offices = Office.active  
-    @office_role = []
-
     @isotanks = Isotank.active.order(:isotanknumber)
     @isotanks = @isotanks.where("isotanknumber IN ('NLLU 2902068','NLLU 2902073','NLLU 2902089','NLLU 2902094','NLLU 2902108','NLLU 2902113','NLLU 2902129','NLLU 2902134','NLLU 2902140','NLLU 2902155','NLLU 2902284','NLLU 2902290','NLLU 2902303','NLLU 2902319','NLLU 2902324','NLLU 2902330','NLLU 2902345','NLLU 2902350','NLLU 2902366','NLLU 2902371','NLLU 2900764','NLLU 2900770','NLLU 2900785','NLLU 2900790','NLLU 2900804','NLLU 2900810','NLLU 2900825','NLLU 2900830','NLLU 2900846','NLLU 2900851','NLLU 2901380','NLLU 2901415','NLLU 2901800','NLLU 2901816','NLLU 2901842','NLLU 2901159','NLLU 2901190','NLLU 2901210','NLLU 2901225','NLLU 9700027','NLLU 2800277','NLLU 2800282','NLLU 2800298','SAXU 2705112','SAXU 2705468','NLLU 2900907','NLLU 2900912','NLLU 2900928','NLLU 2900949','NLLU 2901077','NLLU 2901082','NLLU 2901117','NLLU 2901122','NLLU 2901138','NLLU 2901164','NLLU 2902746','NLLU 2902751','NLLU 2902767','NLLU 2902772','NLLU 2902788','NLLU 2902793','NLLU 2902807','NLLU 2902812','NLLU 2902828','NLLU 2902833','NLLU 2902849','NLLU 2902854','NLLU 2902860','NLLU 2902875','NLLU 2900070','NLLU 2900105','NLLU 2900173','NLLU 2900189','NLLU 2900424','NLLU 2900430')")
+      
+    @offices = Office.active  
+    @office_role = []
       
     if checkrole 'BKK Kantor Sidoarjo'
         @office_role.push(1)
@@ -235,15 +235,15 @@ class InvoicesController < ApplicationController
     @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0 if @invoice.gas_cost.nil?
     @iseditable = false
       
-    if @invoice.tanktype == 'STANDART'
-        @invoice.tanktype = 'TANGKI'
-    end
-
     if params[:train] || params[:train] == true 
       @where = "indexinvoicetrain"
       @tanktypes = ["ISOTANK", "KONTAINER"]
     end
-    
+
+    if @invoice.tanktype == 'STANDART'
+        @invoice.tanktype = 'TANGKI'
+    end
+
     @isotanks = Isotank.active.order(:isotanknumber)
     @isotanks = @isotanks.where("isotanknumber IN ('NLLU 2902068','NLLU 2902073','NLLU 2902089','NLLU 2902094','NLLU 2902108','NLLU 2902113','NLLU 2902129','NLLU 2902134','NLLU 2902140','NLLU 2902155','NLLU 2902284','NLLU 2902290','NLLU 2902303','NLLU 2902319','NLLU 2902324','NLLU 2902330','NLLU 2902345','NLLU 2902350','NLLU 2902366','NLLU 2902371','NLLU 2900764','NLLU 2900770','NLLU 2900785','NLLU 2900790','NLLU 2900804','NLLU 2900810','NLLU 2900825','NLLU 2900830','NLLU 2900846','NLLU 2900851','NLLU 2901380','NLLU 2901415','NLLU 2901800','NLLU 2901816','NLLU 2901842','NLLU 2901159','NLLU 2901190','NLLU 2901210','NLLU 2901225','NLLU 9700027','NLLU 2800277','NLLU 2800282','NLLU 2800298','SAXU 2705112','SAXU 2705468','NLLU 2900907','NLLU 2900912','NLLU 2900928','NLLU 2900949','NLLU 2901077','NLLU 2901082','NLLU 2901117','NLLU 2901122','NLLU 2901138','NLLU 2901164','NLLU 2902746','NLLU 2902751','NLLU 2902767','NLLU 2902772','NLLU 2902788','NLLU 2902793','NLLU 2902807','NLLU 2902812','NLLU 2902828','NLLU 2902833','NLLU 2902849','NLLU 2902854','NLLU 2902860','NLLU 2902875','NLLU 2900070','NLLU 2900105','NLLU 2900173','NLLU 2900189','NLLU 2900424','NLLU 2900430')")
       
@@ -713,6 +713,24 @@ class InvoicesController < ApplicationController
     render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json; 
   end
 
+  def get_routesbyoffice
+    
+    is_train = params[:train]
+    office_id = params[:office_id]  
+      
+    if is_train == "0"
+        
+        @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
+        
+    else
+        
+        @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).where("name ~* '.*depo.*'").order(:name)
+        
+    end
+        
+    render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json; 
+  end
+
   def get_routeswithtype
     # render json: params
     # return false
@@ -732,6 +750,11 @@ class InvoicesController < ApplicationController
   def get_trainroute
     @routes = Routetrain.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
     render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains", :layout => false) }.to_json; 
+  end
+
+  def get_trainroute2
+    @routes = Routetrain.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains_for_events", :layout => false) }.to_json; 
   end
 
   def get_routes2
@@ -1009,6 +1032,43 @@ class InvoicesController < ApplicationController
 
   def adddriver
     @where = "invoiceaddriver"
+
+    @tanktypes = ["ISOTANK", "KONTAINER"]
+      
+    @isotanks = Isotank.active.order(:isotanknumber)
+    @isotanks = @isotanks.where("isotanknumber IN ('NLLU 2902068','NLLU 2902073','NLLU 2902089','NLLU 2902094','NLLU 2902108','NLLU 2902113','NLLU 2902129','NLLU 2902134','NLLU 2902140','NLLU 2902155','NLLU 2902284','NLLU 2902290','NLLU 2902303','NLLU 2902319','NLLU 2902324','NLLU 2902330','NLLU 2902345','NLLU 2902350','NLLU 2902366','NLLU 2902371','NLLU 2900764','NLLU 2900770','NLLU 2900785','NLLU 2900790','NLLU 2900804','NLLU 2900810','NLLU 2900825','NLLU 2900830','NLLU 2900846','NLLU 2900851','NLLU 2901380','NLLU 2901415','NLLU 2901800','NLLU 2901816','NLLU 2901842','NLLU 2901159','NLLU 2901190','NLLU 2901210','NLLU 2901225','NLLU 9700027','NLLU 2800277','NLLU 2800282','NLLU 2800298','SAXU 2705112','SAXU 2705468','NLLU 2900907','NLLU 2900912','NLLU 2900928','NLLU 2900949','NLLU 2901077','NLLU 2901082','NLLU 2901117','NLLU 2901122','NLLU 2901138','NLLU 2901164','NLLU 2902746','NLLU 2902751','NLLU 2902767','NLLU 2902772','NLLU 2902788','NLLU 2902793','NLLU 2902807','NLLU 2902812','NLLU 2902828','NLLU 2902833','NLLU 2902849','NLLU 2902854','NLLU 2902860','NLLU 2902875','NLLU 2900070','NLLU 2900105','NLLU 2900173','NLLU 2900189','NLLU 2900424','NLLU 2900430')")
+      
+    @offices = Office.active  
+    @office_role = []
+      
+    if checkrole 'BKK Kantor Sidoarjo'
+        @office_role.push(1)
+    end
+    if checkrole 'BKK Kantor Jakarta'
+        @office_role.push(2)
+    end
+    if checkrole 'BKK Kantor Probolinggo'
+        @office_role.push(3)
+    end    
+    if checkrole 'BKK Kantor Semarang'
+        @office_role.push(4)
+    end
+    if checkrole 'BKK Kantor Surabaya'
+      @office_role.push(5)
+    end
+    if checkrole 'BKK Kantor Sumatera'
+        @office_role.push(6)
+    end
+    if checkrole 'BKK Cargo Padat'
+        @office_role.push(7)
+    end
+    
+    if checkrole 'Operasional BKK'
+        @offices = @offices.order('id asc')
+    else
+        @offices = @offices.where('id IN (?)', @office_role).order('id asc')
+    end
+
     # @errors = Hash.new
 
     @invoice_id = params[:invoice_id]
@@ -1021,11 +1081,11 @@ class InvoicesController < ApplicationController
       isotank_id: @invoice_ori.isotank_id,
       tanktype: @invoice_ori.tanktype,
       invoicetrain: @invoice_ori.invoicetrain,
-      office_id: @invoice_ori.office_id,
+      # office_id: @invoice_ori.office_id,
       date: @invoice_ori.date,
     })
     
-    @invoice.office_id = current_user.office_id rescue nil || 1 
+    # @invoice.office_id = current_user.office_id rescue nil || 0 
     @iseditable = true
     @invoice.enabled = true
     @invoice.date = Date.today
@@ -1347,6 +1407,4 @@ def fetch_excel
         
       end
 
-
-      
     end

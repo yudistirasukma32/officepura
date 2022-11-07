@@ -62,11 +62,19 @@ class EventsController < ApplicationController
     # render json: eventvendors
     # return false
     inputs = params[:event]
+
+    if inputs[:invoicetrain] == false || inputs[:invoicetrain] == "false"
+    
+      inputs[:operator_id] = 0
+      inputs[:routetrain_id] = 0
+      inputs[:station_id] = 0
+
+    end
+
     @event = Event.new(inputs)
 
     query = @event.cancelled ? "?type=cancelled" : ""
     @event.user_id = current_user.id
-    @event.company_id = 2
    
     if @event.save
 
@@ -113,6 +121,14 @@ class EventsController < ApplicationController
       
     if inputs[:need_vendor] == '0'
         inputs[:vendor_name] = ''
+    end
+
+    if inputs[:invoicetrain] == false || inputs[:invoicetrain] == "false"
+    
+      inputs[:operator_id] = 0
+      inputs[:routetrain_id] = 0
+      inputs[:station_id] = 0
+
     end
 
     if @event.update_attributes(inputs)
@@ -237,12 +253,12 @@ class EventsController < ApplicationController
 
     elsif params[:type] == 'cancelled'
       
-      @events = Event.active.where("company_id = 2 AND cancelled = true AND start_date >= ?", 3.months.ago).order(:id)
+      @events = Event.active.where("cancelled = true and start_date >= ?", 3.months.ago).order(:id)
         
       @events = @events.map do |e|
             
         if e.company.nil?
-          company = ' [PURA]'
+          company = ' [RDPI]'
           summary = e.summary + company
         else
           company = e.company.abbr
@@ -261,7 +277,7 @@ class EventsController < ApplicationController
         }
         end
     else
-      @events = Event.active.where("company_id = 2 AND cancelled = false AND start_date >= ?", 3.months.ago).order(:id)
+      @events = Event.active.where("cancelled = false and start_date >= ?", 3.months.ago).order(:id)
         
       invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)    
         
@@ -354,11 +370,18 @@ class EventsController < ApplicationController
                 end
 
                 if e.company.nil?
-                  company = ' [PURA]'
+                  company = ' [RDPI]'
                   summary = e.summary + company
                 else
-                  company = e.company.abbr
-                  summary = e.summary + ' ['+company+']'
+
+                  if e.office.nil?
+                    company = e.company.abbr
+                    summary = e.summary + ' ['+company+']'
+                  else
+                    company = e.company.abbr
+                    summary = e.summary + ' ['+company+'] / ' + e.office.abbr
+                  end
+
                 end
 
                 {

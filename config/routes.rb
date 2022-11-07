@@ -95,14 +95,13 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
-  # get 'routes/addnew' => 'routes#addnew'
+  get 'routes/addnew' => 'routes#addnew'
   resources :routes do
     member do
       get 'enable'
       get 'disable'
-    end
-    collection do
-      get 'addnew'
+
+      get "copy"
     end
   end
 
@@ -298,8 +297,12 @@ OfficePuraErp::Application.routes.draw do
 
   
   get 'invoices/get_trainroute/:operator_id' => 'invoices#get_trainroute'
+  get 'invoices/get_trainroute2/:operator_id' => 'invoices#get_trainroute2'
   get 'invoices/getroutesonly/:customer_id' => 'invoices#get_routesonly'
+
   get 'invoices/getroutes/:customer_id' => 'invoices#get_routes'
+  get 'invoices/getroutesbyoffice/:office_id' => 'invoices#get_routesbyoffice'
+
   get 'invoices/getrouteswithtype/:customer_id/:transporttype' => 'invoices#get_routeswithtype'
   get 'invoices/getroutes2/:customer_id/:type' => 'invoices#get_routes2'
   get 'invoices/get_routesonly/:customer_id' => 'invoices#get_routesonly'
@@ -667,6 +670,14 @@ OfficePuraErp::Application.routes.draw do
     scope "api_customers", controller: "api/api_customers" do
       get "get_all_customers"
       get "get_detail_customer"
+    end
+
+    scope "api_taxinvoices", controller: "api/api_taxinvoices" do
+      get "get_detail_taxinvoice"
+      post "create_taxinvoice"
+      post "create_taxinvoice_2"
+      post "create_taxinvoice_taxgenericitem"
+      post "create_taxinvoice_taxgenericitem_2"
     end
 
     scope "api_routes", controller: "api/api_routes" do
