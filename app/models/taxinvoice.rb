@@ -11,7 +11,8 @@ class Taxinvoice < ActiveRecord::Base
   	# Setup accessible (or protected) attributes for your model
   	attr_accessible :customer_id, :office_id, :date, :long_id, :ship_name, :description, :total, :deleted, :paiddate, :duedate, :period_start, :period_end, :product_name, 
   					:spk_no, :po_no, :tank_name, :extra_cost, :extra_cost_info, :total_in_words, :price_by, :is_weightlost, 
-					:spo_no, :sentdate, :so_no, :sto_no, :do_no, :confirmeddate, :waybill, :remarks, :insurance_cost, :claim_cost, :company_id, :user_id
+					:spo_no, :sentdate, :so_no, :sto_no, :do_no, :confirmeddate, :waybill, :remarks, :insurance_cost, :claim_cost, :company_id, :user_id,
+					:generic, :gst_tax, :gst_percentage, :price_tax
 
   	scope :active, lambda {where(:deleted => false)}
 

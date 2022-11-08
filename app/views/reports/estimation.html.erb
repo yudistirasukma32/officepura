@@ -51,6 +51,7 @@
 		<% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
 
 		<% if @invoices.any? %>
+
 		<table class="row-view report-view">
 			<tr>
 				<th width="30">No.</th>
@@ -64,6 +65,9 @@
 			<% total_estimation = estimation = i = qty = day = 0 %>
 			<% @invoices.each do |invoice| %>
 			<% 
+				if invoice.office_id == 7
+					offset = 30000
+				end
 				qty = invoice.quantity
 				qty -= invoice.receiptreturns.where(:deleted => false).sum(:quantity) if invoice.receiptreturns.where(:deleted => false).any? 
 			%>

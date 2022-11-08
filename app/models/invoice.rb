@@ -58,6 +58,8 @@ class Invoice < ActiveRecord::Base
 				tonage = "35.000"
 			elsif(self.invoicetrain && self.isotank_id.present? && self.route.price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage dibuat 20,000 kg 
 				tonage = "20.000"
+			elsif(self.office_id == 7)
+				tonage = "30.000" #BKK Cargo Padat
 			else
 				tonage = "25.000"
 			end
@@ -83,6 +85,8 @@ class Invoice < ActiveRecord::Base
 				estimation = qty * 35000 * (route.price_per.to_i || 0)
 			elsif(self.invoicetrain && self.isotank_id.to_i != 0 && route.price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage dibuat 20,000 kg 
 				estimation = qty * 20000 * (route.price_per.to_i || 0)
+			elsif (self.office_id == 7)
+				estimation = qty * 30000 * (route.price_per.to_i || 0)
 			else
 				estimation = qty * 25000 * (route.price_per.to_i || 0)
 			end
