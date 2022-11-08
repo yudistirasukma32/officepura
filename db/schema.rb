@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20221104065606) do
+ActiveRecord::Schema.define(:version => 20221108235502) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -345,34 +345,34 @@ ActiveRecord::Schema.define(:version => 20221104065606) do
   end
 
   create_table "events", :force => true do |t|
-    t.boolean   "deleted",                       :default => false
+    t.boolean   "deleted",                                                        :default => false
     t.date      "start_date"
     t.date      "end_date"
     t.string    "summary"
     t.text      "description"
-    t.timestamp "created_at",       :limit => 6,                    :null => false
-    t.timestamp "updated_at",       :limit => 6,                    :null => false
-    t.boolean   "cancelled",                     :default => false
+    t.timestamp "created_at",         :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",         :limit => 6,                                                   :null => false
+    t.boolean   "cancelled",                                                      :default => false
     t.integer   "customer_id"
-    t.boolean   "authorised",                    :default => false
-    t.timestamp "authorised_dated", :limit => 6
+    t.boolean   "authorised",                                                     :default => false
+    t.timestamp "authorised_dated",   :limit => 6
     t.string    "payments_by"
     t.integer   "qty"
-    t.boolean   "invoicetrain",                  :default => false
+    t.boolean   "invoicetrain",                                                   :default => false
     t.string    "cargo_number"
     t.string    "cargo_type"
     t.integer   "volume"
     t.integer   "office_id"
-    t.boolean   "pos_sby",                       :default => false
-    t.boolean   "pos_smg",                       :default => false
-    t.boolean   "pos_jkt",                       :default => false
-    t.boolean   "pos_smt",                       :default => false
-    t.boolean   "pos_lorry",                     :default => false
+    t.boolean   "pos_sby",                                                        :default => false
+    t.boolean   "pos_smg",                                                        :default => false
+    t.boolean   "pos_jkt",                                                        :default => false
+    t.boolean   "pos_smt",                                                        :default => false
+    t.boolean   "pos_lorry",                                                      :default => false
     t.string    "vendor_name"
     t.string    "long_id"
     t.integer   "station_id"
     t.string    "route_summary"
-    t.boolean   "need_vendor",                   :default => false
+    t.boolean   "need_vendor",                                                    :default => false
     t.integer   "user_id"
     t.integer   "commodity_id"
     t.integer   "route_id"
@@ -384,6 +384,8 @@ ActiveRecord::Schema.define(:version => 20221104065606) do
     t.date      "unload_date"
     t.integer   "operator_id"
     t.integer   "routetrain_id"
+    t.decimal   "downpayment_amount",              :precision => 19, :scale => 2
+    t.date      "downpayment_date"
   end
 
   add_index "events", ["id", "start_date", "end_date", "customer_id"], :name => "index_events_on_customer_id"

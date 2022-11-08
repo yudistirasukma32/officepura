@@ -293,6 +293,38 @@
  		<%= f.label :payments_by, "Dibayar Oleh" %>
  		<%= f.text_field :payments_by, :placeholder => 'Nama' %>
 	</div>
+
+  <% if current_user.adminrole || current_user.owner %>
+  
+  <div class="field-row">
+    <%= f.label :downpayment_amount, "Jumlah DP" %>    
+    <%= f.text_field :downpayment_amount, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => @event.downpayment_amount.to_i %>
+    <strong>Rupiah</strong>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :downpayment_date, "Tanggal DP" %>
+    <%= f.text_field :downpayment_date, :class => 'half date-picker' %>
+  </div>
+
+  <% else %>
+
+      <% if checkrole 'Marketing, Admin Marketing' %>
+
+        <div class="field-row">
+          <%= f.label :downpayment_amount, "Jumlah DP" %>    
+          <%= f.text_field :downpayment_amount, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => @event.downpayment_amount.to_i %>
+          <strong>Rupiah</strong>
+        </div>
+    
+        <div class="field-row">
+          <%= f.label :downpayment_date, "Tanggal DP" %>
+          <%= f.text_field :downpayment_date, :class => 'half date-picker' %>
+        </div>
+
+      <% end %>
+
+  <% end %>
 	
 	<div class="field-row">
  		<%= f.label :cancelled, "DO Ditolak?", :style => 'font-weight:700;' %>

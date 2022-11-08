@@ -53,7 +53,13 @@
         <tr>
             <td><%=i+=1%>.</td>
             <td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
-            <td><%= invoice.event_id %></td>
+            <td>
+            <% if invoice.event.downpayment_amount.to_i > 0 %>
+            <strong><%= invoice.event_id %></strong>
+            <% else %>
+            <%= invoice.event_id %>
+            <% end %>
+            </td>
             <!-- <td><%=zeropad(invoice.id)%></td> -->
             <td>
             #<%=zeropad(invoice.id)%>: <%=qty%> Rit -> <%=invoice.route.name%> (<%=invoice.driver.name%><%= second_driver.nil? ? '' : ', ' +second_driver %>)
