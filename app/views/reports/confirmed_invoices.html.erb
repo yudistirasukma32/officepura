@@ -31,7 +31,15 @@
                 <% @offices.each do |office| %>
                 <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
                 <% end %>
-            </select> 
+            </select>
+			
+			<label for="is_premi" class="middle" style="margin-top: 0.25rem;">Premi</label>
+			<select name="is_premi" class="short left" style="margin-top: 0.25rem;">
+				<option value="">Semua</option>
+				<option value="1" <%= @is_premi == '1' ? 'selected' : '' %>>Sudah Premi</option>
+				<option value="0" <%= @is_premi == '0' ? 'selected' : '' %>>Tanpa Premi</option>
+			</select>
+
 			&nbsp; &nbsp; <label class="" style="float:none">Tgl Awal</label> &nbsp; &nbsp;
 			<input type="text" name="startdate" class="short date-picker" value="<%=@startdate%>" />
 			&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
@@ -66,25 +74,14 @@
 		<% total_header, driver_allowance_total, gas_allowance_total, misc_allowance_total, tol_fee_total, ferry_fee_total, premi_allowance_total = 0, 0, 0, 0, 0, 0, 0 %>
 		<% @invoices.each_with_index do |invoice, i|
 
-            if invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
-                driver_allowance = 0
-                helper_allowance = 0
-                gas_allowance = 0
-                misc_allowance = 0
-                tol_fee = 0
-                ferry_fee = 0
-                premi_allowance = 0
-                total = driver_allowance + helper_allowance + gas_allowance + misc_allowance + tol_fee + ferry_fee + premi_allowance
-            else
-                driver_allowance = invoice.driver_allowance
-                helper_allowance = invoice.helper_allowance
-                gas_allowance = invoice.gas_allowance
-                misc_allowance = invoice.misc_allowance
-                tol_fee = invoice.tol_fee
-                ferry_fee = invoice.ferry_fee
-                premi_allowance = invoice.premi_allowance
-                total = driver_allowance + helper_allowance + gas_allowance + misc_allowance + tol_fee + ferry_fee + premi_allowance
-            end
+			driver_allowance = invoice.driver_allowance
+			helper_allowance = invoice.helper_allowance
+			gas_allowance = invoice.gas_allowance
+			misc_allowance = invoice.misc_allowance
+			tol_fee = invoice.tol_fee
+			ferry_fee = invoice.ferry_fee
+			premi_allowance = invoice.premi_allowance
+			total = driver_allowance + helper_allowance + gas_allowance + misc_allowance + tol_fee + ferry_fee + premi_allowance
 
             driver_allowance_total += driver_allowance
             gas_allowance_total += gas_allowance

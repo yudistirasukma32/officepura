@@ -36,6 +36,7 @@
 			<th width="70" class="right {sorter:true, filter: false}">Sangu</th>
 			<th width="80" class="right {sorter:true, filter: false}">Solar</th>
 			<th width="80" class="right {sorter:true, filter: false}">Tambahan</th>
+			<th width="80" class="right {sorter:true, filter: false}">Premi</th>
 			<th width="80" class="right {sorter:true, filter: false}">Tol + ASDP</th>
 			<th width="80" class="right sorter:true, filter: false">Total DO</th>
 			<th width="80" class="right {sorter:true, filter: false}">Estimasi</th>
@@ -54,6 +55,7 @@
 			<td class="" align="right"><%=to_currency(event[:sangu])%></td>
 			<td class="" align="right"><%=to_currency(event[:solar])%></td>
 			<td class="" align="right"><%=to_currency(event[:tambahan])%></td>
+			<td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
 			<td class="" align="right"><%=to_currency(event[:tol_asdp])%></td>
 			<td class="red" align="right"><%=to_currency(event[:invoice_total])%></td>
 			<td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
@@ -65,10 +67,11 @@
 
 		<% if @events %>
 		<tr class="footer">
-			<td class="total" colspan="4">TOTAL</td>
+			<td class="total" colspan="3">TOTAL</td>
 			<td align="right"><%=to_currency(@summary[:global_sangu])%></td>
 			<td align="right"><%=to_currency(@summary[:global_solar])%></td>
 			<td align="right"><%=to_currency(@summary[:global_tambahan])%></td>
+			<td align="right"><%=to_currency(@summary[:global_premi])%></td>
 			<td align="right"><%=to_currency(@summary[:global_tol_asdp])%></td>
 			<td class="total" align="right"><%=to_currency(@summary[:global_invoice_total])%></td>
 			<td class="total" align="right"><%=to_currency(@summary[:global_total_estimasi])%></td>

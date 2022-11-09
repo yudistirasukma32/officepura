@@ -645,6 +645,7 @@ def confirmed_invoices
       @invoices = Invoice.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
       @invoicereturns = Invoicereturn.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
       @office_id = params[:office_id]
+      @is_premi = params[:is_premi]
         
       if @office_id.present? and @office_id != "all"
         @invoices = @invoices.where("office_id = ?", @office_id)
@@ -663,8 +664,22 @@ def confirmed_invoices
         @invoices = @invoices.where("invoicetrain = false").where("customer_id NOT IN (50,51,144)").order(:id)
 
       end
-        
+
       @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
+
+      if @is_premi.present?
+        
+        if @is_premi == '1'
+
+          @invoices = @invoices.where("premi_allowance > money(0)")
+
+        elsif @is_premi == '0'
+
+          @invoices = @invoices.where("premi = false")
+        
+        end
+
+      end
 
       @section = "reports1"
       @where = "confirmed-invoices"
@@ -2646,6 +2661,7 @@ end
       global_solar = 0
       global_tambahan = 0
       global_tol_asdp = 0
+      global_premi = 0
       global_invoice_total = 0
       global_total_estimation = 0
 
@@ -2659,6 +2675,7 @@ end
         solar = 0
         tambahan = 0
         tol_asdp = 0
+        premi_allowance = 0
         invoice_total = 0
         total_estimation = 0
         total_quantity = 0
@@ -2676,6 +2693,7 @@ end
           end
 
           sangu += invoice.driver_allowance.to_i + invoice.helper_allowance.to_i
+          premi_allowance += invoice.premi_allowance.to_i
           solar += invoice.gas_allowance.to_i
           tambahan += invoice.misc_allowance.to_i
           tol_asdp += invoice.tol_fee.to_i + invoice.ferry_fee.to_i
@@ -2693,9 +2711,10 @@ end
         end
 
         description = "#{total_quantity} Rit ##{event.id}: #{route.name rescue nil}"
-        global_sangu = 0
+        global_sangu += sangu
         global_solar += solar
         global_tambahan += tambahan
+        global_premi += premi_allowance
         global_tol_asdp += tol_asdp
         global_invoice_total += invoice_total
         global_total_estimation += total_estimation
@@ -2707,6 +2726,7 @@ end
           sangu: sangu,
           solar: solar,
           tambahan: tambahan,
+          premi_allowance: premi_allowance,
           tol_asdp: tol_asdp,
           invoice_total: invoice_total,
           total_estimation: total_estimation,
@@ -2715,9 +2735,11 @@ end
         }
       end
       @summary = {
+        global_sangu: global_sangu ,
         global_solar: global_solar ,
         global_tambahan: global_tambahan ,
         global_tol_asdp: global_tol_asdp ,
+        global_premi: global_premi ,
         global_invoice_total: global_invoice_total ,
         global_total_estimation: global_total_estimation ,
       }
