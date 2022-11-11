@@ -74,10 +74,10 @@
 			<td align="right"><%=to_currency(@summary[:global_premi])%></td>
 			<td align="right"><%=to_currency(@summary[:global_tol_asdp])%></td>
 			<td class="total" align="right"><%=to_currency(@summary[:global_invoice_total])%></td>
-			<td class="total" align="right"><%=to_currency(@summary[:global_total_estimasi])%></td>
+			<td class="total" align="right"><%=to_currency(@summary[:global_total_estimation])%></td>
             <td align="right" class="total">
 			<span style="display: none">
-			<%= (@summary[:global_invoice_total].to_i == 0 || @summary[:global_total_estimasi].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimasi].to_i * 100).round() %>
+			<%= (@summary[:global_invoice_total].to_i == 0 || @summary[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
 			</span>
 			</td>
             <td></td>
