@@ -1,3 +1,38 @@
+<style>
+	.pagination {
+	display: inline-block;
+	}
+
+	.pagination a {
+	color: black;
+	float: left;
+	padding: 8px 16px;
+	text-decoration: none;
+	}
+
+	.pagination a.active {
+	background-color: #4CAF50;
+	color: white;
+	}
+
+	.pagination a:hover:not(.active) {background-color: #ddd;}
+</style>
+<% 
+	page = params[:page].blank? ? 1 : params[:page].to_i 
+	if @total_page > 6
+		start_page = page - 3
+		start_page = 2 if start_page <= 1
+		end_page = page + 4
+		end_page = @total_page if end_page >= @total_page
+		max_page = @total_page	
+		first_page = 1
+
+	else
+		start_page = 1
+		end_page = @total_page + 1
+	end
+	
+%>
 <%= render "shared/header" %>
 
 <div id="nav">
@@ -31,7 +66,36 @@
 		</div>
 
 		<br class="clearfix" />
+			<div class="pagination">
+			
+				<% if page > 1 %>
+					<a href="<%= routes_url(office_id: params[:office_id], page: page - 1) %>">&laquo;</a>
+				<% end %>
+				
+				<% if first_page.present? %>
+					<a href="<%= routes_url(office_id: params[:office_id], page: first_page) %>" class="<%= page == first_page ? "active" : "" %>"><%= first_page %></a>
+				<% end %>
+				
+				<% if page > 5 %>
+					<a href="#" class="">...</a>
+				<% end %>
+				
+				<% until start_page == end_page  do %>
+					<a href="<%= routes_url(office_id: params[:office_id], page: start_page) %>" class="<%= page == start_page ? "active" : "" %>"><%= start_page %></a>
+					<% start_page += 1 %>
+				<% end %>
+				
+				<% if max_page.present? %>
+					<% if page < max_page - 4 %>
+						<a href="#" class="">...</a>
+					<% end %>
+				<a href="<%= routes_url(office_id: params[:office_id], page: max_page) %>" class="<%= page == max_page ? "active" : "" %>"><%= max_page %></a>
+				<% end %>
 
+				<% if page < @total_page %>
+					<a href="<%= routes_url(office_id: params[:office_id], page: page + 1) %>">&raquo;</a>
+				<% end %>
+			</div>
 			<table class="row-view report-view tablesorter tablesorterFilters">
 				<thead>
 				<tr>
@@ -69,7 +133,53 @@
 				</tbody>	
 
 			</table>
+		
+		<% 
+			page = params[:page].blank? ? 1 : params[:page].to_i 
+			if @total_page > 6
+				start_page = page - 3
+				start_page = 2 if start_page <= 1
+				end_page = page + 4
+				end_page = @total_page if end_page >= @total_page
+				max_page = @total_page	
+				first_page = 1
 
+			else
+				start_page = 1
+				end_page = @total_page + 1
+			end
+			
+		%>
+		<div class="pagination">
+			
+			<% if page > 1 %>
+				<a href="<%= routes_url(office_id: params[:office_id], page: page - 1) %>">&laquo;</a>
+			<% end %>
+			
+			<% if first_page.present? %>
+				<a href="<%= routes_url(office_id: params[:office_id], page: first_page) %>" class="<%= page == first_page ? "active" : "" %>"><%= first_page %></a>
+			<% end %>
+			
+			<% if page > 5 %>
+				<a href="#" class="">...</a>
+			<% end %>
+			
+			<% until start_page == end_page  do %>
+				<a href="<%= routes_url(office_id: params[:office_id], page: start_page) %>" class="<%= page == start_page ? "active" : "" %>"><%= start_page %></a>
+				<% start_page += 1 %>
+			<% end %>
+			
+			<% if max_page.present? %>
+				<% if page < max_page - 4 %>
+					<a href="#" class="">...</a>
+				<% end %>
+			<a href="<%= routes_url(office_id: params[:office_id], page: max_page) %>" class="<%= page == max_page ? "active" : "" %>"><%= max_page %></a>
+			<% end %>
+
+			<% if page < @total_page %>
+				<a href="<%= routes_url(office_id: params[:office_id], page: page + 1) %>">&raquo;</a>
+			<% end %>
+		</div>
 		<br class="clearfix"/>
 
 	</div>

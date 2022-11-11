@@ -2764,7 +2764,7 @@ end
         solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
         tambahan = route_allowance.misc_allowance.to_i rescue 0
         tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
-        invoice_total = sangu + premi + solar + tambahan + tol_asdp
+        invoice_total = (sangu + premi + solar + tambahan + tol_asdp) * quantity
 
         if price_per >= offset 
           estimation = quantity * price_per

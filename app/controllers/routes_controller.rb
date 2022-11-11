@@ -11,14 +11,44 @@ class RoutesController < ApplicationController
   end
 
   def index
-    @routes = Route.active.where('office_id is not null').order('name ASC')
+    batas = 40
+    halaman = params[:page].present? ? params[:page].to_i : 1
+    halaman_awal = (halaman > 1) ? (halaman * batas) - batas : 0
+    halaman_awal = halaman_awal + 1	
+
+    previous = halaman - 1;
+    next_step = halaman + 1;
+    
+   
     
     @office_id = params[:office_id]
 
     @offices = Office.active.order('id asc')
     if @office_id.present? and @office_id != "all"
-      @routes = @routes.where("office_id = ?", @office_id)
-    end 
+      all_data = Route.active.where("office_id = ?", @office_id).where('office_id is not null').select(:id).count()
+      @routes = Route.active.where("office_id = ?", @office_id).where('office_id is not null').limit(batas).offset(halaman_awal).order("name asc")
+    else
+      all_data = Route.active.where('office_id is not null').select(:id).count()
+      @routes = Route.active.limit(batas).offset(halaman_awal).order("name asc")
+    end
+
+    
+    @total_page = (all_data.to_f / batas.to_f).ceil
+
+    # nomor = halaman_awal+1
+    # render json: {
+    #   all_data: all_data,
+    #   batas: batas,
+    #   total_page: @total_page,
+    # }
+    # render json: {
+    #   # data: @routes.count,
+    #   # batas: batas,
+    #   # halaman_awal: halaman_awal,
+    #   all_data: all_data
+    # }
+
+
   end
 
   def addnew
