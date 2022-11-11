@@ -801,6 +801,13 @@ class InvoicesController < ApplicationController
       gas_litre = quantity * (@allowances.gas_trip || 0)
 			additional_gas_detail = 0
 			additional_gas_allowance = 0
+
+      #SOLAR TAMBAHAN utk SIL 8 & build up
+      if vehiclegroup_id == 4 || vehiclegroup_id == 5
+        gas_litre = gas_litre + (gas_litre.to_i*10/100)
+        additional_gas_detail = gas_litre - gas_litre_ori
+        additional_gas_allowance = (gas_litre.to_i*10/100) * @gascost
+      end
 			
 			# if year_diff >= 15
 			# 	gas_litre = gas_litre + (gas_litre.to_i*year_diff.to_i/100)

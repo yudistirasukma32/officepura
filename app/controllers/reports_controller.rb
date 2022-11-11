@@ -645,6 +645,7 @@ def confirmed_invoices
       @invoices = Invoice.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
       @invoicereturns = Invoicereturn.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
       @office_id = params[:office_id]
+      @is_premi = params[:is_premi]
         
       if @office_id.present? and @office_id != "all"
         @invoices = @invoices.where("office_id = ?", @office_id)
@@ -661,6 +662,20 @@ def confirmed_invoices
       elsif @transporttype == 'TRUK'
 
         @invoices = @invoices.where("invoicetrain = false").where("customer_id NOT IN (50,51,144)").order(:id)
+
+      end
+
+      if @is_premi.present?
+        
+        if @is_premi == '1'
+
+          @invoices = @invoices.where("premi_allowance > money(0)")
+
+        elsif @is_premi == '0'
+
+          @invoices = @invoices.where("premi = false")
+        
+        end
 
       end
         
