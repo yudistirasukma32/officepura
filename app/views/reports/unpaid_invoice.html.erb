@@ -73,6 +73,8 @@
             <tr>
                 <th class="{sorter:true, filter: false}">Pelanggan</th>
                 <th class="center {sorter:true, filter: false}" width="200">No Invoice</th>
+                <th class="{sorter:true, filter: false}" width="90">Kirim</th>
+                <th class="{sorter:true, filter: false}" width="90">Konfirm</th>
                 <th class="{sorter:false, filter: false}" width="110">Jatuh Tempo</th>
                 <th width="80" class="center {sorter:true, filter: false}">DPP</th>
                 <th width="80" class="center {sorter:true, filter: false}">PPN</th>
@@ -88,7 +90,9 @@
             <% total = total + taxinvoice.total %>
                 <tr>
                     <td><%= taxinvoice.customer.name%>&nbsp;<% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
-                    <td align=""><%= taxinvoice.long_id %></td> 
+                    <td align=""><%= taxinvoice.long_id %></td>
+                    <td><%=taxinvoice.sentdate.strftime('%d-%m-%y') rescue nil%></td>
+                    <td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td> 
                     
                     <%
                         if taxinvoice.sentdate 

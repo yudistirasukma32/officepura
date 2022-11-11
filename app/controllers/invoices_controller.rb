@@ -802,11 +802,11 @@ class InvoicesController < ApplicationController
 			additional_gas_detail = 0
 			additional_gas_allowance = 0
 			
-			if year_diff >= 15
-				gas_litre = gas_litre + (gas_litre.to_i*year_diff.to_i/100)
-				additional_gas_detail = gas_litre - gas_litre_ori
-				additional_gas_allowance = (gas_litre.to_i*year_diff.to_i/100) * @gascost
-			end
+			# if year_diff >= 15
+			# 	gas_litre = gas_litre + (gas_litre.to_i*year_diff.to_i/100)
+			# 	additional_gas_detail = gas_litre - gas_litre_ori
+			# 	additional_gas_allowance = (gas_litre.to_i*year_diff.to_i/100) * @gascost
+			# end
 			
       gas_allowance = gas_litre * @gascost
       ferry_fee = @route.ferry_fee || 0

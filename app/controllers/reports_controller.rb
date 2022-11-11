@@ -2664,72 +2664,59 @@ end
       global_premi = 0
       global_invoice_total = 0
       global_total_estimation = 0
-
+      solar_price = Setting.find_by_name("Harga Solar").value.to_i
+      customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
       @events = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date).map do |event|
         route = event.route
-        price_per = route.price_per.to_i rescue 0
+        price_per = route.price_per.to_i
         price_per_type = route.price_per_type rescue 'KG'
-        invoices = event.invoices.active.pluck("route_id")
+        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first
+        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i
 
-        sangu = 0
-        solar = 0
-        tambahan = 0
-        tol_asdp = 0
-        premi_allowance = 0
-        invoice_total = 0
-        total_estimation = 0
-        total_quantity = 0
-        customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
-        invoice_summary = event.invoices.active.map do |invoice|
-          quantity = invoice.quantity - (invoice.receiptreturns.where(:deleted => false).sum(:quantity).to_i)
-          if price_per >= offset 
-            estimation = quantity * price_per
-          elsif customer_35.include? invoice.customer_id
-            estimation = quantity * 20000 * price_per
-          elsif(invoice.invoicetrain && invoice.isotank_id.to_i != 0 && price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg 
-            estimation = quantity * 20000 * price_per
-          else
-            estimation = quantity * 25000 * price_per
-          end
+        # price_per = route.price_per.to_i rescue 0
+        # price_per_type = route.price_per_type rescue 'KG'
+        # invoices = event.invoices.active.pluck("route_id")
 
-          sangu += invoice.driver_allowance.to_i + invoice.helper_allowance.to_i
-          premi_allowance += invoice.premi_allowance.to_i
-          solar += invoice.gas_allowance.to_i
-          tambahan += invoice.misc_allowance.to_i
-          tol_asdp += invoice.tol_fee.to_i + invoice.ferry_fee.to_i
-          invoice_total += invoice.total.to_i
-          total_estimation += estimation
-          
-          total_quantity += quantity
+        sangu = (route_allowance.driver_trip.to_i + route_allowance.helper_trip.to_i) rescue 0
+        premi = route.bonus.to_i
+        solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
+        tambahan = route_allowance.misc_allowance.to_i rescue 0
+        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i
+        
+        invoice_total = sangu + premi + solar + tambahan + tol_asdp
+        invoice_total = invoice_total * event.qty
 
-          {
-            bkk_id: invoice.id,
-            quantity: invoice.quantity,
-            route_id: invoice.route_id,
-            estimation: estimation
-          }
+        if price_per >= offset 
+          estimation = quantity * price_per
+        elsif customer_35.include? event.customer_id
+          estimation = quantity * 20000 * price_per
+        elsif(price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg 
+          estimation = quantity * 20000 * price_per
+        else
+          estimation = quantity * 25000 * price_per
         end
-
-        description = "#{total_quantity} Rit ##{event.id}: #{route.name rescue nil}"
+        
         global_sangu += sangu
         global_solar += solar
         global_tambahan += tambahan
-        global_premi += premi_allowance
         global_tol_asdp += tol_asdp
+        global_premi += premi
         global_invoice_total += invoice_total
-        global_total_estimation += total_estimation
+        global_total_estimation += estimation
+
+
+        description = "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
         {
           route_name: (route.name rescue "Kosong"),
           route_price: (route.price_per rescue "Kosong"),
           route_id: event.route_id,
-          invoices: invoice_summary,
           sangu: sangu,
           solar: solar,
           tambahan: tambahan,
-          premi_allowance: premi_allowance,
+          premi_allowance: premi,
           tol_asdp: tol_asdp,
           invoice_total: invoice_total,
-          total_estimation: total_estimation,
+          total_estimation: estimation,
           description: description,
           start_date: event.start_date
         }
