@@ -645,7 +645,6 @@ def confirmed_invoices
       @invoices = Invoice.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
       @invoicereturns = Invoicereturn.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
       @office_id = params[:office_id]
-      @is_premi = params[:is_premi]
         
       if @office_id.present? and @office_id != "all"
         @invoices = @invoices.where("office_id = ?", @office_id)
@@ -664,22 +663,8 @@ def confirmed_invoices
         @invoices = @invoices.where("invoicetrain = false").where("customer_id NOT IN (50,51,144)").order(:id)
 
       end
-
+        
       @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
-
-      if @is_premi.present?
-        
-        if @is_premi == '1'
-
-          @invoices = @invoices.where("premi_allowance > money(0)")
-
-        elsif @is_premi == '0'
-
-          @invoices = @invoices.where("premi = false")
-        
-        end
-
-      end
 
       @section = "reports1"
       @where = "confirmed-invoices"
@@ -1266,6 +1251,8 @@ end
       
       @bankexpensecredit = Bankexpense.where("to_char(date, 'DD-MM-YYYY') = ? AND creditgroup_id = ? AND deleted = false AND pettycashledger = false", @date, kas.id)
       @bankexpensedebit = Bankexpense.where("to_char(date, 'DD-MM-YYYY') = ? AND debitgroup_id = ? AND deleted = false AND pettycashledger = false", @date, kas.id)
+      # render json: @bankexpensecredit
+      # return false
       @receipts = Receipt.where("to_char(created_at, 'DD-MM-YYYY') = ? AND deleted = false", @date).order(:office_id)
       @receiptreturns = Receiptreturn.where("to_char(created_at, 'DD-MM-YYYY') = ? AND deleted = false", @date).order(:office_id)
       @officeexpensegroups = Officeexpensegroup.active
@@ -1331,15 +1318,15 @@ end
     
       @support = Setting.find_by_name("Penyesuaian Saldo Setelah 1 November 2022").value.to_i
       @balance = @balance + @support 
-
-
-      offsetRunning = Setting.find_by_name("Offset Saldo Akhir 1 Nov").value.to_i
-
-      @sdate = Date.new(2022, 11, 1)
       
-      if @date.to_i > @sdate.strftime('%d-%m-%Y').to_i
-        @balance = @balance - offsetRunning
-      end
+
+      # offsetRunning = Setting.find_by_name("Offset Saldo Akhir 1 Nov").value.to_i
+
+      # @sdate = Date.new(2022, 11, 1)
+      
+      # if @date.to_i > @sdate.strftime('%d-%m-%Y').to_i
+      #   @balance = @balance - offsetRunning
+      # end
 
 
       render "expenses-daily-new"
@@ -2647,6 +2634,105 @@ end
       redirect_to root_path()
     end
   end    
+  def estimation_event_expense_backup
+    role = cek_roles 'Admin Keuangan'
+    if role
+      offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
+
+      @startdate = params[:startdate]
+      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+
+      global_sangu = 0
+      global_solar = 0
+      global_tambahan = 0
+      global_tol_asdp = 0
+      global_invoice_total = 0
+      global_total_estimation = 0
+
+      @events = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date).map do |event|
+        route = event.route
+        price_per = route.price_per.to_i rescue 0
+        price_per_type = route.price_per_type rescue 'KG'
+        invoices = event.invoices.active.pluck("route_id")
+
+        sangu = 0
+        solar = 0
+        tambahan = 0
+        tol_asdp = 0
+        invoice_total = 0
+        total_estimation = 0
+        total_quantity = 0
+        customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
+        invoice_summary = event.invoices.active.map do |invoice|
+          quantity = invoice.quantity - (invoice.receiptreturns.where(:deleted => false).sum(:quantity).to_i)
+          if price_per >= offset 
+            estimation = quantity * price_per
+          elsif customer_35.include? invoice.customer_id
+            estimation = quantity * 20000 * price_per
+          elsif(invoice.invoicetrain && invoice.isotank_id.to_i != 0 && price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg 
+            estimation = quantity * 20000 * price_per
+          else
+            estimation = quantity * 25000 * price_per
+          end
+
+          sangu += invoice.driver_allowance.to_i + invoice.helper_allowance.to_i
+          solar += invoice.gas_allowance.to_i
+          tambahan += invoice.misc_allowance.to_i
+          tol_asdp += invoice.tol_fee.to_i + invoice.ferry_fee.to_i
+          invoice_total += invoice.total.to_i
+          total_estimation += estimation
+          
+          total_quantity += quantity
+
+          {
+            bkk_id: invoice.id,
+            quantity: invoice.quantity,
+            route_id: invoice.route_id,
+            estimation: estimation
+          }
+        end
+
+        description = "#{total_quantity} Rit ##{event.id}: #{route.name rescue nil}"
+        global_sangu = 0
+        global_solar += solar
+        global_tambahan += tambahan
+        global_tol_asdp += tol_asdp
+        global_invoice_total += invoice_total
+        global_total_estimation += total_estimation
+        {
+          route_name: (route.name rescue "Kosong"),
+          route_price: (route.price_per rescue "Kosong"),
+          route_id: event.route_id,
+          invoices: invoice_summary,
+          sangu: sangu,
+          solar: solar,
+          tambahan: tambahan,
+          tol_asdp: tol_asdp,
+          invoice_total: invoice_total,
+          total_estimation: total_estimation,
+          description: description,
+          start_date: event.start_date
+        }
+      end
+      @summary = {
+        global_solar: global_solar ,
+        global_tambahan: global_tambahan ,
+        global_tol_asdp: global_tol_asdp ,
+        global_invoice_total: global_invoice_total ,
+        global_total_estimation: global_total_estimation ,
+      }
+      @section = "estimationreport"
+      @where = "estimation_event_invoice"
+      # render json: @events
+      # render "estimation"
+    else
+      redirect_to root_path()
+    end
+    
+  end
+
   def estimation_event_expense
     role = cek_roles 'Admin Keuangan'
     if role
@@ -2668,23 +2754,17 @@ end
       customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
       @events = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date).map do |event|
         route = event.route
-        price_per = route.price_per.to_i
+        price_per = route.price_per.to_i rescue 0
         price_per_type = route.price_per_type rescue 'KG'
-        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first
-        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i
-
-        # price_per = route.price_per.to_i rescue 0
-        # price_per_type = route.price_per_type rescue 'KG'
-        # invoices = event.invoices.active.pluck("route_id")
+        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
+        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
 
         sangu = (route_allowance.driver_trip.to_i + route_allowance.helper_trip.to_i) rescue 0
-        premi = route.bonus.to_i
+        premi = route.bonus.to_i rescue 0
         solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
         tambahan = route_allowance.misc_allowance.to_i rescue 0
-        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i
-        
+        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
         invoice_total = sangu + premi + solar + tambahan + tol_asdp
-        invoice_total = invoice_total * event.qty
 
         if price_per >= offset 
           estimation = quantity * price_per
