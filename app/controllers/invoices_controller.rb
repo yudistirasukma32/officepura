@@ -694,14 +694,21 @@ class InvoicesController < ApplicationController
     customer_id = params[:customer_id]  
       
     if is_train == "0"
-        
-        if customer_id == "50" || customer_id == "51" || customer_id == "144"
+
+        #customer kosongan pura / rdpi
+        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*'").pluck(:id)
+
+        if cust_kosongan.include? params[:customer_id].to_i
             
             @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
+
+            inklude = true
         
         else
             
             @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
+
+            inklude = false
             
         end
         
@@ -711,7 +718,8 @@ class InvoicesController < ApplicationController
         
     end
         
-    render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json; 
+    render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json;
+
   end
 
   def get_routesbyoffice
