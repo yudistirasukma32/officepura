@@ -1393,8 +1393,8 @@ end
     if role
         @where = "ledger"
       @section = "reports1"
-      id_group_sangu = 54 
-      id_group_premi = 8 
+      id_group_sangu = 999 
+      id_group_premi = 999
       id_groupbank_sangu = 25
       id_groupbank_premi = 32
       id_groupbank_solar = 27 
@@ -1405,12 +1405,12 @@ end
 
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
       @bankexpensegroups = Bankexpensegroup.active.where("id not in (?,?,?)", id_groupbank_solar, id_groupbank_sangu, id_groupbank_premi).order(:name)
-      @officeexpensegroups = Officeexpensegroup.active.where("officeexpensegroup_id is not null and id not in (?,?)", id_group_sangu, id_group_premi).order(:name)
+      @officeexpensegroups = Officeexpensegroup.active.where("officeexpensegroup_id is not null and id not in (?)", id_group_sangu, id_group_premi).order(:name)
 
       @groups = Array.new
       @groups.push("Sangu")
       @groups.push("Solar")
-      @groups.push("Premi")
+      # @groups.push("Premi")
       @groups.push("Onderdil Kontan")
       @groups.push("Penjualan Barang")
       @officeexpensegroups.each do |group|
