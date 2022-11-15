@@ -21,7 +21,6 @@ class DriversController < ApplicationController
     else
       redirect_to root_path()
     end
-    
   end
 
   def new
@@ -103,5 +102,18 @@ class DriversController < ApplicationController
     @driver = Driver.find(params[:id])
     @driver.update_attributes(:enabled => false)
     redirect_to(drivers_url)
+  end
+
+  def create_bank_expense_group
+    # Bankexpensegroup.
+    Driver.active.where("bankexpensegroup_id is not null").each do |driver|
+      bank_expense_group = Bankexpensegroup.create({
+        name: "Bank Supir #{driver.name}",
+        bankexpensegroup_id: 137
+      })
+
+      driver.bankexpensegroup_id = bank_expense_group.id
+      driver.save
+    end
   end
 end

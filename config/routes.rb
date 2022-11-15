@@ -51,6 +51,10 @@ OfficePuraErp::Application.routes.draw do
       get 'enable'
       get 'disable'
     end
+
+    collection do
+      get "create_bank_expense_group"
+    end
   end
   resources :helpers
   resources :isotanks do

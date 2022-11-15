@@ -14,6 +14,9 @@
     <div class="sliding_tab" id="tab_<%=tab+=1%>">
 
     <%= form_for(@driver) do |f| %>
+      <% if params[:id].present? %>
+          <%= f.hidden_field :old_name, value: @driver.name %>
+      <% end %>
     	<div class="field-row first">
         <%= f.label :name, "Nama" %>
         <%= f.text_field :name %>
@@ -102,6 +105,18 @@
         <%= f.label :terms_of_payment_in_days, "Batas Hutang" %>
         <%= f.text_field :terms_of_payment_in_days, :class => 'half' %>
         <span>Hari</span>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :bank_name, "Nama Bank" %>
+        <%= f.select :bank_name, options_for_select([["Pilih Bank",nil],"BNI","BCA","Mandiri","BRI","Danamon"], @driver.bank_name), {}, { :class => 'half left' } %>
+
+        <%= f.label :bank_account, "Rekening", :class => 'middle' %>
+        <%= f.text_field :bank_account, :class => 'half left' %>
+      </div>
+      <div class="field-row">
+        <%= f.label :bankexpensegroup_id, "Jurnal" %>
+        <%= f.select :bankexpensegroup_id, options_for_select(Bankexpensegroup.active.collect { |bankexpense| [bankexpense.name, bankexpense.id] }, @driver.bankexpensegroup_id), {}, { :class => 'half left chzn-select' } %>
       </div>
 
       <div class="field-row" >
