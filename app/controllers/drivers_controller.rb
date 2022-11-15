@@ -106,7 +106,7 @@ class DriversController < ApplicationController
 
   def create_bank_expense_group
     # Bankexpensegroup.
-    Driver.active.where("bankexpensegroup_id is not null").each do |driver|
+    Driver.active.where("bankexpensegroup_id is null").each do |driver|
       bank_expense_group = Bankexpensegroup.create({
         name: "Bank Supir #{driver.name}",
         bankexpensegroup_id: 137
