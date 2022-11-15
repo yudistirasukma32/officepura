@@ -17,22 +17,7 @@
 
 	.pagination a:hover:not(.active) {background-color: #ddd;}
 </style>
-<% 
-	page = params[:page].blank? ? 1 : params[:page].to_i 
-	if @total_page > 6
-		start_page = page - 3
-		start_page = 2 if start_page <= 1
-		end_page = page + 4
-		end_page = @total_page if end_page >= @total_page
-		max_page = @total_page	
-		first_page = 1
 
-	else
-		start_page = 1
-		end_page = @total_page + 1
-	end
-	
-%>
 <%= render "shared/header" %>
 
 <div id="nav">
@@ -52,136 +37,81 @@
 			<div class="field-row continue">
 
 				<label for="office_id" class="middle">Pilih Kantor</label>
-				<select name="office_id" class="half left ">
-					
+				<select name="office_id" class="half left office_id">
 					<option value="all">All</option>
 					<% @offices.each do |office| %>
 					<option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
 					<% end %>
 				</select> 
-
-				<input class="submit left" type="submit" value="Filter" />
+				<label for="customer" class="middle">Customer</label>
+				<select name="customer" class="half left chzn-select customer_id">
+					<option value="all">All</option>
+					<% Customer.active.select("id,name").each do |customer| %>
+					<option value="<%=customer.id%>" <%= params[:custoemr_id].to_i == customer.id ? "selected" : "" %>><%=customer.name%></option>
+					<% end %>
+				</select>
+				<label for="query-name" class="middle">Jurusan</label>
+				<input type="text" name="search" id="query-name" class="half left" placeholder="" style="margin-left: 10px;">
+				<input class="submit" type="submit" value="Filter" />
 			</div>
 			</form>
 		</div>
+		<div id="content-table">
 
-		<br class="clearfix" />
-			<div class="pagination">
-			
-				<% if page > 1 %>
-					<a href="<%= routes_url(office_id: params[:office_id], page: page - 1) %>">&laquo;</a>
-				<% end %>
-				
-				<% if first_page.present? %>
-					<a href="<%= routes_url(office_id: params[:office_id], page: first_page) %>" class="<%= page == first_page ? "active" : "" %>"><%= first_page %></a>
-				<% end %>
-				
-				<% if page > 5 %>
-					<a href="#" class="">...</a>
-				<% end %>
-				
-				<% until start_page == end_page  do %>
-					<a href="<%= routes_url(office_id: params[:office_id], page: start_page) %>" class="<%= page == start_page ? "active" : "" %>"><%= start_page %></a>
-					<% start_page += 1 %>
-				<% end %>
-				
-				<% if max_page.present? %>
-					<% if page < max_page - 4 %>
-						<a href="#" class="">...</a>
-					<% end %>
-				<a href="<%= routes_url(office_id: params[:office_id], page: max_page) %>" class="<%= page == max_page ? "active" : "" %>"><%= max_page %></a>
-				<% end %>
-
-				<% if page < @total_page %>
-					<a href="<%= routes_url(office_id: params[:office_id], page: page + 1) %>">&raquo;</a>
-				<% end %>
-			</div>
-			<table class="row-view report-view tablesorter tablesorterFilters">
-				<thead>
-				<tr>
-					<th class="{sorter:true, filter: true}" >Nama Jurusan</th>
-					<th class="{sorter:true, filter: true}" >Nama Pelanggan</th>
-					<th class="{sorter:true, filter: true}" width="80">Muatan</th>
-					<th class="{sorter:true, filter: true}" width="100">Kantor</th>
-					<th class="{sorter: false, filter: false}">Rute</th>
-					<th class="{sorter: false, filter: false}">Aktif</th>
-					<th width="60" class="{sorter: false, filter: false}"></th>
-				</tr>
-				</thead>
-
-				<tbody class="tablesorter-sort">
-				<% @routes.each do |route| %>
-				<tr>
-					<td><% if checkrole 'Master Jurusan, Admin Marketing' %><%= link_to route.name, edit_route_path(route) %> <% else %> <%= route.name %> <% end %></td>
-					<td><%= route.customer.name if !route.customer.nil? %></td>
-					<td><%= route.commodity.name if !route.commodity.nil? %></td>
-					<td><%= route.office.name if !route.office.nil? %></td>
-					<td><%= route.routegroup.name if !route.routegroup.nil? %></td>
-					<% if route.enabled %>
-						<td><% if checkrole 'Master Jurusan, Admin Marketing'%> <%= link_to '&#xf058;'.html_safe, disable_route_path(route), :class => 'enabled tipsy', :title => 'Non Aktifkan' %><% else %><%= link_to '&#xf058;'.html_safe, '', :class => 'enabled tipsy' %><% end %></td>
-					<% else %>
-						<td><% if checkrole 'Master Jurusan, Admin Marketing'%> <%= link_to '&#xf057;'.html_safe, enable_route_path(route), :class => 'disabled tipsy', :title => 'Aktifkan' %><% else %><%= link_to '&#xf057;'.html_safe, '', :class => 'disabled tipsy' %><% end %></td>
-					<% end %>
-					<td class="right">
-						<% if checkrole 'Master Jurusan, Admin Marketing' %>
-							<%= link_to '&#xf044;'.html_safe, edit_route_path(route, :operational => true), :class => "edit tipsy", :title => 'Edit' %>
-						<% end %> 
-						<%= link_to '&#xf00d;'.html_safe, route, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
-					</td>
-				</tr>
-				<% end %>
-				</tbody>	
-
-			</table>
-		
-		<% 
-			page = params[:page].blank? ? 1 : params[:page].to_i 
-			if @total_page > 6
-				start_page = page - 3
-				start_page = 2 if start_page <= 1
-				end_page = page + 4
-				end_page = @total_page if end_page >= @total_page
-				max_page = @total_page	
-				first_page = 1
-
-			else
-				start_page = 1
-				end_page = @total_page + 1
-			end
-			
-		%>
-		<div class="pagination">
-			
-			<% if page > 1 %>
-				<a href="<%= routes_url(office_id: params[:office_id], page: page - 1) %>">&laquo;</a>
-			<% end %>
-			
-			<% if first_page.present? %>
-				<a href="<%= routes_url(office_id: params[:office_id], page: first_page) %>" class="<%= page == first_page ? "active" : "" %>"><%= first_page %></a>
-			<% end %>
-			
-			<% if page > 5 %>
-				<a href="#" class="">...</a>
-			<% end %>
-			
-			<% until start_page == end_page  do %>
-				<a href="<%= routes_url(office_id: params[:office_id], page: start_page) %>" class="<%= page == start_page ? "active" : "" %>"><%= start_page %></a>
-				<% start_page += 1 %>
-			<% end %>
-			
-			<% if max_page.present? %>
-				<% if page < max_page - 4 %>
-					<a href="#" class="">...</a>
-				<% end %>
-			<a href="<%= routes_url(office_id: params[:office_id], page: max_page) %>" class="<%= page == max_page ? "active" : "" %>"><%= max_page %></a>
-			<% end %>
-
-			<% if page < @total_page %>
-				<a href="<%= routes_url(office_id: params[:office_id], page: page + 1) %>">&raquo;</a>
-			<% end %>
 		</div>
+		<br class="clearfix" />
+		
 		<br class="clearfix"/>
 
 	</div>
 
 </div>
+
+
+<%= content_for :js do %>
+	<script>
+		global_page = 1;
+		old_office_id = "";
+		old_customer_id = "";
+		old_query = "";
+		
+		function show_data() {
+			query  = $("#query-name").val();
+			office_id  = $(".office_id").val();
+			customer_id  = $(".customer_id").val();
+			if (old_customer_id != customer_id || old_office_id != office_id || old_query != query) {
+				global_page = 1;
+			}
+			old_office_id = office_id;
+			old_customer_id = customer_id;
+			old_query = query;
+
+			$.ajax({
+				url: "<%= index_api_routes_url %>",
+				method: "get",
+				data:{
+					query,office_id,customer_id,page: global_page
+				},
+				dataType: "html",
+				success:function(data){
+					$("#content-table").html(data);
+				}
+			});
+		}
+
+		$(document).ready(function(){
+			element = $("[name=customer]").next();
+			$(element).addClass("left");
+			show_data();
+		})
+		.on("submit","#filterform",function(e){
+			e.preventDefault();
+			show_data();
+		})
+		.on("click",".pagination-link",function(e){
+			e.preventDefault();
+			global_page = $(this).data("page");
+			show_data();
+		});
+	</script>
+<% end %>

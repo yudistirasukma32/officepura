@@ -107,6 +107,10 @@ OfficePuraErp::Application.routes.draw do
 
       get "copy"
     end
+
+    collection do
+      get "index_api"
+    end
   end
 
   match 'vehicles/index_asset' => 'vehicles#index_asset'

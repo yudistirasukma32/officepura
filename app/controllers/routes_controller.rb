@@ -11,44 +11,37 @@ class RoutesController < ApplicationController
   end
 
   def index
+    @offices = Office.active.order('id asc')
+  end
+
+  def index_api
     batas = 40
     halaman = params[:page].present? ? params[:page].to_i : 1
     halaman_awal = (halaman > 1) ? (halaman * batas) - batas : 0
     halaman_awal = halaman_awal + 1	
+    additional_query = ""
+    if params[:query].present?
+      additional_query += " and name ~* '.*#{params[:query]}.*'"
+    end
+    if params[:customer_id].present? && params[:customer_id] != "all"
+      additional_query += " and customer_id = #{params[:customer_id]}"
+    end
 
-    previous = halaman - 1;
-    next_step = halaman + 1;
-    
-   
-    
     @office_id = params[:office_id]
-
-    @offices = Office.active.order('id asc')
     if @office_id.present? and @office_id != "all"
-      all_data = Route.active.where("office_id = ?", @office_id).where('office_id is not null').select(:id).count()
-      @routes = Route.active.where("office_id = ?", @office_id).where('office_id is not null').limit(batas).offset(halaman_awal).order("name asc")
+      all_data = Route.active.where("office_id = ?#{additional_query}", @office_id).select(:id).count()
+      @routes = Route.active.where("office_id = ?#{additional_query}", @office_id).limit(batas).offset(halaman_awal).order("name asc")
     else
-      all_data = Route.active.where('office_id is not null').select(:id).count()
-      @routes = Route.active.limit(batas).offset(halaman_awal).order("name asc")
+      all_data = Route.where("deleted = false#{additional_query}").select(:id).count()
+      @routes = Route.where("deleted = false#{additional_query}").limit(batas).offset(halaman_awal).order("name asc")
     end
 
     
+
     @total_page = (all_data.to_f / batas.to_f).ceil
 
-    # nomor = halaman_awal+1
-    # render json: {
-    #   all_data: all_data,
-    #   batas: batas,
-    #   total_page: @total_page,
-    # }
-    # render json: {
-    #   # data: @routes.count,
-    #   # batas: batas,
-    #   # halaman_awal: halaman_awal,
-    #   all_data: all_data
-    # }
-
-
+    render partial: "table"
+    # render json: @routes.to_sql
   end
 
   def addnew
@@ -58,8 +51,10 @@ class RoutesController < ApplicationController
 
   def new
     @route = Route.new
-    @customer = Customer.find(params[:format])
-    @route.customer_id = @customer.id
+    if params[:format].present?
+      @customer = Customer.find(params[:format])
+      @route.customer_id = @customer.id
+    end
     @route.ferry_fee = @route.ferry_fee.to_i
     @route.tol_fee = @route.tol_fee.to_i
     @route.bonus = @route.bonus.to_i
