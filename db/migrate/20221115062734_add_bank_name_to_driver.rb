@@ -1,10 +1,11 @@
 class AddBankNameToDriver < ActiveRecord::Migration
   def up
-    # add_column :drivers, :bank_name, :string
-    change_table :drivers do |t|
-      t.string :bank_name
-      t.references :bankexpensegroup, foreign_key: true, index: true
-    end
+    # change_table :drivers do |t|
+    #   t.string :bank_name
+    #   t.references :bankexpensegroup, foreign_key: true, index: true
+    # end
+    add_column :drivers, :bank_name, :string
+    add_column :drivers, :bankexpensegroup_id, :integer
   end
   def down
     remove_column :drivers, :bankexpensegroup_id
