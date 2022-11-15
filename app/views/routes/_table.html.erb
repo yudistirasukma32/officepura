@@ -15,46 +15,18 @@
 	
 %>
 
-<div class="pagination">
-    <% if page > 1 %>
-        <a data-page="<%= page - 1 %>" href="<%= routes_url(office_id: params[:office_id], page: page - 1) %>" class="pagination-link">&laquo;</a>
-    <% end %>
 
-    <% if first_page.present? %>
-        <a data-page="<%= first_page %>" href="<%= routes_url(office_id: params[:office_id], page: first_page) %>" class="pagination-link <%= page == first_page ? "active" : "" %>"><%= first_page %></a>
-    <% end %>
-
-    <% if page > 5 %>
-        <a href="#" class="pagination-link <%= page == first_page ? "active" : "" %>">...</a>
-    <% end %>
-
-    <% until start_page == end_page  do %>
-        <a data-page="<%= start_page %>" href="<%= routes_url(office_id: params[:office_id], page: start_page) %>" class="pagination-link <%= page == start_page ? "active" : "" %>"><%= start_page %></a>
-        <% start_page += 1 %>
-    <% end %>
-
-    <% if max_page.present? %>
-        <% if page < max_page - 4 %>
-            <a data-page="<%= page %>" href="#" class="pagination-link">...</a>
-        <% end %>
-    <a data-page="<%= max_page %>" href="<%= routes_url(office_id: params[:office_id], page: max_page) %>" class="pagination-link <%= page == max_page ? "active" : "" %>"><%= max_page %></a>
-    <% end %>
-
-    <% if page < @total_page %>
-        <a data-page="<%= page + 1 %>" href="<%= routes_url(office_id: params[:office_id], page: page + 1) %>" class="pagination-link">&raquo;</a>
-    <% end %>
-    </div>
-    <table class="row-view report-view tablesorter tablesorterFilters">
+<table class="row-view report-view tablesorter tablesorterFilters">
     <thead>
-    <tr>
-        <th class="{sorter:true, filter: true}" >Nama Jurusan</th>
-        <th class="{sorter:true, filter: true}" >Nama Pelanggan</th>
-        <th class="{sorter:true, filter: true}" width="80">Muatan</th>
-        <th class="{sorter:true, filter: true}" width="100">Kantor</th>
-        <th class="{sorter: false, filter: false}">Rute</th>
-        <th class="{sorter: false, filter: false}">Aktif</th>
-        <th width="60" class="{sorter: false, filter: false}"></th>
-    </tr>
+        <tr>
+            <th class="{sorter:true, filter: true}" >Nama Jurusan</th>
+            <th class="{sorter:true, filter: true}" >Nama Pelanggan</th>
+            <th class="{sorter:true, filter: true}" width="80">Muatan</th>
+            <th class="{sorter:true, filter: true}" width="100">Kantor</th>
+            <th class="{sorter: false, filter: false}">Rute</th>
+            <th class="{sorter: false, filter: false}">Aktif</th>
+            <th width="60" class="{sorter: false, filter: false}"></th>
+        </tr>
     </thead>
 
     <tbody class="tablesorter-sort">
@@ -80,51 +52,51 @@
     <% end %>
     </tbody>	
 
-    </table>
+</table>
 
-    <% 
-    page = params[:page].blank? ? 1 : params[:page].to_i 
-    if @total_page > 6
-        start_page = page - 3
-        start_page = 2 if start_page <= 1
-        end_page = page + 4
-        end_page = @total_page if end_page >= @total_page
-        max_page = @total_page	
-        first_page = 1
+<% 
+page = params[:page].blank? ? 1 : params[:page].to_i 
+if @total_page > 6
+    start_page = page - 3
+    start_page = 2 if start_page <= 1
+    end_page = page + 4
+    end_page = @total_page if end_page >= @total_page
+    max_page = @total_page	
+    first_page = 1
 
-    else
-        start_page = 1
-        end_page = @total_page + 1
-    end
+else
+    start_page = 1
+    end_page = @total_page + 1
+end
 
-    %>
-    <div class="pagination">
+%>
+<div class="pagination">
 
-    <% if page > 1 %>
-        <a data-page="<%= page - 1 %>" href="<%= routes_url(office_id: params[:office_id], page: page - 1) %>" class="pagination-link">&laquo;</a>
+<% if page > 1 %>
+    <a data-page="<%= page - 1 %>" href="<%= routes_url(office_id: params[:office_id], page: page - 1) %>" class="pagination-link">&laquo;</a>
+<% end %>
+
+<% if first_page.present? %>
+    <a data-page="<%= first_page %>" href="<%= routes_url(office_id: params[:office_id], page: first_page) %>" class="pagination-link <%= page == first_page ? "active" : "" %>"><%= first_page %></a>
+<% end %>
+
+<% if page > 5 %>
+    <a href="#" class="pagination-link">...</a>
+<% end %>
+
+<% until start_page == end_page  do %>
+    <a data-page="<%= start_page %>" href="<%= routes_url(office_id: params[:office_id], page: start_page) %>" class="pagination-link <%= page == start_page ? "active" : "" %>"><%= start_page %></a>
+    <% start_page += 1 %>
+<% end %>
+
+<% if max_page.present? %>
+    <% if page < max_page - 4 %>
+        <a onclick="" href="#" class="">...</a>
     <% end %>
+<a data-page="<%= max_page %>" href="<%= routes_url(office_id: params[:office_id], page: max_page) %>" class="pagination-link <%= page == max_page ? "active" : "" %>"><%= max_page %></a>
+<% end %>
 
-    <% if first_page.present? %>
-        <a data-page="<%= first_page %>" href="<%= routes_url(office_id: params[:office_id], page: first_page) %>" class="pagination-link <%= page == first_page ? "active" : "" %>"><%= first_page %></a>
-    <% end %>
-
-    <% if page > 5 %>
-        <a href="#" class="pagination-link">...</a>
-    <% end %>
-
-    <% until start_page == end_page  do %>
-        <a data-page="<%= start_page %>" href="<%= routes_url(office_id: params[:office_id], page: start_page) %>" class="pagination-link <%= page == start_page ? "active" : "" %>"><%= start_page %></a>
-        <% start_page += 1 %>
-    <% end %>
-
-    <% if max_page.present? %>
-        <% if page < max_page - 4 %>
-            <a onclick="" href="#" class="">...</a>
-        <% end %>
-    <a data-page="<%= max_page %>" href="<%= routes_url(office_id: params[:office_id], page: max_page) %>" class="pagination-link <%= page == max_page ? "active" : "" %>"><%= max_page %></a>
-    <% end %>
-
-    <% if page < @total_page %>
-        <a data-page="<%= page + 1 %>" href="<%= routes_url(office_id: params[:office_id], page: page + 1) %>" class="pagination-link">&raquo;</a>
-    <% end %>
+<% if page < @total_page %>
+    <a data-page="<%= page + 1 %>" href="<%= routes_url(office_id: params[:office_id], page: page + 1) %>" class="pagination-link">&raquo;</a>
+<% end %>
 </div>
