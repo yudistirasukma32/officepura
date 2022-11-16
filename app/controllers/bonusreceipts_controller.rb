@@ -13,7 +13,7 @@ class BonusreceiptsController < ApplicationController
   def index
     @startdate = params[:startdate] || Date.today.at_beginning_of_month.strftime('%d-%m-%Y')
     @enddate = params[:enddate] || (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y')
-    @invoices = Invoice.where("deleted = false AND date BETWEEN :startdate AND :enddate AND route_id in (SELECT id FROM routes where money(bonus) > money(0)) and id not in (SELECT invoice_id FROM bonusreceipts where deleted=false)", {:startdate => @startdate.to_date, :enddate => @enddate.to_date}).order(:id)
+    @invoices = Invoice.where("deleted = false AND date BETWEEN :startdate AND :enddate AND route_id in (SELECT id FROM routes where money(bonus) > money(0)) and id not in (SELECT invoice_id FROM bonusreceipts where deleted=false)", {:startdate => @startdate.to_date, :enddate => @enddate.to_date}).where("premi_allowance = money(0) and premi = false").order(:id)
     respond_to :html
   end
 

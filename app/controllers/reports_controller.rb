@@ -1421,7 +1421,7 @@ end
       @bankexpensegroups.each do |group|
         @groupbanks.push(group.name)
       end
-
+      # render json: {}
       render "filterledger"
     else
       redirect_to root_path()
@@ -1433,15 +1433,18 @@ end
     @where = "ledger"
     @section = "reports1"
     @inputs = params[:filterform]
-    id_group_sangu = 54 
+    id_group_sangu = 0 
     id_group_premi = 8 
     id_groupbank_sangu = 25
     id_groupbank_premi = 32
     id_groupbank_solar = 27 
+    # @bankexpensegroups = Bankexpensegroup.active.where("id not in (?,?,?)", id_groupbank_solar, id_groupbank_sangu, id_groupbank_premi).order(:name)
+    # @officeexpensegroups = Officeexpensegroup.active.where("officeexpensegroup_id is not null and id not in (?,?)", id_group_sangu, id_group_premi).order(:name)
     @bankexpensegroups = Bankexpensegroup.active.where("id not in (?,?,?)", id_groupbank_solar, id_groupbank_sangu, id_groupbank_premi).order(:name)
-    @officeexpensegroups = Officeexpensegroup.active.where("officeexpensegroup_id is not null and id not in (?,?)", id_group_sangu, id_group_premi).order(:name)
+    @officeexpensegroups = Officeexpensegroup.active.where("officeexpensegroup_id is not null").order(:name)
 
     render "ledger"
+    # render json: @officeexpensegroups.pluck(:name)
   end
 
   def balances
