@@ -259,10 +259,10 @@ class EventsController < ApplicationController
             
         if e.company.nil?
           company = ' [RDPI]'
-          summary = e.summary + company
+          summary = e.summary + company + ' / ' + e.user.username rescue nil
         else
           company = e.company.abbr
-          summary = e.summary + ' ['+company+']'
+          summary = e.summary + ' ['+company+']' + ' / ' + e.user.username rescue nil
         end
 
         {
@@ -371,15 +371,15 @@ class EventsController < ApplicationController
 
                 if e.company.nil?
                   company = ' [RDPI]'
-                  summary = e.summary + company
+                  summary = e.summary + company + ' / ' + e.user.username rescue nil
                 else
 
                   if e.office.nil?
                     company = e.company.abbr
-                    summary = e.summary + ' ['+company+']'
+                    summary = e.summary + ' ['+company+']' + ' / ' + e.user.username rescue nil
                   else
                     company = e.company.abbr
-                    summary = e.summary + ' ['+company+'] / ' + e.office.abbr
+                    summary = e.summary + ' ['+company+'] / ' + e.office.abbr + ' / ' + e.user.username rescue nil
                   end
 
                 end
@@ -420,9 +420,6 @@ class EventsController < ApplicationController
     @customer_id = @customer.id if @customer
   
     @id = params[:id]
-
-    # render json: @customer.events.where(a: "a")
-    # return false
     
     if @customer.present?
       @events = @customer.events.active
@@ -438,18 +435,45 @@ class EventsController < ApplicationController
 
     end
      
-    # @events = @customer.events.active if @customer
     @events = @events.order(:start_date)
  
     @invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)
 
     render "report-events"
-    # render json: {
-    #   startdate: @startdate,
-    #   enddate: @enddate,
-    #   events: @events,
-    #   invoices: @invoices
-    # }
+  end
+
+  def report_dpevents
+
+    @where = 'report-dp-events'
+    @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
+    @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
+
+    @customer = Customer.find(params[:customer_id]) rescue nil
+    @customer_id = @customer.id if @customer
+  
+    @id = params[:id]
+    
+    if @customer.present?
+      @events = @customer.events.active
+    else
+      @events = Event.active
+    end
+
+    @events = @events.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
+
+    if @id.present?
+    
+      @events = Event.where('id = ?', @id)
+
+    end
+
+    @events = @events.where("downpayment_amount > money(0)")
+    @events = @events.order(:start_date)
+ 
+    @invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)
+
+    render "report-dpevents"
+
   end
 
 end
