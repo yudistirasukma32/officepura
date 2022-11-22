@@ -124,7 +124,7 @@ class DriversController < ApplicationController
 		require 'json'
 
     # url = URI("https://office.puratrans.com/api_customers/get_all_customers")
-    url = URI("http://localhost:3000/api/driversapi/list_sangu")
+    url = URI("https://internal.puratrans.com/api/driversapi/list_sangu")
 
 		http = Net::HTTP.new(url.host, url.port)
 		# http.use_ssl = true
