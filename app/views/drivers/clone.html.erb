@@ -27,7 +27,7 @@
 
 			<tbody>
 				<% @drivers.each do |driver| %>
-					<% current_driver = Driver.where("name like '#{driver["name"]}%'").first %>
+					<% current_driver = Driver.active.where("name like '#{driver["name"]}%'").first %>
 					<% if current_driver.present? %>
 						<tr>
 							<td>Dari: <%= driver["name"] %></td>
