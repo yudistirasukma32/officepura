@@ -54,6 +54,8 @@ OfficePuraErp::Application.routes.draw do
 
     collection do
       get "create_bank_expense_group"
+      get "clone"
+      get "save_clone"
     end
   end
   resources :helpers

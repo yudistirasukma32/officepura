@@ -116,4 +116,57 @@ class DriversController < ApplicationController
       driver.save
     end
   end
+
+  def clone
+    require "uri"
+		require "net/http"
+		require "openssl"
+		require 'json'
+
+    # url = URI("https://office.puratrans.com/api_customers/get_all_customers")
+    url = URI("http://localhost:3000/api/driversapi/list_sangu")
+
+		http = Net::HTTP.new(url.host, url.port)
+		# http.use_ssl = true
+		http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+		request = Net::HTTP::Get.new(url.request_uri)
+
+		response = http.request(request)
+		@drivers = ActiveSupport::JSON.decode(response.read_body)
+    # render json: destination_drivers[0]
+  end
+
+  def save_clone
+    require "uri"
+		require "net/http"
+		require "openssl"
+		require 'json'
+
+    # url = URI("https://office.puratrans.com/api_customers/get_all_customers")
+    url = URI("http://localhost:3000/api/driversapi/list_sangu")
+
+		http = Net::HTTP.new(url.host, url.port)
+		# http.use_ssl = true
+		http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+		request = Net::HTTP::Get.new(url.request_uri)
+
+		response = http.request(request)
+    driver_id = []
+		ActiveSupport::JSON.decode(response.read_body).each do |driver|
+      current_driver = Driver.where("name like '#{driver["name"]}%'").first
+      if current_driver.present?
+        driver_id.push(current_driver.id)
+        current_driver.accident = driver["accident"].to_i
+        current_driver.weight_loss = driver["weight_loss"].to_i
+        current_driver.sparepart = driver["sparepart"].to_i
+        current_driver.bon = driver["bon"].to_i
+        current_driver.saving = driver["saving"].to_i
+        current_driver.save
+
+      end
+    end
+    
+    render json: Driver.active.where(id: driver_id).select("id, accident, weight_loss, sparepart, bon, saving, name")
+
+  end
 end
