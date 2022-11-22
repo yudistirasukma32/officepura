@@ -110,7 +110,7 @@ class CustomersController < ApplicationController
 
 		else	
 			
-		@customerlist = JSON(@response)['data']
+		  @customerlist = JSON(@response)['data']
 			
 		end
 
