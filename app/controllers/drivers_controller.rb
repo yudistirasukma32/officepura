@@ -127,7 +127,7 @@ class DriversController < ApplicationController
     url = URI("https://internal.puratrans.com/api/driversapi/list_sangu")
 
 		http = Net::HTTP.new(url.host, url.port)
-		# http.use_ssl = true
+		http.use_ssl = true
 		http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 		request = Net::HTTP::Get.new(url.request_uri)
 
