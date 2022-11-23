@@ -1,7 +1,7 @@
 <% tab = 0 %>
 
 
-<% if current_user.owner || current_user.adminrole%>
+<% if current_user.owner || current_user.adminrole %>
 
 <ul class="rounded" id="tabbed">
   <li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
@@ -11,7 +11,7 @@
 
 <% else %>
 
-  <% if checkrole 'Admin Operasional, Operasional BKK' %>
+  <% if checkrole 'Admin Sangu' %>
 
   <ul class="rounded" id="tabbed">
     <li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
