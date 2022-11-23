@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>PURA Office</title>
+  <title>PURA Office ERP</title>
   
   <%= stylesheet_link_tag 'chosen' %>
 	<%= stylesheet_link_tag 'application', :media => "all" %>
@@ -95,11 +95,12 @@
 <%= javascript_include_tag 'cms' %>
 <%= javascript_include_tag 'tablesorter/jquery.tablesorter.js' %>
 <%= javascript_include_tag 'tablesorter/jquery.tablesorter.widgets.js' %>
+<%= content_for :js %>
 
 <script
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9dtXou1nkunpTD6hHKIcRi-7w1Actbxc&callback=initMap&libraries=places&v=weekly"
 async
-></script> 
+></script>
 <script>
 	
 	function initMap() {
@@ -179,8 +180,90 @@ async
 		infowindow.open(map, marker);
 	  });
 	
-	
+	  initMap2()
 	}
+
+
+	function initMap2() {
+	
+		var routelocationAddressStart = document.getElementById("routelocation_address_start");
+		var routelocationLongitudeStart = document.getElementById("routelocation_longitude_start");
+		var routelocationLatitudeStart = document.getElementById("routelocation_latitude_start");
+		if (document.getElementById("routelocation_longitude_start") == null) {
+			return false;
+		}
+		if(routelocationLongitudeStart.value != "" && routelocationLatitudeStart.value != "") {
+			var latlng = { lat: parseFloat(routelocationLatitudeStart.value), lng: parseFloat(routelocationLongitudeStart.value) };
+		} else {
+			var latlng = { lat: -7.2574719, lng: 112.7520883 }
+		}
+	
+		  var map = new google.maps.Map(document.getElementById("map2"), {
+			center: latlng,
+			zoom: 12,
+			mapTypeControl: false,
+		  });
+		  var card = document.getElementById("pac-card2");
+		  var input = document.getElementById("pac-input2");
+		  var biasInputElement = document.getElementById("use-location-bias2");
+		  var strictBoundsInputElement = document.getElementById("use-strict-bounds2");
+		  var options = {
+			fields: ["formatted_address", "geometry", "name"],
+			strictBounds: false,
+			types: ["establishment"],
+		  };
+		
+		  map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
+		
+		  var autocomplete = new google.maps.places.Autocomplete(input, options);
+	 
+		  autocomplete.bindTo("bounds", map);
+		
+		  var infowindow = new google.maps.InfoWindow();
+		  var infowindowContent = document.getElementById("infowindow-content");
+		
+	
+	
+		  infowindow.setContent(infowindowContent);
+		
+		  var marker = new google.maps.Marker({map,anchorPoint: new google.maps.Point(0, -29) });
+		  marker.setPosition(latlng);
+		
+		  autocomplete.addListener("place_changed", function() {
+			infowindow.close();
+			marker.setVisible(false);
+		
+			var place = autocomplete.getPlace();
+		
+			if (!place.geometry || !place.geometry.location) {
+	 
+			  window.alert("No details available for input: '" + place.name + "'");
+			  return;
+			}
+	 
+			if (place.geometry.viewport) {
+			  map.fitBounds(place.geometry.viewport); 
+			} else {
+			  map.setCenter(place.geometry.location);
+			  map.setZoom(17); 
+			}
+			routelocationAddressStart.value = place.formatted_address;
+		
+			var locationCoordinate = place.geometry.location; 
+			routelocationLatitudeStart.value = locationCoordinate.lat();
+			routelocationLongitudeStart.value = locationCoordinate.lng();
+	 
+		
+			marker.setPosition(place.geometry.location);
+			marker.setVisible(true);
+			infowindowContent.children["place-name"].textContent = place.name;
+			infowindowContent.children["place-address"].textContent = place.formatted_address;
+			infowindow.open(map, marker);
+		  });
+		
+		
+		}
+
 </script>
 <%= content_for :js %>
 </body>

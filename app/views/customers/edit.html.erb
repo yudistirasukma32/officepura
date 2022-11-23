@@ -12,12 +12,12 @@
 		<h1>Master / <a href="<%=customers_path%>">Pelanggan</a> / Edit <strong title="<%=@customer.name%>"><%= @customer.name %></strong></h1>
 
 		<% tab = 0 %>
-	  <ul class="rounded" id="tabbed">
-	    <li><a id="link_<%=tab+=1%>" href="">Data Pelanggan</a></li>
-		<% if checkrole 'Admin Jurusan' %>
-	    <li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
-		<% end %>
-	  </ul>
+		<ul class="rounded" id="tabbed">
+			<li><a id="link_<%=tab+=1%>" href="">Data Pelanggan</a></li>
+			<% if checkrole 'Admin Jurusan, Admin Marketing, Marketing' %>
+			<li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
+			<% end %>
+		</ul>
 
 		<br class="clearfix" />
  

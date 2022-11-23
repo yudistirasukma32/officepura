@@ -7,7 +7,7 @@
 	<% end %>
 
 	<% if @section == 'masters' %>
-		<li class="<%= @where == 'customers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan, Admin Jurusan'), "Pelanggan", "/customers" %></li>
+		<li class="<%= @where == 'customers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Marketing, Admin Marketing, Admin Keuangan'), "Pelanggan", "/customers" %></li>
 		<li class="<%= @where == 'drivers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Operasional BKK'), "Supir", "/drivers" %></li>
 		<li class="<%= @where == 'staffs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "Staf", "/staffs" %></li>
 

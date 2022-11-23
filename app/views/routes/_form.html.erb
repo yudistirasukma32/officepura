@@ -1,10 +1,36 @@
 <% tab = 0 %>
 
+
+<% if current_user.owner || current_user.adminrole%>
+
+<ul class="rounded" id="tabbed">
+  <li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
+  <% if !params[:id].nil? %><li><a id="link_<%=tab+=1%>" href="">Data Sangu + Solar</a></li><% end %>
+  <% if !params[:id].nil? %><li><a id="link_<%=tab+=1%>" href="">Data Lokasi Jurusan</a></li><% end %>
+</ul>
+
+<% else %>
+
+  <% if checkrole 'Admin Operasional, Operasional BKK' %>
+
   <ul class="rounded" id="tabbed">
     <li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
     <% if !params[:id].nil? %><li><a id="link_<%=tab+=1%>" href="">Data Sangu + Solar</a></li><% end %>
     <% if !params[:id].nil? %><li><a id="link_<%=tab+=1%>" href="">Data Lokasi Jurusan</a></li><% end %>
   </ul>
+
+  <% else %>
+
+  <ul class="rounded" id="tabbed">
+    <li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
+    <% if !params[:id].nil? %><li><a id="link_<%=tab+=2%>" href="">Data Lokasi Jurusan</a></li><% end %>
+  </ul>
+
+  <% end %>
+
+<% end %>
+
+
 
 <br class="clearfix"/>
 
@@ -186,6 +212,10 @@
     </div>
 
     <div class="sliding_tab" id="tab_<%=tab+=1%>">
+
+    <div style="width: 420px; position: relative;">
+    
+
     
     <%= form_for(@routelocation) do |r| %>
 
@@ -199,6 +229,50 @@
       <p>*Pengisian Longitude & Latitude harap menggunakan format Longitude/Latitude bukan GPS. <br/>Format Longitude dan latitude yg benar seperti : -7.329603 atau 112.752704</p>
     </div>
           
+    <div class="field-row">
+      <div class="pac-card2" id="pac-card2">
+        <div>
+        <div id="title">Address Search</div>
+          <div id="type-selector2" class="pac-controls2" style="opacity: 0;">
+            <input type="radio" name="type" id="changetype-all2" checked="checked"/>
+            <label for="changetype-all">All</label>
+          </div>
+        </div>
+      <div id="pac-container2">
+        <input id="pac-input2" type="text" placeholder="Enter a location" />
+        <br/>
+      </div>
+    </div>
+
+    <div class="field-row" style="background: none;">
+      <p style="padding-bottom: 0;"><b>Peta Titik Start / Muat</b></p>
+    </div>
+
+    <div id="map2" style="height: 420px; width: 100%;"></div>
+      <div id="infowindow-content">
+        <span id="place-name" class="title"></span><br />
+        <span id="place-address"></span>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <p><b>Titik Start / Muat</b></p>
+      <%= r.label :longitude_start, "Longitude" %>
+      <%= r.text_field :longitude_start, :class => 'half left', :readonly => true %>
+      <%= r.label :latitude_start, "Latitude", :class => 'middle' %>
+      <%= r.text_field :latitude_start, :class => 'half', :readonly => true %>
+    </div>
+
+    <div class="field-row" style="margin-bottom:30px;">
+      <%= r.label :address_start, "Alamat Titik Muat" %>
+      <%= r.text_field :address_start %>
+    </div>
+
+
+    <div class="field-row">
+      <p><b>Peta Titik Finish / Bongkar</b></p>
+    </div>
+
     <div class="field-row">
       <div class="pac-card" id="pac-card">
         <div>
@@ -214,14 +288,12 @@
       </div>
     </div>
 
-      <div id="map" style="height: 420px; width: 100%;"></div>
-
+    <div id="map" style="height: 420px; width: 100%;"></div>
       <div id="infowindow-content">
         <span id="place-name" class="title"></span><br />
         <span id="place-address"></span>
       </div>
     </div>
-
 
     <div class="field-row">
       <p><b>Titik Finish / Bongkar</b></p>
@@ -232,7 +304,7 @@
     </div>
 
     <div class="field-row" style="margin-bottom:30px;">
-      <%= r.label :address_end, "Alamat Titik Akhir" %>
+      <%= r.label :address_end, "Alamat Titik Bongkar" %>
       <%= r.text_field :address_end %>
     </div>
 
@@ -245,7 +317,7 @@
 
     <% end %>
 
-    
+    </div>
 
   </div>
 </div>

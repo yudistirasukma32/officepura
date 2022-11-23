@@ -10,7 +10,7 @@ class CustomersController < ApplicationController
   end
 
   def set_role
-    @user_role = 'Admin Operasional, Admin Keuangan, Master Jurusan, User Jurusan, Admin Jurusan'
+    @user_role = 'Admin Marketing, Marketing, Admin Keuangan, Master Jurusan, User Jurusan, Admin Jurusan'
   end
 
   def index
