@@ -125,7 +125,14 @@ class RoutesController < ApplicationController
     #end
 
     if @route.update_attributes(inputs)
-      @route.price_per = inputs[:price_per].delete('.').gsub(",",".") || 0
+      
+      
+      if checkrole 'Marketing, Admin Marketing'
+
+        @route.price_per = inputs[:price_per].delete('.').gsub(",",".") || 0
+ 
+      end      
+
       @route.save
 
       if oldcustomer != @route.customer_id
