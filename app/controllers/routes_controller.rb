@@ -95,7 +95,16 @@ class RoutesController < ApplicationController
     inputs = params[:route]
     @route = Route.new(inputs)
     @route.enabled = true
-    @route.price_per = inputs[:price_per].delete('.').gsub(",",".") || 0
+
+    if checkrole 'Marketing, Admin Marketing'
+
+      @route.price_per = inputs[:price_per].delete('.').gsub(",",".") || 0
+
+    else
+
+      @route.price_per = 0
+
+    end
 
     if @route.save
       redirect_to(edit_route_url(@route), :notice => 'Data Jurusan sukses di tambah.')
