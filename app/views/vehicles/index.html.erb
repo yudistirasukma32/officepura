@@ -69,7 +69,7 @@
 					<% end %>
 					<td class="right" width="60">
 						<%= link_to '&#xf044;'.html_safe, edit_vehicle_path(vehicle), :class => "edit tipsy", :title => 'Edit' %> 
-						<%= link_to '&#xf00d;'.html_safe, vehicle, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+						<%= link_to '&#xf00d;'.html_safe, vehicle, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner || (checkrole 'Admin Kendaraan') %>
 					</td>
 				</tr>
 				<% else %>
