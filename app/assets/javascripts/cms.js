@@ -2809,6 +2809,16 @@ $(document).ready(function(e){
 		}
 	});
 })
+.on("keyup change","#chk_price_tax,#routetrain_price_per",function(){
+	price_per = $("#routetrain_price_per").val() != "" ? parseInt($("#routetrain_price_per").val()) : 0;
+	ppn = 0;
+	if (price_per > 0) {
+		ppn = $("#chk_price_tax").is(":checked") ? parseInt(price_per * 11 / 100) : 0;
+	}
+	total = price_per + ppn;
+	$("#routetrain_total").val(total);
+	$("#txt_total").text(total);
+})
 ;
 
 // Get the modal
