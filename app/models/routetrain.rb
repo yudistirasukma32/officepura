@@ -9,7 +9,7 @@ class Routetrain < ActiveRecord::Base
 
 	# Setup accessible (or protected) attributes for your model
 	attr_accessible :enabled, :deleted, :name, :container_type, :size,
-	:operator_id, :origin_station_id, :destination_station_id, :price_per
+	:operator_id, :origin_station_id, :destination_station_id, :price_per, :gst_tax, :total
 
 	validates :name, presence: true
 	validates :operator_id, presence: true

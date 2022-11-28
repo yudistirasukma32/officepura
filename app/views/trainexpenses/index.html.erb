@@ -79,14 +79,14 @@
 							<td><%= zeropad(invoice.event_id) rescue nil %></td>
 							<td><%= invoice.routetrain.container_type rescue nil %></td>
 							<td><%= invoice.routetrain.operator.abbr rescue nil %></td>
-							<td align="right" class="red"><%=to_currency(invoice.routetrain.price_per)%></td>
+							<td align="right" class="red"><%=to_currency(invoice.routetrain.total)%></td>
 							<td class="right" width="60">&nbsp;</td>
 						</tr>
 						<% end %>
 
 					<% else %>
 
-						<% @grandTotal += invoice.routetrain.price_per %>
+						<% @grandTotal += invoice.routetrain.total %>
 
 						<tr>
 							<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
@@ -101,7 +101,7 @@
 							<td><%= zeropad(invoice.event_id) rescue nil %></td>
 							<td><%= invoice.routetrain.container_type rescue nil %></td>
 							<td><%= invoice.routetrain.operator.abbr rescue nil %></td>
-							<td align="right" class="red"><%=to_currency(invoice.routetrain.price_per)%></td>
+							<td align="right" class="red"><%=to_currency(invoice.routetrain.total)%></td>
 							<td class="right" width="60">
 
 								<% if (current_user.adminrole || current_user.owner)%>

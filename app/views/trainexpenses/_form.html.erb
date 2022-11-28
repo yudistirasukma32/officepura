@@ -92,19 +92,19 @@
 
       <tr>
         <td><%= f.label :total, "Tarif" %></td>
-        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per), :readOnly => 'true' %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.total), :readOnly => 'true' %></td>
       </tr>
 
       <tr class="total-row">
         <td><%= f.label :total, "Total" %></td>
-        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per), :readOnly => 'true' %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.total), :readOnly => 'true' %></td>
       </tr>
     </table>
 
     <div class="field-row continue">
 
       <%= f.hidden_field :routetrain_id, :value => @invoice.routetrain_id %>
-      <%= f.hidden_field :total, :value => @invoice.routetrain.price_per %>
+      <%= f.hidden_field :total, :value => @invoice.routetrain.total %>
       <%= f.hidden_field :user_id, :value => current_user.id %>
 
       <%= f.submit "Tambah Data", :class => 'submit right' %>    

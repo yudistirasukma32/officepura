@@ -40,8 +40,12 @@ class RoutetrainsController < ApplicationController
 
   def create
     inputs = params[:routetrain]
+    if inputs[:gst_tax].present?
+      inputs[:gst_tax] = (inputs[:price_per].to_i * 11 / 100).to_i
+    else
+      inputs[:gst_tax] = 0
+    end
     @routetrain = Routetrain.new(inputs)
-
     if @routetrain.save
       redirect_to(routetrains_url(), :notice => 'Data Jurusan Kereta sukses ditambah.')
     else
@@ -52,7 +56,11 @@ class RoutetrainsController < ApplicationController
   def update
     inputs = params[:routetrain]
     @routetrain = Routetrain.find(params[:id])
-
+    if inputs[:gst_tax].present?
+      inputs[:gst_tax] = (inputs[:price_per].to_i * 11 / 100).to_i
+    else
+      inputs[:gst_tax] = 0
+    end
     if @routetrain.update_attributes(inputs)
       @routetrain.save
       redirect_to(edit_routetrain_url(@routetrain), :notice => 'Data Jurusan Kereta sukses disimpan.')
