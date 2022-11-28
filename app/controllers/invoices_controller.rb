@@ -1,7 +1,7 @@
 class InvoicesController < ApplicationController
   include ApplicationHelper
   include ActionView::Helpers::NumberHelper
-	layout "application", :except => [:get_routes, :get_allowances, :get_vehicles, :get_vehicle, :get_vehiclegroupid, :get_trainroute, :get_trainroute2, :get_routesbyoffice]
+	layout "application", :except => [:get_routes, :get_allowances, :get_vehicles, :get_vehicle, :get_vehiclegroupid, :get_trainroute, :get_trainroute2, :get_shiproute, :get_shiproute2, :get_routesbyoffice]
   protect_from_forgery :except => [:add, :updateinvoice]
   before_filter :authenticate_user!, :set_section
 
@@ -293,6 +293,8 @@ class InvoicesController < ApplicationController
   def confirmation
     @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
     @invoice = Invoice.find(params[:id])
+
+    @routelocation = Routelocation.where('route_id = ?', @invoice.route_id).first rescue nil
 
     # ssl = request.ssl?
     # if ssl
@@ -761,6 +763,16 @@ class InvoicesController < ApplicationController
     render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains", :layout => false) }.to_json; 
   end
 
+  def get_shiproute
+    @routes = Routeship.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routeships", :layout => false) }.to_json; 
+  end
+    
+  def get_shiproute2
+    @routes = Routeship.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routeships_for_events", :layout => false) }.to_json; 
+  end
+  
   def get_trainroute2
     @routes = Routetrain.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
     render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains_for_events", :layout => false) }.to_json; 

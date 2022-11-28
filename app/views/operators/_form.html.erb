@@ -9,6 +9,11 @@
     <%= f.text_field :abbr %>
   </div>
 
+<div class="field-row first">
+    <%= f.label :operatortype, "Tipe Operator"  %>
+    <%= f.select :operatortype, options_for_select(@operatortype.collect {|w| [w, w]}, (params[:operatortype].present? ? params[:type] : @operator.operatortype)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
   <div class="field-row first">
     <%= f.label :description, "Keterangan" %>
     <%= f.text_field :description %>

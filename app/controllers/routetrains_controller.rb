@@ -14,7 +14,7 @@ class RoutetrainsController < ApplicationController
   end
 
   def set_role
-    @user_role = 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan'
+    @user_role = 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Admin Jurusan'
   end
 
   def index

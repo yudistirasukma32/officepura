@@ -8,7 +8,7 @@
 	
 	<div id="content-full">
 
-		<h1>Transaksi / <a href="<%=trainexpenses_path%>">Hutang Operator Kereta</a> / Index</h1>
+		<h1>Transaksi / <a href="<%=shipexpenses_path%>">Hutang Operator Ro-Ro (Kapal)</a> / Index</h1>
 
 		<br class="clearfix" />
 
@@ -27,18 +27,11 @@
 				<label for="operator_id" class="middle short" style='width:50px;float:none;'>Operator</label> &nbsp; &nbsp;
 				<select name="operator_id" class="middle short">
 					<option value="">Semua</option>
-					<% Operator.active.order(:name).each do |ope| %>
+					<% Operator.multimode.active.order(:name).each do |ope| %>
 					<option value="<%=ope.id%>"<% if ope.id == @ope %> selected='selected'<% end %>><%=ope.abbr%></option>
 					<% end %>
 				</select>
-				<label for="type" class="middle short" style='width:50px;float:none;'>Jenis Cont.</label> &nbsp; &nbsp;
-				<select name="containertype" class="middle short">
-					<option value="">Semua</option>
-					<% @contype.each do |contype| %>
-					<option value="<%=contype%>" <% if contype == @containertype %> selected='selected'<% end %>><%=contype%></option>
-					<% end %>
-				</select>
-
+				
 				<input class="submit" type="submit" value="Filter" />
 			</div>
 			</form>
@@ -54,14 +47,13 @@
 					<th width="60">NoPol</th>
                     <th width="80">Kontainer/Iso</th>
 					<th width="50">No. DO</th>
-					<th width="80">Type</th>
 					<th width="40">Operator</th>
 					<th width="90" class="right">Total</th>
 					<th width="40"></th>
 				</tr>
 
 				<% @grandTotal = 0%>
-				<% @trainexpenses.each do |invoice| %>
+				<% @shipexpenses.each do |invoice| %>
 					<% if invoice.deleted %>
 						<% @grandTotal += 0 %>
 						<% if current_user.adminrole %>
@@ -71,48 +63,46 @@
 							<td>
 								<%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
 								<br/>
-								<%=invoice.routetrain.name rescue nil %>
- 							</td>
+								<%=invoice.routeship.name rescue nil %>
+							</td>
 							<td><%=invoice.vehicle.current_id rescue nil%></td>
 							<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : '' %>
 							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></td>
 							<td><%= zeropad(invoice.event_id) rescue nil %></td>
-							<td><%= invoice.routetrain.container_type rescue nil %></td>
-							<td><%= invoice.routetrain.operator.abbr rescue nil %></td>
-							<td align="right" class="red"><%=to_currency(invoice.routetrain.price_per)%></td>
+							<td><%= invoice.routeship.operator.abbr rescue nil %></td>
+							<td align="right" class="red"><%=to_currency(invoice.routeship.price_per)%></td>
 							<td class="right" width="60">&nbsp;</td>
 						</tr>
 						<% end %>
 
 					<% else %>
 
-						<% @grandTotal += invoice.routetrain.price_per %>
+						<% @grandTotal += invoice.routeship.price_per %>
 
 						<tr>
 							<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
 							<td><%= zeropad(invoice.id) %></td>
 							<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
 							<br/>
-+							<strong><%=invoice.routetrain.name rescue nil %></strong>
+							<strong><%=invoice.routeship.name rescue nil %></strong>
 							</td>
 							<td><%=invoice.vehicle.current_id rescue nil%></td>
 							<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : '' %>
 							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></td>
 							<td><%= zeropad(invoice.event_id) rescue nil %></td>
-							<td><%= invoice.routetrain.container_type rescue nil %></td>
-							<td><%= invoice.routetrain.operator.abbr rescue nil %></td>
-							<td align="right" class="red"><%=to_currency(invoice.routetrain.price_per)%></td>
+							<td><%= invoice.routeship.operator.abbr rescue nil %></td>
+							<td align="right" class="red"><%=to_currency(invoice.routeship.price_per)%></td>
 							<td class="right" width="60">
 
 								<% if (current_user.adminrole || current_user.owner)%>
 
-									<% if invoice.trainexpenses.active.count > 1 %>
+									<% if invoice.shipexpenses.active.count > 1 %>
 
-										<a class="cta" style="opacity: 1;" href="trainexpenses/delete/<%=invoice.id%>">Batal</a>
+										<a class="cta" style="opacity: 1;" href="shipexpenses/delete/<%=invoice.id%>">Batal</a>
 									
 									<% else %>
 
-										<a class="cta" style="background: #2196f3;" href="<%=new_trainexpense_path%>/<%=invoice.id%>">Bayar</a>
+										<a class="cta" style="background: #2196f3;" href="<%=new_shipexpense_path%>/<%=invoice.id%>">Bayar</a>
 								
 									<% end %>
 
@@ -120,9 +110,9 @@
 								
 								<% if checkrole 'Admin Operasional' %>
 
-									<% if invoice.trainexpenses.active.count == 0 %>
+									<% if invoice.shipexpenses.active.count == 0 %>
 
-										<a class="cta" style="background: #2196f3;" href="<%=new_trainexpense_path%>/<%=invoice.id%>">Bayar</a>
+										<a class="cta" style="background: #2196f3;" href="<%=new_shipexpense_path%>/<%=invoice.id%>">Bayar</a>
 									
 									<% end %>
  
@@ -136,7 +126,7 @@
 				<% end %>	
 			
 				<tr class="footer">
-					<td class="total" align="right" colspan="8">TOTAL</td>
+					<td class="total" align="right" colspan="7">TOTAL</td>
 					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
 				</tr>
 			</table>

@@ -23,6 +23,13 @@ OfficePuraErp::Application.routes.draw do
     end  
   end
   
+  resources :routeships do
+    member do
+      get 'enable'
+      get 'disable'
+    end  
+  end
+
   resources :customers do
     member do
       get 'enable'
@@ -181,7 +188,7 @@ OfficePuraErp::Application.routes.draw do
     
   get 'events/get_event_by_customer/:customer_id' =>'events#get_event_by_customer' 
 
-  resources :trainexpenses do
+  resources :shipexpenses do
     member do
       get 'enable'
       get 'disable'
@@ -308,6 +315,8 @@ OfficePuraErp::Application.routes.draw do
   
   get 'invoices/get_trainroute/:operator_id' => 'invoices#get_trainroute'
   get 'invoices/get_trainroute2/:operator_id' => 'invoices#get_trainroute2'
+  get 'invoices/get_shiproute/:operator_id' => 'invoices#get_shiproute'
+  get 'invoices/get_shiproute2/:operator_id' => 'invoices#get_shiproute2'
   get 'invoices/getroutesonly/:customer_id' => 'invoices#get_routesonly'
 
   get 'invoices/getroutes/:customer_id' => 'invoices#get_routes'
@@ -649,6 +658,9 @@ OfficePuraErp::Application.routes.draw do
 
     match 'trainexpenses/new/:invoice_id' => 'trainexpenses#new'
     match 'trainexpenses/delete/:invoice_id' => 'trainexpenses#delete'
+
+    match 'shipexpenses/new/:invoice_id' => 'shipexpenses#new'
+    match 'shipexpenses/delete/:invoice_id' => 'shipexpenses#delete'
 
     match 'receipttrains/new/:trainexpense_id' => 'receipttrains#new'
 

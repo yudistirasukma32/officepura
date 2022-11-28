@@ -1,11 +1,11 @@
-class Receipttrain < ActiveRecord::Base
+class Receiptship < ActiveRecord::Base
 
 	belongs_to :officeexpensegroup
-	belongs_to :trainexpense
+	belongs_to :shipexpense
 	belongs_to :user
 
   	# Setup accessible (or protected) attributes for your model
-  	attr_accessible :date, :trainexpense_id, :total, :description, :user_id, 
+  	attr_accessible :date, :shipexpense_id, :total, :description, :user_id, 
 	:deleted, :enabled, :officeexpensegroup_id, :bankexpensegroup_id, :expensetype, :gst_percentage, :gst_tax
 
   	scope :active, lambda {where(:deleted => false)}

@@ -7,6 +7,7 @@ class OperatorsController < ApplicationController
   def set_section
     @section = "masters"
     @where = "operators"
+    @operatortype = ["TRAIN", "MULTIMODE"]
   end
 
   def set_role

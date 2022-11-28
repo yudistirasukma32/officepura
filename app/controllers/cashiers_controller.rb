@@ -27,7 +27,7 @@ class CashiersController < ApplicationController
 		@receiptpayrolls = Receiptpayroll.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date)
 		@receiptpayrollreturns = Receiptpayrollreturn.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date)
 
-		# @receipttrains = Receipttrain.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date)
+		@receipttrains = Receipttrain.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date)
 	end
 
 	def getrequests
@@ -53,8 +53,7 @@ class CashiersController < ApplicationController
 
 		@payrolls = Payroll.find_by_sql("SELECT * FROM payrolls where date = '#{@date.to_date}' AND deleted = false AND id not in (SELECT payroll_id FROM receiptpayrolls where deleted = false)")
 		@payrollreturns = Payrollreturn.find_by_sql("SELECT * FROM payrollreturns where date = '#{@date.to_date}' AND deleted = false AND payroll_id not in (SELECT payroll_id FROM receiptpayrollreturns where deleted = false)")
-
-		# @trainexpenses = Trainexpense.find_by_sql("SELECT * FROM trainexpenses where date = '#{@date.to_date}' AND deleted = false AND id not in (SELECT trainexpense_id FROM receipttrains where deleted = false)") 
+		@trainexpenses = Trainexpense.find_by_sql("SELECT * FROM trainexpenses where date = '#{@date.to_date}' AND deleted = false AND id not in (SELECT trainexpense_id FROM receipttrains where deleted = false)")
 
 		@saldokas = Setting.find_by_name("Saldo Kas Kantor").value rescue nil || 0
 

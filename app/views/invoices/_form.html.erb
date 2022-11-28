@@ -132,7 +132,7 @@
     <%= f.label :operator_id, "Operator Kereta" %>
     <select id="invoice_operator_id" name="invoice[operator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteTrain(this.value);">
       <option value="0">- Operator -</option>
-      <% Operator.active.each do |operator| %>
+      <% Operator.train.active.each do |operator| %>
       <option value="<%=operator.id%>"
         <% if operator.id == @invoice.operator_id %> selected="selected"<% end %>><%=operator.name%> (<%=operator.abbr%>)</option>
       <% end %>
@@ -225,6 +225,25 @@
     <%= f.text_field :insurance, :class => 'half', :style => 'text-align:right;', :onkeypress => 'javascript:return isNumberKey(this);', :value => @invoice.insurance.to_i %>
     <strong>Rupiah</strong>
     <span>(Uang Pertanggungan)</span>
+  </div>
+  
+  <div class="field-row">
+    <%= f.label :shipoperator_id, "Operator Kapal" %>
+    <select id="invoice_shipoperator_id" name="invoice[shipoperator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteShip(this.value);">
+      <option value="0">- Operator -</option>
+      <% Operator.multimode.active.each do |shipoperator| %>
+      <option value="<%=shipoperator.id%>"
+        <% if shipoperator.id == @invoice.shipoperator_id %> selected="selected"<% end %>><%=shipoperator.name%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div id="div_routeships">
+    <div class="field-row">
+      <%= f.label :routeship, "Jurusan Pelabuhan" %>
+      <input type="text" class="double disabled" value="<%= !@invoice.routeship.nil? ? @invoice.routeship.name : 'Harap memilih operator kapal terlebih dahulu.' %>" />
+      <%= f.hidden_field :routeship_id, :value => @invoice.routeship_id %>
+    </div>
   </div>  
 
   <div class="field-row">

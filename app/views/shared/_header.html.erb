@@ -29,6 +29,7 @@
                     <li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Marketing, Marketing'), "Operator", "/operators" %></li>
 					<li><%= link_to_if (checkrole 'Master Jurusan'), "Jurusan Kereta", "/routetrains" %></li>
+					<li><%= link_to_if (checkrole 'Master Jurusan'), "Jurusan Pelabuhan", "/routeships" %></li>
 					<li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Kapal'), "Kapal", "/ships" %></li>
 					<li><%= link_to_if (checkrole 'Admin Pelabuhan'), "Pelabuhan", "/ports" %></li>
@@ -82,7 +83,8 @@
 					<li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional'), "Memo Kontainer", "/containermemos" %></li>
 					<li class="divider"></li>
-					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional'), "Biaya Kereta", "/trainexpenses" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional'), "Hutang Operator Kereta", "/trainexpenses" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional'), "Hutang Operator Ro-Ro", "/shipexpenses" %></li>
 				</ul>
 			</li>
             

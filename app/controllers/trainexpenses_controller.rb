@@ -8,7 +8,7 @@ class TrainexpensesController < ApplicationController
     @section = "transactions"
     @where = "trainexpenses"
     
-    @contype = ["EMPTY 20FT", "DRY CONTAINER 20FT", "EMPTY 40FT", "DRY CONTAINER 40FT"]
+    @contype = ["ISOTANK 20FT", "ISOTANK EMPTY 20FT", "DRY CONTAINER EMPTY 20FT", "DRY CONTAINER 20FT", "DRY CONTAINER EMPTY 40FT", "DRY CONTAINER 40FT"]
     
     @consize = ["20FT", "40FT"]
   end
@@ -23,7 +23,19 @@ class TrainexpensesController < ApplicationController
     @enddate = params[:enddate]
     @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
 
-    @trainexpenses = Invoice.where('invoicetrain = true AND routetrain_id is not null AND routetrain_id !=0  AND date between ? and ?', @startdate.to_date, @enddate.to_date).order(:id)
+    @operator_id = params[:operator_id]
+        @containertype = params[:containertype]
+    
+        @trainexpenses = Invoice.where('invoicetrain = true AND routetrain_id is not null AND routetrain_id !=0  AND date between ? and ? AND invoices.id not in (select invoice_id from trainexpenses where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
+    
+        if @operator_id.present?
+          @trainexpenses = @trainexpenses.where('invoices.operator_id = ?', @operator_id)
+        end
+    
+        if @containertype.present?
+          @trainexpenses = @trainexpenses.joins(:routetrain).where('routetrains.container_type = ?', @containertype)
+        end
+
   end
 
   def new
@@ -41,7 +53,9 @@ class TrainexpensesController < ApplicationController
 
   def create
     inputs = params[:trainexpense]
+
     @trainexpense = Trainexpense.new(inputs)
+    @trainexpense.date = Date.today
 
     if @trainexpense.save
       redirect_to(trainexpenses_url(), :notice => 'Data Biaya Kereta sukses ditambah.')

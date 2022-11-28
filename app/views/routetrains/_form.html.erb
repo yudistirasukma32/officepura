@@ -5,7 +5,7 @@
     <%= f.label :operator_id, "Operator" %>
     <select id="routetrain_operator_id" name="routetrain[operator_id]" class="chzn-select half">
       <option value="0">- Operator -</option>
-      <% Operator.active.order(:abbr).each do |operator| %>
+      <% Operator.train.active.order(:abbr).each do |operator| %>
       <option value="<%=operator.id%>"<%= operator.id == @routetrain.operator_id ? ' selected="selected"' : '' %>><%=operator.abbr%></option>
       <% end %>
     </select>

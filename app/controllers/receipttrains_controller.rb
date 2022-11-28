@@ -36,11 +36,7 @@ class ReceipttrainsController < ApplicationController
         @receipttrain.user_id = current_user.id
         @receipttrain.expensetype = @trainexpense.expensetype
 
-        if ([5,3,6,7].include? @trainexpense.invoice.office_id)
-          @receipttrain.total = 0
-        end
-
-        receipt_exist = Receipt.where(:invoice_id => inputs[:invoice_id], :deleted => false).first rescue nil
+        receipt_exist = Receipttrain.where(:invoice_id => inputs[:invoice_id], :deleted => false).first rescue nil
         if receipt_exist.nil?
           @receipttrain.transaction do
             if @receipttrain.save

@@ -1,0 +1,57 @@
+<%= form_for(@routeship) do |f| %>
+
+  <div class="field-row first">
+    <%= f.label :operator_id, "Operator" %>
+    <select id="routeship_operator_id" name="routeship[operator_id]" class="chzn-select half">
+      <option value="0">- Operator -</option>
+      <% Operator.multimode.order(:abbr).each do |operator| %>
+      <option value="<%=operator.id%>"<%= operator.id == @routeship.operator_id ? ' selected="selected"' : '' %>><%=operator.abbr%></option>
+      <% end %>
+    </select>
+  </div>
+
+	<div class="field-row">
+    <%= f.label :name, "Nama Jurusan" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row first">
+    <%= f.label :origin_port_id, "Pelabuhan Awal" %>
+    <select id="routeship_origin_port_id" name="routeship[origin_port_id]" class="chzn-select half">
+      <option value="0">- Pelabuhan Awal -</option>
+      <% Port.active.each do |port| %>
+      <option value="<%=port.id%>"<%= port.id == @routeship.origin_port_id ? ' selected="selected"' : '' %>><%=port.name%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row first">
+    <%= f.label :destination_port_id, "Pelabuhan Tujuan" %>
+    <select id="routeship_destination_port_id" name="routeship[destination_port_id]" class="chzn-select half">
+      <option value="0">- Pelabuhan Tujuan -</option>
+      <% Port.active.each do |port| %>
+      <option value="<%=port.id%>"<%= port.id == @routeship.destination_port_id ? ' selected="selected"' : '' %>><%=port.name%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :price_per, "Tarif" %>
+    <%= f.text_field :price_per, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :tempo, "Tempo" %>
+    <%= f.text_field :tempo, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_field :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Jurusan' %>
+    <a class="back left" href="<%=routeships_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

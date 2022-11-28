@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20221108235502) do
+ActiveRecord::Schema.define(:version => 20221128051044) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -185,12 +185,13 @@ ActiveRecord::Schema.define(:version => 20221108235502) do
   end
 
   create_table "commodities", :force => true do |t|
-    t.boolean   "deleted",                  :default => false
-    t.boolean   "enabled",                  :default => true
+    t.boolean   "deleted",                                                      :default => false
+    t.boolean   "enabled",                                                      :default => true
     t.string    "name"
     t.string    "description"
-    t.timestamp "created_at",  :limit => 6,                    :null => false
-    t.timestamp "updated_at",  :limit => 6,                    :null => false
+    t.timestamp "created_at",       :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",       :limit => 6,                                                   :null => false
+    t.decimal   "insurance_amount",              :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "companies", :force => true do |t|
@@ -306,6 +307,8 @@ ActiveRecord::Schema.define(:version => 20221108235502) do
     t.decimal   "saving",                                :precision => 19, :scale => 2, :default => 0.0
     t.integer   "vehicle_id"
     t.string    "bank_account"
+    t.string    "bank_name"
+    t.integer   "bankexpensegroup_id"
   end
 
   create_table "eventcleaningmemos", :force => true do |t|
@@ -525,6 +528,9 @@ ActiveRecord::Schema.define(:version => 20221108235502) do
     t.decimal   "premi_allowance",               :precision => 19, :scale => 2, :default => 0.0
     t.integer   "routetrain_id"
     t.integer   "operator_id"
+    t.integer   "shipoperator_id"
+    t.integer   "routeship_id"
+    t.boolean   "invoicemultimode",                                             :default => false
   end
 
   add_index "invoices", ["date", "customer_id", "event_id", "invoicetrain"], :name => "invoice_events"
@@ -588,13 +594,14 @@ ActiveRecord::Schema.define(:version => 20221108235502) do
   end
 
   create_table "operators", :force => true do |t|
-    t.boolean   "deleted",                  :default => false
-    t.boolean   "enabled",                  :default => true
+    t.boolean   "deleted",                   :default => false
+    t.boolean   "enabled",                   :default => true
     t.string    "name"
     t.string    "abbr"
     t.text      "description"
-    t.timestamp "created_at",  :limit => 6,                    :null => false
-    t.timestamp "updated_at",  :limit => 6,                    :null => false
+    t.timestamp "created_at",   :limit => 6,                    :null => false
+    t.timestamp "updated_at",   :limit => 6,                    :null => false
+    t.string    "operatortype"
   end
 
   create_table "paymentchecks", :force => true do |t|
@@ -949,6 +956,23 @@ ActiveRecord::Schema.define(:version => 20221108235502) do
     t.integer   "deleteuser_id"
   end
 
+  create_table "receiptships", :force => true do |t|
+    t.boolean  "deleted",                                              :default => false
+    t.boolean  "enabled",                                              :default => true
+    t.date     "date"
+    t.integer  "shipexpense_id"
+    t.text     "description"
+    t.integer  "user_id"
+    t.string   "expensetype",                                          :default => "Kredit"
+    t.integer  "officeexpensegroup_id"
+    t.integer  "bankexpensegroup_id"
+    t.datetime "created_at",                                                                 :null => false
+    t.datetime "updated_at",                                                                 :null => false
+    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
+    t.integer  "gst_percentage",                                       :default => 0
+    t.decimal  "gst_tax",               :precision => 19, :scale => 2, :default => 0.0
+  end
+
   create_table "receipttrains", :force => true do |t|
     t.boolean   "deleted",                                                           :default => false
     t.integer   "trainexpense_id"
@@ -962,6 +986,8 @@ ActiveRecord::Schema.define(:version => 20221108235502) do
     t.timestamp "created_at",            :limit => 6,                                                      :null => false
     t.timestamp "updated_at",            :limit => 6,                                                      :null => false
     t.decimal   "total",                              :precision => 19, :scale => 2, :default => 0.0
+    t.integer   "gst_percentage",                                                    :default => 0
+    t.decimal   "gst_tax",                            :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "roles", :force => true do |t|
@@ -1027,6 +1053,20 @@ ActiveRecord::Schema.define(:version => 20221108235502) do
 
   add_index "routes", ["name", "customer_id", "office_id"], :name => "route_office"
 
+  create_table "routeships", :force => true do |t|
+    t.boolean  "deleted",                                            :default => false
+    t.boolean  "enabled",                                            :default => true
+    t.string   "name"
+    t.integer  "operator_id"
+    t.integer  "origin_port_id"
+    t.integer  "destination_port_id"
+    t.datetime "created_at",                                                            :null => false
+    t.datetime "updated_at",                                                            :null => false
+    t.decimal  "price_per",           :precision => 19, :scale => 2, :default => 0.0
+    t.integer  "tempo",                                              :default => 0
+    t.string   "description"
+  end
+
   create_table "routetrains", :force => true do |t|
     t.boolean   "deleted",                                                            :default => false
     t.boolean   "enabled",                                                            :default => true
@@ -1071,6 +1111,26 @@ ActiveRecord::Schema.define(:version => 20221108235502) do
     t.text      "description"
     t.timestamp "created_at",  :limit => 6,                   :null => false
     t.timestamp "updated_at",  :limit => 6,                   :null => false
+  end
+
+  create_table "shipexpenses", :force => true do |t|
+    t.boolean  "deleted",                                              :default => false
+    t.boolean  "enabled",                                              :default => true
+    t.date     "date"
+    t.integer  "routeship_id"
+    t.integer  "invoice_id"
+    t.text     "description"
+    t.integer  "user_id"
+    t.string   "expensetype",                                          :default => "Kredit"
+    t.integer  "officeexpensegroup_id"
+    t.integer  "bankexpensegroup_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                                                                 :null => false
+    t.datetime "updated_at",                                                                 :null => false
+    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
+    t.integer  "gst_percentage",                                       :default => 0
+    t.decimal  "gst_tax",               :precision => 19, :scale => 2, :default => 0.0
+    t.decimal  "price_per",             :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "ships", :force => true do |t|
@@ -1262,6 +1322,9 @@ ActiveRecord::Schema.define(:version => 20221108235502) do
     t.integer   "officeexpensegroup_id"
     t.integer   "bankexpensegroup_id"
     t.integer   "deleteuser_id"
+    t.integer   "gst_percentage",                                                    :default => 0
+    t.decimal   "gst_tax",                            :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "price_per",                          :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "transporttypes", :force => true do |t|

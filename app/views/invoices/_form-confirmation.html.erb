@@ -87,16 +87,39 @@
         <strong>Target</strong>
       </td>
     </tr>
-      <tr>
-        <td>Tgl Muat</td>
-        <td><%= @invoice.event.load_date.strftime('%d %B %Y') rescue nil %></td>
-      </tr>
+    <tr>
+      <td>Tgl Muat</td>
+      <td><%= @invoice.event.load_date.strftime('%d %B %Y') rescue nil %></td>
+    </tr>
 
-      <tr>
-        <td>Tgl Bongkar</td>
-        <td><%= @invoice.event.unload_date.strftime('%d %B %Y') rescue nil %></td>
-      </tr>
+    <tr>
+      <td>Tgl Bongkar</td>
+      <td><%= @invoice.event.unload_date.strftime('%d %B %Y') rescue nil %></td>
+    </tr>
       
+    <% end %>
+
+  <% if @invoice.route.distance.present? %>
+    <tr>
+      <td style="padding-top: 1.5rem;">
+        <strong>Informasi</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>Jarak</td>
+      <td><%= @invoice.route.distance rescue nil %> km</td>
+    </tr>
+    <% end %>
+
+    <% if @invoice.route.routelocation.present? %>
+    <tr>
+      <td>Alamat Muat</td>
+      <td><%= @routelocation.address_start rescue nil %></td>
+    </tr>
+    <tr>
+      <td>Alamat Bongkar</td>
+      <td><%= @routelocation.address_end rescue nil %></td>
+    </tr>
     <% end %>
 
     <% if @invoice.transporttype == "KAPAL (TOL LAUT)" %>

@@ -553,6 +553,22 @@ function getRouteTrain(operator_id) {
 	});
 }
 
+function getRouteShip(operator_id) {
+		$.ajax({
+			type: "GET",
+			url: "/invoices/get_shiproute/" + operator_id,
+			success: function(data) {
+	            console.log("/invoices/get_shiproute/" + operator_id);
+				$('#div_routeships').html(data.html);
+				$(".chzn-select").chosen();
+			},
+			request: function() {
+				$('#div_routeships').html('<em>Mengunduh Data</em>');			
+			},
+			failure: function() {alert("Error. Mohon refresh browser Anda.");}
+		});
+	}
+	
 function getRouteTrain2(operator_id) {
 	$.ajax({
 		type: "GET",

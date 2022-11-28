@@ -206,6 +206,50 @@
 		</tbody>
 	<% end %>
 
+	<% if @trainexpenses.any? %>
+	<% total = 0 %>
+		<tbody class="tablesorter-no-sort">
+			<tr class="subheading">
+				<th colspan="6" style="color:#000;">Biaya Kereta (<%=@trainexpenses.count%>)</th>
+			</tr>
+		</tbody>
+		<tbody>	
+		<% @trainexpenses.each_with_index do |trainexpense| %>
+		<% total += trainexpense.total %>
+			<tr>
+				<td><%=zeropad(trainexpense.invoice.id)%></td>
+				<td><%=trainexpense.invoice.quantity%> Rit: <%=trainexpense.invoice.route.name rescue nil%> (<%= trainexpense.trainexpense.invoice.driver.name rescue nil%> <%=zeropad(trainexpense.invoice.driver.id) rescue nil%>) <%= trainexpense.invoice.invoicetrain ? '= Kereta =' : '' %> 
+                    <%= (trainexpense.invoice.isotank_id.present? && trainexpense.invoice.isotank_id.to_i != 0) ? ("Isotank = " + trainexpense.invoice.isotank.isotanknumber) : '' %>
+                    <%= (trainexpense.invoice.container_id.present? && trainexpense.invoice.container_id.to_i != 0) ? ("Kontainer = " + trainexpense.invoice.container.containernumber) : '' %>
+					<br/>
+					<strong><%=trainexpense.invoice.routetrain.name rescue nil %> | <%= trainexpense.invoice.routetrain.container_type rescue nil %></strong>
+				</td>
+
+				<td class="">
+					<%=trainexpense.invoice.office.abbr if !trainexpense.invoice.office_id.nil?%>
+				</td>
+
+				<td><%=trainexpense.invoice.vehicle.current_id rescue nil%></td>
+				<td align="right" class="red">
+                    <%=to_currency(trainexpense.total)%>
+				</td>
+				<td class="right">
+					<a class="cta" href="<%=new_receipttrain_path%>/<%=trainexpense.id%>">Konfirm</a>
+				</td>
+			</tr>
+		<% end %>
+		</tbody>
+		<tbody class="tablesorter-no-sort">
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="red"><strong><%=to_currency(total.abs)%></strong></td>
+				<td colspan="3">&nbsp;</td>
+			</tr>
+		</tbody>
+	<% end %>
+
+
 	<% if @incentives.any? %>
 	<% total = 0 %>
 
