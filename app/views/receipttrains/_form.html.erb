@@ -93,12 +93,16 @@
 
       <tr>
         <td><%= f.label :total, "Tarif" %></td>
-        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.invoice.routetrain.total.to_i), :readOnly => 'true' %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.price_per.to_i), :readOnly => 'true' %></td>
+      </tr>
+      <tr>
+        <td><%= f.label :gst_tax, "PPN 11%" %></td>
+        <td><%= f.text_field :gst_tax, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.gst_tax.to_i), :readOnly => 'true' %></td>
       </tr>
 
       <tr class="total-row">
         <td><%= f.label :total, "Total" %></td>
-        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.invoice.routetrain.total.to_i), :readOnly => 'true' %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.total.to_i), :readOnly => 'true' %></td>
       </tr>
     </table>
 
