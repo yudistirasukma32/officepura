@@ -83,7 +83,10 @@ class InvoicesController < ApplicationController
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
     # @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date).order(:id)
     @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date)
-    @invoices = @invoices.where("customer_id NOT IN (50,51,144)").order(:id)
+
+    #customer kosongan pura / rdpi
+    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*'").pluck(:id)
+    @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
     # fetch_excel()
       
     @office_id = params[:office_id]
@@ -133,7 +136,9 @@ class InvoicesController < ApplicationController
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
       
     @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date)
-    @invoices = @invoices.where("customer_id IN (50,51,144)").order(:id)
+
+    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*'").pluck(:id)
+    @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
       
     @office_id = params[:office_id]
       
