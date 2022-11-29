@@ -209,5 +209,10 @@
 		<li class="<%= @where == 'users' ? 'on' : '' %>"><%= link_to_if current_user.adminrole || current_user.owner, "Data User", "/users" %></li>
 	<% end %>
 
+	<% if @section == "trainexpenses" %> 
+		<li class="<%= @where == 'trainexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan'), "Hutang Operator Kereta", "/trainexpenses" %></li>
+		<li class="<%= @where == 'trainexpenses-paid' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan'), "Hutang Operator Kereta - Terbayar", "/trainexpenses-paid" %></li>
+	<% end %>
+
 </ul>
 </div>

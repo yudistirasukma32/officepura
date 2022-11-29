@@ -656,6 +656,7 @@ OfficePuraErp::Application.routes.draw do
     post 'api/taxinvoiceitems/create' => 'taxinvoiceitemapi#updateitems' 
     get 'api/taxinvoiceitems/detail/:id' => 'taxinvoiceitemapi#detail'
 
+    match 'trainexpenses-paid' => 'trainexpenses#paid'
     match 'trainexpenses/new/:invoice_id' => 'trainexpenses#new'
     match 'trainexpenses/delete/:invoice_id' => 'trainexpenses#delete'
 

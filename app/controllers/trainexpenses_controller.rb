@@ -5,7 +5,7 @@ class TrainexpensesController < ApplicationController
   protect_from_forgery :except => [:update_asset]
 
   def set_section
-    @section = "transactions"
+    @section = "trainexpenses"
     @where = "trainexpenses"
     
     @contype = ["ISOTANK 20FT", "ISOTANK EMPTY 20FT", "DRY CONTAINER EMPTY 20FT", "DRY CONTAINER 20FT", "DRY CONTAINER EMPTY 40FT", "DRY CONTAINER 40FT"]
@@ -18,6 +18,8 @@ class TrainexpensesController < ApplicationController
   end
 
   def index
+    @where = "trainexpenses"
+
     @startdate = params[:startdate]
     @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
     @enddate = params[:enddate]
@@ -38,7 +40,33 @@ class TrainexpensesController < ApplicationController
 
   end
 
+  def paid
+    @where = "trainexpenses-paid"
+
+    @startdate = params[:startdate]
+    @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
+    @enddate = params[:enddate]
+    @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
+
+    @operator_id = params[:operator_id]
+        @containertype = params[:containertype]
+    
+        # @trainexpenses = Invoice.where('invoicetrain = true AND routetrain_id is not null AND routetrain_id !=0  AND date between ? and ? AND invoices.id in (select invoice_id from trainexpenses where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
+        @trainexpenses = Trainexpense.where('trainexpenses.date between ? and ? and trainexpenses.deleted = false', @startdate.to_date, @enddate.to_date).order(:id)
+    
+        if @operator_id.present?
+          @trainexpenses = @trainexpenses.joins(:invoice).where('invoices.operator_id = ?', @operator_id)
+        end
+    
+        if @containertype.present?
+          @trainexpenses = @trainexpenses.joins(:routetrain).where('routetrains.container_type = ?', @containertype)
+        end
+
+  end
+
   def new
+    @where = "trainexpenses"
+    
     @errors = Hash.new
     @invoice_id = params[:invoice_id]
     @invoice = Invoice.find(params[:invoice_id]) rescue nil
