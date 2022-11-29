@@ -32,7 +32,7 @@ class CustomersController < ApplicationController
 
   def edit
     @customer = Customer.find(params[:id])
-    @routes = @customer.routes.order(:name)
+    @routes = @customer.active.routes.order(:name)
     @customer.wholesale_price = @customer.wholesale_price.to_i
   end
 
