@@ -20,7 +20,7 @@
 			</div>
 
 			<div class="field-row continue">
-				<label for="startdate" class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
+				<label for="startdate" class="" style="float:none">Tgl Bayar Awal</label> &nbsp; &nbsp;
 				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />&nbsp; &nbsp;
 				<label for="enddate" class="middle short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
 				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />&nbsp; &nbsp;
@@ -48,7 +48,8 @@
 
 			<table class="row-view">
 				<tr>
-					<th width="50">TGL</th>
+					<th width="50">TGL BYR</th>
+					<th width="50">TGL BKK</th>
 					<th width="50">No. BKK</th>
 					<th width="200">Keterangan</th>
 					<th width="60">NoPol</th>
@@ -66,6 +67,7 @@
 						<% @grandTotal += 0 %>
 						<% if current_user.adminrole %>
 						<tr class="deleted">
+							<td><strong><%=trainexpense.date.strftime('%d')%></strong>.<%=trainexpense.date.strftime('%m')%></td>
 							<td><strong><%=trainexpense.invoice.date.strftime('%d')%></strong>.<%=trainexpense.invoice.date.strftime('%m')%></td>
 							<td><%= zeropad(trainexpense.invoice.id) %></td>
 							<td>
@@ -89,6 +91,7 @@
 						<% @grandTotal += trainexpense.total %>
 
 						<tr>
+							<td><strong><%=trainexpense.date.strftime('%d')%></strong>.<%=trainexpense.date.strftime('%m')%></td>
 							<td><strong><%=trainexpense.invoice.date.strftime('%d')%></strong>.<%=trainexpense.invoice.date.strftime('%m')%></td>
 							<td><%= zeropad(trainexpense.invoice.id) %></td>
 							<td><%=trainexpense.invoice.quantity%> Rit: <%=trainexpense.invoice.route.name rescue nil%> (<%=trainexpense.invoice.driver.name rescue nil%>) <% if !trainexpense.invoice.description.blank?%> <br /> <%=trainexpense.invoice.description%>  <% end %> 
