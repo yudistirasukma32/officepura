@@ -18,7 +18,7 @@ class RoutesController < ApplicationController
     batas = 40
     halaman = params[:page].present? ? params[:page].to_i : 1
     halaman_awal = (halaman > 1) ? (halaman * batas) - batas : 0
-    halaman_awal = halaman_awal + 1	
+    # halaman_awal = halaman_awal + 1
     additional_query = ""
     if params[:query].present?
       additional_query += " and name ~* '.*#{params[:query]}.*'"
