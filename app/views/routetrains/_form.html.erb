@@ -50,14 +50,6 @@
     <%= f.label :price_per, "Tarif" %>
     <%= f.text_field :price_per, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', value: @routetrain.price_per.to_i %>
   </div>
-  <div class="field-row continue" style="padding-bottom:0px;">
-    <label style="color:#000; font-weight:700;">PPN</label>
-    <input type="checkbox" id="chk_price_tax" name="routetrain[gst_tax]" value="Yes" onchange="" <%= @routetrain.gst_tax.to_i > 0 ? "checked" : "" %> /> &nbsp; PPN 11%
-  </div>
-  <div class="field-row continue">
-    <%= f.label :total, "Total" %>
-    <%= f.text_field :total, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', readonly: true, style: "background-color: #eaeae9;padding: 5px".html_safe, value: @routetrain.total.to_i %>
-  </div>
   <div class="actions">
     <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Jurusan' %>
     <a class="back left" href="<%=routetrains_path%>">Kembali ke Index</a>

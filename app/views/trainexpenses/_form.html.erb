@@ -91,20 +91,23 @@
       </tr>
 
       <tr>
-        <td><%= f.label :total, "Tarif" %></td>
-        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.total), :readOnly => 'true' %></td>
+        <td><%= f.label :price_per, "Tarif" %></td>
+        <td><%= f.text_field :price_per, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per.to_i), :readOnly => 'true' %></td>
+      </tr>
+      <tr>
+        <td>PPN 11% &nbsp; <input type="checkbox" id="routetrain_has_ppn" value="Yes" onchange="" />  </td>
+        <td><%= f.text_field :gst_tax, :class => 'half allowance-field disabled', :onkeypress => 'javascript:return isNumberKey(this);', readonly: true, value: 0 %></td>
       </tr>
 
       <tr class="total-row">
         <td><%= f.label :total, "Total" %></td>
-        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.total), :readOnly => 'true' %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per.to_i), :readOnly => 'true' %></td>
       </tr>
     </table>
 
     <div class="field-row continue">
 
       <%= f.hidden_field :routetrain_id, :value => @invoice.routetrain_id %>
-      <%= f.hidden_field :total, :value => @invoice.routetrain.total %>
       <%= f.hidden_field :user_id, :value => current_user.id %>
 
       <%= f.submit "Tambah Data", :class => 'submit right' %>    
@@ -114,4 +117,51 @@
 
 <% end %>
 
+<% end %>
+
+
+<%= content_for :js do %>
+  <script>
+    function formatRupiah(angka, prefix, decimal_place = 0) {
+      if (typeof(angka) == 'number') {
+        angka = angka.toFixed(decimal_place);
+        angka = angka.toString();
+      }
+
+      var number_string = angka.replace(/[^,\d]/g, '').toString(),
+        split = number_string.split(','),
+        sisa = split[0].length % 3,
+        rupiah = split[0].substr(0, sisa),
+        ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+      // tambahkan titik jika yang di input sudah menjadi angka ribuan
+      if (ribuan) {
+        separator = sisa ? '.' : '';
+        rupiah += separator + ribuan.join('.');
+      }
+
+      rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+      return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+    }
+
+    function clean_currency(string) {
+      return parseInt(string.replaceAll(".","").replaceAll(",","."));
+    }
+
+    $(document).ready(function() {
+      
+    })
+    .on("click","#routetrain_has_ppn",function(){
+      price_per = $("#trainexpense_price_per").val();
+      price_per = price_per == "" ? 0 : clean_currency(price_per);
+      ppn = 0;
+      if ($(this).is(":checked")) {
+        ppn = parseInt(price_per * 11 / 100);
+      }
+
+      $("#trainexpense_gst_tax").val(formatRupiah(ppn));
+      $("#trainexpense_total").val(formatRupiah(price_per + ppn));
+
+    });
+  </script>
 <% end %>
