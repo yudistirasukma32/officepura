@@ -83,7 +83,7 @@ class TrainexpensesController < ApplicationController
     inputs = params[:trainexpense]
     inputs[:price_per] = clean_currency(inputs[:price_per])
     inputs[:gst_tax] = clean_currency(inputs[:gst_tax])
-    inputs[:gst_percentage] = inputs[:gst_tax].to_i > 0 ? 11 : 0
+    inputs[:gst_percentage] = clean_currency(inputs[:gst_tax]).to_i > 0 ? 11 : 0
     inputs[:total] = clean_currency(inputs[:total])
     # render json: inputs
     # return false
