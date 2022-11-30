@@ -79,6 +79,10 @@
             <td>Jurusan Kapal</td>
             <td><%= @shipexpense.invoice.routeship.name rescue nil %></td>
         </tr>
+        <tr>
+          <td>Memo</td>
+          <td><%= @shipexpense.description rescue nil %></td>
+        </tr>
     </table>
 
     <table class="row-view">

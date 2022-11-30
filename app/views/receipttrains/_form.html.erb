@@ -83,6 +83,10 @@
             <td>Tipe</td>
             <td><%= @trainexpense.invoice.routetrain.container_type rescue nil %></td>
         </tr>
+        <tr>
+          <td>Memo</td>
+          <td><%= @trainexpense.description rescue nil %></td>
+        </tr>
     </table>
 
     <table class="row-view">
@@ -113,7 +117,6 @@
     <div class="field-row continue">
 
       <%= f.hidden_field :routetrain_id, :value => @trainexpense.invoice.routetrain_id %>
-      <%= f.hidden_field :total, :value => @trainexpense.invoice.routetrain.total.to_i %>
       <%= f.hidden_field :user_id, :value => current_user.id %>
 
       <%= f.submit "Tambah Data", :class => 'submit right' %>    

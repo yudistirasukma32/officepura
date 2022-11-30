@@ -33,9 +33,9 @@ class ReceipttrainsController < ApplicationController
         @receipttrain.trainexpense_id = inputs[:trainexpense_id]
         @receipttrain.office_id = @trainexpense.invoice.office_id
         @receipttrain.misc_total = @trainexpense.misc_total.to_i
+        @receipttrain.gst_tax = @trainexpense.gst_tax.to_i
+        @receipttrain.gst_percentage = @trainexpense.gst_tax.to_i > 0 ? 11 : 0
         @receipttrain.total = @trainexpense.total.to_i
-        @receipttrain.gst_tax = @trainexpense.gst_tax.to_f
-        @receipttrain.gst_percentage = @trainexpense.gst_percentage.to_i
         @receipttrain.user_id = current_user.id
         @receipttrain.expensetype = @trainexpense.expensetype
 

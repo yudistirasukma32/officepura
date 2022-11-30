@@ -1,0 +1,129 @@
+<% if @receiptship %>
+
+<%= form_for(@receiptship) do |f| %>
+
+  <%= f.hidden_field :invoice_id, :value => @receiptship.shipexpense.invoice_id %>
+  <%= f.hidden_field :shipexpense_id, :value => @receiptship.id %>
+
+  <div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
+
+    <h3>Biaya Kapal BKK #<%=zeropad(@receiptship.shipexpense.invoice.id)%></h3>
+
+    <table class="row-view no-border">
+        <tr>
+          <td width="120">Tanggal</td>
+          <td><%=@receiptship.shipexpense.invoice.date.strftime('%d %B %Y')%> &nbsp;(KTR: <%=@receiptship.shipexpense.invoice.office.name%>)</td>
+        </tr>
+        <tr>
+          <td>Pelanggan</td>
+          <td><%=@receiptship.shipexpense.invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td><strong><%=@receiptship.shipexpense.invoice.quantity%></strong> Rit: <%=@receiptship.shipexpense.invoice.route.name%></td>
+        </tr>
+        <tr>
+          <td>No. DO</td>
+          <td><%=@receiptship.shipexpense.invoice.event_id rescue nil%></td>
+        </tr>
+        <tr>
+          <td>Kendaraan</td>
+          <td><%=@receiptship.shipexpense.invoice.vehicle.current_id%> &nbsp;(UP: <%= @receiptship.shipexpense.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+        </tr>
+        <% if @receiptship.shipexpense.invoice.isotank_id != 0 %>
+        <tr>
+          <td>No. Isotank</td>
+          <td id="strIsotank"><%=@receiptship.shipexpense.invoice.isotank.isotanknumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@receiptship.shipexpense.invoice.isotank_number.nil? %>
+          <tr>
+            <td>No. Isotank</td>
+            <td id="strIsotank"><%=@receiptship.shipexpense.invoice.isotank_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+          
+      <% if @receiptship.shipexpense.invoice.container_id != 0 %>
+        <tr>
+          <td>No. Kontainer</td>
+          <td id="strIsotank"><%=@receiptship.shipexpense.invoice.container.containernumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@receiptship.shipexpense.invoice.container_number.nil? %>
+          <tr>
+            <td>No. Kontainer</td>
+            <td id="strIsotank"><%=@receiptship.shipexpense.invoice.container_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+        <tr>
+          <td>Supir</td>
+          <td><%=@receiptship.shipexpense.invoice.driver.name%> (<%=zeropad(@receiptship.shipexpense.invoice.driver.id)%>)<% if !@receiptship.shipexpense.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@receiptship.shipexpense.invoice.driver.helpers.first.name%>)<% end %></td>
+        </tr>
+        <% if !@receiptship.shipexpense.invoice.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td><%= @receiptship.shipexpense.invoice.description %></td>
+        </tr>   
+        <% end %>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Operator</td>
+            <td><%= @receiptship.shipexpense.invoice.routeship.operator.name rescue nil %></td>
+        </tr>
+        <tr>
+            <td>Jurusan Kapal</td>
+            <td><%= @receiptship.shipexpense.invoice.routeship.name rescue nil %></td>
+        </tr>
+        <tr>
+            <td>Tipe</td>
+            <td><%= @receiptship.shipexpense.invoice.routeship.container_type rescue nil %></td>
+        </tr>
+        <tr>
+          <td>Memo</td>
+          <td><%= @receiptship.shipexpense.description rescue nil %></td>
+        </tr>
+    </table>
+
+    <table class="row-view">
+      <tr>
+        <th>Keterangan</th>
+        <th width="160" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr>
+        <td><%= f.label :total, "Tarif" %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@receiptship.shipexpense.price_per.to_i), :readOnly => 'true' %></td>
+      </tr>
+      <tr>
+        <td><%= f.label :misc_total, "Lain-lain" %></td>
+        <td><%= f.text_field :misc_total, :class => 'half disabled allowance-field', :value => to_currency(@receiptship.misc_total.to_i), :readOnly => 'true' %></td>
+      </tr>
+      <tr>
+        <td><%= f.label :gst_tax, "PPN 11%" %></td>
+        <td><%= f.text_field :gst_tax, :class => 'half disabled allowance-field', :value => to_currency(@receiptship.gst_tax.to_i), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr class="total-row">
+        <td><%= f.label :total, "Total" %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@receiptship.total.to_i), :readOnly => 'true' %></td>
+      </tr>
+    </table>
+
+    <div class="field-row continue">
+
+      <%= f.hidden_field :routeship_id, :value => @receiptship.shipexpense.invoice.routeship_id %>
+      <%= f.hidden_field :user_id, :value => current_user.id %>
+
+      <%= f.submit "Tambah Data", :class => 'submit right' %>    
+    </div>
+
+  </div>
+
+<% end %>
+
+<% end %>
