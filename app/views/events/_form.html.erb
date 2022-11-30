@@ -70,7 +70,7 @@
         <%= f.label :operator_id, "Operator Kereta" %>
         <select id="event_operator_id" name="event[operator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteTrain2(this.value);">
           <option value="0">- Operator -</option>
-          <% Operator.active.each do |operator| %>
+          <% Operator.train.active.each do |operator| %>
           <option value="<%=operator.id%>"
             <% if operator.id == @event.operator_id %> selected="selected"<% end %>><%=operator.name%> (<%=operator.abbr%>)</option>
           <% end %>
