@@ -249,6 +249,48 @@
 		</tbody>
 	<% end %>
 
+	<% if @shipexpenses.any? %>
+	<% total = 0 %>
+		<tbody class="tablesorter-no-sort">
+			<tr class="subheading">
+				<th colspan="6" style="color:#000;">Biaya Kapal (<%=@shipexpenses.count%>)</th>
+			</tr>
+		</tbody>
+		<tbody>	
+		<% @shipexpenses.each_with_index do |shipexpense| %>
+		<% total += shipexpense.total %>
+			<tr>
+				<td><%=zeropad(shipexpense.invoice.id)%></td>
+				<td><%=shipexpense.invoice.quantity%> Rit: <%=shipexpense.invoice.route.name rescue nil%> (<%= shipexpense.shipexpense.invoice.driver.name rescue nil%> <%=zeropad(shipexpense.invoice.driver.id) rescue nil%>)
+					<%= (shipexpense.invoice.isotank_id.present? && shipexpense.invoice.isotank_id.to_i != 0) ? ("Isotank = " + shipexpense.invoice.isotank.isotanknumber) : '' %>
+					<%= (shipexpense.invoice.container_id.present? && shipexpense.invoice.container_id.to_i != 0) ? ("Kontainer = " + shipexpense.invoice.container.containernumber) : '' %>
+					<br/>
+					<strong><%=shipexpense.invoice.routeship.name rescue nil %></strong>
+				</td>
+	
+				<td class="">
+					<%=shipexpense.invoice.office.abbr if !shipexpense.invoice.office_id.nil?%>
+				</td>
+	
+				<td><%=shipexpense.invoice.vehicle.current_id rescue nil%></td>
+				<td align="right" class="red">
+					<%=to_currency(shipexpense.total)%>
+				</td>
+				<td class="right">
+					<a class="cta" href="<%=new_receiptship_path%>/<%=shipexpense.id%>">Konfirm</a>
+				</td>
+			</tr>
+		<% end %>
+		</tbody>
+		<tbody class="tablesorter-no-sort">
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="red"><strong><%=to_currency(total.abs)%></strong></td>
+				<td colspan="3">&nbsp;</td>
+			</tr>
+		</tbody>
+	<% end %>
 
 	<% if @incentives.any? %>
 	<% total = 0 %>

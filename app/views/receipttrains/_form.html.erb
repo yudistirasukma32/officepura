@@ -96,6 +96,10 @@
         <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.price_per.to_i), :readOnly => 'true' %></td>
       </tr>
       <tr>
+        <td><%= f.label :misc_total, "Lain-lain" %></td>
+        <td><%= f.text_field :misc_total, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.misc_total.to_i), :readOnly => 'true' %></td>
+      </tr>
+      <tr>
         <td><%= f.label :gst_tax, "PPN 11%" %></td>
         <td><%= f.text_field :gst_tax, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.gst_tax.to_i), :readOnly => 'true' %></td>
       </tr>

@@ -366,6 +366,7 @@ OfficePuraErp::Application.routes.draw do
   resources :ships
   resources :ports
   resources :receipttrains
+  resources :receiptships
 
   match 'assetpayments/new/:assetorder_id' => 'assetpayments#new'
   match 'assetpayments/index_confirmed' => 'assetpayments#index_confirmed'
@@ -665,6 +666,7 @@ OfficePuraErp::Application.routes.draw do
     match 'shipexpenses/delete/:invoice_id' => 'shipexpenses#delete'
 
     match 'receipttrains/new/:trainexpense_id' => 'receipttrains#new'
+    match 'receiptships/new/:shipexpense_id' => 'receiptships#new'
 
     scope "monitoring" do
       match "operational" => 'monitorings#operational'

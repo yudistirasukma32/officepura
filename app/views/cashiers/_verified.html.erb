@@ -134,6 +134,52 @@
 	</tbody>
 <% end %>
 
+<% if @receiptships.any? %>
+<% total = 0 %>
+	<tbody class="tablesorter-no-sort">
+		<tr class="subheading">
+			<th colspan="6" style="color:#000;">Biaya Kapal (<%=@receiptships.count%>)</th>
+		</tr>
+	</tbody>
+	<tbody>	
+	<% @receiptships.each_with_index do |receiptship| %>
+	<% total += receiptship.shipexpense.total %>
+		<tr>
+			<td><%=zeropad(receiptship.shipexpense.invoice.id)%></td>
+			<td><%=receiptship.shipexpense.invoice.quantity%> Rit: <%=receiptship.shipexpense.invoice.route.name rescue nil%> (<%= receiptship.shipexpense.receiptship.shipexpense.invoice.driver.name rescue nil%> <%=zeropad(receiptship.shipexpense.invoice.driver.id) rescue nil%>)
+				<%= (receiptship.shipexpense.invoice.isotank_id.present? && receiptship.shipexpense.invoice.isotank_id.to_i != 0) ? ("Isotank = " + receiptship.shipexpense.invoice.isotank.isotanknumber) : '' %>
+				<%= (receiptship.shipexpense.invoice.container_id.present? && receiptship.shipexpense.invoice.container_id.to_i != 0) ? ("Kontainer = " + receiptship.shipexpense.invoice.container.containernumber) : '' %>
+				| <strong><%= receiptship.shipexpense.invoice.routeship.name %> (OP. <%= receiptship.shipexpense.invoice.routeship.operator.abbr %>) </strong>
+			</td>
+
+			<td class="">
+				<%=receiptship.shipexpense.invoice.office.abbr if !receiptship.shipexpense.invoice.office_id.nil?%>
+			</td>
+
+			<td><%=receiptship.shipexpense.invoice.vehicle.current_id rescue nil%></td>
+			<td align="right" class="red">
+				<%=to_currency(receiptship.shipexpense.total)%>
+			</td>
+			<td><%= receiptship.user.username if !receiptship.user_id.nil? %></td>
+			<td class="right">
+				<% if current_user.owner %>
+				<%= link_to '&#xf044;'.html_safe, edit_receiptship_path(receiptship), :class => "edit tipsy", :title => 'Edit' %> 
+				<% end %>
+				<%= link_to '&#xf00d;'.html_safe, receiptship, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+			</td>
+		</tr>
+	<% end %>
+	</tbody>
+	<tbody class="tablesorter-no-sort">
+		<tr class="footer">
+			<td>&nbsp;</td>
+			<td colspan="3">TOTAL</td>
+			<td align="right" class="red"><strong><%=to_currency(total.abs)%></strong></td>
+			<td colspan="3">&nbsp;</td>
+		</tr>
+	</tbody>
+<% end %>
+
 <% if @receiptreturns.any? %>
 <% total = 0 %>
 <tbody class="tablesorter-no-sort">
