@@ -82,6 +82,10 @@
             <td>Tipe</td>
             <td><%= @invoice.routeship.container_type rescue nil %></td>
         </tr>
+        <tr>
+          <td>Memo</td>
+          <td><%= f.text_area :description, :class => '', style: "border: 2px solid #d7d7d7; height: 50px;".html_safe, rows: 10 %></td>
+        </tr>
     </table>
 
     <table class="row-view">
@@ -97,7 +101,7 @@
 
       <tr>
         <td><%= f.label :misc_total, "Lain-lain" %></td>
-        <td><%= f.text_field :misc_total, :class => 'half allowance-field', :value => 0 %></td>
+        <td><%= f.text_field :misc_total, :class => 'half allowance-field', onkeyup: "count_shipexpense()", onchange: "count_shipexpense()", :value => 0 %></td>
       </tr>
 
       <tr>
@@ -154,21 +158,25 @@
       return parseInt(string.replaceAll(".","").replaceAll(",","."));
     }
 
-    $(document).ready(function() {
-      
-    })
-    .on("click","#routeship_has_ppn",function(){
+    function count_shipexpense() {
       price_per = $("#shipexpense_price_per").val();
       misc_total = $("#shipexpense_misc_total").val();
       price_per = price_per == "" ? 0 : clean_currency(price_per);
       misc_total = misc_total == "" ? 0 : clean_currency(misc_total);
       ppn = 0;
-      if ($(this).is(":checked")) {
+      if ($("#routeship_has_ppn").is(":checked")) {
         ppn = parseInt(price_per * 11 / 100);
       }
 
       $("#shipexpense_gst_tax").val(formatRupiah(ppn));
       $("#shipexpense_total").val(formatRupiah(price_per + ppn + misc_total));
+    }
+
+    $(document).ready(function() {
+      
+    })
+    .on("click","#routeship_has_ppn",function(){
+      count_shipexpense();
 
     });
   </script>

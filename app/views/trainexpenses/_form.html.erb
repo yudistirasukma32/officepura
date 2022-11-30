@@ -82,6 +82,10 @@
             <td>Tipe</td>
             <td><%= @invoice.routetrain.container_type rescue nil %></td>
         </tr>
+        <tr>
+          <td>Memo</td>
+          <td><%= f.text_area :description, :class => '', style: "border: 2px solid #d7d7d7; height: 50px;".html_safe, rows: 10 %></td>
+        </tr>
     </table>
 
     <table class="row-view">
@@ -93,6 +97,10 @@
       <tr>
         <td><%= f.label :price_per, "Tarif" %></td>
         <td><%= f.text_field :price_per, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per.to_i), :readOnly => 'true' %></td>
+      </tr>
+      <tr>
+        <td><%= f.label :misc_total, "Lain-lain" %></td>
+        <td><%= f.text_field :misc_total, :class => 'half allowance-field', onkeyup: "count_trainexpense()", onchange: "count_trainexpense()", :value => 0 %></td>
       </tr>
       <tr>
         <td>PPN 11% &nbsp; <input type="checkbox" id="routetrain_has_ppn" value="Yes" onchange="" />  </td>
@@ -147,21 +155,42 @@
     function clean_currency(string) {
       return parseInt(string.replaceAll(".","").replaceAll(",","."));
     }
+     function count_trainexpense() {
+      price_per = $("#trainexpense_price_per").val();
+      misc_total = $("#trainexpense_misc_total").val();
+      price_per = price_per == "" ? 0 : clean_currency(price_per);
+      misc_total = misc_total == "" ? 0 : clean_currency(misc_total);
+      ppn = 0;
+      if ($("#routetrain_has_ppn").is(":checked")) {
+        ppn = parseInt(price_per * 11 / 100);
+      }
+
+      $("#trainexpense_gst_tax").val(formatRupiah(ppn));
+      $("#trainexpense_total").val(formatRupiah(price_per + ppn + misc_total));
+    }
 
     $(document).ready(function() {
       
     })
     .on("click","#routetrain_has_ppn",function(){
-      price_per = $("#trainexpense_price_per").val();
-      price_per = price_per == "" ? 0 : clean_currency(price_per);
-      ppn = 0;
-      if ($(this).is(":checked")) {
-        ppn = parseInt(price_per * 11 / 100);
-      }
-
-      $("#trainexpense_gst_tax").val(formatRupiah(ppn));
-      $("#trainexpense_total").val(formatRupiah(price_per + ppn));
+      count_trainexpense();
 
     });
+
+    // $(document).ready(function() {
+      
+    // })
+    // .on("click","#routetrain_has_ppn",function(){
+    //   price_per = $("#trainexpense_price_per").val();
+    //   price_per = price_per == "" ? 0 : clean_currency(price_per);
+    //   ppn = 0;
+    //   if ($(this).is(":checked")) {
+    //     ppn = parseInt(price_per * 11 / 100);
+    //   }
+
+    //   $("#trainexpense_gst_tax").val(formatRupiah(ppn));
+    //   $("#trainexpense_total").val(formatRupiah(price_per + ppn));
+
+    // });
   </script>
 <% end %>
