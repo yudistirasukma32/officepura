@@ -1,0 +1,145 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+
+		<h1>Transaksi / <a href="<%=shipexpenses_path%>">Hutang Operator Ro-Ro (Kapal) - Terbayar</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="display: none;">
+				<label for="date">Pilih Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
+			</div>
+
+			<div class="field-row continue">
+				<label for="startdate" class="" style="float:none">Tgl Bayar Awal</label> &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />&nbsp; &nbsp;
+				<label for="enddate" class="middle short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />&nbsp; &nbsp;
+				<label for="operator_id" class="middle short" style='width:50px;float:none;'>Operator</label> &nbsp; &nbsp;
+				<select name="operator_id" class="middle short">
+					<option value="">Semua</option>
+					<% Operator.active.order(:name).each do |ope| %>
+					<option value="<%=ope.id%>"<% if ope.id == @ope %> selected='selected'<% end %>><%=ope.abbr%></option>
+					<% end %>
+				</select>
+
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+			<table class="row-view">
+				<tr>
+					<th width="50">TGL BYR</th>
+					<th width="50">TGL BKK</th>
+					<th width="50">No. BKK</th>
+					<th width="200">Keterangan</th>
+					<th width="60">NoPol</th>
+                    <th width="80">Kontainer/Iso</th>
+					<th width="50">No. DO</th>
+					<th width="40">Operator</th>
+					<th width="90" class="right">Total</th>
+					<th width="40"></th>
+				</tr>
+
+				<% @grandTotal = 0%>
+				<% @shipexpenses.each do |shipexpense| %>
+					<% if shipexpense.deleted %>
+						<% @grandTotal += 0 %>
+						<% if current_user.adminrole %>
+						<tr class="deleted">
+							<td><strong><%=shipexpense.date.strftime('%d')%></strong>.<%=shipexpense.date.strftime('%m')%></td>
+							<td><strong><%=shipexpense.invoice.date.strftime('%d')%></strong>.<%=shipexpense.invoice.date.strftime('%m')%></td>
+							<td><%= zeropad(shipexpense.invoice.id) %></td>
+							<td>
+								<%=shipexpense.invoice.quantity%> Rit: <%=shipexpense.invoice.route.name rescue nil%> (<%=shipexpense.invoice.driver.name rescue nil%>) <% if !shipexpense.invoice.description.blank?%> <br /> <%=shipexpense.invoice.description%>  <% end %> 
+								<br/>
+								<%=shipexpense.invoice.routeship.name rescue nil %>
+ 							</td>
+							<td><%=shipexpense.invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (shipexpense.invoice.isotank_id.present? && shipexpense.invoice.isotank_id.to_i != 0) ? ( shipexpense.invoice.isotank.isotanknumber) : '' %>
+							<%= (shipexpense.invoice.container_id.present? && shipexpense.invoice.container_id.to_i != 0) ? ( shipexpense.invoice.container.containernumber) : '' %></td>
+							<td><%= zeropad(shipexpense.invoice.event_id) rescue nil %></td>
+							<td><%= shipexpense.invoice.routeship.operator.abbr rescue nil %></td>
+							<td align="right" class="red"><%=to_currency(shipexpense.invoice.routeship.total)%></td>
+							<td class="right" width="60">&nbsp;</td>
+						</tr>
+						<% end %>
+
+					<% else %>
+
+						<% @grandTotal += shipexpense.total %>
+
+						<tr>
+							<td><strong><%=shipexpense.date.strftime('%d')%></strong>.<%=shipexpense.date.strftime('%m')%></td>
+							<td><strong><%=shipexpense.invoice.date.strftime('%d')%></strong>.<%=shipexpense.invoice.date.strftime('%m')%></td>
+							<td><%= zeropad(shipexpense.invoice.id) %></td>
+							<td><%=shipexpense.invoice.quantity%> Rit: <%=shipexpense.invoice.route.name rescue nil%> (<%=shipexpense.invoice.driver.name rescue nil%>) <% if !shipexpense.invoice.description.blank?%> <br /> <%=shipexpense.invoice.description%>  <% end %> 
+							<br/>
+							<strong><%=shipexpense.invoice.routeship.name rescue nil %></strong>
+							</td>
+							<td><%=shipexpense.invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (shipexpense.invoice.isotank_id.present? && shipexpense.invoice.isotank_id.to_i != 0) ? ( shipexpense.invoice.isotank.isotanknumber) : '' %>
+							<%= (shipexpense.invoice.container_id.present? && shipexpense.invoice.container_id.to_i != 0) ? ( shipexpense.invoice.container.containernumber) : '' %></td>
+							<td><%= zeropad(shipexpense.invoice.event_id) rescue nil %></td>
+							<td><%= shipexpense.invoice.routeship.operator.abbr rescue nil %></td>
+							<td align="right" class="red"><%=to_currency(shipexpense.total)%></td>
+							<td class="right" width="60">
+
+								<% if (current_user.adminrole || current_user.owner)%>
+
+									<% if shipexpense.receiptships.active.count == 0 %>
+
+										<a class="cta" style="opacity: 1;" href="shipexpenses/delete/<%=shipexpense.invoice.id%>">Batal</a>
+									
+									<% else %>
+
+										 <span>Confirmed</span>
+								
+									<% end %>
+
+								<% else %>
+								
+								<% if checkrole 'Admin Operasional' %>
+
+									<% if shipexpense.receiptship.active.count != 0 %>
+
+										<span>confirmed</span>
+
+									<% else %>
+
+										<span>delete</span>
+
+									<% end %>
+ 
+								<% end %>
+
+								<% end %>
+
+							</td>
+						</tr>
+					<% end %>
+				<% end %>	
+			
+				<tr class="footer">
+					<td class="total" align="right" colspan="8">TOTAL</td>
+					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
+				</tr>
+			</table>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

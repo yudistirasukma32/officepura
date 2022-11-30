@@ -5,7 +5,7 @@ class ShipexpensesController < ApplicationController
   protect_from_forgery :except => [:update_asset]
 
   def set_section
-    @section = "transactions"
+    @section = "shipexpenses"
     @where = "shipexpenses"
   end
 
@@ -14,6 +14,7 @@ class ShipexpensesController < ApplicationController
   end
 
   def index
+    @where = "shipexpenses"
     @startdate = params[:startdate]
     @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
     @enddate = params[:enddate]
@@ -30,7 +31,33 @@ class ShipexpensesController < ApplicationController
 
   end
 
+  def paid
+    @where = "shipexpenses-paid"
+
+    @startdate = params[:startdate]
+    @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
+    @enddate = params[:enddate]
+    @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
+
+    @operator_id = params[:operator_id]
+        @containertype = params[:containertype]
+    
+        # @shipexpenses = Invoice.where('invoiceship = true AND routeship_id is not null AND routeship_id !=0  AND date between ? and ? AND invoices.id in (select invoice_id from shipexpenses where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
+        @shipexpenses = Shipexpense.where('shipexpenses.date between ? and ? and shipexpenses.deleted = false', @startdate.to_date, @enddate.to_date).order(:id)
+    
+        if @operator_id.present?
+          @shipexpenses = @shipexpenses.joins(:invoice).where('invoices.operator_id = ?', @operator_id)
+        end
+    
+        if @containertype.present?
+          @shipexpenses = @shipexpenses.joins(:routeship).where('routeships.container_type = ?', @containertype)
+        end
+
+  end
+
   def new
+    @where = "shipexpenses"
+    
     @errors = Hash.new
     @invoice_id = params[:invoice_id]
     @invoice = Invoice.find(params[:invoice_id]) rescue nil
@@ -45,14 +72,20 @@ class ShipexpensesController < ApplicationController
 
   def create
     inputs = params[:shipexpense]
-    
+    inputs[:price_per] = clean_currency(inputs[:price_per])
+    inputs[:gst_tax] = clean_currency(inputs[:gst_tax])
+    inputs[:gst_percentage] = clean_currency(inputs[:gst_tax]).to_i > 0 ? 11 : 0
+    inputs[:misc_total] = clean_currency(inputs[:misc_total])
+    inputs[:total] = clean_currency(inputs[:total])
+    # render json: inputs
+    # return false
     @shipexpense = Shipexpense.new(inputs)
     @shipexpense.date = Date.today
 
     if @shipexpense.save
-      redirect_to(shipexpenses_url(), :notice => 'Data Biaya Operator Kapal sukses ditambah.')
+      redirect_to(shipexpenses_url(), :notice => 'Data Biaya Kapal sukses ditambah.')
     else
-      redirect_to(new_shipexpense_url(), :notice => 'Data Biaya Operator Kapal gagal ditambah. Data Harus Unik.')
+      redirect_to(new_shipexpense_url(), :notice => 'Data Biaya Kapal gagal ditambah. Data Harus Unik.')
     end
   end
 

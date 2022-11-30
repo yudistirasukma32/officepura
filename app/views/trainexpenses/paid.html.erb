@@ -96,7 +96,7 @@
 							<td><%= zeropad(trainexpense.invoice.id) %></td>
 							<td><%=trainexpense.invoice.quantity%> Rit: <%=trainexpense.invoice.route.name rescue nil%> (<%=trainexpense.invoice.driver.name rescue nil%>) <% if !trainexpense.invoice.description.blank?%> <br /> <%=trainexpense.invoice.description%>  <% end %> 
 							<br/>
-+							<strong><%=trainexpense.invoice.routetrain.name rescue nil %></strong>
+							<strong><%=trainexpense.invoice.routetrain.name rescue nil %></strong>
 							</td>
 							<td><%=trainexpense.invoice.vehicle.current_id rescue nil%></td>
 							<td><%= (trainexpense.invoice.isotank_id.present? && trainexpense.invoice.isotank_id.to_i != 0) ? ( trainexpense.invoice.isotank.isotanknumber) : '' %>

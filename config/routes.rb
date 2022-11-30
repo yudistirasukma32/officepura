@@ -660,6 +660,7 @@ OfficePuraErp::Application.routes.draw do
     match 'trainexpenses/new/:invoice_id' => 'trainexpenses#new'
     match 'trainexpenses/delete/:invoice_id' => 'trainexpenses#delete'
 
+    match 'shipexpenses-paid' => 'shipexpenses#paid'
     match 'shipexpenses/new/:invoice_id' => 'shipexpenses#new'
     match 'shipexpenses/delete/:invoice_id' => 'shipexpenses#delete'
 

@@ -214,5 +214,10 @@
 		<li class="<%= @where == 'trainexpenses-paid' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan'), "Hutang Operator Kereta - Terbayar", "/trainexpenses-paid" %></li>
 	<% end %>
 
+	<% if @section == "shipexpenses" %> 
+		<li class="<%= @where == 'shipexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan'), "Hutang Operator Ro-Ro", "/shipexpenses" %></li>
+		<li class="<%= @where == 'shipexpenses-paid' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan'), "Hutang Operator Ro-Ro - Terbayar", "/shipexpenses-paid" %></li>
+	<% end %>
+
 </ul>
 </div>
