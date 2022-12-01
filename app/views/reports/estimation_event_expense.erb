@@ -16,6 +16,13 @@
 	<div id="filter">
 		<form id="filterform" name="filterform" action="" method="get">
 		<div class="field-row continue">
+			<label for="office_id" class="middle">Pilih Kantor</label>
+			<select name="office_id" class="half left office_id" style="margin-right: 15px;">	
+				<option value="all">All</option>
+				<% Office.active.each do |office| %>
+				<option value="<%=office.id%>" <%= params[:office_id].to_i == office.id ? "selected" : "" %>><%=office.name%></option>
+				<% end %>
+			</select>  &nbsp; &nbsp;
 			<label for="startdate">Tanggal Awal</label>
 			<input type="text" name="startdate" class="left half date-picker" value="<%=@startdate%>" />
 			<label for="enddate" class="middle">Akhir</label>

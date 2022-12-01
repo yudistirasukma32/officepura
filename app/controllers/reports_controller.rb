@@ -2713,7 +2713,7 @@ end
           }
         end
 
-        description = "#{total_quantity} Rit ##{event.id}: #{route.name rescue nil}"
+        description = "Rit ##{event.id}: #{route.name rescue nil}"
         global_sangu = 0
         global_solar += solar
         global_tambahan += tambahan
@@ -2762,6 +2762,10 @@ end
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
 
+      events = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date)
+      if params[:office_id].present? && params[:office_id] != 'all'
+        events = events.where(office_id: params[:office_id])
+      end
       global_sangu = 0
       global_solar = 0
       global_tambahan = 0
@@ -2771,7 +2775,7 @@ end
       global_total_estimation = 0
       solar_price = Setting.find_by_name("Harga Solar").value.to_i
       customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
-      @events = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date).map do |event|
+      @events = events.map do |event|
         route = event.route
         price_per = route.price_per.to_i rescue 0
         price_per_type = route.price_per_type rescue 'KG'
@@ -2784,6 +2788,8 @@ end
         tambahan = route_allowance.misc_allowance.to_i rescue 0
         tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
         invoice_total = (sangu + premi + solar + tambahan + tol_asdp) * quantity
+
+        quantity = event.qty.to_i rescue 0
 
         if price_per >= offset 
           estimation = quantity * price_per
