@@ -633,7 +633,7 @@ class ReportsController < ApplicationController
     end
   end
     
-def confirmed_invoices
+  def confirmed_invoices
     role = cek_roles 'Admin Operasional, Admin Keuangan'
     if role
       @offices = Office.active        
@@ -657,13 +657,17 @@ def confirmed_invoices
           
       elsif @transporttype == 'KOSONGAN'
           
-        @invoices = @invoices.where("customer_id IN (50,51,144)").order(:id)
+        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+        @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
 
       elsif @transporttype == 'TRUK'
 
-        @invoices = @invoices.where("invoicetrain = false").where("customer_id NOT IN (50,51,144)").order(:id)
+        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+        @invoices = @invoices.where("invoicetrain = false").where("customer_id NOT IN (?)", cust_kosongan).order(:id)
 
       end
+
+      @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
 
       if @is_premi.present?
         
@@ -678,8 +682,6 @@ def confirmed_invoices
         end
 
       end
-        
-      @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
 
       @section = "reports1"
       @where = "confirmed-invoices"

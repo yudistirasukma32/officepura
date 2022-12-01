@@ -83,9 +83,9 @@ class InvoicesController < ApplicationController
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
     # @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date).order(:id)
     @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date)
+    
+    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
 
-    #customer kosongan pura / rdpi
-    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*'").pluck(:id)
     @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
     # fetch_excel()
       
@@ -137,7 +137,8 @@ class InvoicesController < ApplicationController
       
     @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date)
 
-    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*'").pluck(:id)
+    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+
     @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
       
     @office_id = params[:office_id]
@@ -701,21 +702,17 @@ class InvoicesController < ApplicationController
     customer_id = params[:customer_id]  
       
     if is_train == "0"
-
+        
         #customer kosongan pura / rdpi
-        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*'").pluck(:id)
+        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
 
         if cust_kosongan.include? params[:customer_id].to_i
             
             @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
-
-            inklude = true
         
         else
             
             @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
-
-            inklude = false
             
         end
         
@@ -725,8 +722,7 @@ class InvoicesController < ApplicationController
         
     end
         
-    render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json;
-
+    render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json; 
   end
 
   def get_routesbyoffice
@@ -735,8 +731,9 @@ class InvoicesController < ApplicationController
     office_id = params[:office_id]  
       
     if is_train == "0"
-        
-        @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
+
+        @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).order(:name)
+        # @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
         
     else
         
@@ -768,19 +765,19 @@ class InvoicesController < ApplicationController
     render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains", :layout => false) }.to_json; 
   end
 
+  def get_trainroute2
+    @routes = Routetrain.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains_for_events", :layout => false) }.to_json; 
+  end
+
   def get_shiproute
     @routes = Routeship.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
     render :json => { :success => true, :html => render_to_string(:partial => "invoices/routeships", :layout => false) }.to_json; 
   end
-    
+
   def get_shiproute2
     @routes = Routeship.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
     render :json => { :success => true, :html => render_to_string(:partial => "invoices/routeships_for_events", :layout => false) }.to_json; 
-  end
-  
-  def get_trainroute2
-    @routes = Routetrain.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains_for_events", :layout => false) }.to_json; 
   end
 
   def get_routes2
@@ -1440,4 +1437,6 @@ def fetch_excel
         
       end
 
+
+      
     end
