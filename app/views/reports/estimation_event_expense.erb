@@ -40,13 +40,14 @@
 			<th width="30">No.</th>
 			<th width="40">Tgl</th>
 			<th>Keterangan</th>
-			<th width="70" class="right {sorter:true, filter: false}">Sangu</th>
-			<th width="80" class="right {sorter:true, filter: false}">Solar</th>
-			<th width="80" class="right {sorter:true, filter: false}">Tambahan</th>
-			<th width="80" class="right {sorter:true, filter: false}">Premi</th>
-			<th width="80" class="right {sorter:true, filter: false}">Tol + ASDP</th>
-			<th width="80" class="right sorter:true, filter: false">Total BKK</th>
-			<th width="80" class="right {sorter:true, filter: false}">Total DO</th>
+			<th width="60" class="right {sorter:true, filter: false}">Supir</th>
+			<th width="60" class="right {sorter:true, filter: false}">Kernet</th>
+			<th width="60" class="right {sorter:true, filter: false}">Solar</th>
+			<th width="60" class="right {sorter:true, filter: false}">Lain2</th>
+			<th width="60" class="right {sorter:true, filter: false}">Premi</th>
+			<th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
+			<th width="60" class="right sorter:true, filter: false">Total BKK</th>
+			<th width="60" class="right {sorter:true, filter: false}">Total DO</th>
 			<%# <th width="50" class="right {sorter:true, filter: false}">%</th> %>
 		</tr>
 
@@ -59,7 +60,8 @@
 			<td><%=i+1%>.</td>
 			<td><%=event[:start_date].strftime('%d.%m.%y')%></td>
 			<td><%=event[:description] %></td>
-			<td class="" align="right"><%=to_currency(event[:sangu])%></td>
+			<td class="" align="right"><%=to_currency(event[:supir])%></td>
+			<td class="" align="right"><%=to_currency(event[:kernet])%></td>
 			<td class="" align="right"><%=to_currency(event[:solar])%></td>
 			<td class="" align="right"><%=to_currency(event[:tambahan])%></td>
 			<td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
@@ -75,7 +77,8 @@
 		<% if @events %>
 		<tr class="footer">
 			<td class="total" colspan="3">TOTAL</td>
-			<td align="right"><%=to_currency(@summary[:global_sangu])%></td>
+			<td align="right"><%=to_currency(@summary[:global_supir])%></td>
+			<td align="right"><%=to_currency(@summary[:global_kernet])%></td>
 			<td align="right"><%=to_currency(@summary[:global_solar])%></td>
 			<td align="right"><%=to_currency(@summary[:global_tambahan])%></td>
 			<td align="right"><%=to_currency(@summary[:global_premi])%></td>

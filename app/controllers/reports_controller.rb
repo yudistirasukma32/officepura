@@ -660,7 +660,7 @@ class ReportsController < ApplicationController
         cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
         @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
 
-      elsif @transporttype == 'TRUK'
+      elsif @transporttype == 'STANDART'
 
         cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
         @invoices = @invoices.where("invoicetrain = false").where("customer_id NOT IN (?)", cust_kosongan).order(:id)
@@ -1292,8 +1292,10 @@ end
 
       officepexpenses_debit = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Debit' AND deleted = false", @date)
       officepexpenses_credit = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false", @date)
-      @premis = Invoice.joins(:receipts).where("invoices.premi_allowance > money(0) and to_char(receipts.created_at, 'DD-MM-YYYY') = ? AND invoices.deleted = false and receipts.deleted = false", @date).order(:office_id)
       
+      @premis = Invoice.joins(:receipts).where("invoices.premi_allowance > money(0) and to_char(receipts.created_at, 'DD-MM-YYYY') = ? AND invoices.deleted = false and receipts.deleted = false", @date).order(:office_id)
+      @receipttrains = Receipttrain.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date).order(:office_id)
+      @receiptships = Receiptship.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date).order(:office_id)
       # @premis = Receipt.where("premi_allowance > money(0) and to_char(created_at, 'DD-MM-YYYY') = ? AND receipts.deleted = false", @date).order(:office_id)
       
       # render json: @premis
@@ -1308,7 +1310,9 @@ end
       @bankexpensedebitold = Bankexpense.where("(date >= ? and date < ?) AND debitgroup_id = ? AND deleted = false AND pettycashledger = false", firstdate, @date.to_date, kas.id)
       @receiptsold = Receipt.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date).order(:office_id)
       @receiptreturnsold = Receiptreturn.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date).order(:office_id)
-      
+      @receipttrainsold = Receipttrain.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date).order(:office_id)
+      @receiptshipsold = Receiptship.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date).order(:office_id)
+
       @hiddenexpensedebitold = Officeexpense.where("(date >= ? and date < ?) and expensetype = 'Debit' AND deleted = false", firstdate, @date.to_date).where(:officeexpensegroup_id => 60)
       @hiddenexpensecreditold = Officeexpense.where("(date >= ? and date < ?) and expensetype = 'Kredit' AND deleted = false", firstdate, @date.to_date).where(:officeexpensegroup_id => 60)
 
@@ -1330,7 +1334,7 @@ end
 
       @balance =  0
       @balance = @balance + @hiddenexpensedebitold.sum(:total) + @receiptreturnsold.sum(:total) + officepexpenses_debitold.sum(:total) + @receiptsalesold.sum(:total) + @bankexpensedebitold.sum(:total) + @receiptpayrollreturnsold.sum(:total) 
-      @balance = @balance - @hiddenexpensecreditold.sum(:total) - @receiptsold.sum(:total) - officepexpenses_creditold.sum(:total) - @receiptpremisold.sum(:total) - @receiptincentivesold.sum(:total) - @receiptordersold.sum(:total) - @bankexpensecreditold.sum(:total) - @receiptdriversold.sum(:total) - @receiptpayrollsold.sum(:total) 
+      @balance = @balance - @hiddenexpensecreditold.sum(:total) - @receiptsold.sum(:total) - officepexpenses_creditold.sum(:total) - @receiptpremisold.sum(:total) - @receiptincentivesold.sum(:total) - @receiptordersold.sum(:total) - @bankexpensecreditold.sum(:total) - @receiptdriversold.sum(:total) - @receiptpayrollsold.sum(:total) - @receipttrainsold.sum(:total) - @receiptshipsold.sum(:total) 
     
     
       @support = Setting.find_by_name("Penyesuaian Saldo Setelah 1 November 2022").value.to_i
@@ -2761,12 +2765,12 @@ end
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
-
       events = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date)
       if params[:office_id].present? && params[:office_id] != 'all'
         events = events.where(office_id: params[:office_id])
       end
-      global_sangu = 0
+      global_supir = 0
+      global_kernet = 0
       global_solar = 0
       global_tambahan = 0
       global_tol_asdp = 0
@@ -2782,26 +2786,29 @@ end
         route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
         quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
 
-        sangu = (route_allowance.driver_trip.to_i + route_allowance.helper_trip.to_i) rescue 0
+        supir = route_allowance.driver_trip.to_i rescue 0
+        kernet = route_allowance.helper_trip.to_i rescue 0
         premi = route.bonus.to_i rescue 0
         solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
         tambahan = route_allowance.misc_allowance.to_i rescue 0
         tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
-        invoice_total = (sangu + premi + solar + tambahan + tol_asdp) * quantity
+        invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
 
         quantity = event.qty.to_i rescue 0
+        event_tonage = event.estimated_tonage.to_i rescue 0
 
         if price_per >= offset 
           estimation = quantity * price_per
         elsif customer_35.include? event.customer_id
           estimation = quantity * 20000 * price_per
         elsif(price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg 
-          estimation = quantity * 20000 * price_per
+          estimation = quantity * event_tonage * price_per
         else
-          estimation = quantity * 25000 * price_per
+          estimation = quantity * event_tonage * price_per
         end
         
-        global_sangu += sangu
+        global_supir += supir
+        global_kernet += kernet
         global_solar += solar
         global_tambahan += tambahan
         global_tol_asdp += tol_asdp
@@ -2815,7 +2822,8 @@ end
           route_name: (route.name rescue "Kosong"),
           route_price: (route.price_per rescue "Kosong"),
           route_id: event.route_id,
-          sangu: sangu,
+          supir: supir,
+          kernet: kernet,
           solar: solar,
           tambahan: tambahan,
           premi_allowance: premi,
@@ -2827,7 +2835,8 @@ end
         }
       end
       @summary = {
-        global_sangu: global_sangu ,
+        global_supir: global_supir ,
+        global_kernet: global_kernet ,
         global_solar: global_solar ,
         global_tambahan: global_tambahan ,
         global_tol_asdp: global_tol_asdp ,
