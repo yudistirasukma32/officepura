@@ -9,7 +9,7 @@
 	<div id="content-full">
 	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
 	
-	<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Perbandingan DO & Estimasi: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+	<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Estimasi BKK vs DO: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
 
 	<br class="clearfix" />
 
@@ -45,9 +45,9 @@
 			<th width="80" class="right {sorter:true, filter: false}">Tambahan</th>
 			<th width="80" class="right {sorter:true, filter: false}">Premi</th>
 			<th width="80" class="right {sorter:true, filter: false}">Tol + ASDP</th>
-			<th width="80" class="right sorter:true, filter: false">Total DO</th>
-			<th width="80" class="right {sorter:true, filter: false}">Estimasi</th>
-			<th width="50" class="right {sorter:true, filter: false}">%</th>
+			<th width="80" class="right sorter:true, filter: false">Total BKK</th>
+			<th width="80" class="right {sorter:true, filter: false}">Total DO</th>
+			<%# <th width="50" class="right {sorter:true, filter: false}">%</th> %>
 		</tr>
 
 		<% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
@@ -68,7 +68,7 @@
 			<td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
             <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
             <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
-			<td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td>
+			<!-- <td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td> -->
 		</tr>
 		<% end %>	
 
@@ -87,7 +87,7 @@
 			<%= (@summary[:global_invoice_total].to_i == 0 || @summary[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
 			</span>
 			</td>
-            <td></td>
+            <!-- <td></td> -->
 		</tr>
 		<% end %>
 		</table>
