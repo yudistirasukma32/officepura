@@ -206,16 +206,14 @@
 
 			<!-- Uang Inap -->
 			<% uang_inap_id = Officeexpensegroup.find_by_name('Uang Inap').id rescue 0 %>
-			<% @inap_debit = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Debit' AND deleted = false AND officeexpensegroup_id IN (#{uang_inap_id})", @date).order(:id) %>
-			<%= @inap_debit %>
 
-			<!-- Kas Umum: Exclude Uang Inap -->
+			<% extras = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Debit' AND deleted = false AND officeexpensegroup_id IN (#{uang_inap_id})", @date).order(:id) %>
 			
-			<% if @umum_debit.any? %>
+			<% if extras.any? %>
 				<tr class="subheading">
-					<th colspan="<%= colspan %>"><span class="green">Kas Umum </span></th>
+					<th colspan="<%= colspan %>"><span class="green">Uang Inap</span></th>
 				</tr>
-			<% @umum_debit.each_with_index do |expense, i| %>
+			<% extras.each_with_index do |expense, i| %>
 			<% running += expense.total %>
 				<tr>
 					<td><%=i+1%>.</td>
@@ -230,19 +228,46 @@
 				<tr class="footer">
 					<td>&nbsp;</td>
 					<td colspan="3">TOTAL</td>
-					<td align="right" class="green"><%=to_currency(@umum_debit.sum(:total))%></td>
+					<td align="right" class="green"><%=to_currency(extras.sum(:total))%></td>
+					<td>&nbsp;</td>
+				</tr>
+			<% end %>
+
+			<!-- Kas Umum: Exclude Uang Inap -->
+			<% umum = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Debit' AND deleted = false AND (officeexpensegroup_id = 1 OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = 1 and id not in (#{uang_inap_id})))", @date).order(:id) %>
+			
+			<% if umum.any? %>
+				<tr class="subheading">
+					<th colspan="<%= colspan %>"><span class="green">Kas Umum </span></th>
+				</tr>
+			<% umum.each_with_index do |expense, i| %>
+			<% running += expense.total %>
+				<tr>
+					<td><%=i+1%>.</td>
+					<td><%=nl2br(expense.officeexpense.description).html_safe%> <%= (expense.officeexpense.isotank_id.present? && expense.officeexpense.isotank_id.to_i != 0) ? ("Isotank = " + expense.officeexpense.isotank.isotanknumber) : '' %><%= (expense.officeexpense.container_id.present? && expense.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + expense.officeexpense.container.containernumber) : '' %> </td>
+					<td><%=expense.officeexpense.office.abbr if !expense.officeexpense.office_id.nil? %></td>
+					<td><%=expense.officeexpense.vehicle.current_id unless expense.officeexpense.vehicle.nil?%></td>
+					<td align="right" class="green"><%=to_currency(expense.total)%></td>
+					<td align="right" <% if running < 0 %> class="red"<% end %>><%=to_currency(running)%></td>
+				</tr>
+			<% end %>
+
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td colspan="3">TOTAL</td>
+					<td align="right" class="green"><%=to_currency(umum.sum(:total))%></td>
 					<td>&nbsp;</td>
 				</tr>
 			<% end %>
 
 			<!-- Kas Umum Operasional-->
-
+			<% umum = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Debit' AND deleted = false AND (officeexpensegroup_id = #{Officeexpensegroup.find_by_name('UMUM OPERASIONAL').id} OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = #{Officeexpensegroup.find_by_name('UMUM OPERASIONAL').id}))", @date).order(:id) %>
 			
-			<% if @umum_operasional_debit.any? %>
+			<% if umum.any? %>
 				<tr class="subheading">
 					<th colspan="<%= colspan %>"><span class="green">Kas Umum Operasional</span></th>
 				</tr>
-			<% @umum_operasional_debit.each_with_index do |expense, i| %>
+			<% umum.each_with_index do |expense, i| %>
 			<% running += expense.total %>
 				<tr>
 					<td><%=i+1%>.</td>
@@ -257,18 +282,19 @@
 				<tr class="footer">
 					<td>&nbsp;</td>
 					<td colspan="3">TOTAL</td>
-					<td align="right" class="green"><%=to_currency(@umum_operasional_debit.sum(:total))%></td>
+					<td align="right" class="green"><%=to_currency(umum.sum(:total))%></td>
 					<td>&nbsp;</td>
 				</tr>
 			<% end %>
 
 			<!-- Kas Kantor -->
+			<% kantor = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Debit' AND deleted = false AND (officeexpensegroup_id = #{Officeexpensegroup.find_by_name('KANTOR').id} OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = #{Officeexpensegroup.find_by_name('KANTOR').id}))", @date).order(:id) %>
 			
-			<% if @kantor_debit.any? %>
+			<% if kantor.any? %>
 				<tr class="subheading">
 					<th colspan="<%= colspan %>"><span class="green">Kas Kantor</span></th>
 				</tr>
-			<% @kantor_debit.each_with_index do |expense, i| %>
+			<% kantor.each_with_index do |expense, i| %>
 			<% running += expense.total %>
 				<tr>
 					<td><%=i+1%>.</td>
@@ -283,18 +309,19 @@
 				<tr class="footer">
 					<td>&nbsp;</td>
 					<td colspan="3">TOTAL</td>
-					<td align="right" class="green"><%=to_currency(@kantor_debit.sum(:total))%></td>
+					<td align="right" class="green"><%=to_currency(kantor.sum(:total))%></td>
 					<td>&nbsp;</td>
 				</tr>
 			<% end %>
 
 			<!-- bon / uj -->
+			<% bons = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Debit' AND deleted = false AND (officeexpensegroup_id = #{Officeexpensegroup.find_by_name('BON').id} OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = #{Officeexpensegroup.find_by_name('BON').id}))", @date).order(:id) %>
 			
-			<% if @bons_debit.any? %>
+			<% if bons.any? %>
 				<tr class="subheading">
 					<th colspan="<%= colspan %>"><span class="green">BON</span></th>
 				</tr>
-			<% @bons_debit.each_with_index do |expense, i| %>
+			<% bons.each_with_index do |expense, i| %>
 			<% running += expense.total %>
 				<tr>
 					<td><%=i+1%>.</td>
@@ -309,7 +336,7 @@
 				<tr class="footer">
 					<td>&nbsp;</td>
 					<td colspan="3">TOTAL</td>
-					<td align="right" class="green"><%=to_currency(@bons_debit.sum(:total))%></td>
+					<td align="right" class="green"><%=to_currency(bons.sum(:total))%></td>
 					<td>&nbsp;</td>
 				</tr>
 			<% end %>
@@ -346,7 +373,6 @@
 				<td>&nbsp;</td>
 			</tr>
 			<% end %>
-			
 
 			<!-- CREDIT FROM BANK -->
 			<% if @bankexpensecredit.where("money(total) > money(0)").any? %>
@@ -501,7 +527,7 @@
 			<% running -= invoice.premi_allowance.to_i %>
 			<% total_premi += invoice.premi_allowance.to_i %>
 			<tr>
-				<td><%=i+=1%></td>
+				<td><%=i+=1%>.</td>
 				<td>#<%=zeropad(invoice.id)%>: <%=invoice.date.strftime("%d/%m/%y")%>, <%=invoice.quantity%> Rit, <%=invoice.route.name%> (<%=invoice.driver.name%>)</td>
 				<td><%=invoice.office.abbr%></td>
 				<td><%=invoice.vehicle.current_id%></td>
@@ -577,14 +603,15 @@
 			<%end%>	
 
 			<!-- Uang Inap -->
+			<% extras = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND officeexpensegroup_id IN (#{uang_inap_id})", @date).order(:id) %>
 			
-			<% if @inap_kredit.any? %>
+			<% if extras.any? %>
 				<tr class="subheading">
 					<th colspan="<%= colspan %>"><span class="red">Uang Inap</span></th>
 				</tr>
-			<% @inap_kredit.each_with_index do |expense, i| %>
+			<% extras.each_with_index do |expense, i| %>
 			<% running += expense.total %>
-				<tr  class="credit_id" data-id="<%= expense.officeexpense_id %>">
+				<tr>
 					<td><%=i+1%>.</td>
 					<td><%=nl2br(expense.officeexpense.description).html_safe%> <%= (expense.officeexpense.isotank_id.present? && expense.officeexpense.isotank_id.to_i != 0) ? ("Isotank = " + expense.officeexpense.isotank.isotanknumber) : '' %><%= (expense.officeexpense.container_id.present? && expense.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + expense.officeexpense.container.containernumber) : '' %> </td>
 					<td><%=expense.officeexpense.office.abbr if !expense.officeexpense.office_id.nil? %></td>
@@ -597,43 +624,19 @@
 				<tr class="footer">
 					<td>&nbsp;</td>
 					<td colspan="3">TOTAL</td>
-					<td align="right" class="red"><%=to_currency(@inap_kredit.sum(:total))%></td>
+					<td align="right" class="red"><%=to_currency(extras.sum(:total))%></td>
 					<td>&nbsp;</td>
 				</tr>
 			<% end %>
 
 			<!-- Kas Umum -->
-			<% if @umum_kredit.any? %>
+			<% umum = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND (officeexpensegroup_id = 1 OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = 1 and id not in (#{uang_inap_id})))", @date).order(:id) %>
+			
+			<% if umum.any? %>
 				<tr class="subheading">
 					<th colspan="<%= colspan %>"><span class="red">Kas Umum </span></th>
 				</tr>
-			<% @umum_kredit.each_with_index do |expense, i| %>
-			<% running -= expense.total %>
-				<tr class="credit_id" data-id="<%= expense.officeexpense_id %>">
-					<td><%=i+1%>.</td>
-					<td><%=nl2br(expense.officeexpense.description).html_safe%> <%= (expense.officeexpense.isotank_id.present? && expense.officeexpense.isotank_id.to_i != 0) ? ("Isotank = " + expense.officeexpense.isotank.isotanknumber) : '' %><%= (expense.officeexpense.container_id.present? && expense.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + expense.officeexpense.container.containernumber) : '' %> </td>
-					<td><%=expense.officeexpense.office.abbr if !expense.officeexpense.office_id.nil? %></td>
-					<td><%=expense.officeexpense.vehicle.current_id unless expense.officeexpense.vehicle.nil?%></td>
-					<td align="right" class="red" style="padding-right:0;"><%=to_currency(expense.total)%> -</td>
-					<td align="right" <% if running < 0 %> class="red"<% end %>><%=to_currency(running)%></td>
-				</tr>
-			<% end %>
-
-				<tr class="footer">
-					<td>&nbsp;</td>
-					<td colspan="3">TOTAL</td>
-					<td align="right" class="red"><%=to_currency(@umum_kredit.sum(:total))%></td>
-					<td>&nbsp;</td>
-				</tr>
-			<% end %>
-
-			<!-- Kas Umum -->
-			
-			<% if @umum_operasional_kredit.any? %>
-				<tr class="subheading">
-					<th colspan="<%= colspan %>"><span class="red">Kas Umum Operasional</span></th>
-				</tr>
-			<% @umum_operasional_kredit.each_with_index do |expense, i| %>
+			<% umum.each_with_index do |expense, i| %>
 			<% running -= expense.total %>
 				<tr>
 					<td><%=i+1%>.</td>
@@ -648,20 +651,21 @@
 				<tr class="footer">
 					<td>&nbsp;</td>
 					<td colspan="3">TOTAL</td>
-					<td align="right" class="red"><%=to_currency(@umum_operasional_kredit.sum(:total))%></td>
+					<td align="right" class="red"><%=to_currency(umum.sum(:total))%></td>
 					<td>&nbsp;</td>
 				</tr>
-			<% end %>					
+			<% end %>
 
-			<!-- Kas Kantor -->
+			<!-- Kas Umum -->
+			<% umum = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND (officeexpensegroup_id = #{Officeexpensegroup.find_by_name('UMUM OPERASIONAL').id} OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = #{Officeexpensegroup.find_by_name('UMUM OPERASIONAL').id}))", @date).order(:id) %>
 			
-			<% if @kantor_kredit.any? %>
+			<% if umum.any? %>
 				<tr class="subheading">
-					<th colspan="8"><span class="red">Kas Kantor</span></th>
+					<th colspan="<%= colspan %>"><span class="red">Kas Umum Operasional</span></th>
 				</tr>
-			<% @kantor_kredit.each_with_index do |expense, i| %>
+			<% umum.each_with_index do |expense, i| %>
 			<% running -= expense.total %>
-				<tr class="credit_id" data-id="<%= expense.officeexpense_id %>">
+				<tr>
 					<td><%=i+1%>.</td>
 					<td><%=nl2br(expense.officeexpense.description).html_safe%> <%= (expense.officeexpense.isotank_id.present? && expense.officeexpense.isotank_id.to_i != 0) ? ("Isotank = " + expense.officeexpense.isotank.isotanknumber) : '' %><%= (expense.officeexpense.container_id.present? && expense.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + expense.officeexpense.container.containernumber) : '' %> </td>
 					<td><%=expense.officeexpense.office.abbr if !expense.officeexpense.office_id.nil? %></td>
@@ -674,20 +678,49 @@
 				<tr class="footer">
 					<td>&nbsp;</td>
 					<td colspan="3">TOTAL</td>
-					<td align="right" class="red"><%=to_currency(@kantor_kredit.sum(:total))%></td>
+					<td align="right" class="red"><%=to_currency(umum.sum(:total))%></td>
+					<td>&nbsp;</td>
+				</tr>
+			<% end %>					
+
+			<!-- Kas Kantor -->
+			<% kantor = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND (officeexpensegroup_id = #{Officeexpensegroup.find_by_name('KANTOR').id} OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = #{Officeexpensegroup.find_by_name('KANTOR').id}))", @date).order(:id) %>
+			
+			<% if kantor.any? %>
+				<tr class="subheading">
+					<th colspan="8"><span class="red">Kas Kantor</span></th>
+				</tr>
+			<% kantor.each_with_index do |expense, i| %>
+			<% running -= expense.total %>
+				<tr>
+					<td><%=i+1%>.</td>
+					<td><%=nl2br(expense.officeexpense.description).html_safe%> <%= (expense.officeexpense.isotank_id.present? && expense.officeexpense.isotank_id.to_i != 0) ? ("Isotank = " + expense.officeexpense.isotank.isotanknumber) : '' %><%= (expense.officeexpense.container_id.present? && expense.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + expense.officeexpense.container.containernumber) : '' %> </td>
+					<td><%=expense.officeexpense.office.abbr if !expense.officeexpense.office_id.nil? %></td>
+					<td><%=expense.officeexpense.vehicle.current_id unless expense.officeexpense.vehicle.nil?%></td>
+					<td align="right" class="red" style="padding-right:0;"><%=to_currency(expense.total)%> -</td>
+					<td align="right" <% if running < 0 %> class="red"<% end %>><%=to_currency(running)%></td>
+				</tr>
+			<% end %>
+
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td colspan="3">TOTAL</td>
+					<td align="right" class="red"><%=to_currency(kantor.sum(:total))%></td>
 					<td>&nbsp;</td>
 				</tr>
 			<% end %>
 
 
 			<!-- Kas BON -->
-			<% if @bons_kredit.any? %>
+			<% creditBons = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND (officeexpensegroup_id = #{Officeexpensegroup.find_by_name('BON').id} OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = #{Officeexpensegroup.find_by_name('BON').id}))", @date).order(:id) %>
+			
+			<% if creditBons.any? %>
 				<tr class="subheading">
 					<th colspan="8"><span class="red">BON</span></th>
 				</tr>
-			<% @bons_kredit.each_with_index do |expense, i| %>
+			<% creditBons.each_with_index do |expense, i| %>
 			<% running -= expense.total %>
-				<tr class="credit_id" data-id="<%= expense.officeexpense_id %>">
+				<tr>
 					<td><%=i+1%>.</td>
 					<td><%=nl2br(expense.officeexpense.description).html_safe%> <%= (expense.officeexpense.isotank_id.present? && expense.officeexpense.isotank_id.to_i != 0) ? ("Isotank = " + expense.officeexpense.isotank.isotanknumber) : '' %><%= (expense.officeexpense.container_id.present? && expense.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + expense.officeexpense.container.containernumber) : '' %> </td>
 					<td><%=expense.officeexpense.office.abbr if !expense.officeexpense.office_id.nil? %></td>
@@ -700,7 +733,7 @@
 				<tr class="footer">
 					<td>&nbsp;</td>
 					<td colspan="3">TOTAL</td>
-					<td align="right" class="red"><%=to_currency(@bons_kredit.sum(:total))%></td>
+					<td align="right" class="red"><%=to_currency(creditBons.sum(:total))%></td>
 					<td>&nbsp;</td>
 				</tr>
 			<% end %>
@@ -775,7 +808,7 @@
 				</tr>
 				<% @hiddenexpensecredit.where("money(total) > money(0)").each_with_index do |hiddenexpense, i| %>
 				<% running -= hiddenexpense.total %>
-				<tr class="credit_id" data-id="<%= hiddenexpense.officeexpense_id %>">
+				<tr>
 					<%# credit = Officeexpensegroup.find(officeexpense.creditgroup_id) %>
 					<td><%=i+1%>.</td>
 					<td>#<%=zeropad(hiddenexpense.id)%>: <%= hiddenexpense.officeexpensegroup.name %> - <% if !hiddenexpense.description.blank? %>(<%=hiddenexpense.description%>) <% end %> </td>
