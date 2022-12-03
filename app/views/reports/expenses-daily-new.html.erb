@@ -391,12 +391,72 @@
 				<td align="right"><%=to_currency(running)%></td>
 			</tr>
 			<% end %>
-
+			
 			<tr class="footer">
 				<td>&nbsp;</td>
 				<td colspan="3">TOTAL</td>
 				<td align="right" class="red">-<%=to_currency(@bankexpensecredit.sum(:total))%></td>
 				<td>&nbsp;</td>
+			</tr>
+			<% end %>
+
+			<!-- BIAYA KERETA -->
+			<% if @receipttrains.where("money(total) > money(0)").any? %>
+			<tr class="subheading">
+				<th colspan="<%= colspan %>"><span class="red">Biaya Kereta</span></th>
+			</tr>
+
+			<% @receipttrains.where("money(total) > money(0)").each_with_index do |receipttrain, i| %>
+			<% running -= receipttrain.total %>
+			<tr>
+				<td><%=i+1%>.</td>
+				<td><%=receipttrain.trainexpense.invoice.quantity%> Rit: <%=receipttrain.trainexpense.invoice.route.name rescue nil%> (<%= receipttrain.trainexpense.receipttrain.trainexpense.invoice.driver.name rescue nil%> <%=zeropad(receipttrain.trainexpense.invoice.driver.id) rescue nil%>) <%= receipttrain.trainexpense.invoice.invoicetrain ? '= Kereta =' : '' %> 
+				<%= (receipttrain.trainexpense.invoice.isotank_id.present? && receipttrain.trainexpense.invoice.isotank_id.to_i != 0) ? ("Isotank = " + receipttrain.trainexpense.invoice.isotank.isotanknumber) : '' %>
+				<%= (receipttrain.trainexpense.invoice.container_id.present? && receipttrain.trainexpense.invoice.container_id.to_i != 0) ? ("Kontainer = " + receipttrain.trainexpense.invoice.container.containernumber) : '' %>
+				| <strong><%= receipttrain.trainexpense.invoice.routetrain.container_type %> - <%= receipttrain.trainexpense.invoice.routetrain.name %> (OP. <%= receipttrain.trainexpense.invoice.routetrain.operator.abbr %>) </strong>
+				</td>
+				<td><%=receipttrain.trainexpense.invoice.office.abbr%></td>
+				<td><%=receipttrain.trainexpense.invoice.vehicle.current_id%></td>
+				<td align="right" class="red" style="padding-right:0;"><%=to_currency(receipttrain.total)%> -</td>
+				<td align="right" <% if running < 0 %> class="red"<% end %>><%=to_currency(running)%></td>
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="red"><%=to_currency(@receipttrains.sum(:total))%></td>
+				<td>&nbsp;</td>
+			</tr>
+			<% end %>
+
+			<!-- BIAYA KAPAL -->
+			<% if @receiptships.where("money(total) > money(0)").any? %>
+			<tr class="subheading">
+			  <th colspan="<%= colspan %>"><span class="red">Biaya Kapal Ro-Ro</span></th>
+			</tr>
+			
+			<% @receiptships.where("money(total) > money(0)").each_with_index do |receiptship, i| %>
+			<% running -= receiptship.total %>
+			<tr>
+			  <td><%=i+1%>.</td>
+			  <td><%=receiptship.shipexpense.invoice.quantity%> Rit: <%=receiptship.shipexpense.invoice.route.name rescue nil%> (<%= receiptship.shipexpense.receiptship.shipexpense.invoice.driver.name rescue nil%> <%=zeropad(receiptship.shipexpense.invoice.driver.id) rescue nil%>)
+			  <%= (receiptship.shipexpense.invoice.isotank_id.present? && receiptship.shipexpense.invoice.isotank_id.to_i != 0) ? ("Isotank = " + receiptship.shipexpense.invoice.isotank.isotanknumber) : '' %>
+			  <%= (receiptship.shipexpense.invoice.container_id.present? && receiptship.shipexpense.invoice.container_id.to_i != 0) ? ("Kontainer = " + receiptship.shipexpense.invoice.container.containernumber) : '' %>
+			  | <strong><%= receiptship.shipexpense.invoice.routeship.name %> (OP. <%= receiptship.shipexpense.invoice.routeship.operator.abbr %>) </strong>
+			</td>
+		  	<td><%=receiptship.shipexpense.invoice.office.abbr%></td>
+			  <td><%=receiptship.shipexpense.invoice.vehicle.current_id%></td>
+			  <td align="right" class="red" style="padding-right:0;"><%=to_currency(receiptship.total)%> -</td>
+			  <td align="right" <% if running < 0 %> class="red"<% end %>><%=to_currency(running)%></td>
+			</tr>
+			<% end %>
+			
+			<tr class="footer">
+			  <td>&nbsp;</td>
+			  <td colspan="3">TOTAL</td>
+			  <td align="right" class="red"><%=to_currency(@receiptships.sum(:total))%></td>
+			  <td>&nbsp;</td>
 			</tr>
 			<% end %>
 

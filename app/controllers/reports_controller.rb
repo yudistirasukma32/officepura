@@ -1213,7 +1213,8 @@ end
 
       officepexpenses_debit = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Debit' AND deleted = false", @date)
       officepexpenses_credit = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false", @date)
-
+      @receipttrains = Receipttrain.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date).order(:office_id)
+      @receiptships = Receiptship.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date).order(:office_id)
       
       if @date.to_date.year == 2013
         firstdate = Date.new(2013,7,1)
@@ -1241,7 +1242,7 @@ end
 
       @balance =  0
       @balance = @balance + @receiptreturnsold.sum(:total) + officepexpenses_debitold.sum(:total) + @receiptsalesold.sum(:total) + @bankexpensedebitold.sum(:total) + @receiptpayrollreturnsold.sum(:total) 
-      @balance = @balance - @receiptsold.sum(:total) - officepexpenses_creditold.sum(:total) - @receiptpremisold.sum(:total) - @receiptordersold.sum(:total) - @bankexpensecreditold.sum(:total) - @receiptdriversold.sum(:total) - @receiptpayrollsold.sum(:total) 
+      @balance = @balance - @receiptsold.sum(:total) - officepexpenses_creditold.sum(:total) - @receiptpremisold.sum(:total) - @receiptordersold.sum(:total) - @bankexpensecreditold.sum(:total) - @receiptdriversold.sum(:total) - @receiptpayrollsold.sum(:total) - @receipttrainsold.sum(:total) - @receiptshipsold.sum(:total)
 
       render "expenses-daily"
     else
