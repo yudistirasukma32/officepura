@@ -437,7 +437,7 @@ class EventsController < ApplicationController
      
     @events = @events.order(:start_date)
  
-    @invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)
+    @invoices = Invoice.active.select('event_id').where("date >= ?", 12.months.ago).pluck(:event_id)
 
     render "report-events"
   end

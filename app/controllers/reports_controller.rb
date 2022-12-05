@@ -2766,10 +2766,13 @@ end
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+      
       events = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date)
+
       if params[:office_id].present? && params[:office_id] != 'all'
         events = events.where(office_id: params[:office_id])
       end
+      
       global_supir = 0
       global_kernet = 0
       global_solar = 0
@@ -2823,6 +2826,7 @@ end
           route_name: (route.name rescue "Kosong"),
           route_price: (route.price_per rescue "Kosong"),
           route_id: event.route_id,
+          office: (event.office.abbr rescue "Kosong"),
           supir: supir,
           kernet: kernet,
           solar: solar,

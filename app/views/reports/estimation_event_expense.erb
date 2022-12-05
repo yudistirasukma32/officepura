@@ -40,6 +40,7 @@
 			<th width="30">No.</th>
 			<th width="40">Tgl</th>
 			<th>Keterangan</th>
+			<th>KTR</th>
 			<th width="60" class="right {sorter:true, filter: false}">Supir</th>
 			<th width="60" class="right {sorter:true, filter: false}">Kernet</th>
 			<th width="60" class="right {sorter:true, filter: false}">Solar</th>
@@ -60,6 +61,7 @@
 			<td><%=i+1%>.</td>
 			<td><%=event[:start_date].strftime('%d.%m.%y')%></td>
 			<td><%=event[:description] %></td>
+			<td><%=event[:office] %></td>
 			<td class="" align="right"><%=to_currency(event[:supir])%></td>
 			<td class="" align="right"><%=to_currency(event[:kernet])%></td>
 			<td class="" align="right"><%=to_currency(event[:solar])%></td>
@@ -76,7 +78,7 @@
 
 		<% if @events %>
 		<tr class="footer">
-			<td class="total" colspan="3">TOTAL</td>
+			<td class="total" colspan="4">TOTAL</td>
 			<td align="right"><%=to_currency(@summary[:global_supir])%></td>
 			<td align="right"><%=to_currency(@summary[:global_kernet])%></td>
 			<td align="right"><%=to_currency(@summary[:global_solar])%></td>
