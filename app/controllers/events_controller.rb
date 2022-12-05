@@ -253,7 +253,7 @@ class EventsController < ApplicationController
 
     elsif params[:type] == 'cancelled'
       
-      @events = Event.active.where("cancelled = true and start_date >= ?", 3.months.ago).order(:id)
+      @events = Event.where("deleted = false AND cancelled = true and start_date >= ?", 3.months.ago).order(:id)
         
       @events = @events.map do |e|
             
