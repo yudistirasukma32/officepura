@@ -23,10 +23,10 @@ class ShipexpensesController < ApplicationController
     @operator_id = params[:operator_id]
     @containertype = params[:containertype]
 
-    @shipexpenses = Invoice.where('routeship_id is not null AND routeship_id !=0  AND date between ? and ? AND invoices.id not in (select invoice_id from shipexpenses where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
+    @shipexpenses = Invoice.where('shipoperator_id is not null AND shipoperator_id != 0 AND routeship_id is not null AND routeship_id !=0  AND date between ? and ? AND invoices.id not in (select invoice_id from shipexpenses where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
 
     if @operator_id.present?
-      @shipexpenses = @shipexpenses.where('invoices.operator_id = ?', @operator_id)
+      @shipexpenses = @shipexpenses.where('invoices.shipoperator_id = ?', @operator_id)
     end
 
   end
