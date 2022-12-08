@@ -1,137 +1,137 @@
 <%= content_for :css do %>
-<style>
-    #main #filter {
-        height: 80px;
-    }
-</style>
-<% end %>
-<%= render "shared/header" %>
-
-<div id="nav">
-	<%= render "shared/nav" %>
-</div>
-
-<div id="main">
-
-	<div id="content-full">
-		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
-		<h1><%=Setting.find_by_name("Client Name").value%> / Piutang Pelanggan: <span class="red"><%=@year%></span></h1>
-
-		<br class="clearfix" />
-		
-		<div id="filter">
-			<form id="filterform" name="filterform" action="" method="get">
-			<div class="field-row continue">
-				<label for="customer_id" style="width: 72px;">Pelanggan</label>
-				<select name="customer_id" class="third left">
-					<option value="">Semua Pelanggan</option>
-					<% Customer.active.order(:name).each do |customer| %>
-					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
-					<% end %>
-				</select>
-                <label for="date" class="middle" style="width: 64px;">Periode</label>
-				<select name="month" class="half left" style="margin-right:10px;">
-					<% (1.upto(12)).each do |m| %>
-					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
-					<% end %>
-				</select>
-				<% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
-				<select name="year" class="short left">
-					<% (Date.today.year.downto(year_to)).each do |y| %>
-					<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
-					<% end %>
-				</select>
-				<label for="date" class="middle" style="width: 64px;">Sampai</label>
-				<select name="monthEnd" class="half left" style="margin-right:10px;">
-					<% (1.upto(12)).each do |m| %>
-					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @monthEnd %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
-					<% end %>
-				</select>
-				<% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
-				<select name="yearEnd" class="short left">
-					<% (Date.today.year.downto(year_to)).each do |y| %>
-					<option value="<%=y%>"<% if y.to_s == @yearEnd %> selected='selected'<% end %>><%=y%></option>
-					<% end %>
-				</select>
-			</div>
-            <div class="field-row continue">
-				<label for="due_date_order" style="width: 80px;">Jatuh Tempo</label>
-				<select name="due_date_order" class="third left">
-					<option value="">Tanpa Urutan</option>
-					<option value="desc" <%= params[:due_date_order] == "desc" ? "selected" : "" %>>Dari Terlama</option>
-					<option value="asc" <%= params[:due_date_order] == "asc" ? "selected" : "" %>>Dari Terbaru</option>
-				</select>
-                <input class="submit left" type="submit" value="Filter" />
-            </div>
-			</form>
-		</div>
-
-		<br class="clearfix" />
-        
-        <table class="row-view tablesorter">
-            <thead>
-            <tr>
-                <th class="{sorter:true, filter: false}">Pelanggan</th>
-                <th class="center {sorter:true, filter: false}" width="200">No Invoice</th>
-                <th class="{sorter:true, filter: false}" width="90">Kirim</th>
-                <th class="{sorter:true, filter: false}" width="90">Konfirm</th>
-                <th class="{sorter:false, filter: false}" width="110">Jatuh Tempo</th>
-                <th width="80" class="center {sorter:true, filter: false}">DPP</th>
-                <th width="80" class="center {sorter:true, filter: false}">PPN</th>
-                <th width="80" class="center {sorter:true, filter: false}">PPH</th>
-                <th width="100" class="center {sorter:true, filter: false}">Total</th>
-                <th width="20" class="right "></th>
-            </tr>
-            </thead>
-            <% i = 0 %>
-            <% total = 0 %>
-            <tbody>
-            <% @taxinvoices.each_with_index do |taxinvoice| %>
-            <% total = total + taxinvoice.total %>
-                <tr>
-                    <td><%= taxinvoice.customer.name%>&nbsp;<% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
-                    <td align=""><%= taxinvoice.long_id %></td>
-                    <td><%=taxinvoice.sentdate.strftime('%d-%m-%y') rescue nil%></td>
-                    <td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td> 
-                    
-                    <%
-                        if taxinvoice.sentdate 
-                            different = ((taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
-                        else
-                            different = ((taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
-                        end
-                    %>
-
-                    <td<% if taxinvoice.paiddate.nil? and different < 0 %> class="red"<% end %>>
-                        <% if taxinvoice.sentdate %>
-                            <%=(taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
-                        <% else %>
-                            <%=(taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
-                        <% end %>
-                    </td>
-                    
-                    
-                    <td align="right"><%= to_currency(taxinvoice.downpayment) %></td>
-                    <td align="right"><%= to_currency(taxinvoice.gst_tax) %></td>
-                    <td align="right"><%= to_currency(taxinvoice.price_tax) %></td>
-                    <td align="right"><%= to_currency(taxinvoice.total) %></td>
-                    <td align="right"><a href="<%= print_taxinvoice_url(taxinvoice.id) %>" class="delete tipsy" original-title="Print Invoice Tagihan"><i class="icon-print"></i></a>
-                    </td>
-
-                </tr>
-
-            <% end %>
-
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="2"><strong>Total</strong></td>
-                <td colspan="5" align="right"><strong><%= to_currency(total) %></strong></td>
-
-            </tr>
-          </tfoot>
-        </table>
-	
+    <style>
+        #main #filter {
+            height: 80px;
+        }
+    </style>
+    <% end %>
+    <%= render "shared/header" %>
+    
+    <div id="nav">
+        <%= render "shared/nav" %>
     </div>
-
-</div>
+    
+    <div id="main">
+    
+        <div id="content-full">
+            <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+            <h1><%=Setting.find_by_name("Client Name").value%> / Piutang Pelanggan: <span class="red"><%=@year%></span></h1>
+    
+            <br class="clearfix" />
+            
+            <div id="filter">
+                <form id="filterform" name="filterform" action="" method="get">
+                <div class="field-row continue">
+                    <label for="customer_id" style="width: 72px;">Pelanggan</label>
+                    <select name="customer_id" class="third left">
+                        <option value="">Semua Pelanggan</option>
+                        <% Customer.active.order(:name).each do |customer| %>
+                        <option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
+                        <% end %>
+                    </select>
+                    <label for="date" class="middle" style="width: 64px;">Periode</label>
+                    <select name="month" class="half left" style="margin-right:10px;">
+                        <% (1.upto(12)).each do |m| %>
+                        <option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+                        <% end %>
+                    </select>
+                    <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+                    <select name="year" class="short left">
+                        <% (Date.today.year.downto(year_to)).each do |y| %>
+                        <option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+                        <% end %>
+                    </select>
+                    <label for="date" class="middle" style="width: 64px;">Sampai</label>
+                    <select name="monthEnd" class="half left" style="margin-right:10px;">
+                        <% (1.upto(12)).each do |m| %>
+                        <option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @monthEnd %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+                        <% end %>
+                    </select>
+                    <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+                    <select name="yearEnd" class="short left">
+                        <% (Date.today.year.downto(year_to)).each do |y| %>
+                        <option value="<%=y%>"<% if y.to_s == @yearEnd %> selected='selected'<% end %>><%=y%></option>
+                        <% end %>
+                    </select>
+                </div>
+                <div class="field-row continue">
+                    <label for="due_date_order" style="width: 80px;">Jatuh Tempo</label>
+                    <select name="due_date_order" class="third left">
+                        <option value="">Tanpa Urutan</option>
+                        <option value="desc" <%= params[:due_date_order] == "desc" ? "selected" : "" %>>Dari Terlama</option>
+                        <option value="asc" <%= params[:due_date_order] == "asc" ? "selected" : "" %>>Dari Terbaru</option>
+                    </select>
+                    <input class="submit left" type="submit" value="Filter" />
+                </div>
+                </form>
+            </div>
+    
+            <br class="clearfix" />
+            
+            <table class="row-view tablesorter">
+                <thead>
+                <tr>
+                    <th class="{sorter:true, filter: false}">Pelanggan</th>
+                    <th class="center {sorter:true, filter: false}" width="200">No Invoice</th>
+                    <th class="{sorter:true, filter: false}" width="90">Kirim</th>
+                    <th class="{sorter:true, filter: false}" width="90">Konfirm</th>
+                    <th class="{sorter:false, filter: false}" width="110">Jatuh Tempo</th>
+                    <th width="80" class="center {sorter:true, filter: false}">DPP</th>
+                    <th width="80" class="center {sorter:true, filter: false}">PPN</th>
+                    <th width="80" class="center {sorter:true, filter: false}">PPH</th>
+                    <th width="100" class="center {sorter:true, filter: false}">Total</th>
+                    <th width="20" class="right "></th>
+                </tr>
+                </thead>
+                <% i = 0 %>
+                <% total = 0 %>
+                <tbody>
+                <% @taxinvoices.each_with_index do |taxinvoice| %>
+                <% total = total + taxinvoice.total %>
+                    <tr>
+                        <td><%= taxinvoice.customer.name%>&nbsp;<% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
+                        <td align=""><%= taxinvoice.long_id %></td>
+                        <td><%=taxinvoice.sentdate.strftime('%d-%m-%y') rescue nil%></td>
+                        <td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td> 
+                        
+                        <%
+                            if taxinvoice.sentdate 
+                                different = ((taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
+                            else
+                                different = ((taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
+                            end
+                        %>
+    
+                        <td<% if taxinvoice.paiddate.nil? and different < 0 %> class="red"<% end %>>
+                            <% if taxinvoice.sentdate %>
+                                <%=(taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+                            <% else %>
+                                <%=(taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+                            <% end %>
+                        </td>
+                        
+                        
+                        <td align="right"><%= to_currency(taxinvoice.downpayment) %></td>
+                        <td align="right"><%= to_currency(taxinvoice.gst_tax) %></td>
+                        <td align="right"><%= to_currency(taxinvoice.price_tax) %></td>
+                        <td align="right"><%= to_currency(taxinvoice.total) %></td>
+                        <td align="right"><a href="<%= print_taxinvoice_url(taxinvoice.id) %>" class="delete tipsy" original-title="Print Invoice Tagihan"><i class="icon-print"></i></a>
+                        </td>
+    
+                    </tr>
+    
+                <% end %>
+    
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2"><strong>Total</strong></td>
+                    <td colspan="7" align="right"><strong><%= to_currency(total) %></strong></td>
+    
+                </tr>
+              </tfoot>
+            </table>
+        
+        </div>
+    
+    </div>
