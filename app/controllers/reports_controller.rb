@@ -644,13 +644,17 @@ class ReportsController < ApplicationController
       @transporttype = params[:transporttype]
       @invoices = Invoice.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
       @invoicereturns = Invoicereturn.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
+      @drivers = Driver.active.order('name')
+      @driver_id = params[:driver_id]
       @office_id = params[:office_id]
       @is_premi = params[:is_premi]
         
       if @office_id.present? and @office_id != "all"
         @invoices = @invoices.where("office_id = ?", @office_id)
       end
-
+      if @driver_id.present? and @driver_id != "all"
+        @invoices = @invoices.where("driver_id = ?", @driver_id)
+      end
       if @transporttype == 'KERETA'
 
         @invoices = @invoices.where("invoicetrain = true")

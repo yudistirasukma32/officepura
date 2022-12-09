@@ -888,7 +888,8 @@ class InvoicesapiController < ApplicationController
 		render json: {
 			customers: customers,
 			offices: Office.active.order(:name),
-			tanktypes: ["TANGKI",'ISOTANK','KONTAINER']
+			# tanktypes: ["TANGKI",'ISOTANK','KONTAINER']
+			tanktypes: ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER', 'TRUK BOX']
 		}
 	end
 

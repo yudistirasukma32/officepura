@@ -25,15 +25,22 @@
 				<% end %>
 			</select>
             
-            <label for="office_id" class="middle" style="margin-top: 0.25rem;">Pilih KTR</label>
-            <select name="office_id" class="half left" style="margin-top: 0.25rem;">
-                <option value="all">Semua Ktr</option>
+            <label for="office_id" class="middle" style="margin-top: 0.25rem; width: 40px; padding-right: 5px;">Kantor</label>
+            <select name="office_id" class="short left" style="margin-top: 0.25rem;">
+                <option value="all">Semua</option>
                 <% @offices.each do |office| %>
                 <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
                 <% end %>
             </select>
+			<label for="driver_id" class="middle" style="margin-top: 0.25rem; width: 50px;">Supir</label>
+            <select name="driver_id" class="half left" style="margin-top: 0.25rem; width: 100px;">
+                <option value="all">Semua</option>
+                <% @drivers.each do |driver| %>
+                <option value="<%=driver.id%>" <% if @driver_id.to_i == driver.id %> name="driver_id" selected="selected"<% end %>><%=driver.name%></option>
+                <% end %>
+            </select>
 			
-			<label for="is_premi" class="middle" style="margin-top: 0.25rem;">Premi</label>
+			<label for="is_premi" class="middle" style="margin-top: 0.25rem; width: 50px;">Premi</label>
 			<select name="is_premi" class="short left" style="margin-top: 0.25rem;">
 				<option value="">Semua</option>
 				<option value="1" <%= @is_premi == '1' ? 'selected' : '' %>>Sudah Premi</option>
@@ -42,8 +49,8 @@
 
 			&nbsp; &nbsp; <label class="" style="float:none">Tgl Awal</label> &nbsp; &nbsp;
 			<input type="text" name="startdate" class="short date-picker" value="<%=@startdate%>" />
-			&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
-			<input type="text" name="enddate" class="short date-picker" value="<%=@enddate%>" />
+			&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:40px;float:none;padding-right: 5px;'>Akhir</label> &nbsp; &nbsp;
+			<input type="text" name="enddate" class="short date-picker" value="<%=@enddate%>" />&nbsp;
 			<input class="submit" type="submit" value="Filter" />
 		</div>
 		</form>
@@ -62,7 +69,7 @@
 <!--            <th width="40">Tgl Buat</th>-->
 			<th>BKK</th>
 			<th>ISO/KTNR</th>
-			<th width="80">NO. Pol</th>
+			<th width="80">NO.Pol</th>
 			<th width="60" class="right {sorter:true, filter: false}">Supir</th>
 			<th width="60" class="right {sorter:true, filter: false}">Kernet</th>
 			<th width="60" class="right {sorter:true, filter: false}">Solar</th>
@@ -97,7 +104,7 @@
 		<tr<% if i % 2 == 0 %> class="even"<% end %>>
 			<td><%=i+1%></td>
 			<td><%=invoice.date.strftime('%d/%m')%></td>
-			<td>#<%= invoice.id %><br><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%></td>
+			<td>#<%= invoice.id %><br><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
             <td><%=invoice.event.id rescue nil%><br/><%=invoice.event.summary rescue nil%></td>
             <% if invoice.office.abbr == '' %>
             <td class="red"><%=invoice.office.abbr%></td>    

@@ -117,7 +117,7 @@
 			<% if current_user.owner %>
 				<li class="<%= @where == 'taxinvoices-report' ? 'on' : '' %>"><%= link_to "Laporan Invoice", "/reports/taxinvoices_report" %></li>
 				<li class="<%= @where == 'taxinvoiceitems-report' ? 'on' : '' %>"><%= link_to "Laporan Surat Jalan", "/reports/taxinvoiceitems_report" %></li>
-				<li class="<%= @where == 'report_invoices' ? 'on' : '' %>"><%= link_to "Laporan BKK", "/reports/invoices" %></li>
+				<!-- <li class="<%= @where == 'report_invoices' ? 'on' : '' %>"><%= link_to "Laporan BKK", "/reports/invoices" %></li> -->
 				<li class="<%= @where == 'confirmed-invoices' ? 'on' : '' %>"><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>
 				<% else %>
 						<% if checkrole 'Admin Keuangan, Admin Operasional' %>

@@ -146,12 +146,12 @@
 					<% if current_user.owner %>
 						<li><%= link_to "Laporan Invoice", "/reports/taxinvoices_report" %></li>
 						<li><%= link_to "Laporan Surat Jalan", "/reports/taxinvoiceitems_report" %></li>
-						<li><%= link_to "Laporan BKK ", "/reports/invoices" %></li> 
+						<!-- <li><%= link_to "Laporan BKK ", "/reports/invoices" %></li> -->
 						<li><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>
 					<% else %>
 						<% if checkrole 'Admin Keuangan, Admin Operasional' %>
 							<li><%= link_to "Laporan Surat Jalan", "/reports/taxinvoiceitems_report" %></li>
-							<li><%= link_to "Laporan BKK ", "/reports/invoices" %></li>
+							<!-- <li><%= link_to "Laporan BKK ", "/reports/invoices" %></li> -->
 							<li><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>
 						<% end %>
 					<% end %>
