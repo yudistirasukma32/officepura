@@ -160,10 +160,10 @@
   <% if @invoice %>
 
   <h3 class="zone" style="font-weight: bold;">Upload Gambar Surat Jalan</h3>
+    <% images = @invoice.images.where("file_uid is not null and file_uid <> ''") %>
+    <% if images.any? && images.first.file_uid.present? %>
 
-    <% if @invoice.images.any? && @invoice.images.first.file_uid.present? %>
-
-    <% img = @invoice.images.first %>
+    <% img = images.first %>
 
     <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 
