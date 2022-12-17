@@ -1,0 +1,72 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+	
+	<h1><%=Setting.find_by_name("Client Name").value%> / Report Pemakaian Nopol: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+	<br class="clearfix" />
+
+	<div id="filter">
+		<form id="filterform" name="filterform" action="" method="get">
+		<div class="field-row continue">
+			<label for="driver_id" class="middle" style="width: 50px;">Supir</label>
+			<select name="driver_id" class="half left" style="width: 100px;">
+				<option value="all">Semua</option>
+				<% @drivers.each do |driver| %>
+				<option value="<%=driver.id%>" <% if @driver_id.to_i == driver.id %> name="driver_id" selected="selected"<% end %>><%=driver.name%></option>
+				<% end %>
+			</select>
+			<label for="startdate" style="margin-left: 1rem;">Tanggal Awal</label>
+			<input type="text" name="startdate" class="left half date-picker" value="<%=@startdate%>" />
+			<label for="enddate" class="middle">Akhir</label>
+			<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" />
+			<input class="submit" type="submit" value="Filter" />
+		</div>
+		</form>
+	</div>
+
+	<br class="clearfix" />
+
+	<% if @reports.present? %>
+		<table class="tablesorter row-view tablesorterFilters">
+		<tr>
+			<th width="40">No.</th>
+			<th>Nopol.</th>
+			<th align="right" style="text-align: right">Dipakai</th>
+			<th width="70"></th>
+		</tr>
+
+		<% @total = 0 %>
+		<% @reports.each_with_index do |rep, i| %>
+		<tr<% if i % 2 == 0 %> class="even"<% end %>>
+			<td><%=i+1%></td>
+			<td>
+				<a href="confirmed-invoices?driver_id=<%= @driver_id%>&vehicle_id=<%= rep.id%>&startdate=<%= @startdate%>&enddate=<%= @enddate%>">
+					<%= rep.current_id %>
+				</a>
+			</td>
+			<td align="right" style="text-align: right"><%= rep.jml rescue nil%></td>
+			<td align="right">
+				<a href="confirmed-invoices?driver_id=<%= @driver_id%>&vehicle_id=<%= rep.id%>&startdate=<%= @startdate%>&enddate=<%= @enddate%>" style="float: right !important;" target="_blank">
+					Detail&nbsp;
+				</a>
+			</td>
+		</tr>
+		<% @total += rep.jml.to_i %>
+		<% end %>	
+
+		<tr class="footer">
+			<td class="total" colspan="2">TOTAL</td>
+			<td align="right"><%= @total %></td>
+		</tr>
+	
+		</table>
+	<% end %>
+</div>

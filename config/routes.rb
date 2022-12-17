@@ -564,6 +564,7 @@ OfficePuraErp::Application.routes.draw do
     get "indexannualreport_vehicle" => "reports#indexmonthlyreport_vehicle"
     match "indexannualreport_vehicle2" => 'reports#indexannualreport_vehicle'
     match "incomeexpenseestimation_vehicle" => 'reports#incomeexpenseestimation_vehicle'
+    match "drivervehicles" => 'reports#drivervehicles', :as => :report_drivervehicles
   end
   
   match 'payrolls/getdrivers/:type' => 'payrolls#getdrivers'
