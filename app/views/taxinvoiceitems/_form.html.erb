@@ -161,49 +161,40 @@
 
   <h3 class="zone" style="font-weight: bold;">Upload Gambar Surat Jalan</h3>
     <% images = @invoice.images.where("file_uid is not null and file_uid <> ''") %>
-    <% if images.any? && images.first.file_uid.present? %>
+    <% images.each do |img| %>
+        <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 
-    <% img = images.first %>
-
-    <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
-
-    <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
-    
-    <a href="<%= img.file.url() %>" target="_blank">
-        <%= image_tag img.file.thumb('320x240').url(:suffix => "/#{img.name}") if img.file_uid %>
-    </a>
-    
-    <% else %>
-    
-      <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid).truncate(40) %></a>
-    
-    <% end %>
-
-    <br /><br /><br /><%= link_to 'Hapus File'.html_safe, '/attachments/removeTaxInv/'+ @invoice.images.first.id.to_s, class: "btn-txt danger" %>
-
-    <% else %>
+        <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+        
+        <a href="<%= img.file.url() %>" target="_blank">
+            <%= image_tag img.file.thumb('320x240').url(:suffix => "/#{img.name}") if img.file_uid %>
+        </a>  
+      <% else %>
+        <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file.name).truncate(40) %></a>
+      <% end %>
+      <br /><br /><br /><%= link_to 'Hapus File'.html_safe, '/attachments/removeTaxInv/'+ img.id.to_s, class: "btn-txt danger" %>
+      <br /><br /><br />
+    <% end %>    
 
     <form action="/attachments/uploadTaxInv" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
       <input type="hidden" name="model_name" value="Invoice" />
       <input type="hidden" name="item_id" value="<%=@invoice.id%>" />
 
-    <div class="field-row" style="width: 300px;">
-      <label for="name">Nama</label>
-      <input type="text" name="attachment[name]" style="width: 300px;"/>
-    </div>
+      <div class="field-row" style="width: 300px;">
+        <label for="name">Nama</label>
+        <input type="text" name="attachment[name]" style="width: 300px;"/>
+      </div>
 
-    <div class="field-row continue" style="width: 300px;">
-      <label for="file">Browse File</label>
-      <input type="file" name="attachment[file]"/>
-    </div>
+      <div class="field-row continue" style="width: 300px;">
+        <label for="file">Browse File</label>
+        <input type="file" name="attachment[file]"/>
+      </div>
 
-    <div class="actions">
-      <input type="submit" value="Simpan File" />
-    </div>
+      <div class="actions">
+        <input type="submit" value="Simpan File" />
+      </div>
 
     </form>
-
-    <% end %>
 
   <% end %>
 </div>
