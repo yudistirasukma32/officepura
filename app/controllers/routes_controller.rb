@@ -6,7 +6,7 @@ class RoutesController < ApplicationController
   def set_section
     @section = "masters"
     @where = "routes"
-    @price_per_types = ["KG", "LITER", "BORONGAN"]
+    @price_per_types = ["KG", "LITER", "BORONGAN","M3"]
     @transporttypes = ["TRUK", "ISOTANK", "KERETA", "KAPAL (TOL LAUT)"]
   end
 
