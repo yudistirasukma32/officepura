@@ -2848,6 +2848,8 @@ class ReportsController < ApplicationController
 
         if price_per >= offset 
           estimation = quantity * price_per
+        elsif(price_per_type == 'M3')
+          estimation = quantity * 47 * price_per
         elsif customer_35.include? event.customer_id
           estimation = quantity * 20000 * price_per
         elsif(price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg 
