@@ -2814,6 +2814,16 @@ class ReportsController < ApplicationController
       
       events = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date)
 
+      @transporttype = params[:transporttype]
+
+      if @transporttype.present? and @transporttype != 'all'
+        if @transporttype == 'KERETA'
+          events = events.where('invoicetrain = true')
+        else
+          events = events.where('invoicetrain = false')
+        end
+      end
+
       if params[:office_id].present? && params[:office_id] != 'all'
         events = events.where(office_id: params[:office_id])
       end
