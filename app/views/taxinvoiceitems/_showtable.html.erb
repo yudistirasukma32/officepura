@@ -15,7 +15,7 @@
         </th>
         <th width="70" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">Upload</th>
         <th width="50">USER</th>
-        <th width="100" class="{sorter: false, filter: false} sorter-false"></th>
+        <th width="50" class="{sorter: false, filter: false} sorter-false"></th>
     </tr>
     </thead>
     <tbody>
@@ -90,7 +90,7 @@
             <td class="center">
                     <a class="cta" href="/taxinvoiceitems/new/<%=invoice.id%>">Isi SJ</a>&nbsp;
                 <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
-                    <a class="cta" href="/taxinvoiceitems/print/<%=invoice.id%>" style="background-color: green; margin-left: 0.2rem;">Edit</a>
+                    <a class="cta" href="/taxinvoiceitems/print/<%=invoice.id%>" style="background-color: green; margin-left: 0.2rem; display: none;">Edit</a>
                 <% end %>    
             </td>
         </tr>
