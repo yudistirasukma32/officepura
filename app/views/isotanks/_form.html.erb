@@ -4,6 +4,10 @@
     <%= f.text_field :isotanknumber %>
 	</div>
 
+  <div class="field-row">
+    <%= f.label :category, "Tipe Isotank"  %>
+    <%= f.select :category, options_for_select(@categories.collect {|w| [w, w]}, (params[:category].present? ? params[:category] : @isotank.category)), {}, { :class => 'half chzn-select' } %>
+  </div>
 
   <div class="actions">
     <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Kendaraan' %>

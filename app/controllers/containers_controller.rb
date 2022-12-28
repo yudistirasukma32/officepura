@@ -7,6 +7,7 @@ class ContainersController < ApplicationController
   def set_section
     @section = "masters"
     @where = "containers"
+    @categories = ["BELI", "SEWA", "FREEUSE"]
   end
 
   def set_role

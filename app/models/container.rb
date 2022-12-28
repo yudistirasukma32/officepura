@@ -4,7 +4,7 @@ class Container < ActiveRecord::Base
     has_many :officeexpenses
 
 	# Setup accessible (or protected) attributes for your model
-	attr_accessible :enabled, :deleted, :containernumber
+	attr_accessible :enabled, :deleted, :containernumber, :category
 
 	scope :active, lambda {where(:enabled => true, :deleted => false)}  		
 	

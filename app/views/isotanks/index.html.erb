@@ -22,6 +22,7 @@
 			<thead>
 			<tr>
 				<th>Nama</th>
+				<th>Kategori</th>
 				<th width="60" data-sorter="false" class="sorter-false">Aktif</th>
 				<th width="60" class="{sorter: false}"></th>
 			</tr>
@@ -32,7 +33,32 @@
 			<% if isotank.deleted %>
 				<% if current_user.adminrole %>
 				<tr class="deleted">
-					<td><%= isotank.isotanknumber %></td>
+					<td>
+						<% if isotank.category.present? %>
+							<% if isotank.category == 'SEWA' %>
+								<span style="color: blue;"><%= isotank.isotanknumber %></span>
+							<% elsif isotank.category == 'FREEUSE' %>
+								<span style="color: red;"><%= isotank.isotanknumber %></span>
+							<% else %>
+								<%= isotank.isotanknumber %>
+							<% end %>
+						<% else %>
+							<%= isotank.isotanknumber %>	
+						<% end %>
+					</td>
+					<td>
+						<% if isotank.category.present? %>
+							<% if isotank.category == 'SEWA' %>
+								<span style="color: blue;"><%= isotank.category %></span>
+							<% elsif isotank.category == 'FREEUSE' %>
+								<span style="color: red;"><%= isotank.category %></span>
+							<% else %>
+								<%= isotank.category %>
+							<% end %>
+						<% else %>
+							<%= isotank.category rescue nil %>	
+						<% end %>
+					</td>
 					<% if isotank.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
 					<% else %>
@@ -44,7 +70,32 @@
 			<% else %>
 				<% if checkrole 'Admin Kendaraan' %>
 				<tr>
-					<td><%= isotank.isotanknumber %></td>
+					<td>
+						<% if isotank.category.present? %>
+							<% if isotank.category == 'SEWA' %>
+								<span style="color: blue;"><%= isotank.isotanknumber %></span>
+							<% elsif isotank.category == 'FREEUSE' %>
+								<span style="color: red;"><%= isotank.isotanknumber %></span>
+							<% else %>
+								<%= isotank.isotanknumber %>
+							<% end %>
+						<% else %>
+							<%= isotank.isotanknumber %>	
+						<% end %>
+					</td>
+					<td>
+						<% if isotank.category.present? %>
+							<% if isotank.category == 'SEWA' %>
+								<span style="color: blue;"><%= isotank.category %></span>
+							<% elsif isotank.category == 'FREEUSE' %>
+								<span style="color: red;"><%= isotank.category %></span>
+							<% else %>
+								<%= isotank.category %>
+							<% end %>
+						<% else %>
+							<%= isotank.category rescue nil %>	
+						<% end %>
+					</td>
 					<% if isotank.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, disable_isotank_path(isotank), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>
 					<% else %>

@@ -27,54 +27,107 @@
   </div>
 
   <% if @invoice_ori.nil? %>
-    <div class="field-row">
-      <%= f.label :invoicetrain, "Tipe BKK" %>
-      <% if active_node == "edit" %>
+  <div class="field-row">
+    <%= f.label :invoicetrain, "Tipe BKK" %>
+    <% if active_node == "edit" %>
+        <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, false, :disabled => !@invoice.invoicetrain ? false : true %> Standart
+        <% end %>
+        <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, true, :checked => !@invoice.invoicetrain ? false : true, :disabled => @invoice.invoicetrain ? false : true, data: {behavior: "toggle-train"}%> Kereta
+        <% end %>
+    <% else %>
+        <% if params[:train] || params[:train] == true %>
           <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
-            <%= f.radio_button :invoicetrain, false, :disabled => !@invoice.invoicetrain ? false : true %> Standart
+            <%= f.radio_button :invoicetrain, false, :checked => false , :disabled => true  %> Standart
           <% end %>
           <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
-            <%= f.radio_button :invoicetrain, true, :checked => !@invoice.invoicetrain ? false : true, :disabled => @invoice.invoicetrain ? false : true, data: {behavior: "toggle-train"}%> Kereta
+            <%= f.radio_button :invoicetrain, true, :checked => true, data: {behavior: "toggle-train"} %> Kereta
           <% end %>
-      <% else %>
-          <% if params[:train] || params[:train] == true %>
-            <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
-              <%= f.radio_button :invoicetrain, false, :checked => false , :disabled => true  %> Standart
-            <% end %>
-            <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
-              <%= f.radio_button :invoicetrain, true, :checked => true, data: {behavior: "toggle-train"} %> Kereta
-            <% end %>
-          <% else %>
-            <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
-              <%= f.radio_button :invoicetrain, false, :checked => true , data: {behavior: "toggle-standart"}  %> Standart
-            <% end %>
-            <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
-              <%= f.radio_button :invoicetrain, true, :checked => false , :disabled => true %> Kereta
-            <% end %>
+        <% else %>
+          <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, false, :checked => true , data: {behavior: "toggle-standart"}  %> Standart
           <% end %>
-      <% end %>
+          <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
+            <%= f.radio_button :invoicetrain, true, :checked => false , :disabled => true %> Kereta
+          <% end %>
+        <% end %>
+    <% end %>
 
-    </div>
-  <% else %>
-    <div class="field-row">
-      <%= f.label :invoicetrain, "Tipe BKK" %>
-      <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
-        <%= f.radio_button :invoicetrain, false, :disabled => true  %> Standart
-      <% end %>
-      <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
-        <%= f.radio_button :invoicetrain, true, :checked => true %> Kereta
-      <% end %>
-    </div>
+  </div>
+<% else %>
+  <div class="field-row">
+    <%= f.label :invoicetrain, "Tipe BKK" %>
+    <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+      <%= f.radio_button :invoicetrain, false, :disabled => true  %> Standart
+    <% end %>
+    <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
+      <%= f.radio_button :invoicetrain, true, :checked => true %> Kereta
+    <% end %>
+  </div>
 
-      <%= f.hidden_field :invoice_id, :value => @invoice_ori.id %>
-      <%= f.hidden_field :isotank_id, :value => @invoice_ori.isotank_id %>
-      <%= f.hidden_field :container_id, :value => @invoice_ori.container_id %>
-  <% end %>
+    <%= f.hidden_field :invoice_id, :value => @invoice_ori.id %>
+    <%= f.hidden_field :isotank_id, :value => @invoice_ori.isotank_id %>
+    <%= f.hidden_field :container_id, :value => @invoice_ori.container_id %>
+<% end %>
 
   <div class="field-row">
+  <%= f.label :cargo_type, "Tipe Kargo" %>
+  <% if active_node == "edit" %>
+
+      <% if @invoice.cargo_type.present? %>
+
+          <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "padat", :checked => @invoice.cargo_type == "padat" ? true : false, :disabled => @invoice.cargo_type == "cair" ? true : false %> Padat
+          <% end %>
+          <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "cair", :checked => @invoice.cargo_type == "cair" ? true : false, :disabled => @invoice.cargo_type == "padat" ? true : false %> Cair
+          <% end %>
+
+      <% else %>
+
+          <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "padat", :checked => @invoice.tanktype == "KONTAINER" || @invoice.tanktype == "STANDART" ? true : false  %> Padat
+          <% end %>
+          <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "cair" , :checked => @invoice.tanktype == "ISOTANK" ? true : false %> Cair
+          <% end %>
+
+      <% end %>
+
+  <% else %>
+
+      <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+        <%= f.radio_button :cargo_type, "padat", :checked => true  %> Padat
+      <% end %>
+      <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+        <%= f.radio_button :cargo_type, "cair" %> Cair
+      <% end %>
+
+  <% end %>
+
+</div>
+
+<% if active_node == "edit" %>
+
+<div class="field-row">
   <%= f.label :tanktype, "Tipe Tangki"  %>
-  <%= f.select :tanktype, options_for_select(@tanktypes.collect {|w| [w, w]}, (params[:type].present? ? params[:type] : @invoice.tanktype)), {}, { :class => 'half' } %>
+  <input type="text" class="double disabled" value="<%= !@invoice.tanktype.nil? ? @invoice.tanktype : 'Harap memilih Tipe Kargo terlebih dahulu.' %>" />
+</div>
+
+<% else %>
+
+<div id="div_tanktype">
+  <div class="field-row">
+    <%= f.label :tanktype, "Tipe Tangki"  %>
+    <input type="text" class="double disabled" value="<%= !@invoice.tanktype.nil? ? @invoice.tanktype : 'Harap memilih Tipe Kargo terlebih dahulu.' %>" />
   </div>
+</div>
+
+<% end %>
+
+
+
 
   <% 
 
@@ -178,7 +231,8 @@
     <select id="invoice_isotank_id" name="invoice[isotank_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
       <option value="0">- No. Isotank -</option>
       <% @isotanks.each do |isotank| %>
-      <option value="<%=isotank.id%>"<%= isotank.id == @invoice.isotank_id ? ' selected="selected"' : '' %>><%=isotank.isotanknumber%></option>
+      <option value="<%=isotank.id%>"<%= isotank.id == @invoice.isotank_id ? ' selected="selected"' : '' %>>
+      <%=isotank.isotanknumber%><% if isotank.category == 'SEWA' %> (SW)<% elsif isotank.category == 'FREEUSE' %> (FR)<%else%> (BL)<%end%></option>
       <% end %>
     </select>
   </div>
@@ -190,7 +244,8 @@
     <select id="invoice_container_id" name="invoice[container_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
       <option value="0">- No. Kontainer -</option>
       <% Container.active.order(:containernumber).each do |container| %>
-      <option value="<%=container.id%>"<%= container.id == @invoice.container_id ? ' selected="selected"' : '' %>><%=container.containernumber%></option>
+      <option value="<%=container.id%>"<%= container.id == @invoice.container_id ? ' selected="selected"' : '' %>>
+      <%=container.containernumber%><% if container.category == 'SEWA' %> (SW)<% elsif container.category == 'FREEUSE' %> (FR)<%else%> (BL)<%end%></option>
       <% end %>
     </select>
   </div>

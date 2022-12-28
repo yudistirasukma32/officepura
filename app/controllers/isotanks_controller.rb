@@ -7,6 +7,7 @@ class IsotanksController < ApplicationController
   def set_section
     @section = "masters"
     @where = "isotanks"
+    @categories = ["BELI", "SEWA", "FREEUSE"]
   end
 
   def set_role

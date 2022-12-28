@@ -22,6 +22,7 @@
 			<thead>
 			<tr>
 				<th>Nama</th>
+				<th>Kategori</th>
 				<th width="60" data-sorter="false" class="sorter-false">Aktif</th>
 				<th width="60" class="{sorter: false}"></th>
 			</tr>
@@ -32,7 +33,32 @@
 			<% if container.deleted %>
 				<% if current_user.adminrole %>
 				<tr class="deleted">
-					<td><%= container.containernumber %></td>
+					<td>
+						<% if container.category.present? %>
+							<% if container.category == 'SEWA' %>
+								<span style="color: blue;"><%= container.containernumber %></span>
+							<% elsif container.category == 'FREEUSE' %>
+								<span style="color: red;"><%= container.containernumber %></span>
+							<% else %>
+								<%= container.containernumber %>
+							<% end %>
+						<% else %>
+							<%= container.containernumber %>	
+						<% end %>
+					</td>
+					<td>
+						<% if container.category.present? %>
+							<% if container.category == 'SEWA' %>
+								<span style="color: blue;"><%= container.category %></span>
+							<% elsif container.category == 'FREEUSE' %>
+								<span style="color: red;"><%= container.category %></span>
+							<% else %>
+								<%= container.category %>
+							<% end %>
+						<% else %>
+							<%= container.category rescue nil %>	
+						<% end %>
+					</td>
 					<% if container.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
 					<% else %>
@@ -44,7 +70,32 @@
 			<% else %>
 				<% if checkrole 'Admin Kendaraan' %>
 				<tr>
-					<td><%= container.containernumber %></td>
+					<td>
+						<% if container.category.present? %>
+							<% if container.category == 'SEWA' %>
+								<span style="color: blue;"><%= container.containernumber %></span>
+							<% elsif container.category == 'FREEUSE' %>
+								<span style="color: red;"><%= container.containernumber %></span>
+							<% else %>
+								<%= container.containernumber %>
+							<% end %>
+						<% else %>
+							<%= container.containernumber %>	
+						<% end %>
+					</td>
+					<td>
+					<% if container.category.present? %>
+						<% if container.category == 'SEWA' %>
+							<span style="color: blue;"><%= container.category %></span>
+						<% elsif container.category == 'FREEUSE' %>
+							<span style="color: red;"><%= container.category %></span>
+						<% else %>
+							<%= container.category %>
+						<% end %>
+					<% else %>
+						<%= container.category rescue nil %>	
+					<% end %>
+					</td>
 					<% if container.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, disable_container_path(container), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>
 					<% else %>

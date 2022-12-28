@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20221128051044) do
+ActiveRecord::Schema.define(:version => 20221228014906) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -226,6 +226,7 @@ ActiveRecord::Schema.define(:version => 20221128051044) do
     t.string    "containernumber"
     t.timestamp "created_at",      :limit => 6,                    :null => false
     t.timestamp "updated_at",      :limit => 6,                    :null => false
+    t.string    "category"
   end
 
   create_table "customers", :force => true do |t|
@@ -541,6 +542,7 @@ ActiveRecord::Schema.define(:version => 20221128051044) do
     t.string    "isotanknumber"
     t.timestamp "created_at",    :limit => 6,                    :null => false
     t.timestamp "updated_at",    :limit => 6,                    :null => false
+    t.string    "category"
   end
 
   create_table "legalities", :force => true do |t|
@@ -957,20 +959,22 @@ ActiveRecord::Schema.define(:version => 20221128051044) do
   end
 
   create_table "receiptships", :force => true do |t|
-    t.boolean  "deleted",                                              :default => false
-    t.boolean  "enabled",                                              :default => true
-    t.date     "date"
-    t.integer  "shipexpense_id"
-    t.text     "description"
-    t.integer  "user_id"
-    t.string   "expensetype",                                          :default => "Kredit"
-    t.integer  "officeexpensegroup_id"
-    t.integer  "bankexpensegroup_id"
-    t.datetime "created_at",                                                                 :null => false
-    t.datetime "updated_at",                                                                 :null => false
-    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
-    t.integer  "gst_percentage",                                       :default => 0
-    t.decimal  "gst_tax",               :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "deleted",                                                           :default => false
+    t.boolean   "enabled",                                                           :default => true
+    t.integer   "shipexpense_id"
+    t.text      "description"
+    t.integer   "user_id"
+    t.string    "expensetype",                                                       :default => "Kredit"
+    t.integer   "officeexpensegroup_id"
+    t.integer   "bankexpensegroup_id"
+    t.timestamp "created_at",            :limit => 6,                                                      :null => false
+    t.timestamp "updated_at",            :limit => 6,                                                      :null => false
+    t.decimal   "total",                              :precision => 19, :scale => 2, :default => 0.0
+    t.integer   "gst_percentage",                                                    :default => 0
+    t.decimal   "gst_tax",                            :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "misc_total",                         :precision => 19, :scale => 2, :default => 0.0
+    t.integer   "office_id"
+    t.integer   "deleteuser_id"
   end
 
   create_table "receipttrains", :force => true do |t|
@@ -988,6 +992,7 @@ ActiveRecord::Schema.define(:version => 20221128051044) do
     t.decimal   "total",                              :precision => 19, :scale => 2, :default => 0.0
     t.integer   "gst_percentage",                                                    :default => 0
     t.decimal   "gst_tax",                            :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "misc_total",                         :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "roles", :force => true do |t|
@@ -1054,17 +1059,17 @@ ActiveRecord::Schema.define(:version => 20221128051044) do
   add_index "routes", ["name", "customer_id", "office_id"], :name => "route_office"
 
   create_table "routeships", :force => true do |t|
-    t.boolean  "deleted",                                            :default => false
-    t.boolean  "enabled",                                            :default => true
-    t.string   "name"
-    t.integer  "operator_id"
-    t.integer  "origin_port_id"
-    t.integer  "destination_port_id"
-    t.datetime "created_at",                                                            :null => false
-    t.datetime "updated_at",                                                            :null => false
-    t.decimal  "price_per",           :precision => 19, :scale => 2, :default => 0.0
-    t.integer  "tempo",                                              :default => 0
-    t.string   "description"
+    t.boolean   "deleted",                                                         :default => false
+    t.boolean   "enabled",                                                         :default => true
+    t.string    "name"
+    t.integer   "operator_id"
+    t.integer   "origin_port_id"
+    t.integer   "destination_port_id"
+    t.timestamp "created_at",          :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",          :limit => 6,                                                   :null => false
+    t.decimal   "price_per",                        :precision => 19, :scale => 2, :default => 0.0
+    t.integer   "tempo",                                                           :default => 0
+    t.string    "description"
   end
 
   create_table "routetrains", :force => true do |t|
@@ -1079,6 +1084,8 @@ ActiveRecord::Schema.define(:version => 20221128051044) do
     t.timestamp "created_at",             :limit => 6,                                                   :null => false
     t.timestamp "updated_at",             :limit => 6,                                                   :null => false
     t.decimal   "price_per",                           :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "gst_tax",                             :precision => 19, :scale => 2
+    t.decimal   "total",                               :precision => 19, :scale => 2
   end
 
   create_table "saleitems", :force => true do |t|
@@ -1114,23 +1121,24 @@ ActiveRecord::Schema.define(:version => 20221128051044) do
   end
 
   create_table "shipexpenses", :force => true do |t|
-    t.boolean  "deleted",                                              :default => false
-    t.boolean  "enabled",                                              :default => true
-    t.date     "date"
-    t.integer  "routeship_id"
-    t.integer  "invoice_id"
-    t.text     "description"
-    t.integer  "user_id"
-    t.string   "expensetype",                                          :default => "Kredit"
-    t.integer  "officeexpensegroup_id"
-    t.integer  "bankexpensegroup_id"
-    t.integer  "deleteuser_id"
-    t.datetime "created_at",                                                                 :null => false
-    t.datetime "updated_at",                                                                 :null => false
-    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
-    t.integer  "gst_percentage",                                       :default => 0
-    t.decimal  "gst_tax",               :precision => 19, :scale => 2, :default => 0.0
-    t.decimal  "price_per",             :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "deleted",                                                           :default => false
+    t.boolean   "enabled",                                                           :default => true
+    t.date      "date"
+    t.integer   "routeship_id"
+    t.integer   "invoice_id"
+    t.text      "description"
+    t.integer   "user_id"
+    t.string    "expensetype",                                                       :default => "Kredit"
+    t.integer   "officeexpensegroup_id"
+    t.integer   "bankexpensegroup_id"
+    t.integer   "deleteuser_id"
+    t.timestamp "created_at",            :limit => 6,                                                      :null => false
+    t.timestamp "updated_at",            :limit => 6,                                                      :null => false
+    t.decimal   "total",                              :precision => 19, :scale => 2, :default => 0.0
+    t.integer   "gst_percentage",                                                    :default => 0
+    t.decimal   "gst_tax",                            :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "price_per",                          :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "misc_total",                         :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "ships", :force => true do |t|
@@ -1325,6 +1333,7 @@ ActiveRecord::Schema.define(:version => 20221128051044) do
     t.integer   "gst_percentage",                                                    :default => 0
     t.decimal   "gst_tax",                            :precision => 19, :scale => 2, :default => 0.0
     t.decimal   "price_per",                          :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "misc_total",                         :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "transporttypes", :force => true do |t|
