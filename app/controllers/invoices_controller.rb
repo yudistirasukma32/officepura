@@ -1,7 +1,7 @@
 class InvoicesController < ApplicationController
   include ApplicationHelper
   include ActionView::Helpers::NumberHelper
-	layout "application", :except => [:get_routes, :get_allowances, :get_vehicles, :get_vehicle, :get_vehiclegroupid, :get_trainroute, :get_trainroute2, :get_shiproute, :get_shiproute2, :get_routesbyoffice]
+	layout "application", :except => [:get_routes, :get_allowances, :get_vehicles, :get_vehicle, :get_vehiclegroupid, :get_trainroute, :get_trainroute2, :get_shiproute, :get_shiproute2, :get_routesbyoffice, :get_tanktype]
   protect_from_forgery :except => [:add, :updateinvoice]
   before_filter :authenticate_user!, :set_section
 
@@ -9,8 +9,9 @@ class InvoicesController < ApplicationController
     @section = "transactions"
     @where = "invoices"
     @transporttypes = ["STANDART", "KERETA"]
-    # @tanktypes = ["TANGKI", "ISOTANK", "KONTAINER"]
     @tanktypes = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK", "KONTAINER", "LOSBAK", "DROPSIDE", "TRUK BOX"]
+    @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER"]
+    @tanktypesCair = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK"]
   end
 
   def form_event
@@ -117,16 +118,16 @@ class InvoicesController < ApplicationController
     if checkrole 'BKK Kantor Sumatera'
       @office_role.push(6)
     end
-    if checkrole 'BKK Cargo Padat'
-      @office_role.push(7)
-    end
+    # if checkrole 'BKK Cargo Padat'
+    #   @office_role.push(7)
+    # end
     
     if checkrole 'Operasional BKK'
-        @offices = @offices.order('id asc')
+        @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
     end
-      
+        
   
     respond_to :html
   end
@@ -169,12 +170,12 @@ class InvoicesController < ApplicationController
     if checkrole 'BKK Kantor Sumatera'
       @office_role.push(6)
     end
-    if checkrole 'BKK Cargo Padat'
-      @office_role.push(7)
-    end
+    # if checkrole 'BKK Cargo Padat'
+    #   @office_role.push(7)
+    # end
     
     if checkrole 'Operasional BKK'
-        @offices = @offices.order('id asc')
+        @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
     end
@@ -220,12 +221,12 @@ class InvoicesController < ApplicationController
     if checkrole 'BKK Kantor Sumatera'
         @office_role.push(6)
     end
-    if checkrole 'BKK Cargo Padat'
-        @office_role.push(7)
-    end
+    # if checkrole 'BKK Cargo Padat'
+    #     @office_role.push(7)
+    # end
     
     if checkrole 'Operasional BKK'
-        @offices = @offices.order('id asc')
+        @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
     end
@@ -248,7 +249,7 @@ class InvoicesController < ApplicationController
     end
 
     # if @invoice.tanktype == 'STANDART'
-    #     @invoice.tanktype = 'TANGKI'
+    #     @invoice.tanktype = 'TANGKI BESI'
     # end
 
     @isotanks = Isotank.active.order(:isotanknumber)
@@ -276,12 +277,12 @@ class InvoicesController < ApplicationController
     if checkrole 'BKK Kantor Sumatera'
         @office_role.push(6)
     end
-    if checkrole 'BKK Cargo Padat'
-      @office_role.push(7)
-    end
+    # if checkrole 'BKK Cargo Padat'
+    #   @office_role.push(7)
+    # end
     
     if checkrole 'Operasional BKK'
-        @offices = @offices.order('id asc')
+        @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
     end
@@ -321,10 +322,6 @@ class InvoicesController < ApplicationController
 
       if inputs[:invoicetrain] == true
           inputs[:transporttype] ="KERETA"
-      #     puts inputs[:transporttype]
-      # end
-      #     if inputs[:tanktype] == "TANGKI"
-      #     inputs[:tanktype] = "STANDART"
       end
 
       @invoice = Invoice.new
@@ -388,13 +385,18 @@ class InvoicesController < ApplicationController
           gas_litre = quantity * @allowances.gas_trip
           @additional_gas_allowance = 0
 
-          if year_diff >= 15
-              gas_litre += gas_litre.to_i * year_diff.to_i / 100
-              puts "===> gas litre >= 15y"
-              puts gas_litre
-              @additional_gas_allowance = (gas_litre.to_i * year_diff.to_i / 100) * @gascost
-              puts "===> additional allowances"
-              puts @additional_gas_allowance
+          # if year_diff >= 15
+          #     gas_litre += gas_litre.to_i * year_diff.to_i / 100
+          #     puts "===> gas litre >= 15y"
+          #     puts gas_litre
+          #     @additional_gas_allowance = (gas_litre.to_i * year_diff.to_i / 100) * @gascost
+          #     puts "===> additional allowances"
+          #     puts @additional_gas_allowance
+          # end
+
+          #SOLAR TAMBAHAN utk SIL 8 & build up
+          if vehiclegroup_id == 4 || vehiclegroup_id == 5
+            gas_litre = gas_litre + (gas_litre.to_i*10/100)
           end
 
           @invoice.gas_litre = gas_litre
@@ -795,6 +797,21 @@ class InvoicesController < ApplicationController
     render :json => { :success => true, :driver_phone => @driver.mobile, :layout => false }.to_json; 
   end
 
+
+  def get_tanktype
+    if params[:cargotype] == 'padat'
+      @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER"]
+      @tanktypes = @tanktypesPadat
+      render :json => { :success => true, :html => render_to_string(:partial => "invoices/tanktypes", :layout => false) }.to_json; 
+    else
+      @tanktypesCair = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK"]
+      @tanktypes = @tanktypesCair
+      render :json => { :success => true, :html => render_to_string(:partial => "invoices/tanktypes", :layout => false) }.to_json; 
+    end
+    
+    
+  end
+
   def get_allowances
     @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
     gas_litre = ferry_fee = tol_fee = gas_allowance = driver_allowance = quantity = total = 0
@@ -1019,12 +1036,12 @@ class InvoicesController < ApplicationController
     if checkrole 'BKK Kantor Sumatera'
       @office_role.push(6)
     end
-    if checkrole 'BKK Cargo Padat'
-      @office_role.push(7)
-    end
+    # if checkrole 'BKK Cargo Padat'
+    #   @office_role.push(7)
+    # end
     
     if checkrole 'Operasional BKK'
-        @offices = @offices.order('id asc')
+        @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
     end

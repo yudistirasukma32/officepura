@@ -1,0 +1,9 @@
+<div class="field-row">
+  <label for="tanktype">Tipe Tangki</label>
+  <select class="half" name="invoice[tanktype]" id="invoice_tanktype" onchange="javascript:checkTank(this.value);">
+    <option value="0">- Pilih Tangki -</option>
+    <% @tanktypes.each do |tanktype| %>
+    <option value="<%=tanktype%>"><%=tanktype%></option>
+    <% end %>
+  </select>
+</div>

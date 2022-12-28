@@ -2216,16 +2216,52 @@ $(document).ready(function() {
 		return false;
 	});	
 
+	$("input:radio[name='invoice[cargo_type]']").change(function(){  
+		if(this.value == 'padat' && this.checked){
+ 
+			var cargotype = 'padat'
+			$.ajax({
+				type: "GET",
+				url: "/invoices/gettanktype/" + cargotype,
+				success: function(data) {
+					$('#div_tanktype').html(data.html);
+					// $(".chzn-select").chosen();
+				},
+				failure: function() {alert("Error. Mohon refresh browser Anda.");}
+			});		
+	
+		}else{
+
+			var cargotype = 'cair'
+			$.ajax({
+				type: "GET",
+				url: "/invoices/gettanktype/" + cargotype,
+				success: function(data) {
+					$('#div_tanktype').html(data.html);
+					// $(".chzn-select").chosen();
+				},
+				failure: function() {alert("Error. Mohon refresh browser Anda.");}
+			});
+		}
+	});
+
 	$("input:radio[name='event[invoicetrain]']").change(function(){  
 	if(this.value == 'true' && this.checked){
 		$("#div_opstrains").show();
 		$("#div_routetrains").show();
 		$("#div_stationtrains").show();
-
+		$('#event_losing').val(0);
 	}else{
 		$("#div_opstrains").hide();
 		$("#div_routetrains").hide();
 		$("#div_stationtrains").hide();
+		$('#event_losing').val(0);
+
+		if($('.modalosing:checked')){
+			$('#event_losing').val(1);
+		} else {
+			$('#event_losing').val(0);
+		}
 	}
 	});
 
@@ -2638,6 +2674,42 @@ $(".is_isotank").change(function(){
 		$(".isotank_id").show();
 	}
 });
+
+if ($('#invoice_cargo_type_padat').length > 0) {
+	var cargotype = 'padat'
+	$.ajax({
+		type: "GET",
+		url: "/invoices/gettanktype/" + cargotype,
+		success: function(data) {
+			$('#div_tanktype').html(data.html);
+			// $(".chzn-select").chosen();
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
+}
+
+function checkTank(name) {
+	if (name == 'ISOTANK') {
+        $(".isotank_id").show();
+		$(".container_id").hide();
+		// alert('iso');
+        
+	}else if (name == 'KONTAINER') {
+        $(".isotank_id").hide();
+		$(".container_id").show();
+		// alert('cont');
+        
+	}else{
+		$('#invoice_isotank_id').val('').trigger('chosen:updated');
+		$("#invoice_isotank_id").trigger("liszt:updated");
+        $(".isotank_id").hide();
+        $('#invoice_container_id').val('').trigger('chosen:updated');
+		$("#invoice_container_id").trigger("liszt:updated");
+		// $("#phone_driver").val(null)
+		$(".container_id").hide();
+		// alert('others');
+	}
+}
 
 $("#invoice_tanktype").change(function(){
 	if ($(this).val() == 'ISOTANK') {

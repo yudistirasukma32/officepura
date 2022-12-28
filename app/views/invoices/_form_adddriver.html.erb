@@ -55,9 +55,59 @@
   <% end %>
 
   <div class="field-row">
+  <%= f.label :cargo_type, "Tipe Kargo" %>
+  <% if active_node == "edit" %>
+
+      <% if @invoice.cargo_type.present? %>
+
+          <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "padat", :checked => @invoice.cargo_type == "padat" ? true : false, :disabled => @invoice.cargo_type == "cair" ? true : false %> Padat
+          <% end %>
+          <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "cair", :checked => @invoice.cargo_type == "cair" ? true : false, :disabled => @invoice.cargo_type == "padat" ? true : false %> Cair
+          <% end %>
+
+      <% else %>
+
+          <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "padat", :checked => @invoice.tanktype == "KONTAINER" || @invoice.tanktype == "STANDART" ? true : false  %> Padat
+          <% end %>
+          <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+            <%= f.radio_button :cargo_type, "cair" , :checked => @invoice.tanktype == "ISOTANK" ? true : false %> Cair
+          <% end %>
+
+      <% end %>
+
+  <% else %>
+
+      <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+        <%= f.radio_button :cargo_type, "padat", :checked => true  %> Padat
+      <% end %>
+      <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+        <%= f.radio_button :cargo_type, "cair" %> Cair
+      <% end %>
+
+  <% end %>
+
+</div>
+
+<% if active_node == "edit" %>
+
+<div class="field-row">
   <%= f.label :tanktype, "Tipe Tangki"  %>
-  <%= f.select :tanktype, options_for_select(@tanktypes.collect {|w| [w, w]}, (params[:type].present? ? params[:type] : @invoice.tanktype)), {}, { :class => 'half' } %>
+  <input type="text" class="double disabled" value="<%= !@invoice.tanktype.nil? ? @invoice.tanktype : 'Harap memilih Tipe Kargo terlebih dahulu.' %>" />
+</div>
+
+<% else %>
+
+<div id="div_tanktype">
+  <div class="field-row">
+    <%= f.label :tanktype, "Tipe Tangki"  %>
+    <input type="text" class="double disabled" value="<%= !@invoice.tanktype.nil? ? @invoice.tanktype : 'Harap memilih Tipe Kargo terlebih dahulu.' %>" />
   </div>
+</div>
+
+<% end %>
 
     <% 
 

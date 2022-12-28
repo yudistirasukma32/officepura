@@ -311,7 +311,7 @@ OfficePuraErp::Application.routes.draw do
   get 'invoices/getvehicles/:vehiclegroup_id' => 'invoices#get_vehicles'
   get 'invoices/getvehicle/:vehicle_id' => 'invoices#get_vehicle'
   get 'invoices/getvehiclesbyofficeid/:office_id' => 'invoices#get_vehicles_by_office_id'
-
+  get 'invoices/gettanktype/:cargotype' => 'invoices#get_tanktype'
   
   get 'invoices/get_trainroute/:operator_id' => 'invoices#get_trainroute'
   get 'invoices/get_trainroute2/:operator_id' => 'invoices#get_trainroute2'
