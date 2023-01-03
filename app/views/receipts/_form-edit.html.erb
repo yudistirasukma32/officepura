@@ -44,15 +44,15 @@
           <td>Kendaraan Jalan/Pinjam</td>
           <td>
             <strong><%=@receipt.invoice.vehicle_duplicate.current_id%></strong> &nbsp;(UP: <%= @receipt.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
-            <input type="hidden" id="strVehicle" value="<%=@receipt.invoice.vehicle.current_id%> (UP: <%= @receipt.invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+            <input type="hidden" id="strVehicle" value="<%=@receipt.invoice.vehicle_duplicate.current_id%> (UP: <%= @receipt.invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
           </td>
         </tr>
         <% else %>
         <tr>
           <td>Kendaraan</td>
           <td>
-            <strong><%=@receipt.invoice.vehicle.current_id%></strong> &nbsp;(UP: <%= @receipt.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
-            <input type="hidden" id="strVehicle" value="<%=@receipt.invoice.vehicle_duplicate.current_id%> (UP: <%= @receipt.invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+            <%=@receipt.invoice.vehicle.current_id%> &nbsp;(UP: <%= @receipt.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@receipt.invoice.vehicle.current_id%> (UP: <%= @receipt.invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
           </td>
         </tr>
         <% end %>
