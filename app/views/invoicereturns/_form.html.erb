@@ -23,10 +23,31 @@
         <td>Tipe</td>
         <td><%=@invoice.route.routegroup.name%></td>
     </tr>
+
+    <% if @invoice.vehicle_duplicate_id.present? && @invoice.vehicle_duplicate_id != 0 %>
     <tr>
-        <td>Kendaraan</td>
-        <td><%=@invoice.vehicle.current_id%>&nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+      <td>Kendaraan Asli</td>
+      <td>
+        <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+        <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+      </td>
     </tr>
+    <tr>
+      <td>Kendaraan Jalan/Pinjam</td>
+      <td>
+        <strong><%=@invoice.vehicle_duplicate.current_id%></strong> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+        <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+      </td>
+    </tr>
+    <% else %>
+    <tr>
+      <td>Kendaraan</td>
+      <td>
+        <strong><%=@invoice.vehicle.current_id%></strong> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+        <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle_duplicate.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+      </td>
+    </tr>
+    <% end %>
         
     <% if @invoice.isotank_id != 0 %>
     <tr>

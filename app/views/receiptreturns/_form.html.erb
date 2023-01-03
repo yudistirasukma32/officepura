@@ -23,10 +23,30 @@
           <td>Tipe</td>
           <td><%=@invoice.invoice.route.routegroup.name%></td>
         </tr>
-      <tr>
-        <td>Kendaraan</td>
-        <td><%=@invoice.invoice.vehicle.current_id%>&nbsp;(UP: <%= @invoice.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
-      </tr>
+        <% if @invoice.invoice.vehicle_duplicate_id.present? && @invoice.invoice.vehicle_duplicate_id != 0 %>
+        <tr>
+          <td>Kendaraan Asli</td>
+          <td>
+            <%=@invoice.invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.invoice.vehicle.current_id%> (UP: <%= @invoice.invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <tr>
+          <td>Kendaraan Jalan/Pinjam</td>
+          <td>
+            <strong><%=@invoice.invoice.vehicle_duplicate.current_id%></strong> &nbsp;(UP: <%= @invoice.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.invoice.vehicle.current_id%> (UP: <%= @invoice.invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <% else %>
+        <tr>
+          <td>Kendaraan</td>
+          <td>
+            <strong><%=@invoice.invoice.vehicle.current_id%></strong> &nbsp;(UP: <%= @invoice.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.invoice.vehicle_duplicate.current_id%> (UP: <%= @invoice.invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <% end %>
       <tr>
         <td>Supir</td>
         <td><%=@invoice.invoice.driver.name%><% if !@invoice.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.invoice.driver.helpers.first.name%>)<% end %></td>
@@ -86,9 +106,6 @@
     </table>
 
     <div class="">
-    <% if @invoice.office.abbr == 'SDA' || @invoice.office.abbr == 'SMG' %>
-    <em>* Kantor Sidoarjo / Semarang: Nilai konfirmasi kasir <strong>tidak akan mengubah saldo kas.</strong></em>
-    <% end %>
     <br/><br/>
     </div>
 

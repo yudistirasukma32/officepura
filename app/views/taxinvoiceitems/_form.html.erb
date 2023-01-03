@@ -1,10 +1,3 @@
-<style>
-.danger {
-  background-image: linear-gradient(#e61818, #a61111) !important;
-  border-color: #a61111 #a61111 #961010 !important;
-}
-</style>
-
 <div id="filter">
 <form action="/taxinvoiceitems/new/" method="get">
   <div class="field-row continue">
@@ -19,133 +12,176 @@
 
 <% if @invoice %>
 
-  <div class="info-box" style="width:560px; float:left; clear:left;margin-bottom:30px;">  
+<div class="info-box" style="width:560px; float:left; clear:left;margin-bottom:30px;">  
 
-    <h3>Bukti Kas Keluar <%= @invoice.invoicetrain ? "Kereta" : ""%> #<%=zeropad(@invoice.id)%></h3>
+<h3>Bukti Kas Keluar <%= @invoice.invoicetrain ? "Kereta" : ""%> #<%=zeropad(@invoice.id)%></h3>
 
-    <table class="row-view no-border">
-      <tr>
-        <td width="100">Nomor DO</td>
-        <td><%=@invoice.event_id%></td>
-      </tr>
-      <tr>
-        <td width="100">Kantor</td>
-        <td><%=@invoice.office.name%></td>
-      </tr>
-      <tr>
-        <td width="100">Tgl. Bikin</td>
-        <td><%=@invoice.created_at.strftime('%d-%m-%Y')%></td>
-      </tr>
-      <tr>
-        <td>Pelanggan</td>
-        <td><%=@invoice.customer.name%></td>
-      </tr>
-    <% if @invoice.invoicetrain %>
-      <tr>
-          <td>Jurusan Muat</td>
-          <td><%=@invoice.quantity%> Rit: <%=@invoice.route.name%>, <%=@invoice.vehicle.current_id%> <% if !@invoice.vehicle.plat_type.nil? %>(<%= @invoice.vehicle.plat_type %>)<%end%></td>
-      </tr>
+<table class="row-view no-border">
+  <tr>
+    <td width="100">Nomor DO</td>
+    <td><%=@invoice.event_id%></td>
+  </tr>
+  <tr>
+    <td width="100">Kantor</td>
+    <td><%=@invoice.office.name%></td>
+  </tr>
+  <tr>
+    <td width="100">Tgl. Bikin</td>
+    <td><%=@invoice.created_at.strftime('%d-%m-%Y')%></td>
+  </tr>
+  <tr>
+    <td>Pelanggan</td>
+    <td><%=@invoice.customer.name%></td>
+  </tr>
+<% if @invoice.invoicetrain %>
+  <tr>
+      <td>Jurusan Muat</td>
+      <td>
+      <%=@invoice.quantity%> Rit: <%=@invoice.route.name%>,
+      <% if @invoice.vehicle_duplicate.present? && @invoice.vehicle_duplicate_id != 0%>
+        <strong><%=@invoice.vehicle_duplicate.current_id rescue nil%></strong>
+      <% else %>
+          <%=@invoice.vehicle.current_id rescue nil%>
+      <% end %>
+
+      <span style="display: none;">
+        <% if !@invoice.vehicle.plat_type.nil? %>
+          (<%= @invoice.vehicle.plat_type %>)
+        <%end%>
+      </span>
+
+      </td>
+  </tr>
+
+<% if @invoice.invoices.first %>
+  <tr>
+      <td>Jurusan Bkr</td>
+      <td>
+      <%=@invoice.invoices.first.quantity%> Rit: <%=@invoice.invoices.first.route.name%>, 
+ 
+      <% if @invoice.invoices.first.vehicle_duplicate.present? && @invoice.invoices.first.vehicle_duplicate_id != 0%>
+        <strong><%=@invoice.invoices.first.vehicle_duplicate.current_id rescue nil%></strong>
+      <% else %>
+          <%=@invoice.invoices.first.vehicle.current_id rescue nil%>
+      <% end %>
+
+      <span style="display: none;">
+        <% if !@invoice.invoices.first.vehicle.plat_type.nil? %>
+          (<%= @invoice.invoices.first.vehicle.plat_type %>)
+        <%end%>
+      </span>
+
+      </td>
+  </tr>
+<% end %>
     
-    <% if @invoice.invoices.first %>
-      <tr>
-          <td>Jurusan Bkr</td>
-          <td><%=@invoice.invoices.first.quantity%> Rit: <%=@invoice.invoices.first.route.name%>, <%=@invoice.invoices.first.vehicle.current_id%> <% if !@invoice.invoices.first.vehicle.plat_type.nil? %>(<%= @invoice.invoices.first.vehicle.plat_type %>)<%end%></td>
-      </tr>
-    <% end %>
-        
+<% else %>
+  <tr>
+      <td>Jurusan</td>
+      <td>
+      <%=@invoice.quantity%> Rit: <%=@invoice.route.name%>,
+      <% if @invoice.vehicle_duplicate.present? && @invoice.vehicle_duplicate_id != 0%>
+        <strong><%=@invoice.vehicle_duplicate.current_id rescue nil%></strong>
+      <% else %>
+          <%=@invoice.vehicle.current_id rescue nil%>
+      <% end %>
+
+      <span style="display: none;">
+        <% if !@invoice.vehicle.plat_type.nil? %>
+          (<%= @invoice.vehicle.plat_type %>)
+        <%end%>
+      </span>
+
+      </td>
+  </tr>
+<% end %>
+    
+<% if @invoice.isotank_id != 0 %>
+  <tr>
+    <td>No. Isotank</td>
+    <td id="strIsotank"><%=@invoice.isotank.isotanknumber rescue nil%></td>
+  </tr>
+<% end %>
+    
+<% if @invoice.container_id != 0 && @invoice.tanktype == 'KONTAINER' %>
+  <tr>
+    <td>No. Kontainer</td>
+    <td id="strContainer"><%=@invoice.container.containernumber rescue nil%></td>
+  </tr>
+<% end %>
+    
+  <tr>
+    <td>Supir</td>
+    <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %><% if @invoice.invoices.any? %>, <%=@invoice.invoices.first.driver.name%><%end%></td>
+  </tr>
+
+  <% if current_user.adminrole || current_user.owner %>
+    <% if @invoice.price_per.to_f != @invoice.route.price_per.to_f %>
+    <tr>
+      <td>Harga Lama</td>
+      <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> </td>
+    </tr>
+    <tr>
+      <td>Harga Baru</td>
+      <td>@ <%= to_currency_bank(@invoice.route.price_per, 'Rp. ') %> </td>
+    </tr>
     <% else %>
-      <tr>
-          <td>Jurusan</td>
-          <td><%=@invoice.quantity%> Rit: <%=@invoice.route.name%>, <%=@invoice.vehicle.current_id%> <% if !@invoice.vehicle.plat_type.nil? %>(<%= @invoice.vehicle.plat_type %>)<%end%></td>
-      </tr>
+    <tr>
+      <td>Harga Muatan</td>
+      <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> *</td>
+    </tr>
     <% end %>
-        
-    <% if @invoice.isotank_id != 0 %>
-      <tr>
-        <td>No. Isotank</td>
-        <td id="strIsotank"><%=@invoice.isotank.isotanknumber rescue nil%></td>
-      </tr>
+  <% else if checkrole "Invoice / Surat Jalan" %>  
+    <% if @invoice.price_per.to_f != @invoice.route.price_per.to_f %>
+    <tr>
+      <td>Harga Lama</td>
+      <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> </td>
+    </tr>
+    <tr>
+      <td>Harga Baru</td>
+      <td>@ <%= to_currency_bank(@invoice.route.price_per, 'Rp. ') %> </td>
+    </tr>
+    <% else %>
+    <tr>
+      <td>Harga Muatan</td>
+      <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> *</td>
+    </tr>
     <% end %>
-        
-    <% if @invoice.container_id != 0 && @invoice.tanktype == 'KONTAINER' %>
-      <tr>
-        <td>No. Kontainer</td>
-        <td id="strContainer"><%=@invoice.container.containernumber rescue nil%></td>
-      </tr>
-    <% end %>
-        
-      <tr>
-        <td>Supir</td>
-        <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %><% if @invoice.invoices.any? %>, <%=@invoice.invoices.first.driver.name%><%end%></td>
-      </tr>
+  <% end %>
 
-      <% if current_user.adminrole || current_user.owner %>
-        <% if @invoice.price_per.to_f != @invoice.route.price_per.to_f %>
-        <tr>
-          <td>Harga Lama</td>
-          <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> </td>
-        </tr>
-        <tr>
-          <td>Harga Baru</td>
-          <td>@ <%= to_currency_bank(@invoice.route.price_per, 'Rp. ') %> </td>
-        </tr>
-        <% else %>
-        <tr>
-          <td>Harga Muatan</td>
-          <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> *</td>
-        </tr>
-        <% end %>
-      <% else if checkrole "Invoice / Surat Jalan" %>  
-        <% if @invoice.price_per.to_f != @invoice.route.price_per.to_f %>
-        <tr>
-          <td>Harga Lama</td>
-          <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> </td>
-        </tr>
-        <tr>
-          <td>Harga Baru</td>
-          <td>@ <%= to_currency_bank(@invoice.route.price_per, 'Rp. ') %> </td>
-        </tr>
-        <% else %>
-        <tr>
-          <td>Harga Muatan</td>
-          <td>@ <%= to_currency_bank(@invoice.price_per, 'Rp. ') %> *</td>
-        </tr>
-        <% end %>
-      <% end %>
+  <% end %>
 
-      <% end %>
-
-      <% if @taxinvoiceitems.nil? %>
-      <% else  %>
-      <tr>
-        <td>No Invoice</td>
-        <td>
-          <% @taxinvoiceitems.each_with_index do |taxinvoiceitem,i| %>
-            <% @taxinvoice = Taxinvoice.find(taxinvoiceitem.taxinvoice_id) rescue nil  %>
-              <% if @taxinvoice.nil? %>
-              -
-              <% else %>
-                <% if current_user.adminrole || current_user.owner  %>
-                  <%= link_to @taxinvoice.long_id, edit_taxinvoice_path(@taxinvoice.id), target: :_blank %>
-                <% else %>
-                  <%= @taxinvoice.long_id %>
-                <% end %>
-                <br/>
-              <% end %>
+  <% if @taxinvoiceitems.nil? %>
+  <% else  %>
+  <tr>
+    <td>No Invoice</td>
+    <td>
+      <% @taxinvoiceitems.each_with_index do |taxinvoiceitem,i| %>
+        <% @taxinvoice = Taxinvoice.find(taxinvoiceitem.taxinvoice_id) rescue nil  %>
+          <% if @taxinvoice.nil? %>
+          -
+          <% else %>
+            <% if current_user.adminrole || current_user.owner  %>
+              <%= link_to @taxinvoice.long_id, edit_taxinvoice_path(@taxinvoice.id), target: :_blank %>
+            <% else %>
+              <%= @taxinvoice.long_id %>
+            <% end %>
+            <br/>
           <% end %>
-        </td>
-      </tr>
       <% end %>
+    </td>
+  </tr>
+  <% end %>
 
-      <tr><td colspan="2">&nbsp;</td></tr>
-      <tr>
-        <td colspan="2" style="font-size:13px">* Secara default penghitungan total menggunakan harga bongkar. Perubahan penggunaan harga hitung dapat dirubah saat pembuatan tagihan invoice.</td>
-      </tr> 
-    </table>
-  </div>
-  
-   
-  <div class="update-box">
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr>
+    <td colspan="2" style="font-size:13px">* Secara default penghitungan total menggunakan harga bongkar. Perubahan penggunaan harga hitung dapat dirubah saat pembuatan tagihan invoice.</td>
+  </tr> 
+</table>
+</div>
+
+<% if @invoice.price_per.to_f != @invoice.route.price_per.to_f %>
+  <div class="update-box" style="width:300px;float:right;clear:right;padding: 1rem 0 2rem;">
     Ada perubahan harga dalam Master Jurusan. Tekan tombol untuk update harga terbaru. 
     <br class="clearfix"/>
     <br class="clearfix"/>
@@ -154,50 +190,57 @@
     <br class="clearfix"/>
     <a class="btn right btn-green" style="float:left" href="/taxinvoiceitems/new/<%= @invoice.id%>/true">Update Harga</a>
   </div> 
+<% end %>
  
+	<div class="hideprint" style="width:300px; float:right; clear:right;">
+		<% if @invoice %>
 
-  <div class="hideprint update-box" style="border-top: none;">
-  <% if @invoice %>
+		<h3 class="zone" style="font-weight: bold;">Upload Gambar Surat Jalan</h3>
 
-  <h3 class="zone" style="font-weight: bold;">Upload Gambar Surat Jalan</h3>
-    <% images = @invoice.images.where("file_uid is not null and file_uid <> ''") %>
-    <% images.each do |img| %>
-        <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+			<% if @invoice.images.where("file_uid is not null and file_uid <> ''").any? %>
+        <% @invoice.images.where("file_uid is not null and file_uid <> ''").each do |img| %>
+          <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+	
+          <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+          
+          <a href="<%= img.file.url() %>" target="_blank">
+              <%= image_tag img.file.thumb('480x320').url(:suffix => "/#{img.name}") if img.file_uid %>
+          </a>
+          
+          <% else %>
+          
+            <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
+          
+          <% end %>
 
-        <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
-        
-        <a href="<%= img.file.url() %>" target="_blank">
-            <%= image_tag img.file.thumb('320x240').url(:suffix => "/#{img.name}") if img.file_uid %>
-        </a>  
-      <% else %>
-        <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file.name).truncate(40) %></a>
-      <% end %>
-      <br /><br /><br /><%= link_to 'Hapus File'.html_safe, '/attachments/removeTaxInv/'+ img.id.to_s, class: "btn-txt danger" %>
-      <br /><br /><br />
-    <% end %>    
+          <br /><br /><%= link_to '&raquo; Hapus File'.html_safe, '/attachments/removeTaxInv/' + @invoice.images.first.id.to_s %>
+          <br>
+          <br>
+        <% end %>
+			<% end %>
 
-    <form action="/attachments/uploadTaxInv" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
-      <input type="hidden" name="model_name" value="Invoice" />
-      <input type="hidden" name="item_id" value="<%=@invoice.id%>" />
+      <form action="/attachments/uploadTaxInv" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+				<input type="hidden" name="model_name" value="Invoice" />
+				<input type="hidden" name="item_id" value="<%=@invoice.id%>" />
 
-      <div class="field-row" style="width: 300px;">
-        <label for="name">Nama</label>
-        <input type="text" name="attachment[name]" style="width: 300px;"/>
-      </div>
+			<div class="field-row" style="width: 300px;">
+				<label for="name">Nama</label>
+				<input type="text" name="attachment[name]" style="width: 100%; max-width: 280px;"/>
+			</div>
 
-      <div class="field-row continue" style="width: 300px;">
-        <label for="file">Browse File</label>
-        <input type="file" name="attachment[file]"/>
-      </div>
+			<div class="field-row continue" style="width: 100%;">
+				<label for="file">Browse File</label>
+				<input type="file" name="attachment[file]"/>
+			</div>
 
-      <div class="actions">
-        <input type="submit" value="Simpan File" />
-      </div>
+			<div class="actions">
+				<input type="submit" value="Simpan File" />
+			</div>
 
-    </form>
+			</form>
 
-  <% end %>
-</div>
+		<% end %>
+	</div>
 
 <br class="clearfix" />
 
@@ -255,25 +298,14 @@
 </tbody>
 </table>
 
-<div class="actions"> 
-  <a class="btn right" href="<%=taxinvoiceitems_path({:startdate => @invoice.date.strftime('%d-%m-%Y'),:enddate => @invoice.date.strftime('%d-%m-%Y')})%>" style="height: 18px;">Kembali ke Index</a>
+<div class="actions">
+  <a class="btn right" href="<%=taxinvoiceitems_path({:startdate => $globalStartdate, :enddate => $globalEnddate})%>">Kembali ke Index</a>
+  <input type="submit" class="btn right" value="Tambah Data" />
+
+  <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
+	<a type="submit" href="/taxinvoiceitems/downloadexcel/<%= params[:invoice_id] %>" class="btn right" style="height: 18px;">Cetak Excel</a>
+  <% end %>
   
-  <% if current_user.owner %>
-    <input type="submit" class="btn right" value="Tambah Data SJ" />
-  <% else %>
-    <% if checkrole "Admin Keuangan, Admin Surat Jalan" %>
-      <input type="submit" class="btn right" value="Tambah Data SJ" />
-    <% end %>
-  <% end %>
-
-  <% if current_user.owner %>
-    <a type="submit" href="/taxinvoiceitems/downloadexcel/<%= params[:invoice_id] %>" class="btn right" style="height: 18px;">Cetak Excel</a>
-  <% else %>
-    <% if checkrole "Excel" %>
-    <a type="submit" href="/taxinvoiceitems/downloadexcel/<%= params[:invoice_id] %>" class="btn right" style="height: 18px;">Cetak Excel</a>
-    <% end %>
-  <% end %>
-
 </div>
 </form>
 

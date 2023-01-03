@@ -208,6 +208,14 @@
       <%= f.hidden_field :vehicle_id, :value => @invoice.vehicle_id %>
     </div>
   </div>
+
+  <div id="div_vehicles_duplicate">
+    <div class="field-row">
+      <%= f.label :vehicle_duplicate_id, "Kendaraan Pinjam" %>
+      <%= f.select :vehicle_duplicate_id, options_for_select(Vehicle.where(:deleted => false).collect {|g| [g.current_id, g.id]}, @invoice.vehicle_duplicate_id), {:include_blank => '- Tidak Pinjam -'}, :class => 'half chzn-select',  :id => 'vehicle_duplicate_id'%>
+      <small>*Wajib diisi apabila kendaraan yang jalan berbeda.</small>
+    </div>
+  </div>
   
   <div class="field-row">
     <%= f.label :driver_id, "Supir" %>

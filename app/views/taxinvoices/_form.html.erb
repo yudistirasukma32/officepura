@@ -356,7 +356,27 @@
     <td>
       <input type="text" id ="date_<%=taxinvoiceitem.id%>" name="date_<%=taxinvoiceitem.id%>" class="short date-picker" value="<%=taxinvoiceitem.date.strftime('%d-%m-%Y') if !taxinvoiceitem.date.nil?%>" />
     </td>
-    <td><%= taxinvoiceitem.invoice.vehicle.current_id %><% if taxinvoiceitem.invoice.invoicetrain %><% if taxinvoiceitem.invoice.invoices.first %>,<%= taxinvoiceitem.invoice.invoices.first.vehicle.current_id %> <% end %><% end %></td>
+    <td> 
+
+    <% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
+      <strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+    <% else %>
+        <%=taxinvoiceitem.invoice.vehicle.current_id rescue nil%>
+    <% end %>
+    
+    <% if taxinvoiceitem.invoice.invoicetrain %>
+      <% if taxinvoiceitem.invoice.invoices.first %>,
+      
+        <% if taxinvoiceitem.invoice.invoices.first.vehicle_duplicate.present? && taxinvoiceitem.invoice.invoices.first.vehicle_duplicate_id != 0%>
+          <strong><%=taxinvoiceitem.invoice.invoices.first.vehicle_duplicate.current_id rescue nil%></strong>
+        <% else %>
+            <%=taxinvoiceitem.invoice.invoices.first.vehicle.current_id rescue nil%>
+        <% end %>
+
+      <% end %>
+    <% end %>
+
+    </td>
     <td>
       <input type="text" id ="sku_<%=taxinvoiceitem.id%>" name="sku_<%=taxinvoiceitem.id%>" class="half" value="<%=taxinvoiceitem.sku_id%>" />
     </td>

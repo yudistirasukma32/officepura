@@ -20,7 +20,14 @@
 		<td class="">
 		<%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%>
 		</td>
-		<td><%=receipt.invoice.vehicle.current_id%></td>
+
+		<td>
+			<%=receipt.invoice.vehicle.current_id rescue nil%>
+			<% if receipt.invoice.vehicle_duplicate.present? && receipt.invoice.vehicle_duplicate_id != 0%>
+				<br/><strong><%=receipt.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+			<% end %>
+		</td>
+		
 		<td class="red" align="right"><%=to_currency(receipt.total)%></td>
 		<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
 		<td class="right">
@@ -65,7 +72,12 @@
 		<td class="">
 		<%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%>
 		</td>
-		<td><%=receipt.invoice.vehicle.current_id%></td>
+		<td>
+			<%=receipt.invoice.vehicle.current_id rescue nil%>
+			<% if receipt.invoice.vehicle_duplicate.present? && receipt.invoice.vehicle_duplicate_id != 0%>
+				<br/><strong><%=receipt.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+			<% end %>
+		</td>
 		<td class="red" align="right"><%=to_currency(receipt.total)%></td>
 		<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
 		<td class="right">
@@ -197,7 +209,12 @@
 		<td class="">
 		<%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%>
 		</td>
-		<td><%=receipt.invoice.vehicle.current_id%></td>
+		<td>
+			<%=receipt.invoice.vehicle.current_id rescue nil%>
+			<% if receipt.invoice.vehicle_duplicate.present? && receipt.invoice.vehicle_duplicate_id != 0%>
+				<br/><strong><%=receipt.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+			<% end %>
+		</td>
 		<td class="green" align="right"><%=to_currency(receipt.total)%></td>
 		<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
 		<td class="right">

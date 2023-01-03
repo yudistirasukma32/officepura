@@ -66,9 +66,13 @@
                     <td class="red"><%=invoice.office.abbr%></td>    
                     <% else %>
                     <td><%=invoice.office.abbr%></td>
-                    <% end %>
-					
-					<td><%=invoice.vehicle.current_id rescue nil%></td>
+                    <% end %>	
+					<td>
+						<%=invoice.vehicle.current_id rescue nil%>
+						<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+							<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+						<% end %>
+					</td>
 					<td>
 					<% if (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) %>
 						<% if invoice.isotank.category == 'SEWA' %>
@@ -119,7 +123,12 @@
                 <% else %>
                 <td><%=invoice.office.abbr%></td>
                 <% end %>
-				<td><%=invoice.vehicle.current_id rescue nil%></td>
+				<td>
+					<%=invoice.vehicle.current_id rescue nil%>
+					<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+						<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+					<% end %>
+				</td>
 				<td>
 				<% if (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) %>
 					<% if invoice.isotank.category == 'SEWA' %>

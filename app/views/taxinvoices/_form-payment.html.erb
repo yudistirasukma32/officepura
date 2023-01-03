@@ -170,10 +170,7 @@
 	<div class="field-row continue">
     <label for="piutang_id">Piutang</label>
 		<select name="piutang_id" class="third left">
-			<% Bankexpensegroup.where("UPPER(name) like '%TRUCKING' ").active.order('name DESC').each do |bankexpensegroup| %>
-				<option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultPiutangValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
-		  	<% end %>
-			<% Bankexpensegroup.where("UPPER(name) like 'PIUTANG%' AND UPPER(name) not like '%TRUCKING'").active.order('name DESC').each do |bankexpensegroup| %>
+			<% Bankexpensegroup.where("UPPER(name) like 'PIUTANG%' ").active.order(:name).each do |bankexpensegroup| %>
 			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultPiutangValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
 			<% end %>
 		</select>
@@ -243,10 +240,7 @@
 	<div class="field-row continue">
     <label for="piutang_id">Piutang</label>
 		<select name="piutang_id" class="third left">
-			<% Bankexpensegroup.where("UPPER(name) like '%TRUCKING' ").active.order(:name).each do |bankexpensegroup| %>
-				<option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultPiutangValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
-			<% end %>
-			<% Bankexpensegroup.where("UPPER(name) like 'PIUTANG%' AND UPPER(name) not like '%TRUCKING' ").active.order(:name).each do |bankexpensegroup| %>
+			<% Bankexpensegroup.where("UPPER(name) like 'PIUTANG%' ").active.order(:name).each do |bankexpensegroup| %>
 			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultPiutangValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
 			<% end %>
 		</select>

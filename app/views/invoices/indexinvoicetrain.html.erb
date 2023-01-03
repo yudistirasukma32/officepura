@@ -83,7 +83,12 @@
 							<% end %>
 						<% end %> 
 						</td>
-						<td><%=invoice.vehicle.current_id rescue nil%></td>
+						<td>
+							<%=invoice.vehicle.current_id rescue nil%>
+							<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+								<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+							<% end %>
+						</td>
 						<td><%=invoice.driver.name%> <% if invoice.invoices.any? %>, <%=invoice.invoices.first.driver.name%><%end%></td>
                         <td><%=invoice.event_id rescue nil%></td>
 						<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
@@ -131,7 +136,12 @@
 									<% end %>
 								<% end %> 
 								</td>
-								<td><%=invoice.vehicle.current_id rescue nil%></td>
+								<td>
+									<%=invoice.vehicle.current_id rescue nil%>
+									<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+										<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+									<% end %>
+								</td>
 								<td><%=invoice.driver.name%></td>
                                 <td><%=invoice.event_id rescue nil%></td>
 								<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
@@ -183,7 +193,12 @@
 						<% end %>
 					<% end %> 
 					</td>
-					<td><%=invoice.vehicle.current_id rescue nil%></td>
+					<td>
+						<%=invoice.vehicle.current_id rescue nil%>
+						<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+							<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+						<% end %>
+					</td>
 					<td><%=invoice.driver.name rescue nil%> <% if invoice.invoices.any? %>, <%=invoice.invoices.first.driver.name rescue nil%><%end%></td>
                     <td><%=invoice.event_id rescue nil%></td>
 					<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
@@ -254,7 +269,12 @@
 									<% end %>
 								<% end %> 
 								</td>
-								<td><%=invoice.vehicle.current_id rescue nil%></td>
+								<td>
+									<%=invoice.vehicle.current_id rescue nil%>
+									<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+										<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+									<% end %>
+								</td>
 								<td><%=invoice.driver.name rescue nil%></td>
                                 <td><%=invoice.event_id rescue nil%></td>
 								<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
@@ -307,7 +327,12 @@
 									<% end %>
 								<% end %> 
 								</td>
-								<td><%=invoice.vehicle.current_id rescue nil%></td>
+								<td>
+									<%=invoice.vehicle.current_id rescue nil%>
+									<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+										<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+									<% end %>
+								</td>
 								<td><%=invoice.driver.name rescue nil%></td>
                                 <td><%=invoice.event_id rescue nil%></td>
 								<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>

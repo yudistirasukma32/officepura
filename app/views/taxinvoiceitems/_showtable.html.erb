@@ -64,7 +64,14 @@
             <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
             <%= invoice.user_id.nil? ? '': ' | '+invoice.user.username%>
             </td>
-            <td><%=invoice.vehicle.current_id%><%= second_nopol.nil? ? '' : ' ' +second_nopol %></td> 
+            <td>
+            <% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+                <strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+            <% else %>
+                <%=invoice.vehicle.current_id rescue nil%>
+            <% end %>
+            <%= second_nopol.nil? ? '' : ' ' +second_nopol %>
+            </td> 
             <td><%=invoice.customer.name%></td>
             <% if invoice.taxinvoiceitems.any? %>
             <td align="center"><%=invoice.taxinvoiceitems.where("money(total) > money(0)").count%> / <%= qty%></td>
@@ -88,7 +95,7 @@
             <% end %>
             </td>
             <td class="center">
-                    <a class="cta" href="/taxinvoiceitems/new/<%=invoice.id%>">Isi SJ</a>&nbsp;
+                    <a class="cta" style="margin-top:1rem;" href="/taxinvoiceitems/new/<%=invoice.id%>">Isi SJ</a>&nbsp;
                 <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
                     <a class="cta" href="/taxinvoiceitems/print/<%=invoice.id%>" style="background-color: green; margin-left: 0.2rem; display: none;">Edit</a>
                 <% end %>    
@@ -107,7 +114,13 @@
             <%= (inv_bongkar[0].container_id.present? && inv_bongkar[0].container_id.to_i != 0) ? ("Kontainer = " + inv_bongkar[0].container.containernumber) : '' %>
             <%= invoice.user_id.nil? ? '': ' | '+invoice.user.username%>
             </td>
-            <td><%=inv_bongkar[0].vehicle.current_id%><%= second_nopol.nil? ? '' : ' ' +second_nopol %></td> 
+            <td>
+            <% if inv_bongkar[0].vehicle_duplicate.present? && inv_bongkar[0].vehicle_duplicate_id != 0%>
+                <strong><%=inv_bongkar[0].vehicle_duplicate.current_id rescue nil%></strong>
+            <% else %>
+                <%=inv_bongkar[0].vehicle.current_id rescue nil%>
+            <% end %>    
+            </td> 
             <td><%=inv_bongkar[0].customer.name%></td>
         </tr>
         <% end %>

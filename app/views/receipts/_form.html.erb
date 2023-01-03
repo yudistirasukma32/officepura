@@ -33,10 +33,33 @@
           <td>Tipe</td>
           <td><%=@invoice.route.routegroup.name%></td>
         </tr>
+ 
+        <% if @invoice.vehicle_duplicate_id.present? && @invoice.vehicle_duplicate_id != 0 %>
+        <tr>
+          <td>Kendaraan Asli</td>
+          <td>
+            <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <tr>
+          <td>Kendaraan Jalan/Pinjam</td>
+          <td>
+            <strong><%=@invoice.vehicle_duplicate.current_id%></strong> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <% else %>
         <tr>
           <td>Kendaraan</td>
-          <td><%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+          <td>
+            <strong><%=@invoice.vehicle.current_id%></strong> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle_duplicate.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
         </tr>
+        <% end %>
+
+
         <% if @invoice.isotank_id != 0 %>
         <tr>
           <td>No. Isotank</td>
@@ -123,9 +146,7 @@
       </tr>
     </table>
     <p>* Ket. Solar: <%=@invoice.gas_litre+@invoice.gas_voucher+@invoice.gas_leftover%> (Awal) - <%=@invoice.gas_voucher%> (B) - <%=@invoice.gas_leftover%> (G) = <%=@invoice.gas_litre%> liter @ <%=@invoice.gas_cost%>
-    <% if @invoice.office.abbr == 'SDA' || @invoice.office.abbr == 'SMG' %>
-      <br/>* Kantor Sidoarjo / Semarang: Nilai konfirmasi kasir <strong>tidak akan mengubah saldo kas.</strong></em>
-    <% end %>
+
     </p>
 
     <div class="field-row continue">
