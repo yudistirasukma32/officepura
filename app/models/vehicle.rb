@@ -10,6 +10,7 @@ class Vehicle < ActiveRecord::Base
 	has_many :payrolls
 	has_many :drivers
 	has_many :tirebudgets
+	has_many :vehicle_duplicates, class_name: 'Invoice', foreign_key: 'vehicle_duplicate_id'
 	
 	# Setup accessible (or protected) attributes for your model
 	attr_accessible :enabled, :current_id, :previous_id, :id_expiry,
