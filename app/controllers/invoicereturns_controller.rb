@@ -85,8 +85,9 @@ class InvoicereturnsController < ApplicationController
         @invoicereturn.helper_allowance = inputs[:helper_allowance].to_i
         @invoicereturn.misc_allowance = inputs[:misc_allowance].to_i
         @invoicereturn.premi_allowance = inputs[:premi_allowance].to_i
-        @invoicereturn.gas_allowance = (@invoice.gas_allowance.to_i / @invoice.quantity) * @invoicereturn.quantity
-        @invoicereturn.total = @invoicereturn.driver_allowance.to_i + @invoicereturn.helper_allowance.to_i + @invoicereturn.misc_allowance.to_i + @invoicereturn.tol_fee.to_i + @invoicereturn.ferry_fee.to_i + @invoicereturn.premi_allowance.to_i + @invoicereturn.gas_allowance - gas_leftover_cash
+        gas_allowance_old = (@invoice.gas_allowance.to_i / @invoice.quantity) * @invoicereturn.quantity
+        @invoicereturn.gas_allowance = gas_allowance_old - gas_leftover_cash
+        @invoicereturn.total = @invoicereturn.driver_allowance.to_i + @invoicereturn.helper_allowance.to_i + @invoicereturn.misc_allowance.to_i + @invoicereturn.tol_fee.to_i + @invoicereturn.ferry_fee.to_i + @invoicereturn.premi_allowance.to_i + gas_allowance_old - gas_leftover_cash
         @invoicereturn.office_id = @invoice.office_id
         @invoicereturn.user_id = current_user.id
         

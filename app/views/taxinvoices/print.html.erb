@@ -246,6 +246,13 @@
 		  	colspan = 9
 		  	end %>
 
+			<% if @taxinvoice.downpayment.to_i > 0 %>
+				<tr id="pph-row">
+					<td colspan="<%= colspan%>" align="right">DP</td>
+					<td align="right"><span id="txt_price_dp" <% if @taxinvoice.downpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.downpayment.to_i)%></strong></span></td>
+				</tr>
+			<% end %>
+
 		  <% if @taxinvoice.extra_cost > 0 %>
 			<tr>
 				<td colspan="<%= colspan%>" align="right">Biaya Tambahan : <%= @taxinvoice.extra_cost_info%></td>
@@ -283,7 +290,7 @@
 		  <tr class="footer">
 		    <td colspan="<%= colspan - 1%>"><span style="display: none;">&nbsp;<% if !@taxinvoice.total_in_words.blank? %> Terbilang: <%= @taxinvoice.total_in_words%><% end %></span></td>
 		    <td align="right" width="40"><strong>TOTAL</strong></td>
-		    <td align="right" style="border-top: 3px double"><strong><span id="txt_total"><%= @is_pembulatan ? to_currency(@taxinvoice.total) : to_currency_bank(@taxinvoice.total)%></span></strong></td>
+		    <td align="right" style="border-top: 3px double"><strong><span id="txt_total"><%= @is_pembulatan ? to_currency(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i) : to_currency_bank(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i)%></span></strong></td>
 		  </tr>
 
 		  <tr>

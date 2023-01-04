@@ -79,6 +79,12 @@
       </tr>
 
       <tr>
+        <td><%= f.label :gas_allowance, "Solar *" %></td>
+        <td>&nbsp;</td>
+        <td><%= f.text_field :gas_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.gas_allowance.to_i), :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
         <td><%= f.label :ferry_fee, "Penyebrangan" %></td>
         <td>&nbsp;</td>
         <td><%= f.text_field :ferry_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.ferry_fee.to_i), :readOnly => 'true' %></td>
@@ -96,7 +102,7 @@
         <td><%= f.text_field :premi_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.premi_allowance.to_i), :readOnly => 'true' %></td>
       </tr>
 
-      <% total = @invoice.driver_allowance.to_i + @invoice.tol_fee.to_i + @invoice.ferry_fee.to_i + @invoice.misc_allowance.to_i + @invoice.helper_allowance.to_i + @invoice.premi_allowance.to_i %>
+      <% total = @invoice.driver_allowance.to_i + @invoice.tol_fee.to_i + @invoice.ferry_fee.to_i + @invoice.misc_allowance.to_i + @invoice.helper_allowance.to_i + @invoice.premi_allowance.to_i + @invoice.gas_allowance.to_i %>
       
       <tr class="total-row">
         <td><%= f.label :total, "Total" %></td>
