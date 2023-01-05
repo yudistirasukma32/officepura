@@ -38,22 +38,27 @@ class ReceiptreturnsController < ApplicationController
       @receipt.helper_allowance = @invoice.helper_allowance.to_i
       @receipt.misc_allowance = @invoice.misc_allowance.to_i
       @receipt.premi_allowance = @invoice.premi_allowance.to_i
-      @receipt.gas_allowance = 0
-      @receipt.total = @receipt.driver_allowance + @receipt.tol_fee + @receipt.ferry_fee + @receipt.misc_allowance + @receipt.helper_allowance + @receipt.premi_allowance
+      gas_leftover_cash = @invoice.gas_leftover * @invoice.invoice.gas_cost
+      gas_allowance_old = (@invoice.gas_allowance.to_i / @invoice.quantity) * @invoice.quantity
+      @receipt.gas_allowance = gas_allowance_old - gas_leftover_cash
+      @receipt.total = @receipt.driver_allowance + @receipt.tol_fee + @receipt.ferry_fee + @receipt.misc_allowance + @receipt.helper_allowance + @receipt.premi_allowance + gas_allowance_old - gas_leftover_cash
       @receipt.user_id = current_user.id
 
-      
-      if ([99].include? @invoice.office_id)
+      #Cut off sebelum program digabung Nov 2022
+      # if ([5,3,6,7].include? @invoice.office_id)
+      #   if @invoice.date.strftime('%d-%m-%Y') <= '31-10-2022'
 
-        @receipt.driver_allowance = 0
-        @receipt.helper_allowance = 0
-        @receipt.misc_allowance = 0
-        @receipt.ferry_fee = 0
-        @receipt.tol_fee = 0
-        @receipt.gas_allowance = 0
-        @receipt.total = 0
+      #     @receipt.driver_allowance = 0
+      #     @receipt.helper_allowance = 0
+      #     @receipt.misc_allowance = 0
+      #     @receipt.ferry_fee = 0
+      #     @receipt.tol_fee = 0
+      #     @receipt.gas_allowance = 0
+      #     @receipt.premi_allowance = 0
+      #     @receipt.total = 0
 
-      end
+      #   end
+      # end
       
       receipt_exist = Receiptreturn.where(:invoice_id => @receipt.invoice_id, :invoiceturn_id => @receipt.invoicereturn_id, :deleted => false).first rescue nil
       if receipt_exist.nil?

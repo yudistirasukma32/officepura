@@ -115,6 +115,22 @@ class InvoicereturnsController < ApplicationController
   def update
   end
 
+  def index_confirmedtrain
+    @date = params[:date]
+    @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+    @invoices = Invoice.where('date = ? AND deleted = false AND invoicetrain = true', @date.to_date).order(:id) 
+    @invoicereturns = Invoicereturn.where('date = ?', @date.to_date)
+    @where = "invoicereturntrain"
+  end
+
+  def train
+    @date = params[:date]
+    @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+    @invoices = Invoice.where('date = ? AND deleted = false AND invoicetrain = true AND id IN (SELECT invoice_id FROM receipts WHERE deleted = false)', @date.to_date).order(:id) 
+    @invoicereturns = Invoicereturn.where('invoice_id in (select id from invoices where date = ?) AND deleted = false', @date.to_date)
+    @where = "invoicereturntrain"
+  end
+
   def add
     @invoicereturn = Invoicereturn.new
     @invoice = Invoice.where(:id => params[:invoice_id], :deleted => false).first rescue nil
