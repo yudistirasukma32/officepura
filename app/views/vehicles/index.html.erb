@@ -14,12 +14,31 @@
 
 		<%= render 'default/toggle_deleted_checkbox' %>
 
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+
+			<div class="field-row continue">
+ 
+				<label for="enabled" class="middle short" style='width:50px;float:none;'>Status</label> &nbsp; &nbsp;
+				<select name="enabled" class="middle short">
+					<option value="all">Semua</option>
+					<option value="active">Aktif</option>
+					<option value="inactive">Tidak Aktif</option> 
+				</select>
+
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
 		<br class="clearfix" />
+
 		<br class="clearfix" />
 
 		<table class="row-view tablesorter">
 			<thead>
 			<tr> 
+				<th>#</th>
 				<th class="{sorter: false}" width="30"></th>
 				<th>No Pol</th>
 				<th>Jenis</th>
@@ -32,11 +51,13 @@
 			</tr>
 			<thead>
 			<tbody>
+			<% total = i = 0 %>
 			<% @vehicles.each do |vehicle| %>
 			<% img = vehicle.images.first rescue nil %>
 			<% if vehicle.deleted %>
 				<% if current_user.adminrole %>
 				<tr class="deleted">
+					<td><%=i+=1%>.</td>
 					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
 					<td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
 					<td><%= vehicle.platform_type %></td>
@@ -55,6 +76,7 @@
 			<% else %>
 				<% if checkrole 'Admin Operasional, Admin Kendaraan, Operasional BKK' %>
 				<tr>
+					<td><%=i+=1%>.</td>
 					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
 					<td><%= link_to vehicle.current_id, edit_vehicle_path(vehicle) %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
 					<td><%= vehicle.platform_type %></td>
@@ -74,6 +96,7 @@
 				</tr>
 				<% else %>
 				<tr>
+					<td><%=i+=1%>.</td>
 					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
 					<td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
 					<td><%= vehicle.platform_type %></td>

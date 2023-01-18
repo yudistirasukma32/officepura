@@ -16,7 +16,26 @@ class VehiclesController < ApplicationController
   def index
     role = cek_roles @user_role
     if role
+
+      @enabled = params[:enabled]
+
       @vehicles = Vehicle.order("generic, current_id")
+
+      if @enabled == 'active'
+
+        @vehicles = Vehicle.where("enabled = true")
+
+      elsif @enabled == 'inactive'
+
+        @vehicles = Vehicle.where("enabled = false")
+
+      else
+
+        @vehicles = Vehicle.order("generic, current_id")
+
+      end
+
+      
 
       respond_to :html
     else
