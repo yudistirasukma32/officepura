@@ -560,21 +560,34 @@ class ReportsController < ApplicationController
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
       
+      @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND invoicetrain = false AND tanktype = 'KONTAINER' AND (container_id is not null AND container_id != 0))", @startdate.to_date, @enddate.to_date + 1).order(:date)
+
       if params[:transporttype].present?
 
         if params[:transporttype] == 'KERETA'
-          @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND invoicetrain = true AND tanktype = 'KONTAINER' AND container_id is not null)", @startdate.to_date, @enddate.to_date + 1).order(:date)
+          @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND invoicetrain = true AND tanktype = 'KONTAINER' AND (container_id is not null AND container_id != 0))", @startdate.to_date, @enddate.to_date + 1).order(:date)
+          if params[:category].present?
+            @invoices = @invoices.where("container_id in (select id from containers where category = ?)", params[:category])
+          end
         else
-          @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND invoicetrain = false AND tanktype = 'KONTAINER' AND container_id is not null)", @startdate.to_date, @enddate.to_date + 1).order(:date)
+          @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND invoicetrain = false AND tanktype = 'KONTAINER' AND (container_id is not null AND container_id != 0))", @startdate.to_date, @enddate.to_date + 1).order(:date)
+          if params[:category].present?
+            @invoices = @invoices.where("container_id in (select id from containers where category = ?)", params[:category])
+          end
         end
 
       else
 
-        @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND tanktype = 'KONTAINER' AND container_id is not null)", @startdate.to_date, @enddate.to_date + 1).order(:date)
+        @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND tanktype = 'KONTAINER' AND (container_id is not null AND container_id != 0))", @startdate.to_date, @enddate.to_date + 1).order(:date)
+        if params[:category].present?
+          @invoices = @invoices.where("container_id in (select id from containers where category = ?)", params[:category])
+        end
 
       end
+  
+        # @invoices = @invoices.where(container_id: params[:container_id]) if params[:container_id].present?
 
-      @invoices = @invoices.where(container_id: params[:container_id]) if params[:container_id].present?
+       
 
       @section = "reports1"
       @where = "containers-report"

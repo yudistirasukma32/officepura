@@ -25,8 +25,19 @@
 							<% end %>
 						</select> 
 					</div>
-					<div>
-						<label for="container_id">KONTAINER</label>
+
+					<div style="">
+						<label for="category">Kategori</label>
+						<select name="category" class="chzn-select half combo_route" >
+							<option value="">Semua Kategori</option>
+							<% ["BELI", "SEWA", "FREEUSE"].each do |type| %>
+							<option <%= type == params[:category] ? 'selected' : '' %>><%=type%></option>
+							<% end %>
+						</select> 
+					</div>
+
+					<div style="display: none;">
+						<label for="container_id">Kontainer</label>
 						<select name="container_id" class="chzn-select half" style="float:none">
 							<option value="">Semua Kontainer</option>
 							<% Container.active.each do |container| %>
@@ -34,6 +45,7 @@
 							<% end %>
 						</select> 
 					</div>
+
 					<div>
 					&nbsp; &nbsp; <label class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
 						
@@ -72,16 +84,21 @@
 					<td><%=invoice.date.strftime('%d-%m-%Y') rescue nil %></td>
 					<td><%=zeropad(invoice.id)%>: <%=invoice.route.name%> (<%=invoice.driver.name rescue nil%>)</td>
 					<td><%=invoice.invoicetrain ? 'KERETA' : 'TRUK'   %></td>
-					<td><%=invoice.container.containernumber rescue nil %> </td>
+					<td>
+					<% if (invoice.container_id.present? && invoice.container_id.to_i != 0) %>
+						<% if invoice.container.category == 'SEWA' %>
+							<span style="color: blue;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (SW)</span>
+						<% elsif invoice.container.category == 'FREEUSE' %>
+							<span style="color: red;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (FR)</span>
+						<% else %>
+							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (BL)
+						<% end %>
+					<% end %> 
+					</td>
 					<td><%=invoice.vehicle.current_id %></td>
 				</tr>
 			<% end %>
 
-				<tr class="footer">
-					<td>&nbsp;</td>
-					<td class="total" colspan="3">TOTAL</td>
-					<td class="total" align="right"><%#= to_currency(total) %></td>
-				</tr>
 			</tbody>
 		</table>
 
