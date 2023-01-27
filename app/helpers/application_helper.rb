@@ -310,4 +310,34 @@ module ApplicationHelper
 	    end
   	end
 
+	def getlastday (input)
+	    objreturn = ""
+
+	    if input ==  "01"
+	      objreturn = 31
+	    elsif input ==  "02"
+	      objreturn = 28
+	    elsif input ==  "03"
+	      objreturn = 31
+	    elsif input ==  "04"
+	      objreturn = 30
+	    elsif input ==  "05"
+	      objreturn = 31
+	    elsif input ==  "06"
+	      objreturn = 30
+	    elsif input ==  "07"
+	      objreturn = 31
+	    elsif input ==  "08"
+	      objreturn = 31
+	    elsif input ==  "09"
+	      objreturn = 30
+	    elsif input ==  "10"
+	      objreturn = 31
+	    elsif input ==  "11"
+	      objreturn = 30
+	    elsif input ==  "12"
+	      objreturn = 31
+	    end
+	end
+
 end

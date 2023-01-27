@@ -2676,7 +2676,7 @@ class ReportsController < ApplicationController
     
   def unpaid_invoice
     
-      role = cek_roles 'Admin Keuangan, Auditor'
+    role = cek_roles 'Admin Keuangan, Auditor'
       
     if role
       
@@ -2688,14 +2688,15 @@ class ReportsController < ApplicationController
 
       @monthEnd = params[:monthEnd]
       @monthEnd = "%02d" % Date.today.month.to_s if @monthEnd.nil?
-      @dayEnd = "31"  
+      @dayEnd = getlastday (@monthEnd.to_s)
       @yearEnd = params[:yearEnd]
       @yearEnd = Date.today.year if @yearEnd.nil?
- 
+
       @taxinvoices = Taxinvoice.active.joins(:customer)
 
-      @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'DD-MM-YYYY') BETWEEN ? AND ?", "#{@day}-#{@month}-#{@year}","#{@dayEnd}-#{@monthEnd}-#{@yearEnd}")
- 
+      # @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'DD-MM-YYYY') BETWEEN ? AND ?", "#{@day}-#{@month}-#{@year}","#{@dayEnd}-#{@monthEnd}-#{@yearEnd}")
+      @taxinvoices = @taxinvoices.where("paiddate is null AND date BETWEEN ? AND ?", "#{@year}-#{@month}-#{@day}-","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
+
       @customer = Customer.find(params[:customer_id]) rescue nil
 
       if @customer.present?
@@ -2719,6 +2720,7 @@ class ReportsController < ApplicationController
       redirect_to root_path()
     end
   end    
+  
   def estimation_event_expense_backup
     role = cek_roles 'Admin Keuangan'
     if role
