@@ -3,6 +3,7 @@ class Taxinvoice < ActiveRecord::Base
 	belongs_to :customer
 	belongs_to :office
 	belongs_to :company
+	belongs_to :user
 
 	has_many :taxinvoiceitems
 	has_many :taxgenericitems

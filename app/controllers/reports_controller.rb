@@ -2679,24 +2679,27 @@ class ReportsController < ApplicationController
       role = cek_roles 'Admin Keuangan, Auditor'
       
     if role
+      
       @month = params[:month]
       @month = "%02d" % Date.today.month.to_s if @month.nil?
+      @day = "01"
       @year = params[:year]
       @year = Date.today.year if @year.nil?
 
       @monthEnd = params[:monthEnd]
       @monthEnd = "%02d" % Date.today.month.to_s if @monthEnd.nil?
+      @dayEnd = "31"  
       @yearEnd = params[:yearEnd]
       @yearEnd = Date.today.year if @yearEnd.nil?
  
       @taxinvoices = Taxinvoice.active.joins(:customer)
+
+      @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'DD-MM-YYYY') BETWEEN ? AND ?", "#{@day}-#{@month}-#{@year}","#{@dayEnd}-#{@monthEnd}-#{@yearEnd}")
  
       @customer = Customer.find(params[:customer_id]) rescue nil
 
       if @customer.present?
-        @taxinvoices = @taxinvoices.where("to_char(date, 'MM-YYYY') BETWEEN ? AND ?", "#{@month}-#{@year}","#{@monthEnd}-#{@yearEnd}").where("paiddate is null AND customer_id = ?", @customer.id)
-      else
-        @taxinvoices = @taxinvoices.where("to_char(date, 'MM-YYYY') BETWEEN ? AND ?", "#{@month}-#{@year}","#{@monthEnd}-#{@yearEnd}").where("paiddate is null")
+        @taxinvoices = @taxinvoices.where("customer_id = ?", @customer.id)
       end  
       
       if params[:due_date_order].present?
