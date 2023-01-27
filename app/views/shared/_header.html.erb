@@ -49,6 +49,17 @@
 				<%= link_to_if (checkrole 'Admin Operasional'), "Kasir", "/cashiers" %>
 			</li>
 
+			<li class="<%= @section == 'ops' ? 'on' : '' %>">
+			<%= link_to_if (checkrole 'Admin Operasional'), "OPS", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('ops');".html_safe %>
+			
+				<ul id="sub-ops" class="submenu" style="width:220px;">
+					<li><%= link_to_if (checkrole 'Admin Operasional'), "Request Kereta", "/invoices/trainrequest" %></li>
+					<li><%= link_to_if (checkrole 'Admin Operasional'), "Berat Muat", "/invoices/add_weight" %></li>
+					<!-- <li><%= link_to_if (checkrole 'Admin Operasional'), "Call Mekanik", "/mechaniclogs" %></li> -->
+					<!-- <li><%= link_to_if (checkrole 'Admin Operasional'), "Asuransi", "#" %></li> -->
+				</ul>
+			</li>
+
 			<li class="<%= @section == 'transactions' ? 'on' : '' %>">
 				<%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan, Admin HRD, Operasional BKK, BKK Standart, BKK Kosongan, BKK Kereta'), "Kas", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('transactions');".html_safe %>
 

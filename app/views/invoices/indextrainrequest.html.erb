@@ -1,0 +1,177 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+ 
+		<h1>OPS / <a href="<%=invoices_path%>">Request Kereta</a> / Index</h1>
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="" style="margin-top: 3px; ">
+				<label for="date" style="margin-right: 13px;">Pilih Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>"/>
+				<label for="" style="margin: 0 10px">s/d</label>
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>"/>
+				<label for="event_id" style="margin: 0 10px">No. DO</label>
+				<input type="text" name="event_id" class="half middle" value="<%=@event_id%>" style="width: 80px;">&nbsp;&nbsp;
+				<label for="office_id" class="middle">Pilih Kantor</label>
+                <select name="office_id" class="half middle ">
+                    <option value="">All</option>
+                    <% @offices.each do |office| %>
+                    <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
+                    <% end %>
+                </select> 
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<input class="submit" type="submit" value="Filter" style="vertical-align: bottom; margin-top: 2px;">
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view">
+			<tr>
+				<th width="50">Tgl.</th>
+				<th width="50">No.DO</th>
+				<th width="80">No.BKK</th>
+				<th>Keterangan</th>
+				<th width="40">Ktr</th>
+				<th width="80">ISO/CONTAINER</th>
+				<th width="80">No. Pol</th>
+				<th width="40">ST</th>
+				<th width="40">Muat</th>
+				<th width="40">BKR</th>
+				<th width="40">Tonage</th>
+				<th width="50">User</th>
+
+			</tr>
+
+			<% inv = Invoice.where("invoice_id IS NULL and deleted IS false").pluck(:invoice_id) %>
+
+			<% @invoices.each do |invoice| %>
+				<% if inv.index(invoice.id) == nil %>
+				<tr>
+					<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
+					<td><%=invoice.event_id rescue nil%></td>
+					<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice, :train => true) %></td>
+					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+					<% if 
+					# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
+					invoice.office.abbr == '' 
+					%>
+                    <td class="red"><%=invoice.office.abbr%></td>    
+                    <% else %>
+                    <td><%=invoice.office.abbr%></td>
+                    <% end %>
+					<td>
+					<% if (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) %>
+						<% if invoice.isotank.category == 'SEWA' %>
+							<span style="color: blue;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (SW)</span>
+						<% elsif invoice.isotank.category == 'FREEUSE' %>
+							<span style="color: red;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (FR)</span>
+						<% else %>
+							<%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (BL)
+						<% end %>
+					<% end %>
+					<% if (invoice.container_id.present? && invoice.container_id.to_i != 0) %>
+						<% if invoice.container.category == 'SEWA' %>
+							<span style="color: blue;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (SW)</span>
+						<% elsif invoice.container.category == 'FREEUSE' %>
+							<span style="color: red;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (FR)</span>
+						<% else %>
+							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (BL)
+						<% end %>
+					<% end %> 
+					</td>
+					<td>
+						
+						<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+							<strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+						<%else%>
+							<%=invoice.vehicle.current_id rescue nil%>	
+						<% end %>
+					</td>
+					<td>
+						<%=invoice.event.station.name rescue nil%>
+					</td>
+					<td>
+						<%=invoice.event.load_date.strftime('%d.%m') rescue nil%>
+					</td>
+					<td>
+						<%=invoice.event.unload_date.strftime('%d.%m') rescue nil%>
+					</td>
+					<td class="right">
+						<%=invoice.event.estimated_tonage rescue nil%>
+					</td>
+					<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
+				</tr>
+					<% if invoice.invoices.any? %>
+						<% invoice = invoice.invoices.first %>
+						<tr>
+						<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
+						<td><%=invoice.event_id rescue nil%></td>
+						<td><span class="left"><i class="icon-signout"></i></span><span>   <%= link_to zeropad(invoice.id), edit_invoice_path(invoice, :train => true) %></span></td>
+						<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+						<% if 
+						# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
+						invoice.office.abbr == '' 
+						%>
+						<td class="red"><%=invoice.office.abbr%></td>    
+						<% else %>
+						<td><%=invoice.office.abbr%></td>
+						<% end %>
+						<td>
+						<% if (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) %>
+							<% if invoice.isotank.category == 'SEWA' %>
+								<span style="color: blue;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (SW)</span>
+							<% elsif invoice.isotank.category == 'FREEUSE' %>
+								<span style="color: red;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (FR)</span>
+							<% else %>
+								<%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (BL)
+							<% end %>
+						<% end %>
+						<% if (invoice.container_id.present? && invoice.container_id.to_i != 0) %>
+							<% if invoice.container.category == 'SEWA' %>
+								<span style="color: blue;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (SW)</span>
+							<% elsif invoice.container.category == 'FREEUSE' %>
+								<span style="color: red;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (FR)</span>
+							<% else %>
+								<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (BL)
+							<% end %>
+						<% end %> 
+						</td>
+						<td>
+							<%=invoice.vehicle.current_id rescue nil%>
+							<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+								<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+							<% end %>
+						</td>
+						<td>
+							<%=invoice.event.station.name rescue nil%>
+						</td>
+						<td>
+							<%=invoice.event.load_date.strftime('%d.%m') rescue nil%>
+						</td>
+						<td>
+							<%=invoice.event.unload_date.strftime('%d.%m') rescue nil%>
+						</td>
+						<td class="right">
+							<%=invoice.event.estimated_tonage rescue nil%>
+						</td>
+						<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
+					</tr>
+					<% end %>
+				<% end %>
+				<% end %>
+		
+		</table>
+
+	</div>
+
+</div>

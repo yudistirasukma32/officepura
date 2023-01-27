@@ -9,6 +9,7 @@
         <th class="{sorter: false}">Keterangan</th>
         <th width="80">NoPol</th> 
         <th width="150">Pelanggan</th>
+        <th width="50">Muat</th> 
         <th width="70" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">S.Jalan</th>
         <th width="70" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;" title="Surat Tagihan sudah di Invoice">SDH INV.
         <!-- <i class="icon-lock red icon-large" title="Surat Tagihan sudah di Invoice"></i> -->
@@ -73,8 +74,24 @@
             <%= second_nopol.nil? ? '' : ' ' +second_nopol %>
             </td> 
             <td><%=invoice.customer.name%></td>
+            <td class="right">
             <% if invoice.taxinvoiceitems.any? %>
-            <td align="center"><%=invoice.taxinvoiceitems.where("money(total) > money(0)").count%> / <%= qty%></td>
+                <%=invoice.taxinvoiceitems[0].weight_gross rescue nil%>
+            <% else %>
+                <%=invoice.weight_gross rescue nil%>   
+            <% end %>
+            </td>
+            <% if invoice.taxinvoiceitems.any? %>
+            <td align="center">
+                <%=invoice.taxinvoiceitems.where("money(total) > money(0)").count%> / <%= qty%>
+                <% if invoice.taxinvoiceitems[0].rejected %>
+                    <a style="text-align: center;
+                    font-size: 11px;
+                    float: none;" title="<%= invoice.taxinvoiceitems[0].reject_reason %>">
+                    <span style="background: red;padding: 2px 5px;border-radius: 5px;font-size: 11px;color: white;opacity: 0.65;line-height: 1.75;">TOLAKAN</span>
+                    </a>
+                <% end %>
+            </td>
             <% else %>
             <td align="center">0 / <%= qty%></i></td>
             <% end %>
@@ -122,6 +139,7 @@
             <% end %>    
             </td> 
             <td><%=inv_bongkar[0].customer.name%></td>
+            <td class="right"><%=invoice.weight_gross rescue nil%></td>
         </tr>
         <% end %>
         
@@ -132,7 +150,7 @@
         <% end %>   
     <% end %>
         <tr>
-            <td colspan="6"><strong>TOTAL</strong></td>
+            <td colspan="7"><strong>TOTAL</strong></td>
             <td align="center"><%= total_sj_done %> / <%= total_sj %></td>
             <td align="center"><%= total_inv_done %> / <%= total_sj_done %></td>
             <td>&nbsp;</td>

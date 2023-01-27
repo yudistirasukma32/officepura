@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20221228014907) do
+ActiveRecord::Schema.define(:version => 20230121002129) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -478,8 +478,8 @@ ActiveRecord::Schema.define(:version => 20221228014907) do
   end
 
   create_table "invoices", :force => true do |t|
-    t.boolean   "deleted",                                                      :default => false
-    t.boolean   "enabled",                                                      :default => true
+    t.boolean   "deleted",                                                          :default => false
+    t.boolean   "enabled",                                                          :default => true
     t.date      "date"
     t.string    "ship_name"
     t.integer   "driver_id"
@@ -488,52 +488,56 @@ ActiveRecord::Schema.define(:version => 20221228014907) do
     t.integer   "route_id"
     t.integer   "vehiclegroup_id"
     t.integer   "quantity"
-    t.integer   "gas_litre",                                                    :default => 0
-    t.integer   "gas_voucher",                                                  :default => 0
-    t.integer   "gas_leftover",                                                 :default => 0
-    t.float     "insurance_rate",                                               :default => 0.0
+    t.integer   "gas_litre",                                                        :default => 0
+    t.integer   "gas_voucher",                                                      :default => 0
+    t.integer   "gas_leftover",                                                     :default => 0
+    t.float     "insurance_rate",                                                   :default => 0.0
     t.string    "trip_type"
     t.text      "description"
     t.integer   "office_id"
     t.integer   "invoice_id"
-    t.timestamp "created_at",       :limit => 6,                                                    :null => false
-    t.timestamp "updated_at",       :limit => 6,                                                    :null => false
-    t.decimal   "gas_cost",                      :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "gas_allowance",                 :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "driver_allowance",              :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "ferry_fee",                     :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "tol_fee",                       :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "price_per",                     :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "insurance",                     :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "total",                         :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "misc_allowance",                :precision => 19, :scale => 2, :default => 0.0
+    t.timestamp "created_at",           :limit => 6,                                                    :null => false
+    t.timestamp "updated_at",           :limit => 6,                                                    :null => false
+    t.decimal   "gas_cost",                          :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "gas_allowance",                     :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "driver_allowance",                  :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "ferry_fee",                         :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "tol_fee",                           :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "price_per",                         :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "insurance",                         :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "total",                             :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "misc_allowance",                    :precision => 19, :scale => 2, :default => 0.0
     t.integer   "user_id"
-    t.decimal   "helper_allowance",              :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "need_helper",                                                  :default => false
+    t.decimal   "helper_allowance",                  :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "need_helper",                                                      :default => false
     t.integer   "deleteuser_id"
-    t.integer   "gas_start",                                                    :default => 0
+    t.integer   "gas_start",                                                        :default => 0
     t.string    "spk_number"
-    t.decimal   "incentive",                     :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "invoicetrain",                                                 :default => false
+    t.decimal   "incentive",                         :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "invoicetrain",                                                     :default => false
     t.string    "driver_phone"
     t.integer   "isotank_id"
-    t.string    "transporttype",                                                :default => "TRUK"
+    t.string    "transporttype",                                                    :default => "TRUK"
     t.integer   "port_id"
     t.integer   "ship_id"
-    t.decimal   "train_fee",                     :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "train_fee",                         :precision => 19, :scale => 2, :default => 0.0
     t.integer   "container_id"
     t.string    "tanktype"
     t.string    "container_number"
     t.string    "isotank_number"
     t.integer   "event_id"
-    t.boolean   "premi",                                                        :default => false
-    t.decimal   "premi_allowance",               :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "premi",                                                            :default => false
+    t.decimal   "premi_allowance",                   :precision => 19, :scale => 2, :default => 0.0
     t.integer   "routetrain_id"
     t.integer   "operator_id"
     t.integer   "shipoperator_id"
     t.integer   "routeship_id"
-    t.boolean   "invoicemultimode",                                             :default => false
+    t.boolean   "invoicemultimode",                                                 :default => false
     t.string    "cargo_type"
+    t.string    "vehicle_duplicate"
+    t.integer   "vehicle_duplicate_id"
+    t.integer   "weight_gross",                                                     :default => 0
+    t.date      "load_date"
   end
 
   add_index "invoices", ["date", "customer_id", "event_id", "invoicetrain"], :name => "invoice_events"
@@ -1262,6 +1266,8 @@ ActiveRecord::Schema.define(:version => 20221228014907) do
     t.boolean   "is_net",                                                      :default => false
     t.integer   "user_id"
     t.string    "note"
+    t.boolean   "rejected",                                                    :default => false
+    t.string    "reject_reason"
   end
 
   create_table "taxinvoices", :force => true do |t|

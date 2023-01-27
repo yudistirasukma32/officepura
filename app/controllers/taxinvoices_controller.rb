@@ -74,7 +74,7 @@ class TaxinvoicesController < ApplicationController
 
     if @customer
       romenumber = getromenumber (Date.today.month.to_i)
-      @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0)").order(:date, :sku_id)
+      @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date, :sku_id)
       @taxinvoice.period_start = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).minimum(:date) || Date.today.strftime('%d-%m-%Y')
       @taxinvoice.period_end = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).maximum(:date) || Date.today.strftime('%d-%m-%Y')
       @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
@@ -196,7 +196,7 @@ class TaxinvoicesController < ApplicationController
         @taxinvoice.long_id = params[:long_id]
       else
         romenumber = getromenumber (Date.today.month.to_i)
-        @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0)").order(:date)
+        @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date)
         @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
         @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / ' + Date.today.year.to_s 
         @taxinvoice = Taxinvoice.new

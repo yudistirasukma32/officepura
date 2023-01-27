@@ -1,8 +1,8 @@
 class TaxinvoiceitemsController < ApplicationController
 	include ApplicationHelper
   include ActionView::Helpers::NumberHelper
-	layout "application", :except => [:updateitems]
-  protect_from_forgery :except => [:updateitems]
+	layout "application", :except => [:updateitems, :rejected]
+  protect_from_forgery :except => [:updateitems, :rejected]
   before_filter :authenticate_user!, :set_section
 
   def set_section
@@ -347,7 +347,20 @@ class TaxinvoiceitemsController < ApplicationController
   def destroy
     Taxinvoiceitem.destroy(params[:id])
     redirect_to request.referer
-  end 
+  end
+  
+  def rejected
+    inputs = params[:taxinvoiceitems]
+    # render json: inputs
+    @taxinvoiceitem = Taxinvoiceitem.find(params[:id])
+    @taxinvoiceitem.rejected = inputs[:rejected]
+    @taxinvoiceitem.reject_reason = inputs[:reject_reason] 
+
+    if @taxinvoiceitem.save
+      redirect_to("/taxinvoiceitems/new/" + @taxinvoiceitem.invoice_id.to_s, :notice => 'Data Surat Tagihan sukses diupdate.')
+    end
+
+  end
   
   #testing
 

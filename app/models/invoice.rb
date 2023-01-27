@@ -37,7 +37,7 @@ class Invoice < ActiveRecord::Base
   				:invoice_id, :misc_allowance, :user_id, :helper_allowance, :need_helper, :deleteuser_id, :spk_number, :invoicetrain, :isotank_id, 
 				:driver_phone, :transporttype, :port_id, :ship_id, :train_fee, :container_id, :tanktype, :isotank_number, :container_number, :event_id, 
 				:premi, :premi_allowance, :routetrain_id, :operator_id, :shipoperator_id, :routeship_id, :invoicemultimode, :cargo_type, :losing,
-				:vehicle_duplicate, :vehicle_duplicate_id
+				:vehicle_duplicate, :vehicle_duplicate_id, :weight_gross, :load_date
 
   	def sum_gasleftover
   		self.gas_leftover * self.gas_cost

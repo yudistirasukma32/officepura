@@ -233,11 +233,61 @@
 				<input type="file" name="attachment[file]"/>
 			</div>
 
-			<div class="actions">
+			<div class="actions" style="text-align: center; padding: 1rem; margin-bottom: 1.5rem;">
 				<input type="submit" value="Simpan File" />
 			</div>
 
 			</form>
+
+      <% if @invoice.taxinvoiceitems.where("money(total) > money(0) and taxinvoice_id IS NULL and deleted = false").any? %>
+
+      <h3 class="zone" style="font-weight: bold; color: red; margin: 0.25rem 0;">Surat Jalan Tolakan</h3>
+      
+      <form action="/taxinvoiceitems/rejected" method="post" style="margin-bottom: 2rem;">
+
+      <% @invoice.taxinvoiceitems.order(:id).each_with_index do |taxinvoiceitem,i| %>
+
+        <% if taxinvoiceitem.rejected %>
+
+        <div class="field-row" style="width: 300px;">
+        <label for="rejected">Tolakan? &nbsp;</label>
+        <input type="checkbox" id="rejected" name="taxinvoiceitems[rejected]" value="1" checked disabled/>
+        </div>
+         
+        <label for="reject_reason" style="padding-right: 20px;line-height: 26px;">Alasan Tolakan</label>
+        <br/>
+        <textarea id="reject_reason" name="taxinvoiceitems[reject_reason]" style="max-width: 280px;
+        min-width: 280px;" readonly><%= taxinvoiceitem.reject_reason %></textarea>
+ 
+        <br/><br/>
+
+        <% else %>
+
+        <div class="field-row" style="width: 300px;">
+        <label for="reject_reason" style="padding-right: 20px;line-height: 26px;">Tolakan? &nbsp;</label>
+        <input type="checkbox" id="rejected" name="taxinvoiceitems[rejected]" value="1" onchange="javascript: taxinvoiceitemsReject();" />
+        </div>
+        <br/><br/><br/><br/>
+
+        <div id="rejectbox" style="display: none;">
+          <label for="reject_reason" style="padding-right: 20px;line-height: 26px;">Alasan Tolakan</label>
+          <textarea id="reject_reason" name="taxinvoiceitems[reject_reason]" style="max-width: 280px;
+          min-width: 280px;" require></textarea>
+
+          <input type="hidden" name="id" value="<%= taxinvoiceitem.id %>">
+
+          <div class="actions" style="text-align: center; padding: 1rem; margin-bottom: 1.5rem;">
+            <input type="submit" value="Konfirmasi Tolakan" />
+          </div>
+        </div>
+
+       <% end %> 
+
+      <% end %>
+
+      </form>
+      
+      <% end %>
 
 		<% end %>
 	</div>
@@ -278,8 +328,32 @@
 		<td><%=i+1%>.</td>
     <td><input type="text" name="taxinvoiceitems[date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
 		<td><input type="text" name="taxinvoiceitems[sku_id_<%=taxinvoiceitem.id%>]" style="width:120px;" class="<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.sku_id%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
-    <td><input type="text" name="taxinvoiceitems[load_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=load_date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
-		<td><input type="text" id="weight_gross_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[weight_gross_<%=taxinvoiceitem.id%>]" class="short weight-field<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.weight_gross%>" onchange="javascript:getWeightLost('<%=taxinvoiceitem.id%>')" onkeypress="javascript:return isMoneyKey(this);" <% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %>/></td>
+    <td>
+      <%
+        default_load_date = 0
+        if taxinvoiceitem.load_date.nil?
+          if !@invoice.load_date.nil?
+            default_load_date = @invoice.load_date.strftime('%d-%m-%Y')
+          end
+        else
+          default_load_date = load_date
+        end
+      %>
+      <input type="text" name="taxinvoiceitems[load_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=default_load_date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> />
+    </td>
+		<td>
+      <%
+        default_weight_gross = 0
+        if taxinvoiceitem.weight_gross == 0
+          if @invoice.weight_gross != 0
+            default_weight_gross = @invoice.weight_gross
+          end
+        else
+          default_weight_gross = taxinvoiceitem.weight_gross
+        end
+      %>
+      <input type="text" id="weight_gross_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[weight_gross_<%=taxinvoiceitem.id%>]" class="short weight-field<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=default_weight_gross%>" onchange="javascript:getWeightLost('<%=taxinvoiceitem.id%>')" onkeypress="javascript:return isMoneyKey(this);" <% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %>/>
+    </td>
     <td><input type="text" name="taxinvoiceitems[unload_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=unload_date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
 		<td><input type="text" id="weight_net_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[weight_net_<%=taxinvoiceitem.id%>]" class="short weight-field<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.weight_net%>" onchange="javascript:getWeightLost('<%=taxinvoiceitem.id%>')" onkeypress="javascript:return isMoneyKey(this);" <% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
 		<td align="right"><span id="txt_weight_lost_<%=taxinvoiceitem.id%>"><%=taxinvoiceitem.weight_gross - taxinvoiceitem.weight_net%></span></td>

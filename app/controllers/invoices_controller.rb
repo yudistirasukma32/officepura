@@ -2,7 +2,7 @@ class InvoicesController < ApplicationController
   include ApplicationHelper
   include ActionView::Helpers::NumberHelper
 	layout "application", :except => [:get_routes, :get_allowances, :get_vehicles, :get_vehicle, :get_vehiclegroupid, :get_trainroute, :get_trainroute2, :get_shiproute, :get_shiproute2, :get_routesbyoffice, :get_tanktype]
-  protect_from_forgery :except => [:add, :updateinvoice]
+  protect_from_forgery :except => [:add, :updateinvoice, :updateaddweight]
   before_filter :authenticate_user!, :set_section
 
   def set_section
@@ -285,6 +285,88 @@ class InvoicesController < ApplicationController
         @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
+    end
+
+  end
+
+  def indexaddweight
+    @section = "ops"
+    @where = "addweight"
+    @date = params[:date]
+    @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+    # @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date).order(:id)
+    @invoices = Invoice.where("date = ? and deleted = false", @date.to_date)
+    
+    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+
+    @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
+    # fetch_excel()
+      
+    @office_id = params[:office_id]
+      
+    if @office_id.present? and @office_id != "all"
+        @invoices = @invoices.where("office_id = ?", @office_id)
+    end
+      
+    @offices = Office.active.order('id asc')  
+    @office_role = []
+      
+    if checkrole 'BKK Kantor Sidoarjo'
+        @office_role.push(1)
+    end
+    if checkrole 'BKK Kantor Jakarta'
+        @office_role.push(2)
+    end
+    if checkrole 'BKK Kantor Probolinggo'
+        @office_role.push(3)
+    end    
+    if checkrole 'BKK Kantor Semarang'
+        @office_role.push(4)
+    end
+    if checkrole 'BKK Kantor Surabaya'
+      @office_role.push(5)
+    end
+    if checkrole 'BKK Kantor Sumatera'
+      @office_role.push(6)
+    end
+    # if checkrole 'BKK Cargo Padat'
+    #   @office_role.push(7)
+    # end
+    
+    if checkrole 'Operasional BKK'
+        @offices = @offices.where('id != 7').order('id asc')
+    else
+        @offices = @offices.where('id IN (?)', @office_role).order('id asc')
+    end
+        
+  
+    respond_to :html
+  end
+
+  def add_weight
+    @section = "ops"
+    @where = "addweight"
+    @invoice = Invoice.find(params[:invoice_id])
+
+    if @invoice.load_date.nil?
+      @invoice.load_date = Date.today
+    end
+
+  end
+
+  def updateaddweight
+
+    inputs = params[:invoice]
+
+    # render json: inputs
+
+    @invoice = Invoice.find(inputs[:invoice_id])
+    
+    @invoice.load_date = inputs[:load_date]
+    @invoice.weight_gross = inputs[:weight_gross] 
+
+    if @invoice.save
+      redirect_to("/invoices/add_weight/"+@invoice.id.to_s)
     end
 
   end
@@ -1000,6 +1082,77 @@ class InvoicesController < ApplicationController
 
   def indexinvoicetrain
     @where = "indexinvoicetrain"
+    @date = params[:date]
+    @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+    @enddate =  @enddate.nil? ? Date.today.strftime('%d-%m-%Y') : params[:enddate]
+    @container_id = params[:container_id]
+    @isotank_id = params[:isotank_id]
+    @event_id = params[:event_id]
+
+    @invoices = Invoice.where("invoicetrain = true and invoice_id IS NULL AND date between ? and ?", @date.to_date, @enddate.to_date).order(:id)
+        
+    @office_id = params[:office_id]
+  
+    if @office_id.present? and @office_id != ''
+        @invoices = @invoices.where("office_id = ?", @office_id)
+    end
+      
+    @offices = Office.active.order('id asc')  
+    @office_role = []
+      
+    if checkrole 'BKK Kantor Sidoarjo'
+        @office_role.push(1)
+    end
+    if checkrole 'BKK Kantor Jakarta'
+        @office_role.push(2)
+    end
+    if checkrole 'BKK Kantor Probolinggo'
+        @office_role.push(3)
+    end    
+    if checkrole 'BKK Kantor Semarang'
+        @office_role.push(4)
+    end
+    if checkrole 'BKK Kantor Surabaya'
+      @office_role.push(5)
+    end
+    if checkrole 'BKK Kantor Sumatera'
+      @office_role.push(6)
+    end
+    # if checkrole 'BKK Cargo Padat'
+    #   @office_role.push(7)
+    # end
+    
+    if checkrole 'Operasional BKK'
+        @offices = @offices.where('id != 7').order('id asc')
+    else
+        @offices = @offices.where('id IN (?)', @office_role).order('id asc')
+    end
+
+    if @isotank_id.present?
+      @invoices = @invoices.where('isotank_id = ?', @isotank_id)
+    end
+
+    if @container_id.present?
+      @invoices = @invoices.where('container_id = ?', @container_id)
+    end
+
+    if @event_id.present?
+      @invoices = @invoices.where('event_id = ?', @event_id)
+    end
+    
+    office_id = params[:office_id]
+
+    if office_id.present?
+        @invoices = @invoices.where("office_id = ?", office_id)
+    end
+
+    respond_to :html
+
+  end
+
+  def indextrainrequest
+    @section = 'ops'
+    @where = "indextrainrequest"
     @date = params[:date]
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
     @enddate =  @enddate.nil? ? Date.today.strftime('%d-%m-%Y') : params[:enddate]

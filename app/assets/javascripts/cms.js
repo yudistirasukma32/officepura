@@ -2688,6 +2688,14 @@ if ($('#invoice_cargo_type_padat').length > 0) {
 	});
 }
 
+function taxinvoiceitemsReject(){
+	if($('#rejected').prop('checked')){
+		$('#rejectbox').show();
+	} else {
+		$('#rejectbox').hide();
+	}
+}
+
 function checkTank(name) {
 	if (name == 'ISOTANK') {
         $(".isotank_id").show();

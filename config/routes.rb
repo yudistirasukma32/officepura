@@ -233,7 +233,13 @@ OfficePuraErp::Application.routes.draw do
       get 'inReportEnable'
       get 'inReportDisable'
     end
-  end  
+  end
+  
+  match 'invoices/add_weight' => 'invoices#indexaddweight'
+  match 'invoices/add_weight/:invoice_id' => 'invoices#add_weight'
+  post 'invoices/updateaddweight/' => 'invoices#updateaddweight'
+
+  match 'invoices/trainrequest' => 'invoices#indextrainrequest'
 
   match 'invoices/indexadd' => 'invoices#indexadd'
   match 'invoices/add(/:invoice_id)' => 'invoices#add'
@@ -463,6 +469,7 @@ OfficePuraErp::Application.routes.draw do
     match 'taxinvoiceitems/new/:invoice_id(/:update)' => 'taxinvoiceitems#new'
     match 'taxinvoiceitems/print(/:invoice_id)' => 'taxinvoiceitems#print'
     post 'taxinvoiceitems/updateitems' => 'taxinvoiceitems#updateitems'
+    post 'taxinvoiceitems/rejected' => 'taxinvoiceitems#rejected'
     get 'taxinvoiceitems/getCustomerbyDate/:date' => 'taxinvoiceitems#getCustomerbyDate'
     match 'taxinvoices/new(/:customer_id)' => 'taxinvoices#new'
     match 'taxinvoices/updateitems' => 'taxinvoices#updateitems'
