@@ -54,6 +54,11 @@ class Invoice < ActiveRecord::Base
 	def images
 		attachments.where(:media => false).order('id DESC')
 	end
+
+	def thousand(number)
+		extend ActionView::Helpers::NumberHelper
+		number_with_delimiter(number, :delimiter => '.')
+	end
 	
 	def get_tonage(offset, customer_35 = [])
 		# offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
@@ -61,7 +66,7 @@ class Invoice < ActiveRecord::Base
 			if (self.route.price_per || 0) >= offset 
 				tonage = "Borongan"
 			else
-				tonage = self.event.estimated_tonage
+				tonage = thousand(self.event.estimated_tonage.to_i)
 			end
 		elsif self.route.present?
 			if (self.route.price_per || 0) >= offset 
@@ -95,7 +100,7 @@ class Invoice < ActiveRecord::Base
 			if (route.price_per || 0) >= offset
 				estimation = qty * (route.price_per.to_i || 0)
 			else
-				estimation = qty * self.event.estimated_tonage * (route.price_per.to_i || 0)
+				estimation = qty * self.event.estimated_tonage.to_i * (route.price_per.to_i || 0)
 			end
 		elsif route.present?
 			qty = self.quantity
@@ -119,7 +124,3 @@ class Invoice < ActiveRecord::Base
 	end
 
 end
-
-# price_per > offset = qty * price_per
-# invoicetrain.blank? & == 0 & price_per < offset
-# 
