@@ -30,6 +30,8 @@ class TaxinvoicesController < ApplicationController
     @year = params[:year]
     @year = Date.today.year if @year.nil?
 
+    @customers = Customer.where("id in (select customer_id from events where deleted = false and to_char(start_date, 'MM-YYYY') = ?)", "#{@month}-#{@year}").order(:name)
+
     @customer = Customer.find(params[:customer_id]) rescue nil
     @customer_id = @customer.id if @customer
 
