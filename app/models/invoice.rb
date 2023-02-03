@@ -89,7 +89,15 @@ class Invoice < ActiveRecord::Base
 		end
 		offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
 		route = self.route
-		if route.present?
+		qty = self.quantity
+
+		if (self.event.present? && event != 0)
+			if (route.price_per || 0) >= offset
+				estimation = qty * (route.price_per.to_i || 0)
+			else
+				estimation = qty * self.event.estimated_tonage * (route.price_per.to_i || 0)
+			end
+		elsif route.present?
 			qty = self.quantity
 			qty -= self.receiptreturns.where(:deleted => false).sum(:quantity) if self.receiptreturns.where(:deleted => false).any? 
 			if (route.price_per || 0) >= offset 
@@ -100,8 +108,6 @@ class Invoice < ActiveRecord::Base
 				estimation = qty * 20000 * (route.price_per.to_i || 0)
 			elsif (self.office_id == 7)
 				estimation = qty * 30000 * (route.price_per.to_i || 0)
-			elsif (self.customer_id == 184)
-				estimation = qty * 47 * (route.price_per.to_i || 0)
 			else
 				estimation = qty * 25000 * (route.price_per.to_i || 0)
 			end
