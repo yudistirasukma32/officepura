@@ -2832,14 +2832,14 @@ class ReportsController < ApplicationController
       
       @customer_id = params[:customer_id]
 
-      @customers = Customer.where('id in (select customer_id from invoices where deleted = false)').order(:name)
+      @customers = Customer.where('id in (select customer_id from events where deleted = false and start_date between ? and ?)', @startdate.to_date, @enddate.to_date).order(:name)
       
-      @eventsa = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date)
+      @eventsa = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date).order(:start_date)
 
       @transporttype = params[:transporttype]
       @tanktype = params[:tanktype]
 
-      if @customer_id.present?
+      if @customer_id.present? and @customer_id != 'all'
         @eventsa = @eventsa.where('customer_id = ?', @customer_id)
       end
 
@@ -2851,7 +2851,7 @@ class ReportsController < ApplicationController
         end
       end
 
-      if @tanktype.present?
+      if @tanktype.present? and @tanktype != 'all'
         @eventsa = @eventsa.where('tanktype = ?', @tanktype)
       end
  
