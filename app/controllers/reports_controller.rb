@@ -2830,20 +2830,33 @@ class ReportsController < ApplicationController
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
       
-      events = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date)
+      @customer_id = params[:customer_id]
+
+      @customers = Customer.where('id in (select customer_id from invoices where deleted = false)').order(:name)
+      
+      @eventsa = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date)
 
       @transporttype = params[:transporttype]
+      @tanktype = params[:tanktype]
+
+      if @customer_id.present?
+        @eventsa = @eventsa.where('customer_id = ?', @customer_id)
+      end
 
       if @transporttype.present? and @transporttype != 'all'
         if @transporttype == 'KERETA'
-          events = events.where('invoicetrain = true')
+          @eventsa = @eventsa.where('invoicetrain = true')
         else
-          events = events.where('invoicetrain = false')
+          @eventsa = @eventsa.where('invoicetrain = false')
         end
       end
 
+      if @tanktype.present?
+        @eventsa = @eventsa.where('tanktype = ?', @tanktype)
+      end
+ 
       if params[:office_id].present? && params[:office_id] != 'all'
-        events = events.where(office_id: params[:office_id])
+       @eventsa = @eventsa.where(office_id: params[:office_id])
       end
       
       global_supir = 0
@@ -2856,7 +2869,10 @@ class ReportsController < ApplicationController
       global_total_estimation = 0
       solar_price = Setting.find_by_name("Harga Solar").value.to_i
       customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
-      @events = events.map do |event|
+
+      # render json: @eventsa
+
+      @events = @eventsa.map do |event|
         route = event.route
         price_per = route.price_per.to_i rescue 0
         price_per_type = route.price_per_type rescue 'KG'
@@ -2872,18 +2888,25 @@ class ReportsController < ApplicationController
         invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
 
         quantity = event.qty.to_i rescue 0
+        event_price_per_type = event.price_per_type rescue 'KG'
         event_tonage = event.estimated_tonage.to_i rescue 0
+
+        # if price_per >= offset 
+        #   estimation = quantity * price_per
+        # elsif customer_35.include? event.customer_id
+        #   estimation = quantity * 20000 * price_per
+        # elsif(price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg 
+        #   estimation = quantity * event_tonage * price_per
+        # else
+        #   estimation = quantity * event_tonage * price_per
+        # end
 
         if price_per >= offset 
           estimation = quantity * price_per
-        elsif(price_per_type == 'M3')
-          estimation = quantity * 47 * price_per
         elsif customer_35.include? event.customer_id
-          estimation = quantity * 20000 * price_per
-        elsif(price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg 
-          estimation = quantity * event_tonage * price_per
+          estimation = quantity * 20000 * price_per  
         else
-          estimation = quantity * event_tonage * price_per
+          estimation = quantity * event_tonage *  price_per
         end
         
         global_supir += supir

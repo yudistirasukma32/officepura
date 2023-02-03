@@ -325,6 +325,8 @@ OfficePuraErp::Application.routes.draw do
   get 'invoices/get_shiproute2/:operator_id' => 'invoices#get_shiproute2'
   get 'invoices/getroutesonly/:customer_id' => 'invoices#get_routesonly'
 
+  get 'events/estimate_tonage/:price_per_type' => 'events#getestimatedtonage'
+
   get 'invoices/getroutes/:customer_id' => 'invoices#get_routes'
   get 'invoices/getroutesbyoffice/:office_id' => 'invoices#get_routesbyoffice'
 

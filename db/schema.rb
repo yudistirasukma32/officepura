@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20230121002129) do
+ActiveRecord::Schema.define(:version => 20230203042512) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -391,6 +391,7 @@ ActiveRecord::Schema.define(:version => 20230121002129) do
     t.decimal   "downpayment_amount",              :precision => 19, :scale => 2
     t.date      "downpayment_date"
     t.boolean   "losing",                                                         :default => false
+    t.string    "price_per_type"
   end
 
   add_index "events", ["id", "start_date", "end_date", "customer_id"], :name => "index_events_on_customer_id"

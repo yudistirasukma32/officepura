@@ -1,7 +1,7 @@
 class EventsController < ApplicationController
 	include ApplicationHelper
   include ActionView::Helpers::NumberHelper
-	layout "application", :except => [:getevents]
+	layout "application", :except => [:getevents, :getestimatedtonage]
   before_filter :authenticate_user!, :set_section
 
   def set_section
@@ -9,7 +9,25 @@ class EventsController < ApplicationController
     query = params[:type] ? "-cancelled" : ""
     @where = "events" + query
     @estimated_tonage = [20000, 25000, 30000, 35000, 40000]
+    @estimated_tonage_lt = [24000, 26000, 28000, 30000, 32000]
+    @estimated_tonage_kg = [20000, 25000, 30000, 35000, 40000]
+    @estimated_tonage_m3 = [45, 47]
+    @price_per_types = ["KG", "LITER", "M3"]
     @tanktype = ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER', 'TRUK BOX']
+  end
+
+  def getestimatedtonage
+    if params[:price_per_type] == 'M3'
+      @estimated_tonage = @estimated_tonage_m3
+      render :json => { :success => true, :html => render_to_string(:partial => "events/estimatedtonage", :layout => false) }.to_json; 
+    elsif params[:price_per_type] == 'KG'
+      @estimated_tonage = @estimated_tonage_kg
+      render :json => { :success => true, :html => render_to_string(:partial => "events/estimatedtonage", :layout => false) }.to_json; 
+    elsif params[:price_per_type] == 'LITER'
+      @estimated_tonage = @estimated_tonage_lt
+      render :json => { :success => true, :html => render_to_string(:partial => "events/estimatedtonage", :layout => false) }.to_json; 
+    end
+    
   end
 
   def index

@@ -57,7 +57,13 @@ class Invoice < ActiveRecord::Base
 	
 	def get_tonage(offset, customer_35 = [])
 		# offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
-		if self.route.present?
+		if (self.event.present? && event != 0)
+			if (self.route.price_per || 0) >= offset 
+				tonage = "Borongan"
+			else
+				tonage = self.event.estimated_tonage
+			end
+		elsif self.route.present?
 			if (self.route.price_per || 0) >= offset 
 				tonage = "Borongan"
 			elsif customer_35.include? self.customer_id
@@ -69,6 +75,7 @@ class Invoice < ActiveRecord::Base
 			else
 				tonage = "25.000"
 			end
+
 		else
 			tonage = 0
 		end
@@ -93,6 +100,8 @@ class Invoice < ActiveRecord::Base
 				estimation = qty * 20000 * (route.price_per.to_i || 0)
 			elsif (self.office_id == 7)
 				estimation = qty * 30000 * (route.price_per.to_i || 0)
+			elsif (self.customer_id == 184)
+				estimation = qty * 47 * (route.price_per.to_i || 0)
 			else
 				estimation = qty * 25000 * (route.price_per.to_i || 0)
 			end

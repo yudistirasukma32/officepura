@@ -46,29 +46,22 @@
   </div>
 
   <div class="field-row">
-    <%= f.label :invoicetrain, "Multimoda" %>
+    <%= f.label :invoicetrain, "Moda" %>
     <% if active_node == "edit" %>
-        <%= f.label :invoicetrain, :value => "false", :class => 'checkbox', :style => 'width: 150px;' do %>
-          <%= f.radio_button :invoicetrain, false, :checked => (@event.invoicetrain == false ? true : false), class: "moda-standart" %> Industri/Distribusi
+        <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, false, :checked => (@event.invoicetrain == false ? true : false), class: "moda-standart" %> Standart
         <% end %>
         <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
           <%= f.radio_button :invoicetrain, true, :checked => (@event.invoicetrain == true ? true : false),  class: "moda-kereta" %> Kereta
         <% end %>
-        <%= f.label :invoicetrain, :value => "losing", :class => 'checkbox' do %>
-          <%= f.radio_button :invoicetrain, false, :checked => (@event.losing == true ? true : false),  class: "modalosing" %> Losing
-        <% end %>
     <% else %>
-        <%= f.label :invoicetrain, :value => "false", :class => 'checkbox', :style => 'width: 150px;' do %>
-          <%= f.radio_button :invoicetrain, false, :checked => true, class: "moda-standart"  %> Industri/Distribusi
+        <%= f.label :invoicetrain, :value => "false", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, false, :checked => true, class: "moda-standart"  %> Standart
         <% end %>
         <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
           <%= f.radio_button :invoicetrain, true, class: "moda-kereta" %> Kereta
         <% end %>
-        <%= f.label :invoicetrain, :value => "losing", :class => 'checkbox' do %>
-          <%= f.radio_button :invoicetrain, false, class: "modalosing" %> Losing
-        <% end %>
     <% end %>
-    <input type="hidden" name="event[losing]" value="0" id="event_losing">
   </div>
 
     <% if @process == 'new' %>
@@ -77,7 +70,7 @@
         <%= f.label :operator_id, "Operator Kereta" %>
         <select id="event_operator_id" name="event[operator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteTrain2(this.value);">
           <option value="0">- Operator -</option>
-          <% Operator.active.each do |operator| %>
+          <% Operator.train.active.each do |operator| %>
           <option value="<%=operator.id%>"
             <% if operator.id == @event.operator_id %> selected="selected"<% end %>><%=operator.name%> (<%=operator.abbr%>)</option>
           <% end %>
@@ -204,38 +197,10 @@
   </div>
 
   <div class="field-row">
-    <%= f.label :price_per_type, "Satuan (Per)" %> 
-    <select id="event_price_per_type" name="event[price_per_type]" class="left half chzn-select" onchange="javascript:getTonage(this.value);">
-      <option value="0">- Satuan -</option>
-      <% @price_per_types.each do |price_per_type| %>
-      <option value="<%=price_per_type%>"
-        <% if price_per_type == @event.price_per_type %> selected="selected"<% end %>><%=price_per_type%></option>
-      <% end %>
-    </select>
+    <%= f.label :estimated_tonage, "Rata-rata Tonage"  %>
+    <%= f.select :estimated_tonage, options_for_select(@estimated_tonage.collect {|w| [w, w]}, (params[:estimated_tonage].present? ? params[:estimated_tonage] : @event.estimated_tonage)), {}, { :class => 'half chzn-select' } %>
+    <span style="position: absolute; margin-top: 0.5rem;"><strong>kg</strong></span>
   </div>
-
-  <% if @process == 'new' %>
-
-  <div id="div_tonage">
-    <div class="field-row">
-      <%= f.label :estimated_tonage, "Tonase" %>
-      <input type="text" class="double disabled" value="<%= !@event.estimated_tonage.nil? ? @event.estimated_tonage : 'Harap memilih satuan terlebih dahulu.' %>" />
-      <%= f.hidden_field :estimated_tonage, :value => @event.estimated_tonage %>
-      <small>Pilih Estimasi berdasarkan jenis satuan</small>
-    </div>
-  </div>
-
-  <% else %>
-
-  <div id="div_tonage">
-    <div class="field-row">
-      <%= f.label :estimated_tonage, "Est.Tonase" %>
-      <input type="text" class="double disabled" value="<%= !@event.estimated_tonage.nil? ? @event.estimated_tonage : 'Harap memilih satuan terlebih dahulu.' %>" />
-      <%= f.hidden_field :estimated_tonage, :value => @event.estimated_tonage %>
-    </div>
-  </div>
-
-  <% end %>
 
   <div class="field-row">
       <%= f.label :cargo_type, "Tipe Kargo" %>

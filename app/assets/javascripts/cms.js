@@ -692,6 +692,21 @@ function getVehiclesByOffice(office_id){
 
 }
 
+function getTonage(price_per_type) {
+	$.ajax({
+		type: "GET",
+		url: "/events/estimate_tonage/" + price_per_type,
+		success: function(data) {
+            console.log("/events/estimate_tonage/" + price_per_type);
+			$('#div_tonage').html(data.html);
+		},
+		request: function() {
+			$('#div_tonage').html('<em>Mengunduh Data</em>');			
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
+}
+
 function getAllowances() {
 	var ishelper = false;
 	if($("#need_helper").prop('checked'))

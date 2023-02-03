@@ -1,0 +1,10 @@
+<div class="field-row">
+  <label for="estimated_tonage">Est. Tonase</label>
+  <select class="half" name="event[estimated_tonage]" id="event_estimated_tonage">
+    <option value="0">- Pilih Tonase -</option>
+    <% @estimated_tonage.each do |tonage| %>
+    <option value="<%=tonage%>"><%=tonage%></option>
+    <% end %>
+  </select>
+  <small>Pilih Estimasi berdasarkan jenis satuan</small>
+</div>
