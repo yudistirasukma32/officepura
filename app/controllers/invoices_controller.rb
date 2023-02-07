@@ -434,6 +434,7 @@ class InvoicesController < ApplicationController
 
       @invoice.need_helper = inputs[:need_helper] == "Yes" ? true : false
       @invoice.premi = inputs[:premi] == "Yes" ? true : false
+      @invoice.is_insurance = inputs[:is_insurance] == "Yes" ? true : false
 
       @allowances = Allowance.where(:route_id => inputs[:route_id], :vehiclegroup_id => vehiclegroup_id, :deleted => false).first
 

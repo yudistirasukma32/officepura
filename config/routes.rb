@@ -311,6 +311,21 @@ OfficePuraErp::Application.routes.draw do
       get "print"
     end  
   end
+
+  resources :insurancevendors do
+    member do
+      get 'enable'
+      get 'disable'
+    end  
+  end
+
+  resources :insuranceexpenses do
+    member do
+      get 'enable'
+      get 'disable'
+      get "print"
+    end  
+  end
   
   get 'invoices/getcustomer/:route_id' => 'invoices#get_customer'
   get 'invoices/getvehiclegroup/:vehicle_id' => 'invoices#get_vehiclegroup'
@@ -608,6 +623,7 @@ OfficePuraErp::Application.routes.draw do
   match 'deletes/bankexpense' => 'deletes#bankexpense'
   match 'deletes/receiptreturn' => 'deletes#receiptreturn'
   match 'deletes/trainexpense' => 'deletes#trainexpense' 
+  match 'deletes/insuranceexpense' => 'deletes#insuranceexpense' 
 
 
   resources :containermemos do

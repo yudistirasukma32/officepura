@@ -12,7 +12,7 @@ class EventsController < ApplicationController
     @estimated_tonage_lt = [24000, 26000, 28000, 30000, 32000]
     @estimated_tonage_kg = [20000, 25000, 30000, 35000, 40000]
     @estimated_tonage_m3 = [45, 47]
-    @price_per_types = ["KG", "LITER", "M3"]
+    @price_per_types = ["KG", "LITER", "M3", "BORONGAN"]
     @tanktype = ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER', 'TRUK BOX']
   end
 

@@ -1,0 +1,196 @@
+<% if @invoice %>
+
+<%= form_for(@trainexpense) do |f| %>
+
+  <%= f.hidden_field :invoice_id, :value => @invoice.id %>
+
+  <div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
+
+    <h3>Biaya <%= @invoice.invoicetrain ? "Kereta" : ""%> BKK #<%=zeropad(@invoice.id)%></h3>
+
+    <table class="row-view no-border">
+        <tr>
+          <td width="120">Tanggal</td>
+          <td><%=@invoice.date.strftime('%d %B %Y')%> &nbsp;(KTR: <%=@invoice.office.name%>)</td>
+        </tr>
+        <tr>
+          <td>Pelanggan</td>
+          <td><%=@invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td><strong><%=@invoice.quantity%></strong> Rit: <%=@invoice.route.name%></td>
+        </tr>
+        <tr>
+          <td>No. DO</td>
+          <td><%=@invoice.event_id rescue nil%></td>
+        </tr>
+        <tr>
+          <td>Kendaraan</td>
+          <td><%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+        </tr>
+        <% if @invoice.isotank_id != 0 %>
+        <tr>
+          <td>No. Isotank</td>
+          <td id="strIsotank"><%=@invoice.isotank.isotanknumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@invoice.isotank_number.nil? %>
+          <tr>
+            <td>No. Isotank</td>
+            <td id="strIsotank"><%=@invoice.isotank_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+          
+      <% if @invoice.container_id != 0 %>
+        <tr>
+          <td>No. Kontainer</td>
+          <td id="strIsotank"><%=@invoice.container.containernumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@invoice.container_number.nil? %>
+          <tr>
+            <td>No. Kontainer</td>
+            <td id="strIsotank"><%=@invoice.container_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+        <tr>
+          <td>Supir</td>
+          <td><%=@invoice.driver.name%> (<%=zeropad(@invoice.driver.id)%>)<% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
+        </tr>
+        <% if !@invoice.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td><%= @invoice.description %></td>
+        </tr>   
+        <% end %>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Operator</td>
+            <td><%= @invoice.routetrain.operator.name rescue nil %></td>
+        </tr>
+        <tr>
+            <td>Jurusan Kereta</td>
+            <td><%= @invoice.routetrain.name rescue nil %></td>
+        </tr>
+        <tr>
+            <td>Tipe</td>
+            <td><%= @invoice.routetrain.container_type rescue nil %></td>
+        </tr>
+        <tr>
+          <td>Memo</td>
+          <td><%= f.text_area :description, :class => '', style: "border: 2px solid #d7d7d7; height: 50px;".html_safe, rows: 10 %></td>
+        </tr>
+    </table>
+
+    <table class="row-view">
+      <tr>
+        <th>Keterangan</th>
+        <th width="160" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr>
+        <td><%= f.label :price_per, "Tarif" %></td>
+        <td><%= f.text_field :price_per, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per.to_i), :readOnly => 'true' %></td>
+      </tr>
+      <tr>
+        <td><%= f.label :misc_total, "Lain-lain" %></td>
+        <td><%= f.text_field :misc_total, :class => 'half allowance-field', onkeyup: "count_trainexpense()", onchange: "count_trainexpense()", :value => 0 %></td>
+      </tr>
+      <tr>
+        <td>PPN 11% &nbsp; <input type="checkbox" id="routetrain_has_ppn" value="Yes" onchange="" />  </td>
+        <td><%= f.text_field :gst_tax, :class => 'half allowance-field disabled', :onkeypress => 'javascript:return isNumberKey(this);', readonly: true, value: 0 %></td>
+      </tr>
+
+      <tr class="total-row">
+        <td><%= f.label :total, "Total" %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per.to_i), :readOnly => 'true' %></td>
+      </tr>
+    </table>
+
+    <div class="field-row continue">
+
+      <%= f.hidden_field :routetrain_id, :value => @invoice.routetrain_id %>
+      <%= f.hidden_field :user_id, :value => current_user.id %>
+
+      <%= f.submit "Tambah Data", :class => 'submit right' %>    
+    </div>
+
+  </div>
+
+<% end %>
+
+<% end %>
+
+
+<%= content_for :js do %>
+  <script>
+    function formatRupiah(angka, prefix, decimal_place = 0) {
+      if (typeof(angka) == 'number') {
+        angka = angka.toFixed(decimal_place);
+        angka = angka.toString();
+      }
+
+      var number_string = angka.replace(/[^,\d]/g, '').toString(),
+        split = number_string.split(','),
+        sisa = split[0].length % 3,
+        rupiah = split[0].substr(0, sisa),
+        ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+      // tambahkan titik jika yang di input sudah menjadi angka ribuan
+      if (ribuan) {
+        separator = sisa ? '.' : '';
+        rupiah += separator + ribuan.join('.');
+      }
+
+      rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+      return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+    }
+
+    function clean_currency(string) {
+      return parseInt(string.replaceAll(".","").replaceAll(",","."));
+    }
+     function count_trainexpense() {
+      price_per = $("#trainexpense_price_per").val();
+      misc_total = $("#trainexpense_misc_total").val();
+      price_per = price_per == "" ? 0 : clean_currency(price_per);
+      misc_total = misc_total == "" ? 0 : clean_currency(misc_total);
+      ppn = 0;
+      if ($("#routetrain_has_ppn").is(":checked")) {
+        ppn = parseInt(price_per * 11 / 100);
+      }
+
+      $("#trainexpense_gst_tax").val(formatRupiah(ppn));
+      $("#trainexpense_total").val(formatRupiah(price_per + ppn + misc_total));
+    }
+
+    $(document).ready(function() {
+      
+    })
+    .on("click","#routetrain_has_ppn",function(){
+      count_trainexpense();
+
+    });
+
+    // $(document).ready(function() {
+      
+    // })
+    // .on("click","#routetrain_has_ppn",function(){
+    //   price_per = $("#trainexpense_price_per").val();
+    //   price_per = price_per == "" ? 0 : clean_currency(price_per);
+    //   ppn = 0;
+    //   if ($(this).is(":checked")) {
+    //     ppn = parseInt(price_per * 11 / 100);
+    //   }
+
+    //   $("#trainexpense_gst_tax").val(formatRupiah(ppn));
+    //   $("#trainexpense_total").val(formatRupiah(price_per + ppn));
+
+    // });
+  </script>
+<% end %>

@@ -29,6 +29,7 @@ class Invoice < ActiveRecord::Base
 	has_many :incentives
 	has_many :trainexpenses
 	has_many :shipexpenses
+	has_many :insuranceexpenses
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :enabled, :date, :ship_name, :driver_id, :customer_id, :vehicle_id, :trip_type, :price_per, :gas_start,
@@ -37,7 +38,7 @@ class Invoice < ActiveRecord::Base
   				:invoice_id, :misc_allowance, :user_id, :helper_allowance, :need_helper, :deleteuser_id, :spk_number, :invoicetrain, :isotank_id, 
 				:driver_phone, :transporttype, :port_id, :ship_id, :train_fee, :container_id, :tanktype, :isotank_number, :container_number, :event_id, 
 				:premi, :premi_allowance, :routetrain_id, :operator_id, :shipoperator_id, :routeship_id, :invoicemultimode, :cargo_type, :losing,
-				:vehicle_duplicate, :vehicle_duplicate_id, :weight_gross, :load_date
+				:vehicle_duplicate, :vehicle_duplicate_id, :weight_gross, :load_date, :is_insurance, :tsi_total
 
   	def sum_gasleftover
   		self.gas_leftover * self.gas_cost

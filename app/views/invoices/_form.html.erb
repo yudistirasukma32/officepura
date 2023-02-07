@@ -275,6 +275,11 @@
   </div>
 
   <div class="field-row">
+    <%=f.label :is_insurance, "Asuransi" %>
+    <input type="checkbox" id="is_insurance" name="invoice[is_insurance]" value="Yes" <% if @invoice.is_insurance == true %> checked="checked" <% end %>" />
+  </div>
+
+  <div class="field-row">
     <%= f.label :quantity, "Jumlah" %>
     <select id="invoice_quantity" name="invoice[quantity]" class="half chzn-select" onchange="javascript:getAllowances();">
       <% (1..1).each do |i| %>

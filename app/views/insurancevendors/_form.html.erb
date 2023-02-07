@@ -1,0 +1,11 @@
+<%= form_for(@insurancevendor) do |f| %>
+	<div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Operasional, Admin Marketing' %>
+    <a class="back left" href="<%=insurancevendors_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

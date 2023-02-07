@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20230203042512) do
+ActiveRecord::Schema.define(:version => 20230206030303) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -456,6 +456,40 @@ ActiveRecord::Schema.define(:version => 20230203042512) do
     t.decimal   "total",                      :precision => 19, :scale => 2, :default => 0.0
   end
 
+  create_table "insuranceexpenses", :force => true do |t|
+    t.boolean  "deleted",                                              :default => false
+    t.boolean  "enabled",                                              :default => true
+    t.date     "date"
+    t.integer  "invoice_id"
+    t.integer  "insurancevendor_id"
+    t.text     "description"
+    t.integer  "user_id"
+    t.string   "expensetype",                                          :default => "Kredit"
+    t.integer  "officeexpensegroup_id"
+    t.integer  "bankexpensegroup_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                                                                 :null => false
+    t.datetime "updated_at",                                                                 :null => false
+    t.decimal  "tsi_total",             :precision => 19, :scale => 2, :default => 0.0
+    t.float    "insurance_rate",                                       :default => 0.0
+    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
+  end
+
+  create_table "insurancevendors", :force => true do |t|
+    t.boolean  "deleted",                :default => false
+    t.boolean  "enabled",                :default => true
+    t.string   "name"
+    t.text     "description"
+    t.string   "pic"
+    t.string   "phone"
+    t.string   "mobile"
+    t.string   "bank_name"
+    t.string   "bank_account"
+    t.integer  "term_of_payment_in_day"
+    t.datetime "created_at",                                :null => false
+    t.datetime "updated_at",                                :null => false
+  end
+
   create_table "invoicereturns", :force => true do |t|
     t.boolean   "deleted",                                                      :default => false
     t.date      "date"
@@ -539,6 +573,8 @@ ActiveRecord::Schema.define(:version => 20230203042512) do
     t.integer   "vehicle_duplicate_id"
     t.integer   "weight_gross",                                                     :default => 0
     t.date      "load_date"
+    t.boolean   "is_insurance",                                                     :default => false
+    t.decimal   "tsi_total",                         :precision => 19, :scale => 2, :default => 0.0
   end
 
   add_index "invoices", ["date", "customer_id", "event_id", "invoicetrain"], :name => "invoice_events"
@@ -847,6 +883,23 @@ ActiveRecord::Schema.define(:version => 20230203042512) do
     t.timestamp "created_at",    :limit => 6,                                                   :null => false
     t.timestamp "updated_at",    :limit => 6,                                                   :null => false
     t.decimal   "total",                      :precision => 19, :scale => 2, :default => 0.0
+  end
+
+  create_table "receiptinsurances", :force => true do |t|
+    t.boolean  "deleted",                                              :default => false
+    t.boolean  "enabled",                                              :default => true
+    t.date     "date"
+    t.integer  "insuranceexpense_id"
+    t.text     "description"
+    t.integer  "user_id"
+    t.string   "expensetype",                                          :default => "Kredit"
+    t.integer  "officeexpensegroup_id"
+    t.integer  "bankexpensegroup_id"
+    t.datetime "created_at",                                                                 :null => false
+    t.datetime "updated_at",                                                                 :null => false
+    t.decimal  "tsi_total",             :precision => 19, :scale => 2, :default => 0.0
+    t.float    "insurance_rate",                                       :default => 0.0
+    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "receiptorders", :force => true do |t|

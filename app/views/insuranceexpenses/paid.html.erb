@@ -1,0 +1,155 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+
+		<h1>Transaksi / <a href="<%=trainexpenses_path%>">Hutang Operator Kereta - Terbayar</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="display: none;">
+				<label for="date">Pilih Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
+			</div>
+
+			<div class="field-row continue">
+				<label for="startdate" class="" style="float:none">Tgl Bayar Awal</label> &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />&nbsp; &nbsp;
+				<label for="enddate" class="middle short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />&nbsp; &nbsp;
+				<label for="operator_id" class="middle short" style='width:50px;float:none;'>Operator</label> &nbsp; &nbsp;
+				<select name="operator_id" class="middle short">
+					<option value="">Semua</option>
+					<% Operator.active.order(:name).each do |ope| %>
+					<option value="<%=ope.id%>"<% if ope.id == @ope %> selected='selected'<% end %>><%=ope.abbr%></option>
+					<% end %>
+				</select>
+				<label for="type" class="middle short" style='width:50px;float:none;'>Jenis Cont.</label> &nbsp; &nbsp;
+				<select name="containertype" class="middle short">
+					<option value="">Semua</option>
+					<% @contype.each do |contype| %>
+					<option value="<%=contype%>" <% if contype == @containertype %> selected='selected'<% end %>><%=contype%></option>
+					<% end %>
+				</select>
+
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+			<table class="row-view">
+				<tr>
+					<th width="50">TGL BYR</th>
+					<th width="50">TGL BKK</th>
+					<th width="50">No. BKK</th>
+					<th width="200">Keterangan</th>
+					<th width="60">NoPol</th>
+                    <th width="80">Kontainer/Iso</th>
+					<th width="50">No. DO</th>
+					<th width="80">Type</th>
+					<th width="40">Operator</th>
+					<th width="90" class="right">Total</th>
+					<th width="40"></th>
+				</tr>
+
+				<% @grandTotal = 0%>
+				<% @trainexpenses.each do |trainexpense| %>
+					<% if trainexpense.deleted %>
+						<% @grandTotal += 0 %>
+						<% if current_user.adminrole %>
+						<tr class="deleted">
+							<td><strong><%=trainexpense.date.strftime('%d')%></strong>.<%=trainexpense.date.strftime('%m')%></td>
+							<td><strong><%=trainexpense.invoice.date.strftime('%d')%></strong>.<%=trainexpense.invoice.date.strftime('%m')%></td>
+							<td><%= zeropad(trainexpense.invoice.id) %></td>
+							<td>
+								<%=trainexpense.invoice.quantity%> Rit: <%=trainexpense.invoice.route.name rescue nil%> (<%=trainexpense.invoice.driver.name rescue nil%>) <% if !trainexpense.invoice.description.blank?%> <br /> <%=trainexpense.invoice.description%>  <% end %> 
+								<br/>
+								<%=trainexpense.invoice.routetrain.name rescue nil %>
+ 							</td>
+							<td><%=trainexpense.invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (trainexpense.invoice.isotank_id.present? && trainexpense.invoice.isotank_id.to_i != 0) ? ( trainexpense.invoice.isotank.isotanknumber) : '' %>
+							<%= (trainexpense.invoice.container_id.present? && trainexpense.invoice.container_id.to_i != 0) ? ( trainexpense.invoice.container.containernumber) : '' %></td>
+							<td><%= zeropad(trainexpense.invoice.event_id) rescue nil %></td>
+							<td><%= trainexpense.invoice.routetrain.container_type rescue nil %></td>
+							<td><%= trainexpense.invoice.routetrain.operator.abbr rescue nil %></td>
+							<td align="right" class="red"><%=to_currency(trainexpense.invoice.routetrain.total)%></td>
+							<td class="right" width="60">&nbsp;</td>
+						</tr>
+						<% end %>
+
+					<% else %>
+
+						<% @grandTotal += trainexpense.total %>
+
+						<tr>
+							<td><strong><%=trainexpense.date.strftime('%d')%></strong>.<%=trainexpense.date.strftime('%m')%></td>
+							<td><strong><%=trainexpense.invoice.date.strftime('%d')%></strong>.<%=trainexpense.invoice.date.strftime('%m')%></td>
+							<td><%= zeropad(trainexpense.invoice.id) %></td>
+							<td><%=trainexpense.invoice.quantity%> Rit: <%=trainexpense.invoice.route.name rescue nil%> (<%=trainexpense.invoice.driver.name rescue nil%>) <% if !trainexpense.invoice.description.blank?%> <br /> <%=trainexpense.invoice.description%>  <% end %> 
+							<br/>
+							<strong><%=trainexpense.invoice.routetrain.name rescue nil %></strong>
+							</td>
+							<td><%=trainexpense.invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (trainexpense.invoice.isotank_id.present? && trainexpense.invoice.isotank_id.to_i != 0) ? ( trainexpense.invoice.isotank.isotanknumber) : '' %>
+							<%= (trainexpense.invoice.container_id.present? && trainexpense.invoice.container_id.to_i != 0) ? ( trainexpense.invoice.container.containernumber) : '' %></td>
+							<td><%= zeropad(trainexpense.invoice.event_id) rescue nil %></td>
+							<td><%= trainexpense.invoice.routetrain.container_type rescue nil %></td>
+							<td><%= trainexpense.invoice.routetrain.operator.abbr rescue nil %></td>
+							<td align="right" class="red"><%=to_currency(trainexpense.total)%></td>
+							<td class="right" width="60">
+
+								<% if (current_user.adminrole || current_user.owner)%>
+
+									<% if trainexpense.receipttrains.active.count == 0 %>
+
+										<a class="cta" style="opacity: 1;" href="trainexpenses/delete/<%=trainexpense.invoice.id%>">Batal</a>
+									
+									<% else %>
+
+										 <span>Confirmed</span>
+								
+									<% end %>
+
+								<% else %>
+								
+								<% if checkrole 'Admin Operasional' %>
+
+									<% if trainexpense.receipttrains.active.count != 0 %>
+
+										<span>confirmed</span>
+
+									<% else %>
+
+										<span>delete</span>
+
+									<% end %>
+ 
+								<% end %>
+
+								<% end %>
+
+							</td>
+						</tr>
+					<% end %>
+				<% end %>	
+			
+				<tr class="footer">
+					<td class="total" align="right" colspan="9">TOTAL</td>
+					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
+				</tr>
+			</table>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>
