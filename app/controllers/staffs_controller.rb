@@ -6,7 +6,7 @@ class StaffsController < ApplicationController
   def set_section
     @section = "masters"
     @where = "staffs"
-    @statuses = ["Tetap", "Warnen"]
+    @statuses = ["Tetap", "Kontrak", "Resign"]
   end
 
   def set_role
@@ -16,7 +16,15 @@ class StaffsController < ApplicationController
   def index
     role = cek_roles @user_role
     if role
-      @staffs = Staff.all(:order =>:name)
+
+      @status = params[:status]
+
+      @staffs = Staff.order('name')
+
+      if @status.present? and @status != ''
+          @staffs = @staffs.where("status = ?", @status)
+      end
+
       respond_to :html
     else
       redirect_to root_path()

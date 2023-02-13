@@ -26,7 +26,7 @@
     <%= f.text_field :mobile, :class => 'half left' %>
   </div>
 
-  <div class="field-row">
+  <div class="field-row" style="display: none;">
     <%= f.label :driver_licence, "SIM" %>
     <%= f.text_field :driver_licence, :class => 'half left' %>
     <%= f.label :driver_licence_expiry, "Expired", :class => 'middle' %>
@@ -38,6 +38,18 @@
     <%= f.text_field :id_card, :class => 'half left' %>
     <%= f.label :id_card_expiry, "Expired", :class => 'middle' %>
     <%= f.text_field :id_card_expiry, :class => 'half left date-picker' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :family_card_number, "No. KK" %>
+    <%= f.text_field :family_card_number, :class => 'half left' %>
+    <%= f.label :family_status, "Status Keluarga", :class => 'middle' %>
+    <%= f.text_field :family_status, :class => 'half left' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :emergency_contact, "Kontak Darurat" %>
+    <%= f.text_field :emergency_contact, :class => 'half left' %> 
   </div>
 
   <div class="field-row">

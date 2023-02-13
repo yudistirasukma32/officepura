@@ -18,7 +18,7 @@ class Vehicle < ActiveRecord::Base
 						:tire_size, :barcode, :next_checkup_date, :next_registration_date, :next_tax_date, :next_tera_date,
 					:machine_serial, :skel_bar_serial, :skel_bar_serial_2, :next_checkup_date_second,
 					:description, :vehiclegroup_id, :deleted, :date_purchase, :amount, :tank_type, :siup, :tire_target, :plat_type,
-					:vehicleincentivegroup_id, :office_id, :platform_type, :gps_number
+					:vehicleincentivegroup_id, :office_id, :platform_type, :gps_number, :bpkb_number, :owner_name, :owner_address, :brand, :color, :tire_amount
 
 	scope :active, lambda {where(:enabled => true, :deleted => false)}  					
   

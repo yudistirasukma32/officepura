@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20230206030303) do
+ActiveRecord::Schema.define(:version => 20230213220914) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -310,6 +310,7 @@ ActiveRecord::Schema.define(:version => 20230206030303) do
     t.string    "bank_account"
     t.string    "bank_name"
     t.integer   "bankexpensegroup_id"
+    t.string    "origin"
   end
 
   create_table "eventcleaningmemos", :force => true do |t|
@@ -1236,6 +1237,10 @@ ActiveRecord::Schema.define(:version => 20230206030303) do
     t.timestamp "created_at",               :limit => 6,                    :null => false
     t.timestamp "updated_at",               :limit => 6,                    :null => false
     t.integer   "office_id"
+    t.string    "origin"
+    t.string    "emergency_contact"
+    t.string    "family_status"
+    t.string    "family_card_number"
   end
 
   create_table "stations", :id => false, :force => true do |t|
@@ -1524,6 +1529,12 @@ ActiveRecord::Schema.define(:version => 20230206030303) do
     t.integer   "office_id"
     t.string    "platform_type"
     t.integer   "gps_number"
+    t.string    "bpkb_number"
+    t.string    "owner_name"
+    t.text      "owner_address"
+    t.string    "brand"
+    t.string    "color"
+    t.string    "tire_amount"
   end
 
   create_table "warehouses", :id => false, :force => true do |t|

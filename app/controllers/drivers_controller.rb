@@ -16,11 +16,20 @@ class DriversController < ApplicationController
   def index
     role = cek_roles @user_role
     if role
-      @drivers = Driver.all(:order =>:name)
+
+      @origin = params[:origin]
+
+      @drivers = Driver.order('name')
+
+      if @origin.present? and @origin != ''
+          @drivers = @drivers.where("origin = ?", @origin)
+      end
+
       respond_to :html
     else
       redirect_to root_path()
     end
+    
   end
 
   def new

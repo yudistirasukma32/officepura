@@ -17,6 +17,25 @@
 		<br class="clearfix" />
 		<br class="clearfix" />
 
+		<div id="filter" style="padding: 5px 10px 5px 10px;">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+
+				<label for="origin" style="float:none">Status</label>
+				<select name="origin" class="half combo_route" style="margin-top: 0.25rem;">
+				<option value="">Semua</option>
+					<% ["Mitra", "Outsource", "Resign"].each do |type| %>
+					<option <%= type == params[:origin] ? 'selected' : '' %>><%=type%></option>
+					<% end %>
+				</select> 
+ 
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
 		<table class="row-view tablesorter">
 			<thead>
 			<tr>
@@ -24,6 +43,7 @@
 				<th>Kota</th>
 				<th>Telp</th>
 				<th>Rekening</th>
+				<th>Status</th>
 				<th width="60" class="{sorter: false}">Aktif</th>
 				<th width="60" class="{sorter: false}"></th>
 			</tr>
@@ -38,6 +58,7 @@
 					<td><%= driver.city %></td>
 					<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
 					<td><%= driver.bank_account %></td>
+					<td><%= driver.origin %></td>
 					<% if driver.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
 					<% else %>
@@ -53,6 +74,7 @@
 					<td><%= driver.city %></td>
 					<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
 					<td><%= driver.bank_account %></td>
+					<td><%= driver.origin %></td>
 					<% if driver.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, disable_driver_path(driver), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>
 					<% else %>
@@ -69,6 +91,7 @@
 					<td><%= driver.city %></td>
 					<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
 					<td><%= driver.bank_account %></td>
+					<td><%= driver.origin %></td>
 					<% if driver.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
 					<% else %>

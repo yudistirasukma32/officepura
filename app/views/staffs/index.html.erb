@@ -17,12 +17,32 @@
 		<br class="clearfix" />
 		<br class="clearfix" />
 
+		<div id="filter" style="padding: 5px 10px 5px 10px;">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+
+				<label for="status" style="float:none">Status</label>
+				<select name="status" class="half combo_route" style="margin-top: 0.25rem;">
+				<option value="">Semua</option>
+					<% ["Tetap", "Kontrak", "Resign"].each do |type| %>
+					<option <%= type == params[:status] ? 'selected' : '' %>><%=type%></option>
+					<% end %>
+				</select> 
+ 
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
 		<table class="row-view tablesorter">
 			<thead>
 			<tr>
 				<th>Nama</th>
 				<th>Kota</th>
 				<th>Telp</th>
+				<th>Status</th>
 				<th width="60" class="{sorter: false}">Aktif</th>
 				<th width="60" class="{sorter: false}"></th>
 			</tr>
@@ -36,6 +56,7 @@
 					<td><%= staff.name %></td>
 					<td><%= staff.city %></td>
 					<td><%= !staff.phone.blank? ? staff.phone : staff.mobile %></td>
+					<td><%= staff.status %></td>
 					<% if staff.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
 					<% else %>
@@ -50,6 +71,7 @@
 					<td><%= link_to staff.name, edit_staff_path(staff) %></td>
 					<td><%= staff.city %></td>
 					<td><%= !staff.phone.blank? ? staff.phone : staff.mobile %></td>
+					<td><%= staff.status %></td>
 					<% if staff.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, disable_staff_path(staff), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>
 					<% else %>
@@ -65,6 +87,7 @@
 					<td><%= staff.name %></td>
 					<td><%= staff.city %></td>
 					<td><%= !staff.phone.blank? ? staff.phone : staff.mobile %></td>
+					<td><%= staff.status %></td>
 					<% if staff.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
 					<% else %>

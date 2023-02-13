@@ -45,7 +45,7 @@
 
       <div class="field-row">
         <%= f.label :vehiclegroup_id, "Grup" %>
-        <%= f.select :vehiclegroup_id, options_for_select(Vehiclegroup.all.collect {|g| [g.name, g.id]}, @vehicle.vehiclegroup_id), {}, :class => 'half left' %>
+        <%= f.select :vehiclegroup_id, options_for_select(Vehiclegroup.active.collect {|g| [g.name, g.id]}, @vehicle.vehiclegroup_id), {}, :class => 'half left' %>
         <%= f.label :vehicleincentivegroup_id, "Insentif", :class => 'middle' %>
         <%= f.select :vehicleincentivegroup_id, options_for_select(Vehicleincentivegroup.all.collect {|g| [g.name, g.id]}, @vehicle.vehicleincentivegroup_id), {:include_blank => 'Normal'}, :class => 'half' %>
       </div>
@@ -117,6 +117,31 @@
         <%= f.label :gps_number, "No. GPS Tracking" %>
         <%= f.text_field :gps_number, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
       </div>
+
+      <div class="field-row">
+        <%= f.label :bpkb_number, "No. BPKB" %>
+        <%= f.text_field :bpkb_number, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :owner_name, "Nama Pemilik" %>
+        <%= f.text_field :owner_name, :class => 'half left' %>
+        <%= f.label :owner_name, "Alamat", :class => 'middle' %>
+        <%= f.text_field :owner_address, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :brand, "Merek" %>
+        <%= f.text_field :brand, :class => 'half left' %>
+        <%= f.label :color, "Warna", :class => 'middle' %>
+        <%= f.text_field :color, :class => 'half left' %>
+      </div>
+
+      <div class="field-row">
+        <%= f.label :tire_amount, "Jml. Roda" %>
+        <%= f.text_field :tire_amount, :class => 'half left' %> 
+      </div>
+
 
       <div class="field-row">
         <%= f.label :description, "Keterangan" %>

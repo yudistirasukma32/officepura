@@ -33,11 +33,6 @@
       </div>
 
       <div class="field-row">
-        <%= f.label :bank_account, "No. Rekening" %>
-        <%= f.text_field :bank_account %>
-      </div>
-
-      <div class="field-row">
         <%= f.label :phone, "No. Telp" %>
         <%= f.text_field :phone, :class => 'half left' %>
         <%= f.label :mobile, "No. HP", :class => 'middle' %>
@@ -106,7 +101,6 @@
         <%= f.text_field :terms_of_payment_in_days, :class => 'half' %>
         <span>Hari</span>
       </div>
-
       <div class="field-row">
         <%= f.label :bank_name, "Nama Bank" %>
         <%= f.select :bank_name, options_for_select([["Pilih Bank",nil],"BNI","BCA","Mandiri","BRI","Danamon"], @driver.bank_name), {}, { :class => 'half left' } %>
@@ -117,6 +111,16 @@
       <div class="field-row">
         <%= f.label :bankexpensegroup_id, "Jurnal" %>
         <%= f.select :bankexpensegroup_id, options_for_select(Bankexpensegroup.active.collect { |bankexpense| [bankexpense.name, bankexpense.id] }, @driver.bankexpensegroup_id), {}, { :class => 'half left chzn-select' } %>
+      </div>
+
+      <div class="field-row">
+      <%= f.label :origin, "Status Kepagawaian" %>
+        <select name="driver[origin]" class="half left ">
+            <option value="">-- Status --</option>
+            <option value="Outsource" <% if @driver.origin == "Outsource"%> selected="selected" <% end %>>Outsource</option>
+            <option value="Mitra" <% if @driver.origin == "Mitra"%> selected="selected" <% end %>>Mitra</option>
+            <option value="Resign" <% if @driver.origin == "Resign"%> selected="selected" <% end %>>Resign (Ex)</option>
+        </select>
       </div>
 
       <div class="field-row" >
@@ -200,7 +204,7 @@
         <%= f.label :bon, "Pinjaman", :class => 'middle' %>
         <%= f.text_field :bon, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
       </div>
-
+      
       <div class="field-row">
         <%= f.label :description, "Keterangan" %>
         <%= f.text_area :description %>
