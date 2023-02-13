@@ -324,13 +324,33 @@
         </tr>
       <% end %>
     <% end %>
-      <tr>
-        <td>Supir</td>
-        <td>
-          <%=@invoice.driver.name%> (<%=zeropad(@invoice.driver.id)%>) <% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %>
-          <input type="hidden" id="strDriver" value="<%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %>" />
-        </td>
-      </tr>
+
+    <tr>
+      <td style="padding-top: 1.5rem;">
+        <strong>Supir</strong>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Supir</td>
+      <td>
+        <%=@invoice.driver.name rescue nil%> (<%= zeropad(@invoice.driver.id) rescue nil%>)
+        <% if !@invoice.driver.helpers.first.nil? && @invoice.need_helper %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil %>)<% end %>
+        <input type="hidden" id="strDriver" value="<%=@invoice.driver.name rescue nil%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil%>)<% end %>" />
+      </td>
+    </tr>
+
+    <td>No. Telp.</td>
+      <td><%=@invoice.driver.phone rescue nil%> &nbsp; <%=@invoice.driver.mobile rescue nil%></td>
+    </tr>
+
+    <tr>
+      <td>No. Rek.</td>
+      <td><%=@invoice.driver.bank_account rescue nil%></td>
+    </tr>
+
+
+
       <% if !@invoice.description.blank? %>
       <tr>
         <td>Keterangan</td>

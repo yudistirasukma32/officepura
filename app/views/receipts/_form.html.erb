@@ -91,6 +91,15 @@
           <td>Supir</td>
           <td><%=@invoice.driver.name%> (<%=zeropad(@invoice.driver.id)%>)<% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
         </tr>
+        <tr>
+        <td>No. Telp. Supir</td>
+          <td><%=@invoice.driver.mobile rescue nil%></td>
+        </tr>
+        <tr>
+          <td>No. Rek. Supir</td>
+          <td><%=@invoice.driver.bank_account rescue nil%></td>
+        </tr>
+        
         <% if !@invoice.description.blank? %>
         <tr>
           <td>Keterangan</td>

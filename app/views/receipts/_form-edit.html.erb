@@ -68,6 +68,14 @@
           <td>No. Rek. Supir</td>
           <td><%=@receipt.invoice.driver.bank_account%></td>
         </tr>
+          <td>No. Telp.</td>
+          <td><%=@receipt.invoice.driver.mobile rescue nil%></td>
+        </tr>
+        <tr>
+          <td>No. Rek. Supir</td>
+          <td><%=@receipt.invoice.driver.bank_account rescue nil%></td>
+        </tr>
+
         <% if !@receipt.invoice.description.blank? %>
         <tr>
           <td>Keterangan</td>
