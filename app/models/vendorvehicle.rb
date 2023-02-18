@@ -1,4 +1,4 @@
-class Vendorvehicles < ActiveRecord::Base
+class Vendorvehicle < ActiveRecord::Base
 
     belongs_to :vendor
 
