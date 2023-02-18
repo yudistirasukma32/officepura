@@ -23,6 +23,7 @@
 			<tr>
 				<th>Nama</th>
 				<th>Kategori</th>
+				<th>Vendor</th>
 				<th width="60" data-sorter="false" class="sorter-false">Aktif</th>
 				<th width="60" class="{sorter: false}"></th>
 			</tr>
@@ -58,6 +59,9 @@
 						<% else %>
 							<%= container.category rescue nil %>	
 						<% end %>
+					</td>
+					<td>
+						<%= container.vendor.name rescue nil %>
 					</td>
 					<% if container.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
@@ -95,6 +99,9 @@
 					<% else %>
 						<%= container.category rescue nil %>	
 					<% end %>
+					</td>
+					<td>
+						<%= container.vendor.name rescue nil %>
 					</td>
 					<% if container.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, disable_container_path(container), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>

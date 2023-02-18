@@ -1,0 +1,43 @@
+<%= form_for(@vendorvehicle) do |f| %>
+	<div class="field-row first">
+		<%= f.label :current_id, "No. Pol" %>
+		<%= f.text_field :current_id %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :vendor_id, "Vendor" %>
+
+		<select id="vendorvehicle_vendor_id" name="vendorvehicle[vendor_id]" class="double chzn-select">
+		<option value="0">- Pilih Vendor -</option>
+		<% Vendor.active.order(:name).each do |vendor| %>
+		<option value="<%=vendor.id%>"
+			<% if vendor.id == @vendorvehicle.vendor_id %> selected="selected"<% end %>><%=vendor.name%></option>
+		<% end %>
+		</select>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :brand, "Merek" %>
+		<%= f.text_field :brand, :class => 'half left' %>
+		<%= f.label :color, "Warna", :class => 'middle' %>
+		<%= f.text_field :color, :class => 'half left' %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :year_made, "Thn. Kendaraan" %>
+		<%= f.text_field :year_made, :class => 'half left', :required => true %>
+		<%= f.label :tire_amount, "Jml. Roda", :class => 'middle' %>
+		<%= f.text_field :tire_amount, :class => 'half left' %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :description, "Keterangan" %>
+		<%= f.text_area :description %>
+	</div>
+
+	<div class="actions">
+		<%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Kendaraan' %>
+		<a class="back left" href="<%=vendorvehicles_path%>">Kembali ke Index</a>
+	</div>
+
+<% end %>

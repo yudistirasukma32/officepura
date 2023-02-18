@@ -1,0 +1,28 @@
+<%= form_for(@vendor) do |f| %>
+	<div class="field-row first">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :email, "Email" %>
+    <%= f.text_field :email %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :phone, "No. Telp" %>
+    <%= f.text_field :phone, :class => 'half left' %>
+    <%= f.label :mobile, "No. HP", :class => 'middle' %>
+    <%= f.text_field :mobile, :class => 'half left' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin HRD, Admin Operasional, Admin Marketing' %>
+    <a class="back left" href="<%=vendors_path%>">Kembali ke Index</a>
+  </div>
+<% end %>

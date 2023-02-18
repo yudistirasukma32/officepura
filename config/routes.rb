@@ -326,6 +326,20 @@ OfficePuraErp::Application.routes.draw do
       get "print"
     end  
   end
+
+  resources :vendors do
+    member do
+      get 'enable'
+      get 'disable'
+    end  
+  end
+
+  resources :vendorvehicles do
+    member do
+      get 'enable'
+      get 'disable'
+    end  
+  end  
   
   get 'invoices/getcustomer/:route_id' => 'invoices#get_customer'
   get 'invoices/getvehiclegroup/:vehicle_id' => 'invoices#get_vehiclegroup'

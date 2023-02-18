@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20230213220914) do
+ActiveRecord::Schema.define(:version => 20230217101613) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -204,6 +204,27 @@ ActiveRecord::Schema.define(:version => 20230213220914) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
+  create_table "containerexpenses", :force => true do |t|
+    t.boolean  "deleted",                                              :default => false
+    t.boolean  "enabled",                                              :default => true
+    t.date     "date"
+    t.integer  "event_id"
+    t.integer  "invoice_id"
+    t.integer  "container_id"
+    t.text     "description"
+    t.integer  "user_id"
+    t.string   "expensetype",                                          :default => "Kredit"
+    t.integer  "officeexpensegroup_id"
+    t.integer  "bankexpensegroup_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                                                                 :null => false
+    t.datetime "updated_at",                                                                 :null => false
+    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
+    t.integer  "gst_percentage",                                       :default => 0
+    t.decimal  "gst_tax",               :precision => 19, :scale => 2, :default => 0.0
+    t.decimal  "price_per",             :precision => 19, :scale => 2, :default => 0.0
+  end
+
   create_table "containermemos", :force => true do |t|
     t.boolean   "deleted",                                                    :default => false
     t.boolean   "enabled",                                                    :default => true
@@ -227,6 +248,7 @@ ActiveRecord::Schema.define(:version => 20230213220914) do
     t.timestamp "created_at",      :limit => 6,                    :null => false
     t.timestamp "updated_at",      :limit => 6,                    :null => false
     t.string    "category"
+    t.integer   "vendor_id"
   end
 
   create_table "customers", :force => true do |t|
@@ -458,37 +480,37 @@ ActiveRecord::Schema.define(:version => 20230213220914) do
   end
 
   create_table "insuranceexpenses", :force => true do |t|
-    t.boolean  "deleted",                                              :default => false
-    t.boolean  "enabled",                                              :default => true
-    t.date     "date"
-    t.integer  "invoice_id"
-    t.integer  "insurancevendor_id"
-    t.text     "description"
-    t.integer  "user_id"
-    t.string   "expensetype",                                          :default => "Kredit"
-    t.integer  "officeexpensegroup_id"
-    t.integer  "bankexpensegroup_id"
-    t.integer  "deleteuser_id"
-    t.datetime "created_at",                                                                 :null => false
-    t.datetime "updated_at",                                                                 :null => false
-    t.decimal  "tsi_total",             :precision => 19, :scale => 2, :default => 0.0
-    t.float    "insurance_rate",                                       :default => 0.0
-    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "deleted",                                                           :default => false
+    t.boolean   "enabled",                                                           :default => true
+    t.date      "date"
+    t.integer   "invoice_id"
+    t.integer   "insurancevendor_id"
+    t.text      "description"
+    t.integer   "user_id"
+    t.string    "expensetype",                                                       :default => "Kredit"
+    t.integer   "officeexpensegroup_id"
+    t.integer   "bankexpensegroup_id"
+    t.integer   "deleteuser_id"
+    t.timestamp "created_at",            :limit => 6,                                                      :null => false
+    t.timestamp "updated_at",            :limit => 6,                                                      :null => false
+    t.decimal   "tsi_total",                          :precision => 19, :scale => 2, :default => 0.0
+    t.float     "insurance_rate",                                                    :default => 0.0
+    t.decimal   "total",                              :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "insurancevendors", :force => true do |t|
-    t.boolean  "deleted",                :default => false
-    t.boolean  "enabled",                :default => true
-    t.string   "name"
-    t.text     "description"
-    t.string   "pic"
-    t.string   "phone"
-    t.string   "mobile"
-    t.string   "bank_name"
-    t.string   "bank_account"
-    t.integer  "term_of_payment_in_day"
-    t.datetime "created_at",                                :null => false
-    t.datetime "updated_at",                                :null => false
+    t.boolean   "deleted",                             :default => false
+    t.boolean   "enabled",                             :default => true
+    t.string    "name"
+    t.text      "description"
+    t.string    "pic"
+    t.string    "phone"
+    t.string    "mobile"
+    t.string    "bank_name"
+    t.string    "bank_account"
+    t.integer   "term_of_payment_in_day"
+    t.timestamp "created_at",             :limit => 6,                    :null => false
+    t.timestamp "updated_at",             :limit => 6,                    :null => false
   end
 
   create_table "invoicereturns", :force => true do |t|
@@ -848,6 +870,23 @@ ActiveRecord::Schema.define(:version => 20230213220914) do
     t.timestamp "updated_at", :limit => 6,                    :null => false
   end
 
+  create_table "receiptcontainers", :force => true do |t|
+    t.boolean  "deleted",                                              :default => false
+    t.boolean  "enabled",                                              :default => true
+    t.date     "date"
+    t.integer  "containerexpense_id"
+    t.text     "description"
+    t.integer  "user_id"
+    t.string   "expensetype",                                          :default => "Kredit"
+    t.integer  "officeexpensegroup_id"
+    t.integer  "bankexpensegroup_id"
+    t.datetime "created_at",                                                                 :null => false
+    t.datetime "updated_at",                                                                 :null => false
+    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
+    t.integer  "gst_percentage",                                       :default => 0
+    t.decimal  "gst_tax",               :precision => 19, :scale => 2, :default => 0.0
+  end
+
   create_table "receiptdrivers", :force => true do |t|
     t.boolean   "deleted",                                                      :default => false
     t.integer   "driverexpense_id"
@@ -887,20 +926,20 @@ ActiveRecord::Schema.define(:version => 20230213220914) do
   end
 
   create_table "receiptinsurances", :force => true do |t|
-    t.boolean  "deleted",                                              :default => false
-    t.boolean  "enabled",                                              :default => true
-    t.date     "date"
-    t.integer  "insuranceexpense_id"
-    t.text     "description"
-    t.integer  "user_id"
-    t.string   "expensetype",                                          :default => "Kredit"
-    t.integer  "officeexpensegroup_id"
-    t.integer  "bankexpensegroup_id"
-    t.datetime "created_at",                                                                 :null => false
-    t.datetime "updated_at",                                                                 :null => false
-    t.decimal  "tsi_total",             :precision => 19, :scale => 2, :default => 0.0
-    t.float    "insurance_rate",                                       :default => 0.0
-    t.decimal  "total",                 :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "deleted",                                                           :default => false
+    t.boolean   "enabled",                                                           :default => true
+    t.date      "date"
+    t.integer   "insuranceexpense_id"
+    t.text      "description"
+    t.integer   "user_id"
+    t.string    "expensetype",                                                       :default => "Kredit"
+    t.integer   "officeexpensegroup_id"
+    t.integer   "bankexpensegroup_id"
+    t.timestamp "created_at",            :limit => 6,                                                      :null => false
+    t.timestamp "updated_at",            :limit => 6,                                                      :null => false
+    t.decimal   "tsi_total",                          :precision => 19, :scale => 2, :default => 0.0
+    t.float     "insurance_rate",                                                    :default => 0.0
+    t.decimal   "total",                              :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "receiptorders", :force => true do |t|
@@ -1535,6 +1574,39 @@ ActiveRecord::Schema.define(:version => 20230213220914) do
     t.string    "brand"
     t.string    "color"
     t.string    "tire_amount"
+  end
+
+  create_table "vendors", :force => true do |t|
+    t.boolean  "deleted",       :default => false
+    t.boolean  "enabled",       :default => true
+    t.string   "name"
+    t.string   "npwp"
+    t.string   "phone"
+    t.string   "mobile"
+    t.string   "pic_name"
+    t.string   "email"
+    t.text     "description"
+    t.string   "group",         :default => "Container"
+    t.integer  "user_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                             :null => false
+    t.datetime "updated_at",                             :null => false
+  end
+
+  create_table "vendorvehicles", :force => true do |t|
+    t.boolean  "deleted",       :default => false
+    t.boolean  "enabled",       :default => true
+    t.integer  "vendor_id"
+    t.string   "current_id"
+    t.string   "year_made"
+    t.string   "brand"
+    t.string   "color"
+    t.string   "tire_amount"
+    t.text     "description"
+    t.integer  "user_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
   end
 
   create_table "warehouses", :id => false, :force => true do |t|

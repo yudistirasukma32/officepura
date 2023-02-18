@@ -33,7 +33,10 @@
 					<li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Kapal'), "Kapal", "/ships" %></li>
 					<li><%= link_to_if (checkrole 'Admin Pelabuhan'), "Pelabuhan", "/ports" %></li>
-                    <li class="divider"></li>
+					<li class="divider"></li>
+					<li><%= link_to_if (checkrole 'Admin Operasional, Admin Marketing, Admin Keuangan'), "Vendor", "/vendors" %></li>
+					<li><%= link_to_if (checkrole 'Admin Operasional, Admin Marketing, Admin Keuangan'), "Kendaraan Vendor", "/vendorvehicles" %></li>
+					<li class="divider"></li>
                     <li><%= link_to_if (checkrole 'Admin Keuangan'), "Aktiva", "/assets" %></li>
                     <li><%= link_to_if (checkrole 'Admin Legalitas'), "Legalitas", "/legalities" %></li>
 					<li><%= link_to_if (checkrole 'Admin Marketing'), "Komoditas", "/commodities" %></li>

@@ -9,6 +9,20 @@
     <%= f.select :category, options_for_select(@categories.collect {|w| [w, w]}, (params[:category].present? ? params[:category] : @container.category)), {}, { :class => 'half chzn-select' } %>
   </div>
 
+  
+	<div class="field-row">
+    <%= f.label :vendor_id, "Vendor" %>
+
+    <select id="container_vendor_id" name="container[vendor_id]" class="double chzn-select">
+    <option value="0">- Pilih Vendor -</option>
+    <% Vendor.active.order(:name).each do |vendor| %>
+    <option value="<%=vendor.id%>"
+      <% if vendor.id == @container.vendor_id %> selected="selected"<% end %>><%=vendor.name%></option>
+    <% end %>
+    </select>
+  </div>
+
+
   <div class="actions">
     <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Kendaraan' %>
     <a class="back left" href="<%=containers_path%>">Kembali ke Index</a>

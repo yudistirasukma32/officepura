@@ -38,6 +38,11 @@
 
 	<% end %>
 
+	<% if @where == 'vendors' || @where == 'vendorvehicles' %>
+		<li class="<%= @where == 'vendors' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional'), "Vendor", "/vendors" %></li>
+		<li class="<%= @where == 'vendorvehicles' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional'), "Kendaraan Vendor", "/vendorvehicles" %></li>
+	<% end %>
+
 	<% if @section == 'events' %>
 		<li class="<%= @where == 'events' ? 'on' : '' %>"><%= link_to "Kalender Events", "/events" %></li>
 		<li class="<%= @where == 'events-cancelled' ? 'on' : '' %>"><%= link_to "DO Ditolak", "/events?type=cancelled" %></li>
