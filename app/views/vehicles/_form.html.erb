@@ -190,6 +190,10 @@
 
       <% end %>
 
+      <% if @vehicle.updated_by %>
+        <p>Terakhir diupdate: <strong><%= @vehicle.updated_by %></strong></p>
+      <% end %>
+
     </div>
 
     <div class="sliding_tab" id="tab_<%=tab+=1%>">
@@ -324,3 +328,4 @@
 
   </div>
 </div>
+

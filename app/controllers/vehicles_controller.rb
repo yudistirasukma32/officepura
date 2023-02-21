@@ -105,9 +105,16 @@ class VehiclesController < ApplicationController
     inputs = params[:vehicle]
     @vehicle = Vehicle.find(params[:id])
 
+    old_data = @vehicle.current_id + ' // ' + @vehicle.vehiclegroup_id.to_s + ' // ' + @vehicle.platform_type + ' // ' + @vehicle.office_id.to_s + ' // ' + DateTime.now.to_s
+
     if @vehicle.update_attributes(inputs)
+
+      @vehicle.user_id = current_user.id
+      @vehicle.updated_by = current_user.username
+      @vehicle.previous_data = old_data
+
       @vehicle.save
-      redirect_to(edit_vehicle_url(@vehicle), :notice => 'Data Kendaraan sukses di simpan.')
+      redirect_to(edit_vehicle_url(@vehicle), :notice => 'Data Kendaraan sukses disimpan.')
     else
       to_flash(@vehicle)
       render :action => "edit"
