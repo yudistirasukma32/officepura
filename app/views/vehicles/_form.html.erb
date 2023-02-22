@@ -191,7 +191,7 @@
       <% end %>
 
       <% if @vehicle.updated_by %>
-        <p>Terakhir diupdate: <strong><%= @vehicle.updated_by %></strong></p>
+        <p>Terakhir diupdate: <strong><%= @vehicle.updated_at %></strong> <strong><%= @vehicle.updated_by %></strong></p>
       <% end %>
 
     </div>

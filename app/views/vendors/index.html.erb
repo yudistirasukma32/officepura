@@ -13,6 +13,8 @@
 		<table class="row-view">
 		<tr>
 			<th>Name</th>
+			<th>Group</th>
+			<th width="60" data-sorter="false" class="sorter-false">Aktif</th>
 			<th></th>
 		</tr>
 
@@ -20,11 +22,19 @@
 		<% if vendor.deleted %>
 			<tr class="deleted">
 				<td><%= vendor.name %></td>
+				<td><%= vendor.group rescue nil %></td>
+				<td></td>
 				<td class="right" width="60"></td>
 			</tr>
 			<% else %>
 			<tr>
 				<td><%= vendor.name %></td>
+				<td><%= vendor.group rescue nil %></td>
+				<% if vendor.enabled %>
+				<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+				<% else %>
+				<td><%= link_to '&#xf057;'.html_safe, 'javascript: void();', :class => 'disabled tipsy', :title => 'Tidak Aktif' %></td>
+				<% end %>
 				<td class="right" width="60">
 					<%= link_to '&#xf044;'.html_safe, edit_vendor_path(vendor), :class => "edit tipsy", :title => 'Edit' %> 
 					<%= link_to '&#xf00d;'.html_safe, vendor, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>

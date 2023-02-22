@@ -35,8 +35,9 @@ class TaxinvoiceitemsController < ApplicationController
     #hide bkk bongkar
     @invoices = @invoices.where('invoice_id is null')
     #hide bkk kosongan
-    cust_kosongan = Customer.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
-    @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
+    @cust_kosongan = Customer.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+
+    @invoices = @invoices.where("customer_id NOT IN (?)", @cust_kosongan).order(:id)
 
     if params[:customer_id].present?
       @invoices = @invoices.where(customer_id: params[:customer_id])
@@ -44,9 +45,12 @@ class TaxinvoiceitemsController < ApplicationController
 
     if params[:lain].present?
       if params[:lain] == "belum-sj"
-        invoice_id = Taxinvoiceitem.joins(:invoice).where(deleted: false).where("invoices.deleted = false and invoices.date between ? and ?", @startdate.to_date, @enddate.to_date).pluck(:invoice_id)
+        invoice_id = Taxinvoiceitem.joins(:invoice).where(deleted: false).where("invoices.deleted = false and invoices.date between ? and ?", @startdate.to_date, @enddate.to_date).where("taxinvoiceitems.total > money(0)").pluck(:invoice_id)
       elsif params[:lain] == 'belum-invoice'
-        invoice_id = Taxinvoice.joins(:taxinvoiceitems).joins("join invoices i on i.id = taxinvoiceitems.invoice_id").where("taxinvoices.deleted = false and taxinvoiceitems.deleted = false and i.deleted = false and i.date between ? and ?", @startdate.to_date, @enddate.to_date).pluck("i.id")
+
+        invoice_id = Taxinvoiceitem.joins(:invoice).where(deleted: false).where("invoices.deleted = false and invoices.date between ? and ?", @startdate.to_date, @enddate.to_date).where(taxinvoice_id: nil).where("taxinvoiceitems.total > money(0)").pluck(:invoice_id)
+        # render json: invoice_id
+        # return false
       elsif params[:lain] == 'upload-invoice'
         invoice_id = Invoice.joins(:attachments).where("attachments.file_uid is not null and attachments.file_uid <> '' and invoices.deleted = false and invoices.date between ? and ?", @startdate.to_date, @enddate.to_date).pluck(:id)
       end
@@ -54,8 +58,16 @@ class TaxinvoiceitemsController < ApplicationController
       invoice_id = []
     end
     
-    if invoice_id.length > 0
-        @invoices = @invoices.where("invoices.id not in (#{invoice_id.join(",")})")
+    if params[:lain] == 'belum-invoice'
+      if invoice_id.length > 0
+        @invoices = @invoices.where("invoices.id in (#{invoice_id.join(",")})")
+      else
+        @invoices = Invoice.active.where("id < 0")
+      end
+    else
+      if invoice_id.length > 0
+          @invoices = @invoices.where("invoices.id not in (#{invoice_id.join(",")})")
+        end
     end
 
     # bkm_invoice_id = Invoicereturn.joins(:invoice).where(deleted: false).where("invoices.deleted = false and invoices.date between ? and ?", @startdate.to_date, @enddate.to_date).pluck(:invoice_id)

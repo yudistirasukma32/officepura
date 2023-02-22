@@ -9,7 +9,7 @@
 
 		<select id="vendorvehicle_vendor_id" name="vendorvehicle[vendor_id]" class="double chzn-select">
 		<option value="0">- Pilih Vendor -</option>
-		<% Vendor.active.order(:name).each do |vendor| %>
+		<% Vendor.active.truck.order(:name).each do |vendor| %>
 		<option value="<%=vendor.id%>"
 			<% if vendor.id == @vendorvehicle.vendor_id %> selected="selected"<% end %>><%=vendor.name%></option>
 		<% end %>

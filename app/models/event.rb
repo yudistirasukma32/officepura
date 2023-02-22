@@ -9,6 +9,7 @@ class Event < ActiveRecord::Base
     belongs_to :company
     belongs_to :routetrain
 	belongs_to :operator
+    belongs_to :vendor
     
     has_many :invoices
     has_many :eventsalesorders

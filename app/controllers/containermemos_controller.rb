@@ -19,7 +19,26 @@ class ContainermemosController < ApplicationController
   def index
     role = cek_roles @user_role
     if role
-      @containermemos = Containermemo.all(:order =>:date)
+      # @containermemos = Containermemo.all(:order =>:date)
+
+      @startdate = params[:startdate]
+      @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
+
+      @vendor_id = params[:vendor_id]
+      @containertype = params[:containertype]
+  
+      @containermemos = Containermemo.where('deleted = false AND date between ? and ? AND id not in (select containermemo_id from containerexpenses where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
+  
+      if @vendor_id.present?
+        @containermemos = @containermemos.where('vendor_id = ?', @vendor_id)
+      end
+
+      if @containertype.present?
+        @containermemos = @containermemos.where('container_type = ?', @containertype)
+      end
+
       respond_to :html
     else
       redirect_to root_path()
@@ -55,7 +74,7 @@ class ContainermemosController < ApplicationController
 
     if @containermemo.update_attributes(inputs)
       @containermemo.save
-      redirect_to(edit_container_url(@containermemo), :notice => 'Data Memo Container sukses disimpan.')
+      redirect_to(edit_containermemo_url(@containermemo), :notice => 'Data Memo Container sukses disimpan.')
     else
       to_flash(@containermemo)
       render :action => "edit"

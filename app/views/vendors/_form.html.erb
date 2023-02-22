@@ -5,6 +5,21 @@
 	</div>
 
   <div class="field-row">
+    <%= f.label :abbr, "Singkatan" %>
+    <%= f.text_field :abbr %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :group, "Group"  %>
+    <%= f.select :group, options_for_select(@groups.collect {|w| [w, w]}, (params[:group].present? ? params[:group] : @vendor.group)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :category, "Kategori"  %>
+    <%= f.select :category, options_for_select(@categories.collect {|w| [w, w]}, (params[:category].present? ? params[:category] : @vendor.category)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
     <%= f.label :email, "Email" %>
     <%= f.text_field :email %>
   </div>

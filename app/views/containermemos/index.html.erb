@@ -13,20 +13,52 @@
 		<% end %>
 		<h1><a href="<%=containermemos_path%>">MEMO Kontainer</a> / Index</h1>
 
-		<%= render 'default/toggle_deleted_checkbox' %>
-
 		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="display: none;">
+				<label for="date">Pilih Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
+			</div>
+
+			<div class="field-row continue">
+				<label for="startdate" class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
+				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />&nbsp; &nbsp;
+				<label for="enddate" class="middle short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />&nbsp; &nbsp;
+				<label for="vendor_id" class="middle short" style='width:50px;float:none;'>Operator</label> &nbsp; &nbsp;
+				<select name="vendor_id" class="middle short">
+					<option value="">Semua</option>
+					<% Vendor.active.container.order(:name).each do |ope| %>
+					<option value="<%=ope.id%>"<% if ope.id == @ope %> selected='selected'<% end %>><%=ope.name%></option>
+					<% end %>
+				</select>
+				<label for="type" class="middle short" style='width:50px;float:none;'>Jenis Cont.</label> &nbsp; &nbsp;
+				<select name="containertype" class="middle short">
+					<option value="">Semua</option>
+					<% @contype.each do |contype| %>
+					<option value="<%=contype%>" <% if contype == @containertype %> selected='selected'<% end %>><%=contype%></option>
+					<% end %>
+				</select>
+
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
 		<br class="clearfix" />
 
 		<table class="row-view tablesorter hasFilters">
 			<thead>
 			<tr>
-				<th>Tanggal</th>
+				<th width="80">Tanggal</th>
+				<th>ID</th>
 				<th>Nomor Kontainer</th>
 				<th>Jenis</th>
-				<th>Operator</th>
+				<th>Vendor</th>
 				<th width="80">Storage</th>
-				<th>Total Biaya</th>
+				<th class="right">Total Biaya</th>
 				<th width="60" class="{sorter: false}"></th>
 			</tr>
 			</thead>
@@ -37,9 +69,10 @@
 				<% if current_user.adminrole %>
 				<tr class="deleted">
 					<td><strong><%=containermemo.date.strftime('%d')%></strong>.<%=containermemo.date.strftime('%m')%></td>
+					<td><%=zeropad(containermemo.id) %></td>
 					<td><%= containermemo.container.containernumber rescue nil %></td>
 					<td><%= containermemo.container_type %></td>
-					<td><%= containermemo.operator.abbr %></td>
+					<td><%= containermemo.vendor.name %></td>
 					<td class="right"><%= containermemo.storage_day rescue 0%> hari</td>
 					<td class="right"><%=to_currency_bank(containermemo.total)%></td>
 					<td class="right" width="60">&nbsp;</td>
@@ -49,9 +82,10 @@
 				<% if checkrole 'Admin Kendaraan' %>
 				<tr>
 					<td><strong><%=containermemo.date.strftime('%d')%></strong>.<%=containermemo.date.strftime('%m')%></td>
+					<td><%=zeropad(containermemo.id) %></td>
 					<td><%= containermemo.container.containernumber rescue nil %></td>
 					<td><%= containermemo.container_type %></td>
-					<td><%= containermemo.operator.abbr %></td>
+					<td><%= containermemo.vendor.name %></td>
 					<td class="right"><%= containermemo.storage_day rescue 0%> hari</td>
 					<td class="right"><%=to_currency_bank(containermemo.total)%></td>
 					<td class="right" width="60">
