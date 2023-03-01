@@ -250,6 +250,7 @@
 					<li><%= link_to_if (checkrole 'Admin HRD, Marketing, Auditor, Admin Marketing'), "Report DO", "/report-events" %></li> 
 					<li><%= link_to_if (checkrole 'Admin HRD, Marketing, Auditor, Admin Marketing, Admin Keuangan'), "Report DP DO", "/report-dp-events" %></li> 
 					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Kalender Event BKK", "/invoices/form_event" %></li>
+					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan'), "Report Memo Clean", "/reports/memocleanings" %></li>
 				</ul>
 			</li>
 			

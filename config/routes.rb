@@ -598,6 +598,8 @@ OfficePuraErp::Application.routes.draw do
     get "isotanks-utilization" => 'reports#isotankutilization'
     get "containers-utilization" => 'reports#containerutilization'
 
+    get "memocleanings" => 'reports#memocleanings'
+
     # match "indexannualreport_vehicle" => 'reports#indexannualreport_vehicle'
     get "indexannualreport_vehicle" => "reports#indexmonthlyreport_vehicle"
     match "indexannualreport_vehicle2" => 'reports#indexannualreport_vehicle'

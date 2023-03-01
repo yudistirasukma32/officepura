@@ -1,0 +1,74 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+		
+	<div id="content-full">
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1><%=Setting.find_by_name("Client Name").value%> / Report / Memo Cleaning: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue" style="display: flex;">
+					<div>
+						<label class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
+						<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
+					</div>
+					<div>
+						&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
+					<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+					</div>
+					<div>
+						<input class="submit" type="submit" value="Filter" style="margin-top: 0;" />
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<table class="row-view tablesorter sortable tablesorterFilters">
+		
+			<thead>
+				<tr>
+					<th width="30">No.</th>
+					<th width="40">DO.</th>
+					<th width="60">Tanggal.</th>
+					<th>Jurusan</th>
+					<th>No. Isotank</th>
+					<th>Komoditas</th>
+					<th>Selanjutnya</th>
+					<th class="{sorter:false, filter: false}"></th>
+				</tr>
+			</thead>
+
+			<tbody>
+			<% totalall = totaltruck = totaltrain = i = 0 %>
+			<% @containers.each do |container| %>
+				<tr id="<%=container.id%>">
+					<td><%=i+=1%>.</td>
+					<td><%=container.date.strftime('%d/%m/%y')%></td>
+					<td><%=container.event_id%></td>
+					<td><%=container.event.route.name rescue nil%></td>
+					<td><%=container.isotank.isotanknumber rescue nil%></td>
+					<td><%=container.event.commodity.name rescue nil%></td>
+					<td><%=container.next_description%></td>
+					<td>
+						<a href="/eventcleaningmemos/<%=container.id%>/edit" style="float: right !important;" target="_blank">
+							Detail&nbsp;
+						</a>
+					</td>
+				</tr>
+			<% end %>
+
+			</tbody>
+		</table>
+
+	</div>
+
+</div>

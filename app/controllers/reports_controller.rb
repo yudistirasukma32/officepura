@@ -2956,5 +2956,33 @@ class ReportsController < ApplicationController
     end
     
   end
+
+  def memocleanings
+    role = cek_roles 'Admin Operasional, Admin Marketing, Marketing, Admin Keuangan'
+
+    if role
+      @startdate = params[:startdate]
+      @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
+
+      @vendor_id = params[:vendor_id]
+      @containertype = params[:containertype]
+
+      @containers = Eventcleaningmemo.where('deleted = false AND date between ? and ?', @startdate.to_date, @enddate.to_date).order(:id)
+
+      if @vendor_id.present?
+        @containers = @containers.where('vendor_id = ?', @vendor_id)
+      end
+
+      if @containertype.present?
+        @containers = @containers.where('container_type = ?', @containertype)
+      end
+
+      respond_to :html
+    else
+      redirect_to root_path()
+    end
+  end
 end
 
