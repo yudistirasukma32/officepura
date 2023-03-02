@@ -161,15 +161,6 @@
 
     <% else %>
 
-      <% if @event.route_id.nil?  %>
-      
-        <div class="field-row">
-            <%= f.label :route_summary, "Jurusan" %>
-            <%= f.text_field :route_summary, class: "", :placeholder => 'Jurusan A - B' %>
-        </div>
-
-      <% else %>
-
         <div id="div_routes">
           <div class="field-row">
             <%= f.label :route_id, "Jurusan" %>
@@ -177,8 +168,6 @@
             <%= f.hidden_field :route_id, :value => @event.route_id %>
           </div>
         </div>
-
-      <% end %>
 
     <% end %>
 

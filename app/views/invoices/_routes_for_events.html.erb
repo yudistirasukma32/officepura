@@ -1,12 +1,12 @@
 <% if !@routes.first.nil? %>
 <div class="field-row">
   <label for="route_id">Jurusan</label>
-  <select id="event_route_id" name="event[route_id]" class="chzn-select double combo_route">
-    <option value="0">- Pilih Jurusan -</option>
+  <select id="event_route_id" name="event[route_id]" class="chzn-select double combo_route" required>
+    <!-- <option value="0">- Pilih Jurusan -</option> -->
     <% @routes.each do |route| %>
     <option value="<%=route.id%>"><%=route.name%> (<%=route.routegroup.name%>)</option>
     <% end %>
   </select>
-  <small>*Jurusan yang ditampilkan diatas berdasarkan Pilihan Pelanggan.</small>
+  <small>*Jurusan yang ditampilkan diatas berdasarkan Pilihan Pelanggan!.</small>
  </div>
 <% end %>
