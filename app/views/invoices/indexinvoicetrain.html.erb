@@ -7,8 +7,10 @@
 <div id="main">
 	
 	<div id="content-full">
- 
+	<% if !checkroleonly 'Vendor Supir' %>
 		<a class="btn-txt right" href="<%=new_invoice_path%>?train=true"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+	<% end %>
+		
 		<h1>Transaksi / <a href="<%=invoices_path%>">Bukti Kas Keluar Kereta</a> / Index</h1>
 		<br class="clearfix" />
 

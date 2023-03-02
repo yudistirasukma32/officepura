@@ -1,5 +1,4 @@
 class Driver < ActiveRecord::Base
-
 	after_create :setup_bankexpensegroup
 	before_update :check_bankexpensegroup
 
@@ -13,22 +12,24 @@ class Driver < ActiveRecord::Base
 	has_many :payrolls
 
 	belongs_to :vehicle
+	belongs_to :vendor
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :enabled, :name,
 					:address, :city, :phone, :mobile, :driver_licence, :driver_licence_expiry, :id_card, :id_card_expiry,
 					:start_working, :description, :min_wages, :status, :salary, :terms_of_payment_in_days, :deleted, :emergency_number,
-					:weight_loss, :accident, :sparepart, :bon, :saving, :vehicle_id, :bank_account, :bank_name, :bankexpensegroup_id, :old_name, :origin
+					:weight_loss, :accident, :sparepart, :bon, :saving, :vehicle_id, :bank_account, :bank_name, :bankexpensegroup_id, 
+					:old_name, :origin, :is_resign, :vendor_id
 
   scope :active, lambda {where(:enabled => true, :deleted => false)}  					
+
 
   def setup_bankexpensegroup
 	bankexpensegroup = Bankexpensegroup.create({
 		name: "Bank Supir #{self.name}",
 		bankexpensegroup_id: 137
 	})
-	self.bankexpensegroup_id = bankexpensegroup.id
-	self.save
+	self.save rescue nil
   end
 
   def check_bankexpensegroup

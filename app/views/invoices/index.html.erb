@@ -7,7 +7,9 @@
 <div id="main">
 	
 	<div id="content-full">
-		<a class="btn print" href="<%=new_invoice_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<% if !checkroleonly 'Vendor Supir' %>
+			<a class="btn print" href="<%=new_invoice_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<% end %>
 		<h1>Transaksi / <a href="<%=invoices_path%>">Bukti Kas Keluar</a> / Index</h1>
 		
 		<br class="clearfix" />
@@ -59,14 +61,7 @@
 					<td><%=zeropad(invoice.id) %></td>
 					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
 					</td>
-					<% if 
-					# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
-					invoice.office.abbr == '' 
-					%>
-                    <td class="red"><%=invoice.office.abbr%></td>    
-                    <% else %>
-                    <td><%=invoice.office.abbr%></td>
-                    <% end %>	
+					<td><%=invoice.office.abbr rescue nil%></td>	
 					<td>
 						<%=invoice.vehicle.current_id rescue nil%>
 						<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
@@ -95,18 +90,9 @@
 					</td>
 					<td><%=invoice.event_id rescue nil%></td>
                     <td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
-					<% if 
-					# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
-					invoice.office.abbr == '' 
-					%>
-                    <td align="right" class="red">
-                        <%=to_currency(0)%>
-                    </td>    
-                    <% else %>
-                    <td align="right">        
-                        <%=to_currency(invoice.total)%>
-                    </td>
-                    <% end %>
+					<td align="right">        
+						<%=to_currency(invoice.total)%>
+					</td>
                     <td width="60">DIHAPUS</td>
 				</tr>
 				<% end %>
@@ -115,14 +101,7 @@
 				<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice) %></td>
 				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> 
                 </td>
-				<% if 
-				# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
-				invoice.office.abbr == '' 
-				%>
-                <td class="red"><%=invoice.office.abbr%></td>    
-                <% else %>
-                <td><%=invoice.office.abbr%></td>
-                <% end %>
+				<td><%=invoice.office.abbr rescue nil%></td>
 				<td>
 					<%=invoice.vehicle.current_id rescue nil%>
 					<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
@@ -156,18 +135,9 @@
                 </td>
 				<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
 				
-				<% if 
-				# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
-				invoice.office.abbr == '' 
-				%>
-                <td align="right" class="red">
-                    <%=to_currency(0)%>
-                </td>    
-                <% else %>
                 <td align="right">        
                     <%=to_currency(invoice.total)%>
                 </td>
-                <% end %>
 				
                 <td class="right" width="60">
 					<% if invoice.receipts.active.count == 0 %>
@@ -184,9 +154,11 @@
 		
 		</table>
 
+		<% if !checkroleonly 'Vendor Supir' %>
 		<div class="actions">
 			<a class="btn-txt right" href="<%=new_invoice_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
 		</div>
+		<% end %>
 	</div>
 
 </div>

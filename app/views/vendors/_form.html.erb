@@ -36,6 +36,17 @@
     <%= f.text_area :description %>
   </div>
 
+  <div class="field-row">
+    <%= f.label :user_id, "User Vendor" %>
+    <select id="vendor_user_id" name="vendor[user_id]" class="half left chzn-select">
+    <option value="0">- Pilih User Vendor -</option>
+    <% @users.each do |user| %>
+    <option value="<%=user.id%>"
+      <% if user.id == @vendor.user_id %> selected="selected"<% end %>><%=user.username%></option>
+    <% end %>
+    </select>
+  </div>
+
   <div class="actions">
     <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin HRD, Admin Operasional, Admin Marketing' %>
     <a class="back left" href="<%=vendors_path%>">Kembali ke Index</a>

@@ -17,6 +17,8 @@
 		<br class="clearfix" />
 		<br class="clearfix" />
 
+		<% if !checkroleonly 'Vendor Supir' %>
+
 		<div id="filter" style="padding: 5px 10px 5px 10px;">
 			<form id="filterform" name="filterform" action="" method="get">
 			<div class="field-row continue">
@@ -24,15 +26,33 @@
 				<label for="origin" style="float:none">Status</label>
 				<select name="origin" class="half combo_route" style="margin-top: 0.25rem;">
 				<option value="">Semua</option>
-					<% ["Mitra", "Outsource", "Resign"].each do |type| %>
+					<% ["Mitra", "Outsource"].each do |type| %>
 					<option <%= type == params[:origin] ? 'selected' : '' %>><%=type%></option>
 					<% end %>
-				</select> 
+				</select> &nbsp; &nbsp;
+				
+				<label for="is_resign" style="float:none">Resign</label>
+				<select name="is_resign" class="half combo_route" style="margin-top: 0.25rem;">
+				<option value="">Semua</option>
+					<% ["Yes", "No"].each do |type| %>
+					<option <%= type == params[:is_resign] ? 'selected' : '' %>><%=type%></option>
+					<% end %>
+				</select>
+				
+				<label for="vendor_id" class="middle short" style='width:50px;float:none;'>Operator</label> &nbsp; &nbsp;
+				<select name="vendor_id" class="middle short">
+					<option value="">Semua</option>
+					<% Vendor.driver.active.order(:name).each do |ope| %>
+					<option value="<%=ope.id%>"<% if ope.id == @ope %> selected='selected'<% end %>><%=ope.abbr%></option>
+					<% end %>
+				</select>
  
 				<input class="submit" type="submit" value="Filter" />
 			</div>
 			</form>
 		</div>
+
+		<% end %>
 
 		<br class="clearfix" />
 
@@ -43,7 +63,9 @@
 				<th>Kota</th>
 				<th>Telp</th>
 				<th>Rekening</th>
-				<th>Status</th>
+				<th width="90">Vendor</th>
+				<th width="90">Status</th>
+				<th>Resign</th>
 				<th width="60" class="{sorter: false}">Aktif</th>
 				<th width="60" class="{sorter: false}"></th>
 			</tr>
@@ -58,7 +80,9 @@
 					<td><%= driver.city %></td>
 					<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
 					<td><%= driver.bank_account %></td>
+					<td><%= driver.vendor.name rescue nil %></td>
 					<td><%= driver.origin %></td>
+					<td><%= driver.is_resign ? 'Resign' : '' %></td>
 					<% if driver.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
 					<% else %>
@@ -74,7 +98,9 @@
 					<td><%= driver.city %></td>
 					<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
 					<td><%= driver.bank_account %></td>
+					<td><%= driver.vendor.name rescue nil %></td>
 					<td><%= driver.origin %></td>
+					<td><%= driver.is_resign ? 'Resign' : '' %></td>
 					<% if driver.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, disable_driver_path(driver), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>
 					<% else %>
@@ -91,7 +117,9 @@
 					<td><%= driver.city %></td>
 					<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
 					<td><%= driver.bank_account %></td>
+					<td><%= driver.vendor.name rescue nil %></td>
 					<td><%= driver.origin %></td>
+					<td><%= driver.is_resign ? 'Resign' : '' %></td>
 					<% if driver.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
 					<% else %>

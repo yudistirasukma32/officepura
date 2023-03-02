@@ -7,7 +7,10 @@
 <div id="main">
 	
 	<div id="content-full">
-		<a class="btn print" href="<%=new_invoice_path%>?kosongan=true"><i class="icon-plus-sign"></i> &nbsp;Tambah BKK Kosongan</a>
+
+		<% if !checkroleonly 'Vendor Supir' %>
+			<a class="btn print" href="<%=new_invoice_path%>?kosongan=true"><i class="icon-plus-sign"></i> &nbsp;Tambah BKK Kosongan</a>
+		<% end %>
  
 		<h1>Transaksi / <a href="kosongan">BKK Kosongan</a> / Index</h1>
 		
@@ -182,9 +185,11 @@
 		
 		</table>
 
-		<div class="actions">
-			<a class="btn-txt right" href="<%=new_invoice_path%>?kosongan=true"><i class="icon-plus-sign"></i> &nbsp;Tambah BKK Kosongan</a>
-		</div>
+		<% if !checkroleonly 'Vendor Supir' %>
+			<div class="actions">
+				<a class="btn-txt right" href="<%=new_invoice_path%>?kosongan=true"><i class="icon-plus-sign"></i> &nbsp;Tambah BKK Kosongan</a>
+			</div>
+		<% end %>
 	</div>
 
 </div>

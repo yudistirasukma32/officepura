@@ -114,13 +114,28 @@
       </div>
 
       <div class="field-row">
-      <%= f.label :origin, "Status Kepagawaian" %>
+        <%= f.label :origin, "Status Kepagawaian" %>
         <select name="driver[origin]" class="half left ">
             <option value="">-- Status --</option>
             <option value="Outsource" <% if @driver.origin == "Outsource"%> selected="selected" <% end %>>Outsource</option>
             <option value="Mitra" <% if @driver.origin == "Mitra"%> selected="selected" <% end %>>Mitra</option>
-            <option value="Resign" <% if @driver.origin == "Resign"%> selected="selected" <% end %>>Resign (Ex)</option>
+            <!-- <option value="Resign" <% if @driver.origin == "Resign"%> selected="selected" <% end %>>Resign (Ex)</option> --!>
         </select>
+
+        <%= f.label :vendor_id, "Vendor", :class => 'middle' %>
+
+        <select id="driver_vendor_id" name="driver[vendor_id]" class="half left chzn-select">
+        <option value="0">- Pilih Vendor -</option>
+        <% Vendor.active.driver.order(:name).each do |vendor| %>
+        <option value="<%=vendor.id%>"
+          <% if vendor.id == @driver.vendor_id %> selected="selected"<% end %>><%=vendor.name%></option>
+        <% end %>
+        </select>
+      </div>
+
+      <div class="field-row" >
+        <%= f.label :is_resign, "Resign", :class => 'half left "' %>
+        <input type="checkbox" value="1" name="driver[is_resign]" <% if @driver.is_resign %> checked="checked" <% end %> />
       </div>
 
       <div class="field-row" >

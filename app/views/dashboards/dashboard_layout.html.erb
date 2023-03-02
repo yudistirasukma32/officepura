@@ -10,6 +10,7 @@
 
 		<h1><%=Setting.find_by_name("Client Name").value%> / Dashboard<br /><span class="red"><%=@date.to_date.strftime('%B %Y')%></span></h1>
 
+		<% if !checkroleonly 'Vendor Supir' %>
 		<div class="row">
 			<div class="widget blue small-widget">
 				<ul>
@@ -67,5 +68,17 @@
 				</ul>
 			</div>
 		</div>
+		<% else %>
+
+		<div class="row">
+			<div class="widget blue small-widget">
+				<ul>
+					<li class="head"><a href="/drivers"><i class="icon-user"></i><br /><h3>Supir</h3></a></li>
+					<li class="footer grey"><%=@driver%></li>
+				</ul>
+			</div>
+		</div>
+
+		<% end %>
 	</div>
 </div>

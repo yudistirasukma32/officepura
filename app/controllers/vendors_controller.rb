@@ -8,7 +8,7 @@ class VendorsController < ApplicationController
     @section = "vendors"
     @where = "vendors"
     @categories = ["Dry Container 20'", "Side Door Open 20'"]
-    @groups = ["Container", "Truck"]
+    @groups = ["Container", "Truck", "Driver"]
 
   end
 
@@ -29,12 +29,13 @@ class VendorsController < ApplicationController
   def new
     @vendor = Vendor.new
     @vendor.enabled = true
+    @users = User.where("deleted = false AND username LIKE 'vendor_%'")
     respond_to :html
   end
 
   def edit
     @vendor = Vendor.find(params[:id])
-
+    @users = User.where("deleted = false AND username LIKE 'vendor_%'")
     respond_to :html
   end
 

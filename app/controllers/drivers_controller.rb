@@ -10,19 +10,46 @@ class DriversController < ApplicationController
   end
 
   def set_role
-    @user_role = 'Admin Operasional, Admin HRD, Admin Keuangan, Operasional BKK'
+    @user_role = 'Admin Operasional, Admin HRD, Admin Keuangan, Operasional BKK, Vendor Supir'
+    @vendor = 'Vendor Supir'
   end
 
   def index
     role = cek_roles @user_role
     if role
 
-      @origin = params[:origin]
+      vendor_role = checkroleonly @vendor
 
-      @drivers = Driver.order('name')
+      if vendor_role
 
-      if @origin.present? and @origin != ''
-          @drivers = @drivers.where("origin = ?", @origin)
+        @vendor = Vendor.where('user_id = ?', current_user.id)
+        
+        if @vendor.present?
+          @drivers = Driver.order('name')
+          @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
+        end
+
+      else
+
+        @origin = params[:origin]
+        @is_resign = params[:is_resign]
+        @vendor_id = params[:vendor_id]
+  
+        @drivers = Driver.order('name')
+  
+        if @origin.present? and @origin != ''
+            @drivers = @drivers.where("origin = ?", @origin)
+        end
+  
+        if @is_resign.present? and @is_resign != 'No'
+            @drivers = @drivers.where("is_resign = true")
+        end
+  
+        if @is_resign.present? and @is_resign == 'No'
+          @drivers = @drivers.where("is_resign = false")
+        end
+  
+          
       end
 
       respond_to :html
@@ -67,14 +94,31 @@ class DriversController < ApplicationController
     @helper.saving = @helper.saving.to_i
     @helper.driver_licence_expiry = @helper.driver_licence_expiry.strftime('%d-%m-%Y') if !@helper.driver_licence_expiry.blank?
     @helper.id_card_expiry = @helper.id_card_expiry.strftime('%d-%m-%Y') if !@helper.id_card_expiry.blank?
+
+    # render json: @driver.bank_account
+  end
+
+  def create_bank_expense_group
+    # Bankexpensegroup.
+    Driver.active.each do |driver|
+      bank_expense_group = Bankexpensegroup.create({
+        name: "Bank Supir #{driver.name}",
+        bankexpensegroup_id: 137
+      })
+
+      driver.bankexpensegroup_id = bank_expense_group.id
+      driver.save
+    end
   end
 
   def create
     inputs = params[:driver]
     @driver = Driver.new(inputs)
 
+    @driver.is_resign = inputs[:is_resign] == "1" ? true : false
+
     if @driver.save
-      redirect_to(edit_driver_url(@driver), :notice => 'Data Supir sukses di tambah.')
+      redirect_to(edit_driver_url(@driver), :notice => 'Data Supir sukses ditambah.')
     else
       to_flash(@driver)
       render :action => "new"
@@ -85,9 +129,12 @@ class DriversController < ApplicationController
     inputs = params[:driver]
     @driver = Driver.find(params[:id])
 
+    @driver.is_resign = inputs[:is_resign] == "1" ? true : false
+
     if @driver.update_attributes(inputs)
+
       @driver.save
-      redirect_to(edit_driver_url(@driver), :notice => 'Data Supir sukses di simpan.')
+      redirect_to(edit_driver_url(@driver), :notice => 'Data Supir sukses disimpan.')
     else
       to_flash(@driver)
       render :action => "edit"
@@ -111,71 +158,5 @@ class DriversController < ApplicationController
     @driver = Driver.find(params[:id])
     @driver.update_attributes(:enabled => false)
     redirect_to(drivers_url)
-  end
-
-  def create_bank_expense_group
-    # Bankexpensegroup.
-    Driver.active.where("bankexpensegroup_id is null").each do |driver|
-      bank_expense_group = Bankexpensegroup.create({
-        name: "Bank Supir #{driver.name}",
-        bankexpensegroup_id: 137
-      })
-
-      driver.bankexpensegroup_id = bank_expense_group.id
-      driver.save
-    end
-  end
-
-  def clone
-    require "uri"
-		require "net/http"
-		require "openssl"
-		require 'json'
-
-    # url = URI("https://office.puratrans.com/api_customers/get_all_customers")
-    url = URI("https://internal.puratrans.com/api/driversapi/list_sangu")
-
-		http = Net::HTTP.new(url.host, url.port)
-		http.use_ssl = true
-		http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-		request = Net::HTTP::Get.new(url.request_uri)
-
-		response = http.request(request)
-		@drivers = ActiveSupport::JSON.decode(response.read_body)
-    # render json: destination_drivers[0]
-  end
-
-  def save_clone
-    require "uri"
-		require "net/http"
-		require "openssl"
-		require 'json'
-
-    # url = URI("https://office.puratrans.com/api_customers/get_all_customers")
-    url = URI("https://internal.puratrans.com/api/driversapi/list_sangu")
-
-		http = Net::HTTP.new(url.host, url.port)
-		http.use_ssl = true
-		http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-		request = Net::HTTP::Get.new(url.request_uri)
-
-		response = http.request(request)
-    driver_id = []
-		ActiveSupport::JSON.decode(response.read_body).each do |driver|
-      current_driver = Driver.where("name like '#{driver["name"]}%'").first
-      if current_driver.present?
-        driver_id.push(current_driver.id)
-        current_driver.accident = driver["accident"].to_i
-        current_driver.weight_loss = driver["weight_loss"].to_i
-        current_driver.sparepart = driver["sparepart"].to_i
-        current_driver.bon = driver["bon"].to_i
-        current_driver.saving = driver["saving"].to_i
-        current_driver.save
-
-      end
-    end
-    
-    render json: Driver.active.where(id: driver_id).select("id, accident, weight_loss, sparepart, bon, saving, name")
-
   end
 end

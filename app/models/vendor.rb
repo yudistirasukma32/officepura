@@ -16,4 +16,6 @@ class Vendor < ActiveRecord::Base
 
     scope :truck, lambda {where(:group => 'Truck')}
 
+    scope :driver, lambda {where(:group => 'Driver')}
+
 end
