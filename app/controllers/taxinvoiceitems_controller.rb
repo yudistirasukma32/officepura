@@ -76,6 +76,16 @@ class TaxinvoiceitemsController < ApplicationController
     # confirmed_invoice_id = Receipt.joins(:invoice).where(deleted: false).where("invoices.deleted = false and invoices.date between ? and ?", @startdate.to_date, @enddate.to_date).pluck(:invoice_id)
     # @invoices = @invoices.where("id in(#{confirmed_invoice_id.join(",")})") if confirmed_invoice_id.present?
     
+    if checkroleonly 'Vendor Supir'
+
+      @vendor = Vendor.where('user_id = ?', current_user.id)
+
+      if @vendor.present? 
+        @invoices = @invoices.where('driver_id in (select id from drivers where vendor_id = ?)', @vendor[0].id)
+      end
+
+    end
+    
     @invoices = @invoices.order(:id)
     # render json: confirmed_invoice_id
     # return false

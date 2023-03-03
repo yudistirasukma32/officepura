@@ -6,6 +6,7 @@ development:
   username: pura
   password: puratrans123
   host: localhost
+  port: 5433
   
 production:
   adapter: postgresql

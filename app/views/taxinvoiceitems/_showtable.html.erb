@@ -112,7 +112,13 @@
             <% end %>
             </td>
             <td class="center">
-                    <a class="cta" style="margin-top:1rem;" href="/taxinvoiceitems/new/<%=invoice.id%>">Isi SJ</a>&nbsp;
+                
+                <% if !checkroleonly 'Vendor Supir' %>
+                <a class="cta" style="margin-top:1rem;" href="/taxinvoiceitems/new/<%=invoice.id%>">Isi SJ</a>&nbsp;
+                <% else %>
+                <a class="cta" style="margin-top:1rem;" href="/taxinvoiceitems/new/<%=invoice.id%>">Detail</a>&nbsp;
+                <% end %>
+
                 <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
                     <a class="cta" href="/taxinvoiceitems/print/<%=invoice.id%>" style="background-color: green; margin-left: 0.2rem; display: none;">Edit</a>
                 <% end %>    

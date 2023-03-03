@@ -192,6 +192,7 @@
   </div> 
 <% end %>
  
+<% if !checkroleonly 'Vendor Supir' %>
 	<div class="hideprint" style="width:300px; float:right; clear:right;">
 		<% if @invoice %>
 
@@ -291,6 +292,7 @@
 
 		<% end %>
 	</div>
+<% end %>
 
 <br class="clearfix" />
 
@@ -374,10 +376,13 @@
 
 <div class="actions">
   <a class="btn right" href="<%=taxinvoiceitems_path({:startdate => $globalStartdate, :enddate => $globalEnddate})%>">Kembali ke Index</a>
-  <input type="submit" class="btn right" value="Tambah Data" />
 
-  <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
-	<a type="submit" href="/taxinvoiceitems/downloadexcel/<%= params[:invoice_id] %>" class="btn right" style="height: 18px;">Cetak Excel</a>
+  <% if !checkroleonly 'Vendor Supir' %>
+    <input type="submit" class="btn right" value="Tambah Data" />
+  
+    <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
+    <a type="submit" href="/taxinvoiceitems/downloadexcel/<%= params[:invoice_id] %>" class="btn right" style="height: 18px;">Cetak Excel</a>
+    <% end %>
   <% end %>
   
 </div>

@@ -140,12 +140,16 @@
                 </td>
 				
                 <td class="right" width="60">
-					<% if invoice.receipts.active.count == 0 %>
-						<%= link_to '&#xf044;'.html_safe, edit_invoice_path(invoice), :class => "edit tipsy", :title => 'Edit' %> 
+					<% if !checkroleonly 'Vendor Supir' %>
+						<% if invoice.receipts.active.count == 0 %>
+							<%= link_to '&#xf044;'.html_safe, edit_invoice_path(invoice), :class => "edit tipsy", :title => 'Edit' %> 
+						<% end %>
 					<% end %>
 					<a href="/invoices/<%=invoice.id%>/confirmation" class="delete tipsy" title="Print BKK"><i class="icon-print"></i></a>
-					<% if invoice.receipts.active.count == 0 %>
-						<%= link_to '&#xf00d;'.html_safe, invoice, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+					<% if !checkroleonly 'Vendor Supir' %>
+						<% if invoice.receipts.active.count == 0 %>
+							<%= link_to '&#xf00d;'.html_safe, invoice, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+						<% end %>
 					<% end %>
 				</td>
 			</tr>
