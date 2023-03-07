@@ -295,7 +295,7 @@ class EventsController < ApplicationController
         }
         end
     else
-      @events = Event.active.where("cancelled = false and start_date >= ?", 3.months.ago).order(:id)
+      @events = Event.active.where("start_date >= ?", 3.months.ago).order(:id)
         
       invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)    
         
@@ -317,6 +317,10 @@ class EventsController < ApplicationController
 
                 if e.need_vendor
                   completed_by_vendor = true
+                end
+
+                if e.cancelled
+                  cancelled = true
                 end
                 
                 if invoices.index(e.id)

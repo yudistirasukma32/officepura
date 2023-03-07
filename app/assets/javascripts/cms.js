@@ -1442,6 +1442,7 @@ function getDataEvents(cl)
 					obj.url = '/events/' + object.id + '/edit'
 				}
 
+				if (object.cancelled) obj.className = 'cancelled';
 				if (object.is_booking) obj.className = 'is_booking';
 				if (object.authorised) obj.className = 'authorised';
                 if (object.half_completed) obj.className = 'half_completed';

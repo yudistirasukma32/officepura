@@ -26,7 +26,7 @@ class Event < ActiveRecord::Base
     :company_id, :estimated_tonage, :tanktype, :load_date, :unload_date, :routetrain_id, :operator_id, 
     :downpayment_amount, :downpayment_date, :losing, :price_per_type
 
-    scope :active, lambda {where(:cancelled => false, :deleted => false)}  
+    scope :active, lambda {where(:deleted => false)}  
 
     include PublicActivity::Model
 	tracked owner: Proc.new { |controller, model| controller.current_user }

@@ -270,6 +270,11 @@ html .fc,
 	background-color: #c03; /* default BACKGROUND color */	
 }
 
+.fc-event.cancelled {
+	border: 1px solid #c03; /* default BORDER color */
+	background-color: #c03; /* default BACKGROUND color */	
+}
+
 .fc-event.authorised {
 	border: 1px solid #2196f3; /* default BORDER color */
 	background-color: #2196f3; /* default BACKGROUND color */	
