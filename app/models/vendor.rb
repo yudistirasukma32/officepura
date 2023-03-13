@@ -3,6 +3,7 @@ class Vendor < ActiveRecord::Base
     has_many :containers
     has_many :vendorvehicles
     has_many :events
+    has_many :truckvendors, class_name: 'Invoice', foreign_key: 'truckvendor_id'
 
     # Setup accessible (or protected) attributes for your model
     attr_accessible :deleted, :enabled, :event_id, :name, :npwp, :phone, :mobile,

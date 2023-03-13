@@ -42,8 +42,9 @@
                     <th width="80">No. BKK</th>
 					<th width="100">No.SJ</th>
 					<th width="400" >Keterangan INV</th>
-					<th width="300">Pelanggan</th>
-					<th width="80">Nopol</th>
+					<th width="280">Pelanggan</th>
+					<th width="100">Nopol</th>
+					<th width="80">Supir</th>
 					<!-- <th width="80" class="right">Total</th> -->
 				</tr>
 			</thead>
@@ -62,6 +63,7 @@
 					<td><%if taxinvoiceitem.taxinvoice %><%= ''+ taxinvoiceitem.taxinvoice.date.strftime('%d/%m/%Y') + ' - ' + taxinvoiceitem.taxinvoice.long_id %> <%else%> - <%end%> </td>
 					<td><%=taxinvoiceitem.customer.name rescue nil %></td>
 					<td><%=taxinvoiceitem.invoice.vehicle.current_id rescue nil %> </td>
+					<td><%=taxinvoiceitem.invoice.driver.name rescue nil %> </td>
 
 					<!-- <td align="right">
 						<%=to_currency_bank(taxinvoiceitem.total) rescue '0' %>

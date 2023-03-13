@@ -21,7 +21,7 @@ class InvoicereturnsController < ApplicationController
       @date = params[:date]
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
       $globalDate = @date
-      @invoices = Invoice.where('date = ? AND deleted = false AND id NOT IN (SELECT invoice_id FROM taxinvoiceitems WHERE deleted = false AND money(total) > money(0)) AND id IN (SELECT invoice_id FROM receipts WHERE deleted = false)', @date.to_date).order(:id) 
+      @invoices = Invoice.where('date = ? AND by_vendor = false AND deleted = false AND id NOT IN (SELECT invoice_id FROM taxinvoiceitems WHERE deleted = false AND money(total) > money(0)) AND id IN (SELECT invoice_id FROM receipts WHERE deleted = false)', @date.to_date).order(:id) 
       @invoicereturns = Invoicereturn.where('invoice_id in (select id from invoices where date = ?) AND deleted = false', @date.to_date)
       respond_to :html
     else

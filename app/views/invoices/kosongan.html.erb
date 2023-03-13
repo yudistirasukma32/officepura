@@ -62,6 +62,9 @@
 				<tr class="deleted">
 					<td><%=zeropad(invoice.id) %></td>
 					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
+					<% if invoice.by_vendor %>
+						<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+					<% end %>
 					</td>
                     <% if 
 						# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP' 
@@ -120,7 +123,10 @@
 			<tr>
 				<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice) %></td>
 				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> 
-                </td>
+				<% if invoice.by_vendor %>
+					<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+				<% end %>
+				</td>
 				<% if 
 				# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP' 
 				invoice.office.abbr == ''

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20230302063228) do
+ActiveRecord::Schema.define(:version => 20230310095129) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -338,6 +338,8 @@ ActiveRecord::Schema.define(:version => 20230302063228) do
     t.string    "origin"
     t.boolean   "is_resign",                                                            :default => false
     t.integer   "vendor_id"
+    t.date      "datein"
+    t.date      "dateout"
   end
 
   create_table "eventcleaningmemos", :force => true do |t|
@@ -603,6 +605,8 @@ ActiveRecord::Schema.define(:version => 20230302063228) do
     t.date      "load_date"
     t.boolean   "is_insurance",                                                     :default => false
     t.decimal   "tsi_total",                         :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "by_vendor",                                                        :default => false
+    t.integer   "truckvendor_id"
   end
 
   add_index "invoices", ["date", "customer_id", "event_id", "invoicetrain"], :name => "invoice_events"

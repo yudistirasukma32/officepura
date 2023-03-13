@@ -131,7 +131,7 @@
 			</li>
 
 			<li class="<%= @section == 'reports1' ? 'on' : '' %>">
-				<%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan, Admin HRD'), "Laporan 1", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('reports1');".html_safe %>
+				<%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan, Admin HRD, Vendor Supir'), "Laporan 1", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('reports1');".html_safe %>
 			
 				<ul id="sub-reports1" class="submenu" style="width:200px;">					
 					<!--<li><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Kas Harian (Lama)", "/reports/expenses-daily" %></li>-->
@@ -165,7 +165,7 @@
 						<li><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>
 						<li><%= link_to "Laporan Pemakaian Nopol ", "/reports/drivervehicles" %></li> 
 					<% else %>
-						<% if checkrole 'Admin Keuangan, Admin Operasional' %>
+						<% if checkrole 'Admin Keuangan, Admin Operasional, Vendor Supir' %>
 							<li><%= link_to "Laporan Surat Jalan", "/reports/taxinvoiceitems_report" %></li>
 							<!-- <li><%= link_to "Laporan BKK ", "/reports/invoices" %></li> -->
 							<li><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>

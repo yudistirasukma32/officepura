@@ -7,7 +7,7 @@ class VendorsController < ApplicationController
   def set_section
     @section = "vendors"
     @where = "vendors"
-    @categories = ["Dry Container 20'", "Side Door Open 20'"]
+    @categories = ["-", "Dry Container 20'", "Side Door Open 20'"]
     @groups = ["Container", "Truck", "Driver"]
 
   end

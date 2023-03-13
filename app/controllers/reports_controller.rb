@@ -475,29 +475,43 @@ class ReportsController < ApplicationController
   end
 
   def taxinvoiceitems_report
-#    role = current_user.owner
-    role = cek_roles 'Admin Operasional, Admin Keuangan'
-    if role
-      @startdate = params[:startdate]
-      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
-      @enddate = params[:enddate]
-      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
-
-      @customer_id = Customer.find(params[:customer_id]).id rescue nil
-
-      if @customer_id
-        @taxinvoiceitems = Taxinvoiceitem.active.where("(date >= ? and date < ? AND customer_id = ?)", @startdate.to_date, @enddate.to_date + 1, @customer_id).order("date, taxinvoice_id")
-      else
-        @taxinvoiceitems = Taxinvoiceitem.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("date ASC, taxinvoice_id ASC")
-      end
-      @section = "reports1"
-      @where = "taxinvoiceitems-report"
-      render "taxinvoiceitems-report"
-    else
-      redirect_to root_path()
-    end
+    #    role = current_user.owner
+        role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
+        if role
+          @startdate = params[:startdate]
+          @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+          @enddate = params[:enddate]
+          @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
     
-  end
+          @customer_id = Customer.find(params[:customer_id]).id rescue nil
+    
+          if @customer_id
+            @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ? AND taxinvoiceitems.customer_id = ?)", @startdate.to_date, @enddate.to_date + 1, @customer_id).order("date, taxinvoice_id")
+          else
+            @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ?)", @startdate.to_date, @enddate.to_date + 1).order("date ASC, taxinvoice_id ASC")
+          end
+    
+          if checkroleonly 'Vendor Supir'
+    
+            @vendor = Vendor.where('user_id = ?', current_user.id)
+            
+            if @vendor.present?
+              @drivers = Driver.order('name')
+              @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
+    
+              @taxinvoiceitems = @taxinvoiceitems.joins(:invoice).where("invoices.driver_id in (select id from drivers where vendor_id = ?)", @vendor[0].id)
+            end
+    
+          end
+    
+          @section = "reports1"
+          @where = "taxinvoiceitems-report"
+          render "taxinvoiceitems-report"
+        else
+          redirect_to root_path()
+        end
+        
+      end
 
   def isotanks_report
     role = cek_roles 'Admin Operasional, Admin HRD, Admin Gudang'
@@ -647,7 +661,7 @@ class ReportsController < ApplicationController
   end
     
   def confirmed_invoices
-    role = cek_roles 'Admin Operasional, Admin Keuangan'
+    role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
     if role
       @offices = Office.active        
       @startdate = params[:startdate]
@@ -660,6 +674,20 @@ class ReportsController < ApplicationController
 
       @drivers = Driver.active.order('name')
       @driver_id = params[:driver_id]
+
+      if checkroleonly 'Vendor Supir'
+
+        @vendor = Vendor.where('user_id = ?', current_user.id)
+        
+        if @vendor.present?
+          @drivers = Driver.order('name')
+          @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
+
+          @invoices = @invoices.where("driver_id in (select id from drivers where vendor_id = ?)", @vendor[0].id)
+        end
+
+      end
+
       @vehicle_id = params[:vehicle_id]
 
       @office_id = params[:office_id]
@@ -715,41 +743,52 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-  end  
+end  
 
-  def drivervehicles
-    role = cek_roles 'Admin Operasional, Admin Keuangan'
-    if role
- 
-      @startdate = params[:startdate]
-      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
-      @enddate = params[:enddate]
-      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+def drivervehicles
+  role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
+  if role
 
-      @drivers = Driver.active.order('name')
+    @startdate = params[:startdate]
+    @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+    @enddate = params[:enddate]
+    @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
 
-      @driver_id = params[:driver_id]
-      @driver = Driver.find(@driver_id) rescue nil
+    @drivers = Driver.active.order('name')
 
-      if @driver
+    if checkroleonly 'Vendor Supir'
 
-        @reports = Invoice.active.joins(:driver).joins(:vehicle).where("invoices.id in (select invoice_id from receipts where deleted = false)")
-        .where("invoices.id not in (select invoice_id from receiptreturns where deleted = false)")
-        .where("invoices.date between ? and ?",@startdate.to_date, @enddate.to_date).where("drivers.deleted = false")
-        .where("invoices.driver_id = ?", @driver_id)
-        .group("vehicles.id")
-        .select("vehicles.id, vehicles.current_id, count(invoices.vehicle_id) as jml")
-        .order('vehicles.current_id')
-
+      @vendor = Vendor.where('user_id = ?', current_user.id)
+      
+      if @vendor.present?
+        @drivers = Driver.order('name')
+        @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
       end
 
-      @section = "reports1"
-      @where = "drivervehicles"
-      render "drivervehicles"
-    else
-      redirect_to root_path()
     end
+
+    @driver_id = params[:driver_id]
+    @driver = Driver.find(@driver_id) rescue nil
+
+    if @driver
+
+      @reports = Invoice.active.joins(:driver).joins(:vehicle).where("invoices.id in (select invoice_id from receipts where deleted = false)")
+      .where("invoices.id not in (select invoice_id from receiptreturns where deleted = false)")
+      .where("invoices.date between ? and ?",@startdate.to_date, @enddate.to_date).where("drivers.deleted = false")
+      .where("invoices.driver_id = ?", @driver_id)
+      .group("vehicles.id")
+      .select("vehicles.id, vehicles.current_id, count(invoices.vehicle_id) as jml")
+      .order('vehicles.current_id')
+
+    end
+
+    @section = "reports1"
+    @where = "drivervehicles"
+    render "drivervehicles"
+  else
+    redirect_to root_path()
   end
+end 
 
   def indexannualreport_vehicle
     role = cek_roles 'Admin Operasional, Admin HRD, Admin Keuangan'

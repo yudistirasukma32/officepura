@@ -92,7 +92,7 @@ class InvoicesController < ApplicationController
 
       if @vendor.present? 
       # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
-      @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total
+      @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
                                       join drivers ON invoices.driver_id = drivers.id 
                                       join routes ON invoices.route_id = routes.id
@@ -175,7 +175,7 @@ class InvoicesController < ApplicationController
       if @vendor.present? 
 
       # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
-      @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total
+      @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
                                       join drivers ON invoices.driver_id = drivers.id 
                                       join routes ON invoices.route_id = routes.id
@@ -473,6 +473,7 @@ class InvoicesController < ApplicationController
       @invoice.need_helper = inputs[:need_helper] == "Yes" ? true : false
       @invoice.premi = inputs[:premi] == "Yes" ? true : false
       @invoice.is_insurance = inputs[:is_insurance] == "Yes" ? true : false
+      @invoice.by_vendor = inputs[:by_vendor] == "Yes" ? true : false
 
       @allowances = Allowance.where(:route_id => inputs[:route_id], :vehiclegroup_id => vehiclegroup_id, :deleted => false).first
 
@@ -1132,7 +1133,7 @@ class InvoicesController < ApplicationController
 
       if @vendor.present? 
       # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
-      @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total
+      @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
                                       join drivers ON invoices.driver_id = drivers.id 
                                       join routes ON invoices.route_id = routes.id

@@ -19,7 +19,7 @@ class Driver < ActiveRecord::Base
 					:address, :city, :phone, :mobile, :driver_licence, :driver_licence_expiry, :id_card, :id_card_expiry,
 					:start_working, :description, :min_wages, :status, :salary, :terms_of_payment_in_days, :deleted, :emergency_number,
 					:weight_loss, :accident, :sparepart, :bon, :saving, :vehicle_id, :bank_account, :bank_name, :bankexpensegroup_id, 
-					:old_name, :origin, :is_resign, :vendor_id
+					:old_name, :origin, :is_resign, :vendor_id, :datein, :dateout
 
   scope :active, lambda {where(:enabled => true, :deleted => false)}  					
 

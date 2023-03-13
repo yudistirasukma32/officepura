@@ -26,6 +26,45 @@
     <span>(tgl/bln/thn)</span>
   </div>
 
+  <div class="field-row">
+    <%=f.label :by_vendor, "Pakai Vendor" %>
+    <input type="checkbox" onclick="toggleVendorCheckbox()" id="by_vendor" name="invoice[by_vendor]" value="Yes" <% if @invoice.by_vendor == true %> checked="checked" <% end %>" />
+  </div>
+
+  <% if active_node == "edit" %>
+
+  <div id="div_vendor" style="display: block;">
+    <div class="field-row">
+      <%= f.label :truckvendor_id, "Vendor" %>
+
+      <select id="invoice_truckvendor_id" name="invoice[truckvendor_id]" class="double chzn-select">
+      <option value="0">- Pilih Vendor -</option>
+      <% Vendor.active.truck.order(:name).each do |vendor| %>
+      <option value="<%=vendor.id%>"
+        <% if vendor.id == @invoice.truckvendor_id %> selected="selected"<% end %>><%=vendor.name%></option>
+      <% end %>
+      </select>
+    </div>
+  </div>
+
+  <% else %>
+
+  <div id="div_vendor" style="display: none;">
+    <div class="field-row">
+      <%= f.label :truckvendor_id, "Vendor" %>
+
+      <select id="invoice_truckvendor_id" name="invoice[truckvendor_id]" class="double chzn-select">
+      <option value="0">- Pilih Vendor -</option>
+      <% Vendor.active.truck.order(:name).each do |vendor| %>
+      <option value="<%=vendor.id%>"
+        <% if vendor.id == @invoice.truckvendor_id %> selected="selected"<% end %>><%=vendor.name%></option>
+      <% end %>
+      </select>
+    </div>
+  </div>
+
+  <% end %>
+
   <% if @invoice_ori.nil? %>
   <div class="field-row">
     <%= f.label :invoicetrain, "Tipe BKK" %>

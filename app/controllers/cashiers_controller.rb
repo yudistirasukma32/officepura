@@ -35,8 +35,8 @@ class CashiersController < ApplicationController
     @date = params[:date]
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil? 
 
-		@invoices = Invoice.find_by_sql("SELECT * FROM invoices where invoicetrain = false AND date = '#{@date.to_date}' AND deleted = false AND id not in (SELECT invoice_id FROM receipts where deleted = false)")
-		@invoicetrains = Invoice.find_by_sql("SELECT * FROM invoices where invoicetrain = true AND date = '#{@date.to_date}' AND deleted = false AND id not in (SELECT invoice_id FROM receipts where deleted = false)")
+		@invoices = Invoice.find_by_sql("SELECT * FROM invoices where by_vendor = false and invoicetrain = false AND date = '#{@date.to_date}' AND deleted = false AND id not in (SELECT invoice_id FROM receipts where deleted = false)")
+		@invoicetrains = Invoice.find_by_sql("SELECT * FROM invoices where by_vendor = false and invoicetrain = true AND date = '#{@date.to_date}' AND deleted = false AND id not in (SELECT invoice_id FROM receipts where deleted = false)")
 		@invoicereturns = Invoicereturn.find_by_sql("SELECT * FROM invoicereturns where date = '#{@date.to_date}' AND deleted = false AND id not in (SELECT id from invoicereturns where id in (SELECT invoicereturn_id FROM receiptreturns where deleted = false))") 
 		@bonusreceipts = Bonusreceipt.find_by_sql("SELECT * FROM bonusreceipts where to_char(created_at, 'DD-MM-YYYY') = '#{@date}' AND deleted = false AND money(total) > money(0) AND invoice_id not in (SELECT invoice_id FROM receiptpremis where deleted = false)")
 		@sales = Sale.find_by_sql("SELECT * FROM sales where date = '#{@date.to_date}' AND deleted = false AND id not in (SELECT sale_id FROM receiptsales where deleted = false)") 

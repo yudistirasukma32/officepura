@@ -64,6 +64,9 @@
             <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
             <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
             <%= invoice.user_id.nil? ? '': ' | '+invoice.user.username%>
+            <% if invoice.by_vendor %>
+            &nbsp;<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+            <% end %>
             </td>
             <td>
             <% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
@@ -136,6 +139,9 @@
             <%= (inv_bongkar[0].isotank_id.present? && inv_bongkar[0].isotank_id.to_i != 0) ? ("Isotank = " + inv_bongkar[0].isotank.isotanknumber) : '' %>
             <%= (inv_bongkar[0].container_id.present? && inv_bongkar[0].container_id.to_i != 0) ? ("Kontainer = " + inv_bongkar[0].container.containernumber) : '' %>
             <%= invoice.user_id.nil? ? '': ' | '+invoice.user.username%>
+            <% if invoice.by_vendor %>
+                &nbsp;<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+            <% end %>
             </td>
             <td>
             <% if inv_bongkar[0].vehicle_duplicate.present? && inv_bongkar[0].vehicle_duplicate_id != 0%>

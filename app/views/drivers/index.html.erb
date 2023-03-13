@@ -7,7 +7,7 @@
 <div id="main">
 	
 	<div id="content-full">
-		<% if checkrole 'Admin HRD' %>
+		<% if checkrole 'Admin HRD, Vendor Supir' %>
 		<a class="btn print" href="<%=new_driver_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
 		<% end %>
 		<h1>Master / <a href="<%=drivers_path%>">Supir</a> / Index</h1>
@@ -92,7 +92,7 @@
 				</tr>
 				<% end %>
 			<% else %>
-				<% if (checkrole 'Admin HRD, Admin Operasional') %>
+				<% if (checkrole 'Admin HRD, Admin Operasional, Vendor Supir') %>
 				<tr>
 					<td><%= link_to driver.name, edit_driver_path(driver) %> &nbsp;(<%= zeropad(driver.id)%>)</td>
 					<td><%= driver.city %></td>
@@ -134,7 +134,7 @@
 		
 		</table>
 
-		<% if checkrole 'Admin HRD' %>
+		<% if checkrole 'Admin HRD, Vendor Supir' %>
 		<div class="actions">
 			<a class="btn-txt right" href="<%=new_driver_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
 		</div>

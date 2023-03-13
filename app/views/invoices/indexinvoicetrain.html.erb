@@ -63,7 +63,11 @@
 					<tr class="deleted">
 						<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
 						<td><%=zeropad(invoice.id) %></td>
-						<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> </td>
+						<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> 
+						<% if invoice.by_vendor %>
+							<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+						<% end %>
+						</td>
 						<td><%=invoice.office.abbr%></td>
 						<td>
 						<% if (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) %>
@@ -112,7 +116,11 @@
 							<tr class="deleted">
 								<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
 								<td><span class="left"><i class="icon-signout"></i></span><%=zeropad(invoice.id) %></td>
-								<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %></td>
+								<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %>
+								<% if invoice.by_vendor %>
+									<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+								<% end %>
+								</td>
 								<% if invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP' %>
 								<td class="red"><%=invoice.office.abbr%></td>    
 								<% else %>
@@ -166,7 +174,11 @@
 				<tr>
 					<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
 					<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice, :train => true) %></td>
-					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)
+					<% if invoice.by_vendor %>
+						<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+					<% end %>
+					</td>
 					<% if 
 					# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
 					invoice.office.abbr == '' 
@@ -248,7 +260,11 @@
 							<tr class="deleted">
 								<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
 								<td><span class="left"><i class="icon-signout"></i></span><%=zeropad(invoice.id) %></td>
-								<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %></td>
+								<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %>
+								<% if invoice.by_vendor %>
+									<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+								<% end %>
+								</td>
 								<% if 
 								# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
 								invoice.office.abbr == '' 
@@ -306,7 +322,11 @@
 							<tr>
 								<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
 								<td><span class="left"><i class="icon-signout"></i></span><span>   <%= link_to zeropad(invoice.id), edit_invoice_path(invoice, :train => true) %></span></td>
-								<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+								<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)
+								<% if invoice.by_vendor %>
+									<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+								<% end %>
+								</td>
 								<% if 
 								# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
 								invoice.office.abbr == '' 

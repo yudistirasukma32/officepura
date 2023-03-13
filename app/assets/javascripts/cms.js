@@ -1941,6 +1941,15 @@ function togglePremiCheckbox()
 	}
 }
 
+function toggleVendorCheckbox()
+{
+	if ($('#by_vendor').prop('checked')) {
+		$('#div_vendor').show();
+	}else{
+		$('#div_vendor').hide();
+	}
+}
+
 function getAllowanceInvoiceAdd()
 {
 	var quantity = Number($('#invoice_quantity').val());
