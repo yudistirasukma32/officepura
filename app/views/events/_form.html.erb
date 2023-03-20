@@ -54,9 +54,6 @@
         <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
           <%= f.radio_button :invoicetrain, true, :checked => (@event.invoicetrain == true ? true : false),  class: "moda-kereta" %> Kereta
         <% end %>
-        <%= f.label :invoicetrain, :value => "losing", :class => 'checkbox' do %>
-          <%= f.radio_button :invoicetrain, false, :checked => (@event.losing == true ? true : false),  class: "modalosing" %> Losing
-        <% end %>
     <% else %>
         <%= f.label :invoicetrain, :value => "false", :class => 'checkbox', :style => 'width: 150px;' do %>
           <%= f.radio_button :invoicetrain, false, :checked => true, class: "moda-standart"  %> Industri/Distribusi
@@ -64,11 +61,12 @@
         <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
           <%= f.radio_button :invoicetrain, true, class: "moda-kereta" %> Kereta
         <% end %>
-        <%= f.label :invoicetrain, :value => "losing", :class => 'checkbox' do %>
-          <%= f.radio_button :invoicetrain, false, class: "modalosing" %> Losing
-        <% end %>
     <% end %>
-    <input type="hidden" name="event[losing]" value="0" id="event_losing">
+  </div>
+
+  <div class="field-row">
+    <%= f.label :losing, "Losing" %>
+    <%= f.check_box :losing %>
   </div>
 
     <% if @process == 'new' %>

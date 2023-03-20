@@ -2275,18 +2275,10 @@ $(document).ready(function() {
 		$("#div_opstrains").show();
 		$("#div_routetrains").show();
 		$("#div_stationtrains").show();
-		$('#event_losing').val(0);
 	}else{
 		$("#div_opstrains").hide();
 		$("#div_routetrains").hide();
 		$("#div_stationtrains").hide();
-		$('#event_losing').val(0);
-
-		if($('.modalosing:checked')){
-			$('#event_losing').val(1);
-		} else {
-			$('#event_losing').val(0);
-		}
 	}
 	});
 

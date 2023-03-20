@@ -86,6 +86,7 @@
 <% end %>
 </div>
 
+<% if @process == 'edit' %>
 
 <div class="update-box" style="padding-top: 0; border-top: none;">
 <h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment</h3>
@@ -120,10 +121,10 @@
     <% end %>
 
   <% end %>
+ 
+</ul>
 
 <% end %>
-
-</ul>
 
 <br />
 
@@ -146,4 +147,9 @@
 </div>
 
 </form>
+
+ 
+
 </div>
+
+<% end %>

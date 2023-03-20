@@ -89,6 +89,20 @@ class EventsController < ApplicationController
 
     end
 
+    if inputs[:invoicetrain] == false && inputs[:losing] == true
+      
+      inputs[:invoicetrain] = false
+      inputs[:losing] = true
+
+    end
+
+    if inputs[:invoicetrain] == false && inputs[:losing] == false
+
+      inputs[:invoicetrain] = false
+      inputs[:losing] = false
+    
+    end 
+
     @event = Event.new(inputs)
 
     query = @event.cancelled ? "?type=cancelled" : ""
