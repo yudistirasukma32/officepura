@@ -1,0 +1,102 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>OPS / <a href="<%=invoices_path%>">Operator Kapal</a> / Index</h1>
+
+		<p>BKK yang muncul di bawah dan bisa diedit adalah BKK yang belum pernah diinput hutang kapalnya.</p>
+ 
+		
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date" >Pilih Tanggal</label>
+				<input type="text" name="date" class="half left date-picker" value="<%=@date%>" onchange="javascript:submitFormFilter();" />
+                
+                <label for="office_id" class="middle">Pilih Kantor</label>
+                <select name="office_id" class="half left ">
+                    
+                    <option value="all">All</option>
+                    <% @offices.each do |office| %>
+                    <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
+                    <% end %>
+                </select> 
+
+				<label for="date" class="tiny">#BKK:</label>
+				<input type="text" name="invoice_id" class="short left" value="<%=params[:invoice_id]%>" />
+                
+                <input class="submit" type="submit" value="Filter" style="vertical-align: bottom;">
+			</div>
+ 
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+			<table class="row-view">
+				<tr>
+					<th width="50">TGL</th>
+					<th width="50">No. BKK</th>
+					<th width="200">Keterangan</th>
+					<th width="60">NoPol</th>
+                    <th width="80">Kontainer/Iso</th>
+					<th width="50">No. DO</th>
+					<th width="40">Operator</th>
+					<th width="80">Jurusan Kapal</th>
+					<th width="40"></th>
+				</tr>
+
+				<% @grandTotal = 0%>
+				<% @invoices.each do |invoice| %>
+					<% if invoice.deleted %>
+						<% @grandTotal += 0 %>
+						<% if current_user.adminrole %>
+						<tr class="deleted">
+							<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
+							<td><%= zeropad(invoice.id) %></td>
+							<td>
+								<%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
+							</td>
+							<td><%=invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : '' %>
+							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></td>
+							<td><%= zeropad(invoice.event_id) rescue nil %></td>
+							<td><%= invoice.routeship.operator.abbr rescue nil %></td>
+							<td><%= invoice.routeship.name rescue nil %></td>
+							<td class="right" width="60">&nbsp;</td>
+						</tr>
+						<% end %>
+
+					<% else %>
+
+						<tr>
+							<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
+							<td><%= zeropad(invoice.id) %></td>
+							<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
+							</td>
+							<td><%=invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : '' %>
+							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></td>
+							<td><%= zeropad(invoice.event_id) rescue nil %></td>
+							<td><%= invoice.routeship.operator.abbr rescue nil %></td>
+							<td><%= invoice.routeship.name rescue nil %></td>
+							<td class="right" width="60">
+								<a class="cta" style="background: #2196f3; float: right;" href="add_ship/<%=invoice.id%>">Edit</a>
+							</td>
+						</tr>
+					<% end %>
+				<% end %>	
+			
+ 
+			</table>
+
+		<br class="clearfix" />
+		
+	</div>
+
+</div>

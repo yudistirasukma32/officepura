@@ -235,6 +235,10 @@ OfficePuraErp::Application.routes.draw do
     end
   end
   
+  match 'invoices/add_ship' => 'invoices#indexaddship'
+  match 'invoices/add_ship/:invoice_id' => 'invoices#add_ship'
+  post 'invoices/updateship/' => 'invoices#updateship'
+  
   match 'invoices/add_weight' => 'invoices#indexaddweight'
   match 'invoices/add_weight/:invoice_id' => 'invoices#add_weight'
   post 'invoices/updateaddweight/' => 'invoices#updateaddweight'
