@@ -62,10 +62,11 @@
 										
 										<tr>
 											<td><%= customer.name%></td>
-											<td align="right"><%= to_currency(Taxinvoice.where("extract(year from date) = #{@year} and deleted = false and paiddate IS NULL and customer_id = #{customer.id}").sum(:total)) %></td>
+											<td align="right"><%= to_currency(Taxinvoice.where("extract(year from date) = #{@year} and deleted = false and paiddate IS NULL and customer_id = #{customer.id}").sum(:total)-Taxinvoice.where("extract(year from date) = #{@year} and deleted = false and paiddate IS NULL and customer_id = #{customer.id}").sum(:downpayment)) %></td>
 											<% (1..6).each do |i| %>
-												<% taxinvoices = Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and paiddate IS NULL and customer_id = #{customer.id}").sum(:total) %>
-												<td align="right"><%=to_currency(taxinvoices.to_i)%></td>
+												<% taxinvoices_total = Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and paiddate IS NULL and customer_id = #{customer.id}").sum(:total) %>
+												<% taxinvoices_dp = Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and paiddate IS NULL and customer_id = #{customer.id}").sum(:downpayment) %>
+												<td align="right"><%=to_currency(taxinvoices_total.to_i-taxinvoices_dp.to_i)%></td>
 											<% end %>
 										</tr>
 										<% i += 1 %>
@@ -78,7 +79,8 @@
 		                            <td colspan="2"><strong>Total</strong></td>
 		                            <% 1.upto(6) do |i| %>
 		                            <td align="right"><strong><%= to_currency(Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false
-											    and paiddate IS NULL").sum(:total)) %></strong></td>
+											    and paiddate IS NULL").sum(:total)-Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false
+											    and paiddate IS NULL").sum(:downpayment)) %></strong></td>
 		                            <% end %>
 		                        </tr>
 		                      </tfoot>
@@ -111,11 +113,13 @@
 										
 										<tr>
 											<td><%= customer.name%></td>
-											<td align="right"><%= to_currency(Taxinvoice.where("extract(year from date) = #{@year} and deleted = false and paiddate IS NULL and customer_id = #{customer.id}").sum(:total)) %></td>
+											<td align="right"><%= to_currency(Taxinvoice.where("extract(year from date) = #{@year} and deleted = false and paiddate IS NULL and customer_id = #{customer.id}").sum(:total)-Taxinvoice.where("extract(year from date) = #{@year} and deleted = false and paiddate IS NULL and customer_id = #{customer.id}").sum(:downpayment)) %></td>
 											<% (7..12).each do |i| %>
-												<% taxinvoices = Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false
+												<% taxinvoices_total = Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false
 												    and paiddate IS NULL  and customer_id = #{customer.id}").sum(:total) %>
-												<td align="right"><%=to_currency(taxinvoices.to_i)%></td>
+												<% taxinvoices_dp = Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false
+												    and paiddate IS NULL  and customer_id = #{customer.id}").sum(:downpayment) %>
+												<td align="right"><%=to_currency(taxinvoices_total.to_i-taxinvoices_dp.to_i)%></td>
 											<% end %>
 										</tr>
 										<% i += 1 %>
@@ -128,7 +132,8 @@
 		                            <td colspan="2"><strong>Total</strong></td>
 		                            <% 7.upto(12) do |i| %>
 		                            <td align="right"><strong><%= to_currency(Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false
-											    and paiddate IS NULL").sum(:total)) %></strong></td>
+											    and paiddate IS NULL").sum(:total)-Taxinvoice.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false
+											    and paiddate IS NULL").sum(:downpayment)) %></strong></td>
 		                            <% end %>
 		                        </tr>
 		                      </tfoot>
