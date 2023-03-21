@@ -36,7 +36,7 @@ class TaxinvoiceitemsController < ApplicationController
     #hide bkk bongkar
     @invoices = @invoices.where('invoice_id is null')
     #hide bkk kosongan
-    @cust_kosongan = Customer.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+    @cust_kosongan = Customer.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
     @invoices = @invoices.where("customer_id NOT IN (?)", @cust_kosongan).order(:id)
 

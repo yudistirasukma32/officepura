@@ -711,12 +711,12 @@ class ReportsController < ApplicationController
           
       elsif @transporttype == 'KOSONGAN'
           
-        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
         @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
 
       elsif @transporttype == 'STANDART'
 
-        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
         @invoices = @invoices.where("invoicetrain = false").where("customer_id NOT IN (?)", cust_kosongan).order(:id)
 
       end

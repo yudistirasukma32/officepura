@@ -91,7 +91,7 @@ class InvoicesController < ApplicationController
       @vendor = Vendor.where('user_id = ?', current_user.id)
 
       if @vendor.present? 
-      # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+      # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
       @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
                                       join drivers ON invoices.driver_id = drivers.id 
@@ -101,7 +101,7 @@ class InvoicesController < ApplicationController
                                       join vehicles ON invoices.vehicle_id = vehicles.id
                                       join offices ON invoices.office_id = offices.id
                                       where vendors.id = #{@vendor[0].id} AND date = '#{@date.to_date}'
-                                      AND invoices.customer_id NOT IN (SELECT id from customers WHERE name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*') ORDER BY invoices.id")
+                                      AND invoices.customer_id NOT IN (SELECT id from customers WHERE name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*') ORDER BY invoices.id")
       
       end
 
@@ -112,7 +112,7 @@ class InvoicesController < ApplicationController
       # @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date).order(:id)
       @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date)
       
-      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
   
       @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
       # fetch_excel()
@@ -174,7 +174,7 @@ class InvoicesController < ApplicationController
         
       if @vendor.present? 
 
-      # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+      # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
       @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
                                       join drivers ON invoices.driver_id = drivers.id 
@@ -184,7 +184,7 @@ class InvoicesController < ApplicationController
                                       join vehicles ON invoices.vehicle_id = vehicles.id
                                       join offices ON invoices.office_id = offices.id
                                       where vendors.id = #{@vendor[0].id} AND date = '#{@date.to_date}'
-                                      AND invoices.customer_id IN (SELECT id from customers WHERE name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*') ORDER BY invoices.id")
+                                      AND invoices.customer_id IN (SELECT id from customers WHERE name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*') ORDER BY invoices.id")
 
       end
       
@@ -195,7 +195,7 @@ class InvoicesController < ApplicationController
         
       @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date)
 
-      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
       @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
         
@@ -299,7 +299,7 @@ class InvoicesController < ApplicationController
     # @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date).order(:id)
     @invoices = Invoice.where("date = ? and deleted = false", @date.to_date)
     
-    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
     @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
     # fetch_excel()
@@ -381,7 +381,7 @@ class InvoicesController < ApplicationController
 
     @invoices = @invoices.where("invoices.id not in (select invoice_id from shipexpenses where deleted = false)")
     
-    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
     @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
     # fetch_excel()
@@ -916,7 +916,7 @@ class InvoicesController < ApplicationController
     if is_train == "0"
         
         #customer kosongan pura / rdpi
-        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
         if cust_kosongan.include? params[:customer_id].to_i
             
@@ -1220,7 +1220,7 @@ class InvoicesController < ApplicationController
       @vendor = Vendor.where('user_id = ?', current_user.id)
 
       if @vendor.present? 
-      # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*INTI.*'").pluck(:id)
+      # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
       @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
                                       join drivers ON invoices.driver_id = drivers.id 
