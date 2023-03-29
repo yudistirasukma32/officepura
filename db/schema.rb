@@ -631,6 +631,38 @@ ActiveRecord::Schema.define(:version => 20230310095129) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
+  create_table "mechaniclogs", :force => true do |t|
+    t.boolean  "deleted",        :default => false
+    t.boolean  "enabled",        :default => true
+    t.date     "date"
+    t.integer  "invoice_id"
+    t.integer  "vehicle_id"
+    t.integer  "driver_id"
+    t.integer  "mechanic_id"
+    t.string   "group"
+    t.text     "description"
+    t.text     "comment"
+    t.string   "grade"
+    t.datetime "datetime_start"
+    t.datetime "datetime_end"
+    t.integer  "user_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+  end
+
+  create_table "mechanics", :force => true do |t|
+    t.boolean  "deleted",     :default => false
+    t.boolean  "enabled",     :default => true
+    t.string   "name"
+    t.string   "phone"
+    t.string   "city"
+    t.text     "address"
+    t.text     "description"
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+  end
+
   create_table "officeexpensegroups", :force => true do |t|
     t.boolean   "deleted",                            :default => false
     t.boolean   "enabled",                            :default => true

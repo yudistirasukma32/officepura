@@ -27,6 +27,14 @@
 					<option value="<%=year%>"<% if year == @year.to_i %> selected="selected"<% end %>><%=year%></option>
 					<% end %>
 				</select>
+				<label for="tanktype" class="middle" style="width: 40px;padding: 0 10px 0 5px; margin-left: 15px; ">Group</label>
+				<select name="tanktype" class="half left combo_route" style="margin-left: 15px;">	
+				<option value="all">Semua Group</option>
+					<% ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
+					<% # ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER', 'TRUK BOX', 'MULTIFUNGSI'].each do |type| %>
+					<option <%= type == params[:tanktype] ? 'selected' : '' %>><%=type%></option>
+					<% end %>
+				</select>
 				<input class="submit" type="submit" value="Filter" />
 			</div>
 			</form>
@@ -40,6 +48,7 @@
 			<tr>
 				<th width="30">No.</th>
 				<th>Kendaraan</th>
+				<th width="90" class="right">Ritase</th>
 				<th width="90" class="right">Pemasukan</th>
 				<th width="90" class="right">Pengeluaran</th>
 				<th width="90" class="right">Ban</th>
@@ -61,7 +70,10 @@
 			<tr class="subheading">
 				<th colspan="6"><span class="red"><%= vehiclegroup.name %></span></th>
 			</tr>
-			<% vehiclegroup.vehicles.each_with_index do |vehicle, i| %>
+
+			<% if @tanktype.present? and @tanktype != 'all'%>
+
+			<% vehiclegroup.vehicles.where("platform_type = ?", @tanktype).each_with_index do |vehicle, i| %>
 			<% 	totalincome = 0;
 				totaloutcome = 0;
 				
@@ -74,6 +86,9 @@
 
 				totalincome = taxinvoices.to_i + taxinvoices_generic.to_i + inc_others.to_i
 				totalgroupincome += totalincome
+
+				receiptscount = Receipt.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").count
+				receiptreturnscount = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").count
 
 				receipts = Receipt.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total) 
 		      	receiptreturns = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
@@ -91,6 +106,7 @@
 				
 				onderdil = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (2,3,4,5,6))").sum(:total) 
 
+				totalrit = receiptscount.to_i - receiptreturnscount.to_i
 				totalgroupban += ban.to_i
 				totalgrouponderdil += onderdil.to_i
 				totalreceipt = receipts.to_i + receiptpremis.to_i + receiptexpenses.to_i + productrequests.to_i - receiptreturns.to_i
@@ -101,8 +117,8 @@
 				<% if totalincome != 0 || totaloutcome != 0 || ban != 0 || onderdil != 0 %>	
 				<tr>
 					<td><%= j+=1%>.</td>
-					<td><%= vehicle.current_id%>
-                    </td>
+					<td><%= vehicle.current_id%></td>
+					<td align="right"><%= totalrit %></td>
 					<td align="right"><%= to_currency(totalincome)%></td>
 					<td align="right"><%= to_currency(totalreceipt)%></td>
 					<td align="right"><%= to_currency(ban)%></td>
@@ -112,10 +128,71 @@
 				</tr>
 				<% end %>
 			<% end %>
+
+			<% else %>
+
+			<% vehiclegroup.vehicles.each_with_index do |vehicle, i| %>
+				<% 	totalincome = 0;
+					totaloutcome = 0;
+					
+					taxinvoices = Taxinvoiceitem.where("extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and taxinvoice_id IS NOT NULL and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+	
+					taxinvoices_generic = Taxgenericitem.where("extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{vehicle.id}").sum(:total) 
+	
+					inc_others = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Debit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+	
+	
+					totalincome = taxinvoices.to_i + taxinvoices_generic.to_i + inc_others.to_i
+					totalgroupincome += totalincome
+
+					receiptscount = Receipt.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").count
+					receiptreturnscount = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").count
+
+					receipts = Receipt.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total) 
+					  receiptreturns = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+					  receiptpremis = Receiptpremi.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+	
+					  receiptexpenses = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+	
+					# productgroup aktifa 7
+					# productgroup ban 1 8 9 10 11
+					# productgroup selain Aktifa = Onderdil 2 3 4 5 6
+					
+					  productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id = 7)").sum(:total) 
+	
+					ban = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (1,8,9,10,11))").sum(:total) 
+					
+					onderdil = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (2,3,4,5,6))").sum(:total) 
+	
+					totalrit = receiptscount.to_i - receiptreturnscount.to_i
+					totalgroupban += ban.to_i
+					totalgrouponderdil += onderdil.to_i
+					totalreceipt = receipts.to_i + receiptpremis.to_i + receiptexpenses.to_i + productrequests.to_i - receiptreturns.to_i
+					totalgroupreceipt += totalreceipt
+					totaloutcome = totalreceipt + ban + onderdil
+					totalgroupoutcome += totaloutcome
+				%>
+					<% if totalincome != 0 || totaloutcome != 0 || ban != 0 || onderdil != 0 %>	
+					<tr>
+						<td><%= j+=1%>.</td>
+						<td><%= vehicle.current_id%></td>
+						<td align="right"><%= totalrit %></td>
+						<td align="right"><%= to_currency(totalincome)%></td>
+						<td align="right"><%= to_currency(totalreceipt)%></td>
+						<td align="right"><%= to_currency(ban)%></td>
+						<td align="right"><%= to_currency(onderdil)%></td>
+						<td align="right" class="<% if totalincome - totaloutcome < 0 %> red <% end %>"><%= to_currency(totalincome - totaloutcome)%></td>
+						<td class="hideprint"><a class="cta" href="/reports/annualreport_vehicle/<%=vehicle.id%>/<%=@year%>">Detail</a></td>
+					</tr>
+					<% end %>
+				<% end %>
+
+			<% end %>
 			
 			<tr class="footer">
 				<td>&nbsp;</td>
 				<td class="total">TOTAL</td>
+				<td>&nbsp;</td>
 				<td align="right" class="green"><%=to_currency(totalgroupincome)%></td>
 				<td align="right" class="red"><%=to_currency(totalgroupreceipt)%></td>
 				<td align="right" class="red"><%=to_currency(totalgroupban)%></td>

@@ -31,6 +31,7 @@ class Invoice < ActiveRecord::Base
 	has_many :trainexpenses
 	has_many :shipexpenses
 	has_many :insuranceexpenses
+	has_many :mechaniclogs
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :enabled, :date, :ship_name, :driver_id, :customer_id, :vehicle_id, :trip_type, :price_per, :gas_start,

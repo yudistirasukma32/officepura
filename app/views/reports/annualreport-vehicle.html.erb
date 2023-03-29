@@ -86,7 +86,7 @@
 								<tr>
 									<td>Surat jalan Generic Sudah Tertagih</td>
 									<% (1..6).each do |i| %>
-										<% total = Taxgenericitem.where("extract(year from date) = #{@year} and deleted = false and vehicle_id = #{@vehicle.id}").sum(:total) %>
+										<% total = Taxgenericitem.where("extract(month from created_at) = #{i} and extract(year from date) = #{@year} and deleted = false and vehicle_id = #{@vehicle.id}").sum(:total) %>
 										<td align="right"><%= to_currency(total.to_i) %></td>
 										<% case i
 											when 1 

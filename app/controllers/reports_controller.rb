@@ -2678,8 +2678,15 @@ end
       @month = params[:month]
       @month = Date.today.month if @month.nil?
 
+      @tanktype = params[:tanktype]
+
       @vehiclegroups= Vehiclegroup.where(:deleted => false).order(:name)
-      @vehicles = Vehicle.active.all(:order=>:current_id)
+
+      # @vehicles = Vehicle.active.order(:current_id)
+
+      # if @tanktype.present? and @tanktype != 'all'
+      #   @vehicles = @vehicles.where('platform_type = ?', @tanktype)
+      # end
     
       @section = "reports2"
       @where = "annualreport-vehicle"

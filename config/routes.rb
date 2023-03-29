@@ -188,6 +188,13 @@ OfficePuraErp::Application.routes.draw do
     
   get 'events/get_event_by_customer/:customer_id' =>'events#get_event_by_customer' 
 
+  resources :mechaniclogs do
+    member do
+      get 'enable'
+      get 'disable'
+    end
+  end 
+  
   resources :shipexpenses do
     member do
       get 'enable'
@@ -408,6 +415,8 @@ OfficePuraErp::Application.routes.draw do
   resources :ports
   resources :receipttrains
   resources :receiptships
+
+  resources :mechanics
 
   match 'assetpayments/new/:assetorder_id' => 'assetpayments#new'
   match 'assetpayments/index_confirmed' => 'assetpayments#index_confirmed'
@@ -713,6 +722,10 @@ OfficePuraErp::Application.routes.draw do
 
     match 'receipttrains/new/:trainexpense_id' => 'receipttrains#new'
     match 'receiptships/new/:shipexpense_id' => 'receiptships#new'
+
+    match 'mechaniclogs-done' => 'mechaniclogs#done'
+    match 'mechaniclogs/new/:invoice_id' => 'mechaniclogs#new'
+    match 'mechaniclogs/delete/:invoice_id' => 'mechaniclogs#delete'
 
     scope "monitoring" do
       match "operational" => 'monitorings#operational'

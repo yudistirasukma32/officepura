@@ -1,0 +1,144 @@
+<% if @invoice %>
+
+<%= form_for(@mechaniclog) do |f| %>
+
+  <%= f.hidden_field :invoice_id, :value => @invoice.id %>
+
+  <div class="" style="width: 590px; float:left; margin-bottom: 1rem;">
+
+  <div class="field-row first">
+    <%= f.label :date, "Tanggal Keluhan" %> 
+    <%= f.text_field :date, :class => 'left half date-picker' %>
+  </div>
+
+  <div class="field-row ">
+    <%= f.label :mechanic_id, "Mekanik" %>
+    <select id="mechaniclog_mechanic_id" name="mechaniclog[mechanic_id]" class="half chzn-select">
+      <option value="0">- Pilih Mekanik -</option>
+      <% Mechanic.active.each do |mecha| %>
+      <option value="<%=mecha.id%>"
+        <% if mecha.id == @mechaniclog.mechanic_id %> selected="selected"<% end %>><%=mecha.name%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :group, "Tipe Kerusakan"  %>
+    <%= f.select :group, options_for_select(@loggroups.collect {|w| [w, w]}, (params[:group].present? ? params[:group] : @mechaniclog.group)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Deskripsi Kerusakan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :datetime_start, "Tanggal Start" %>
+    <% if @process == "new" %>
+    <input type="datetime-local" name="mechaniclog[datetime_start]" id="datetime_start" class="left half">
+    <% else %>
+    <input type="datetime-local" name="mechaniclog[datetime_start]" id="datetime_start" class="left half" value="<%= @mechaniclog.datetime_start.to_datetime.strftime("%Y-%m-%dT%H:%M") rescue nil%>"/>
+    <% end %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :datetime_end, "Tanggal Selesai" %>
+    <% if @process == "new" %>
+      <input type="datetime-local" name="mechaniclog[datetime_end]" id="datetime_end" class="left half">
+    <% else %>
+      <input type="datetime-local" name="mechaniclog[datetime_end]" id="datetime_end" class="left half" value="<%= @mechaniclog.datetime_end.to_datetime.strftime("%Y-%m-%dT%H:%M") rescue nil%>"/>
+    <% end %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :grade, "Penilaian"  %>
+    <%= f.select :grade, options_for_select(@grades.collect {|w| [w, w]}, (params[:grade].present? ? params[:grade] : @mechaniclog.grade)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :comment, "Komentar" %>
+    <%= f.text_area :comment %>
+  </div>
+
+  <div class="field-row continue">
+
+  <%= f.hidden_field :invoice_id, :value => @invoice.id %>
+  <%= f.hidden_field :vehicle_id, :value => @invoice.vehicle_id %>
+  <%= f.hidden_field :driver_id, :value => @invoice.driver_id %>
+  <%= f.hidden_field :user_id, :value => current_user.id %>
+
+  <%= f.submit "Tambah Data", :class => 'submit right' %>    
+        <br/>
+  </div>
+
+  </div>
+
+  <div class="info-box" style="margin-bottom:30px; width:420px; float:left;">  
+
+    <h3>Mekanik: BKK #<%=zeropad(@invoice.id)%></h3>
+
+    <table class="row-view no-border">
+        <tr>
+          <td width="120">Tanggal</td>
+          <td><%=@invoice.date.strftime('%d %B %Y')%> &nbsp;(KTR: <%=@invoice.office.name%>)</td>
+        </tr>
+        <tr>
+          <td>Pelanggan</td>
+          <td><%=@invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td><strong><%=@invoice.quantity%></strong> Rit: <%=@invoice.route.name%></td>
+        </tr>
+        <tr>
+          <td>No. DO</td>
+          <td><%=@invoice.event_id rescue nil%></td>
+        </tr>
+        <tr>
+          <td>Kendaraan</td>
+          <td><%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+        </tr>
+        <% if @invoice.isotank_id != 0 %>
+        <tr>
+          <td>No. Isotank</td>
+          <td id="strIsotank"><%=@invoice.isotank.isotanknumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@invoice.isotank_number.nil? %>
+          <tr>
+            <td>No. Isotank</td>
+            <td id="strIsotank"><%=@invoice.isotank_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+          
+      <% if @invoice.container_id != 0 %>
+        <tr>
+          <td>No. Kontainer</td>
+          <td id="strIsotank"><%=@invoice.container.containernumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@invoice.container_number.nil? %>
+          <tr>
+            <td>No. Kontainer</td>
+            <td id="strIsotank"><%=@invoice.container_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+        <tr>
+          <td>Supir</td>
+          <td><%=@invoice.driver.name%> (<%=zeropad(@invoice.driver.id)%>)<% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
+        </tr>
+        <% if !@invoice.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td><%= @invoice.description %></td>
+        </tr>   
+        <% end %>
+    </table>
+
+  </div>
+
+<% end %>
+
+<% end %>
