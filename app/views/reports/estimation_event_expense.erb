@@ -43,7 +43,7 @@
 			<select name="tanktype" class="short left combo_route" style="margin-right: 15px;">	
 			<option value="all">Semua Group</option>
 				<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
-				<% ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER', 'TRUK BOX'].each do |type| %>
+				<% ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER', 'TRUK BOX', 'MULTIFUNGSI'].each do |type| %>
 				<option <%= type == params[:tanktype] ? 'selected' : '' %>><%=type%></option>
 				<% end %>
 			</select>

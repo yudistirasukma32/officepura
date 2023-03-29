@@ -9,8 +9,8 @@ class InvoicesController < ApplicationController
     @section = "transactions"
     @where = "invoices"
     @transporttypes = ["STANDART", "KERETA"]
-    @tanktypes = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK", "KONTAINER", "LOSBAK", "DROPSIDE", "TRUK BOX"]
-    @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER"]
+    @tanktypes = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK", "KONTAINER", "LOSBAK", "DROPSIDE", "TRUK BOX", "MULTIFUNGSI"]
+    @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER", "MULTIFUNGSI"]
     @tanktypesCair = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK"]
   end
 
@@ -1009,7 +1009,7 @@ class InvoicesController < ApplicationController
 
   def get_tanktype
     if params[:cargotype] == 'padat'
-      @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER"]
+      @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER", "MULTIFUNGSI"]
       @tanktypes = @tanktypesPadat
       render :json => { :success => true, :html => render_to_string(:partial => "invoices/tanktypes", :layout => false) }.to_json; 
     else

@@ -2524,13 +2524,19 @@ end
       #   @is_foccon.push(focon.id)
       #   end
 
+      @tanktype = params[:tanktype]
+
       @startdate = params[:startdate]
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
 
       # BKK
-		  @invoices = Invoice.active.where("(date between ? and ?) AND id in (SELECT invoice_id FROM receipts where deleted = false)",@startdate.to_date,@enddate.to_date).order(:date)
+		  @invoices = Invoice.active.where("(date between ? and ?) AND invoices.id in (SELECT invoice_id FROM receipts where deleted = false)",@startdate.to_date,@enddate.to_date).order(:date)
+
+      if @tanktype.present? and @tanktype != 'all'
+        @invoices = @invoices.joins(:vehicle).where('platform_type = ?', @tanktype)
+      end
 
       @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
 

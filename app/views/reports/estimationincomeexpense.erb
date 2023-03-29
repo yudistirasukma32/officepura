@@ -21,6 +21,14 @@
 			<label for="enddate" class="middle">Akhir</label>
 			<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" />
 			<input class="submit" type="submit" value="Filter" />
+			<label for="tanktype" class="middle" style="width: 45px; padding: 0 10px 0 5px;margin-left: 15px;">Group</label>
+			<select name="tanktype" class="half left combo_route" style="margin-left: 15px;">	
+			<option value="all">Semua Group</option>
+				<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
+				<% ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER', 'TRUK BOX', 'MULTIFUNGSI'].each do |type| %>
+				<option <%= type == params[:tanktype] ? 'selected' : '' %>><%=type%></option>
+				<% end %>
+			</select>
 		</div>
 		</form>
 	</div>
