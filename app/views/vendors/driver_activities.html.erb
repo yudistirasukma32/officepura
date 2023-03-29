@@ -1,0 +1,86 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<h1>OPS / Laporan Harian Supir Vendor</h1>
+	</div>
+
+	<div id="filter" style="padding: 5px 10px 5px 10px;">
+		<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date" >Pilih Tanggal</label>
+				<input type="text" name="date" class="half left date-picker" value="<%=@date%>" onchange="javascript:submitFormFilter();" />
+			
+				<label for="vendor_id" class="middle short" style='width:50px;float:none;'>Vendor</label> &nbsp; &nbsp;
+				<select name="vendor_id" class="middle half">
+					<option value="">Semua</option>
+					<% Vendor.driver.active.order(:name).each do |ope| %>
+					<option value="<%=ope.id%>"<% if ope.id == @vendor_id %> selected='selected'<% end %>><%=ope.name%> - <%=ope.abbr%></option>
+					<% end %>
+				</select>
+
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+		</form>
+	</div>
+
+	<br class="clearfix" />
+
+	<table class="row-view tablesorter">
+		<thead>
+		<tr>
+			<th width="200">Nama</th>
+			<th width="90">Kota</th>
+			<th width="90">Telp</th>
+			<th width="150">Vendor</th>
+			<th width="200">Aktivitas Hari Ini</th>
+			<th width="60">Status</th>
+			<th width="60" class="{sorter: false}"></th>
+		</tr>
+		</thead>
+
+		<tbody>
+		<% @drivers.each do |driver| %>
+			<tr>
+				<td><%= driver.name %> (<%= zeropad(driver.id)%>)</td>
+				<td><%= driver.city %></td>
+				<td><%= !driver.phone.blank? ? driver.phone : driver.mobile %></td>
+				<td><%= driver.vendor.name rescue nil %></td>
+				<td>
+					<% 
+						today_activity = 'Belum Ada BKK'
+						last_activity = Invoice.where("date = ? and driver_id = ?", @date.to_date, driver.id)
+						if last_activity.present?
+							today_activity = last_activity
+						end
+					%>
+
+					<% if last_activity.present? %>
+					#<%= today_activity[0].id rescue nil %> - <%= today_activity[0].route.name rescue nil %> | (<%= today_activity[0].vehicle.current_id rescue nil %>) 
+					<% else %>
+					<% today_activity %>
+					<% end %>
+				</td>
+				<td>
+				<% if last_activity.present? %>
+					<span style="background-color: #008000; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Jalan</span>
+				<% else %>
+					<span style="background-color: #3a87ad; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Blm Muat</span>
+				<% end %>
+				</td>
+				<td class="right" width="60">&nbsp;</td>
+			</tr>
+		<% end %>	
+		</tbody>
+	
+	</table>
+
+
+</div>
+
+</div>

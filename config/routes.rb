@@ -194,7 +194,7 @@ OfficePuraErp::Application.routes.draw do
       get 'disable'
     end
   end 
-  
+
   resources :shipexpenses do
     member do
       get 'enable'
@@ -337,6 +337,8 @@ OfficePuraErp::Application.routes.draw do
       get "print"
     end  
   end
+
+  match 'vendors/driver_activities' => 'vendors#driver_activities'
 
   resources :vendors do
     member do

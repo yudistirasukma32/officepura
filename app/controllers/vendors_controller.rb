@@ -80,4 +80,23 @@ class VendorsController < ApplicationController
     @vendor.update_attributes(:enabled => false)
     redirect_to(vendors_url)
   end
+
+  def driver_activities
+    @section = "ops"
+    @where = "driver_activities"
+
+    @date = params[:date]
+    @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+
+    @vendor_id = params[:vendor_id]
+
+    @drivers = Driver.where('vendor_id != 0').order('name')
+
+    if @vendor_id.present?
+      @drivers = @drivers.where('vendor_id = ?', @vendor_id)
+    end
+
+    respond_to :html
+  end
+  
 end
