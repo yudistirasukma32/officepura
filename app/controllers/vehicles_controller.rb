@@ -105,7 +105,11 @@ class VehiclesController < ApplicationController
     inputs = params[:vehicle]
     @vehicle = Vehicle.find(params[:id])
 
-    old_data = @vehicle.current_id + ' // ' + @vehicle.vehiclegroup_id.to_s + ' // ' + @vehicle.platform_type + ' // ' + @vehicle.office_id.to_s + ' // ' + DateTime.now.to_s
+    old_data = @vehicle.current_id + 
+    ' // ' + @vehicle.vehiclegroup_id.to_s + 
+    ' // ' + @vehicle.platform_type.to_s + 
+    ' // ' + @vehicle.office_id.to_s + 
+    ' // ' + DateTime.now.to_s
 
     if @vehicle.update_attributes(inputs)
 
