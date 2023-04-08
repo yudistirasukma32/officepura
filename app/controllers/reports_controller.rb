@@ -21,14 +21,32 @@ class ReportsController < ApplicationController
       @startdate = params[:startdate]
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
-      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+      # @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+      @enddate = (Date.today).strftime('%d-%m-%Y') if @enddate.nil?
+      @vehicles = Vehicle.order(:current_id).all
 
       @invoices = Invoice.where('date BETWEEN :startdate AND :enddate and deleted = false and id in (select invoice_id from receipts where deleted = false)', {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
+      
+      @tanktype = params[:tanktype]
+      if params[:tanktype].present? && params[:tanktype] != 'Semua'
+        @vehicles = Vehicle.where('platform_type = ?', @tanktype)
+        @invoices = @invoices.where('vehicle_id in (?)', @vehicles)
+      end
+
+      @vehicle_id = params[:vehicle_id]
+
+      if params[:vehicle_id].present? && params[:vehicle_id] != 'all'
+        @invoices = @invoices.where('vehicle_id = ?', @vehicle_id)
+      end
+
       if params[:office_id].present?
         @invoices = @invoices.where(office_id: params[:office_id])
       end
       if params[:customer_id].present?
         @invoices = @invoices.where(customer_id: params[:customer_id])
+      end
+      if params[:driver_id].present?
+        @invoices = @invoices.where(driver_id: params[:driver_id])
       end
       @invoices = @invoices.order(:id)
       @ids = @invoices.any? ? @invoices.collect(&:id).join(",") : 0

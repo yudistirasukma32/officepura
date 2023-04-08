@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20230310095129) do
+ActiveRecord::Schema.define(:version => 20230406031058) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -142,6 +142,17 @@ ActiveRecord::Schema.define(:version => 20230310095129) do
     t.boolean   "bankledger",                                                    :default => false
     t.boolean   "pettycashledger",                                               :default => false
     t.boolean   "money_in"
+  end
+
+  create_table "banks", :force => true do |t|
+    t.boolean  "deleted",             :default => false
+    t.boolean  "enabled",             :default => true
+    t.string   "name"
+    t.string   "bank_account_name"
+    t.string   "bank_account_number"
+    t.string   "note"
+    t.datetime "created_at",                             :null => false
+    t.datetime "updated_at",                             :null => false
   end
 
   create_table "bonusreceipts", :force => true do |t|
@@ -1451,6 +1462,8 @@ ActiveRecord::Schema.define(:version => 20230310095129) do
     t.decimal   "claim_cost",                    :precision => 19, :scale => 2, :default => 0.0
     t.integer   "company_id"
     t.integer   "user_id"
+    t.integer   "bank_id"
+    t.string    "booking_code"
   end
 
   create_table "tirebudgets", :force => true do |t|

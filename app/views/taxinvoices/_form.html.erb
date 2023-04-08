@@ -246,7 +246,21 @@
 
 </div>
 
+<div class="field-row continue" style="padding-bottom:20px;">
+    <label for="booking_code" class="half left">Kode Booking</label>
+    <input type="text" class="half left" name="booking_code" value="<%=@taxinvoice.booking_code%>"/> 
+</div>
 
+<div class="field-row" style="padding: 15px 0 0;">
+  <label for="bank_id" class="half left">BANK</label>
+  <select id="" name="bank_id" class="double chzn-select">
+  <option value="0">- Pilih Bank -</option>
+  <% Bank.active.order(:id).each do |bank| %>
+  <option value="<%=bank.id%>"
+    <% if bank.id == @taxinvoice.bank_id %> selected="selected"<% end %>><%=bank.name%> (<%=bank.bank_account_number%>)</option>
+  <% end %>
+  </select>
+</div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
   <label for="extra_cost_info" class="half left">Memo</label>

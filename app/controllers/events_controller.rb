@@ -512,4 +512,46 @@ class EventsController < ApplicationController
 
   end
 
+  def event_summary
+
+    @where = 'report-events-summary'
+    @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
+    @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
+
+    @customer = Customer.find(params[:customer_id]) rescue nil
+    @customer_id = @customer.id if @customer
+  
+    @id = params[:id]
+
+    # render json: @customer.events.where(a: "a")
+    # return false
+    
+    if @customer.present?
+      @events = @customer.events.active
+    else
+      @events = Event.active
+    end
+
+    @events = @events.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
+
+    if @id.present?
+    
+      @events = Event.where('id = ?', @id)
+
+    end
+     
+    # @events = @customer.events.active if @customer
+    @events = @events.order(:start_date)
+ 
+    @invoices = Invoice.active.select('event_id').where("date >= ?", 12.months.ago).pluck(:event_id)
+
+    render "report-events-summary"
+    # render json: {
+    #   startdate: @startdate,
+    #   enddate: @enddate,
+    #   events: @events,
+    #   invoices: @invoices
+    # }
+  end
+
 end

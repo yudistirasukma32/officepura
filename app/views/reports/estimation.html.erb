@@ -9,34 +9,70 @@
 	<div id="content-full">
 		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
 
-		<h1><%=Setting.find_by_name("Client Name").value%> / Estimasi Pendapatan BKK: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+		<h1><%=Setting.find_by_name("Client Name").value%> / Estimasi Pendapatan BKK: <span class="red"><%=@startdate.to_date.strftime('%d %b %y')%> - <%=@enddate.to_date.strftime('%d %b %y')%></span></h1>
 
 		<br class="clearfix" />
 
 		<div id="filter">
 			<form id="filterform" name="filterform" action="" method="get">
 			<div class="field-row continue" style="width:100%;">
+				<div style="position: relative; width: fit-content; float: left;">
+					<label for="office_id" class="middle" style="width: fit-content;">Ktr</label>
+					<select name="office_id" class="chzn-select half left combo_route" style="width: 50px;">		
+						<option value="">All</option>
+						<% Office.active.order(:name).each do |office| %>
+						<option value="<%=office.id%>"<% if office.id == params[:office_id].to_i %> selected='selected'<% end %>><%=office.abbr%></option>
+						<% end %>
+					</select> 
+				</div>
 
-				<label for="office_id" class="middle">Pilih Kantor</label>
-				<select name="office_id" class="half left ">	
-					<option value="">Semua Kantor</option>
-					<% Office.active.order(:name).each do |office| %>
-					<option value="<%=office.id%>"<% if office.id == params[:office_id].to_i %> selected='selected'<% end %>><%=office.name%></option>
-					<% end %>
-				</select> 
-				<label for="customer_id" class="middle">Customer</label>
-				<select name="customer_id" class="half left ">	
-					<option value="">Semua</option>
-					<% Customer.active.order(:name).each do |customer| %>
-					<option value="<%=customer.id%>"<% if customer.id == params[:customer_id].to_i %> selected='selected'<% end %>><%=customer.name%></option>
-					<% end %>
-				</select> 
- 
-				&nbsp; &nbsp; Periode &nbsp; &nbsp;
-				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
-				&nbsp; &nbsp; s/d &nbsp; &nbsp;
-				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
-				<input class="submit" type="submit" value="Filter" />
+				<div style="position: relative; width: fit-content; float: left;">	
+					<label for="customer_id" class="middle" style="width: fit-content; margin-top: 0;">Cust.</label>
+					<select name="customer_id" class="chzn-select half left combo_route" style="width: 100px;">	
+						<option value="">Semua</option>
+						<% Customer.active.order(:name).each do |customer| %>
+						<option value="<%=customer.id%>"<% if customer.id == params[:customer_id].to_i %> selected='selected'<% end %>><%=customer.name%></option>
+						<% end %>
+					</select> 
+				</div>
+				
+				<div style="position: relative; width: fit-content; float: left;">
+					<label for="driver_id" class="middle" style="width: fit-content;">Supir</label>
+					<select name="driver_id" class="chzn-select half left combo_route"  style="width: 100px;">		
+						<option value="">Semua</option>
+						<% Driver.active.order(:name).each do |driver| %>
+						<option value="<%=driver.id%>"<% if driver.id == params[:driver_id].to_i %> selected='selected'<% end %>><%=driver.name%>(<%=driver.id%>)</option>
+						<% end %>
+					</select> 
+				</div>
+				
+				<div style="position: relative; width: fit-content; float: left;">
+					<label for="tanktype" class="middle" style="width: fit-content; margin-top: 0;">Group</label>
+					<select name="tanktype" class="half left combo_route" style="width: 80px;">	
+						<% ["Semua", "Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
+							<option <%= type == params[:tanktype] ? 'selected' : '' %>><%=type%></option>
+						<% end %>
+					</select>
+				</div>
+
+				<div style="position: relative; width: fit-content; float: left;">	
+					<label for="vehicle_id" class="middle" style="width: fit-content; margin-top: 0;">Nopol</label>
+					<select name="vehicle_id" class="chzn-select half combo_route"  style="width: 100px;">
+						<option value="all">Semua</option>	
+						<% @vehicles.each do |vehicle| %>
+						<option value="<%=vehicle.id%>"<% if vehicle.id == params[:vehicle_id].to_i %> selected="selected"<% end %>><%=vehicle.current_id%></option>
+						<% end %>
+					</select>
+				</div>	
+	
+				<div style="position: relative; width: fit-content; float: left; margin-left: 5px; margin-top: -5px;">
+					<label for="startdate" class="left" style="width: fit-content; margin-top: 5px; padding-right: 10px;">Perio.</label>
+					<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" style="width: 70px;" />
+					&nbsp; s/d &nbsp;
+					<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" style="width: 70px;" />
+					<input class="submit" type="submit" value="Filter" />
+				</div>
+
 			</div>
 			</form>
 		</div>
@@ -90,9 +126,11 @@
 							<br/><span>Debitan : <%= receiptreturn.quantity %> Rit, Tanggal konfirmasi <%= receiptreturn.created_at.strftime('%d-%m-%Y') %></span>
 						<% end %>
 					<% end %>
+					<br/>
+					<%= invoice.customer.name %>
 				</td>
 				<td><%=invoice.office.abbr%></td>
-				<td><%=invoice.vehicle.current_id%> <%= invoice.customer.name %></td>
+				<td><%=invoice.vehicle.current_id%></td>
 				<td align="right"><%= invoice.get_tonage(offset,@customer_35) %></td>
 				<td align="right"><%=to_currency((invoice.route.price_per || 0))%></td>
 				<td align="right"><%=to_currency(invoice.get_estimation(offset,@customer_35))%></td>

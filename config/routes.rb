@@ -699,7 +699,8 @@ OfficePuraErp::Application.routes.draw do
     get 'taxinvoiceitems/downloadexcel/:id', to: 'taxinvoiceitems#downloadexcel'
 
     get 'report-events' => 'events#report_events'
-    get 'report-dp-events' => 'events#report_dpevents' 
+    get 'report-dp-events' => 'events#report_dpevents'
+    get 'report-events-summary' => 'events#event_summary' 
 
     get 'api/login' => 'auth#login'
     get 'api/invoices' => 'invoicesapi#index'
