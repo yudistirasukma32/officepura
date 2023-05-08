@@ -42,21 +42,21 @@
 									<td>Surat jalan Sudah Tertagih</td>
 									<% (1..6).each do |i| %>
 										<% total = Taxinvoiceitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) %>
-										<% totalGeneric = Taxgenericitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{@vehicle_id}").sum(:total) %>
-										<td align="right"><%= to_currency(total.to_i + totalGeneric.to_i) %></td>
+										<%# totalGeneric = Taxgenericitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{@vehicle_id}").sum(:total) %>
+										<td align="right"><%= to_currency(total.to_i) %></td>
 										<% case i
 											when 1 
-												inc_jan += total.to_i + totalGeneric.to_i
+												inc_jan += total.to_i
 											when 2 
-												inc_feb += total.to_i + totalGeneric.to_i
+												inc_feb += total.to_i
 											when 3 
-												inc_mar += total.to_i + totalGeneric.to_i
+												inc_mar += total.to_i
 											when 4 
-												inc_apr += total.to_i + totalGeneric.to_i
+												inc_apr += total.to_i
 											when 5 
-												inc_mei += total.to_i + totalGeneric.to_i
+												inc_mei += total.to_i
 											when 6 
-												inc_jun += total.to_i + totalGeneric.to_i
+												inc_jun += total.to_i
 											end%>
 									<% end %>
 								</tr>
@@ -86,7 +86,7 @@
 								<tr>
 									<td>Surat jalan Generic Sudah Tertagih</td>
 									<% (1..6).each do |i| %>
-										<% total = Taxgenericitem.where("extract(month from created_at) = #{i} and extract(year from date) = #{@year} and deleted = false and vehicle_id = #{@vehicle.id}").sum(:total) %>
+										<% total = Taxgenericitem.where("extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{@vehicle.id}").sum(:total) %>
 										<td align="right"><%= to_currency(total.to_i) %></td>
 										<% case i
 											when 1 
@@ -146,8 +146,11 @@
 								<tr>
 									<td>Uang Makan</td>
 									<% (1..6).each do |i| %>
-										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance") 
-											receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id}) and deleted = false").sum("driver_allowance + helper_allowance") %>
+										<%
+										total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance") 
+										# receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id}) and deleted = false").sum("driver_allowance + helper_allowance")
+										receiptreturn = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{i} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance")
+										%>
 										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
 										<% case i
 											when 1 
@@ -170,8 +173,11 @@
 								<tr>
 									<td>Lain-lain</td>
 									<% (1..6).each do |i| %>
-										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee + ferry_fee") %>
-										<% receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id}) and deleted = false").sum("misc_allowance + tol_fee") %>
+										<%
+										total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee + ferry_fee")
+										receiptreturn = Receiptreturn.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee + ferry_fee")
+										# receiptreturn = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{i} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total)
+										%>
 										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
 										<% case i
 											when 1 
@@ -194,21 +200,24 @@
 								<tr>
 									<td>Solar Kontan</td>
 									<% (1..6).each do |i| %>
-										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("gas_allowance") %>
-										<td align="right"><%= to_currency(total) %></td>
+										<%
+										total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:gas_allowance)
+										receiptreturn = Receiptreturn.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:gas_allowance)
+										%>
+										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
 										<% case i
 											when 1 
-												out_jan += total.to_i 
+												out_jan += total.to_i - receiptreturn.to_i
 											when 2 
-												out_feb += total.to_i  
+												out_feb += total.to_i - receiptreturn.to_i
 											when 3 
-												out_mar += total.to_i  
+												out_mar += total.to_i - receiptreturn.to_i
 											when 4 
-												out_apr += total.to_i  
+												out_apr += total.to_i - receiptreturn.to_i
 											when 5 
-												out_mei += total.to_i  
+												out_mei += total.to_i - receiptreturn.to_i
 											when 6 
-												out_jun += total.to_i  
+												out_jun += total.to_i - receiptreturn.to_i
 											end%>
 									<% end %>
 								</tr>
@@ -217,21 +226,30 @@
 								<tr>
 									<td>Premi</td>
 									<% (1..6).each do |i| %>
-										<% total = Receiptpremi.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<%
+										premiold = Receiptpremi.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total)
+										preminew = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:premi_allowance)
+										receiptreturn = Receiptreturn.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:premi_allowance)
+										if preminew > premiold
+											total = preminew.to_i - receiptreturn.to_i
+										else
+											total = premiold.to_i - receiptreturn.to_i
+										end
+										%>
 										<td align="right"><%= to_currency(total) %></td>
 										<% case i
 											when 1 
-												out_jan += total.to_i 
+												out_jan += total
 											when 2 
-												out_feb += total.to_i  
+												out_feb += total 
 											when 3 
-												out_mar += total.to_i  
+												out_mar += total
 											when 4 
-												out_apr += total.to_i  
+												out_apr += total 
 											when 5 
-												out_mei += total.to_i  
+												out_mei += total
 											when 6 
-												out_jun += total.to_i  
+												out_jun += total
 											end%>
 									<% end %>
 								</tr>
@@ -414,8 +432,11 @@
 								<tr>
 									<td>Uang Makan</td>
 									<% (7..12).each do |i| %>
-										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance") 
-											receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance") %>
+										<%
+										total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance") 
+										# receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id}) and deleted = false").sum("driver_allowance + helper_allowance")
+										receiptreturn = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{i} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("driver_allowance + helper_allowance")
+										%>
 										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
 										<% case i
 											when 7 
@@ -438,8 +459,11 @@
 								<tr>
 									<td>Lain-lain</td>
 									<% (7..12).each do |i| %>
-										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee + ferry_fee") 
-											receiptreturn = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee") %>
+										<%
+										total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee + ferry_fee")
+										receiptreturn = Receiptreturn.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("misc_allowance + tol_fee + ferry_fee")
+										# receiptreturn = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{i} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total)
+										%>
 										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
 										<% case i
 											when 7 
@@ -462,21 +486,24 @@
 								<tr>
 									<td>Solar Kontan</td>
 									<% (7..12).each do |i| %>
-										<% total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum("gas_allowance") %>
-										<td align="right"><%= to_currency(total) %></td>
+										<%
+										total = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:gas_allowance)
+										receiptreturn = Receiptreturn.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:gas_allowance)
+										%>
+										<td align="right"><%= to_currency(total.to_i - receiptreturn.to_i) %></td>
 										<% case i
 											when 7 
-												out_jul += total.to_i 
+												out_jul += total.to_i - receiptreturn.to_i
 											when 8 
-												out_agu += total.to_i  
+												out_agu += total.to_i - receiptreturn.to_i
 											when 9 
-												out_sep += total.to_i  
+												out_sep += total.to_i - receiptreturn.to_i
 											when 10 
-												out_okt += total.to_i  
+												out_okt += total.to_i - receiptreturn.to_i
 											when 11 
-												out_nop += total.to_i  
+												out_nop += total.to_i - receiptreturn.to_i
 											when 12 
-												out_des += total.to_i  
+												out_des += total.to_i - receiptreturn.to_i
 											end%>
 									<% end %>
 								</tr>
@@ -485,21 +512,30 @@
 								<tr>
 									<td>Premi</td>
 									<% (7..12).each do |i| %>
-										<% total = Receiptpremi.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) %>
+										<%
+										premiold = Receiptpremi.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total)
+										preminew = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:premi_allowance)
+										receiptreturn = Receiptreturn.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:premi_allowance)
+										if preminew > premiold
+											total = preminew.to_i - receiptreturn.to_i
+										else
+											total = premiold.to_i - receiptreturn.to_i
+										end
+										%>
 										<td align="right"><%= to_currency(total) %></td>
 										<% case i
 											when 7 
-												out_jul += total.to_i 
+												out_jul += total
 											when 8 
-												out_agu += total.to_i  
+												out_agu += total
 											when 9 
-												out_sep += total.to_i  
+												out_sep += total
 											when 10 
-												out_okt += total.to_i  
+												out_okt += total
 											when 11 
-												out_nop += total.to_i  
+												out_nop += total
 											when 12 
-												out_des += total.to_i  
+												out_des += total
 											end%>
 									<% end %>
 								</tr>

@@ -695,6 +695,7 @@ OfficePuraErp::Application.routes.draw do
       
     get 'api/report/annualvehicle' => 'reportsapi#annualvehicle'
     get 'api/report/get_today_invoice' => 'reportsapi#get_today_invoice'
+    get 'api/report/vehicledetails' => 'reportsapi#vehicle_details'
   
     get 'taxinvoiceitems/downloadexcel/:id', to: 'taxinvoiceitems#downloadexcel'
 

@@ -83,7 +83,6 @@
 
 			    inc_others = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Debit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
 
-
 				totalincome = taxinvoices.to_i + taxinvoices_generic.to_i + inc_others.to_i
 				totalgroupincome += totalincome
 
@@ -92,15 +91,28 @@
 
 				receipts = Receipt.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total) 
 		      	receiptreturns = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
-		      	receiptpremis = Receiptpremi.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+				
+		      	#RECEIPT PREMI
+				premiold = Receiptpremi.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum("total")
+				preminew = Receipt.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:premi_allowance)
+				if preminew.to_i > premiold.to_i
+					receiptpremis = 0
+				else
+					receiptpremis = premiold.to_i
+				end
 
-		      	receiptexpenses = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+				# if vehicle.id == 321
+				# 	render :partial => premiold.to_i
+				# 	return false
+				# end
+
+				receiptexpenses = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
 
 				# productgroup aktifa 7
 				# productgroup ban 1 8 9 10 11
 				# productgroup selain Aktifa = Onderdil 2 3 4 5 6
 				
-		      	productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id = 7)").sum(:total) 
+				productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id = 7)").sum(:total) 
 
 				ban = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (1,8,9,10,11))").sum(:total) 
 				
@@ -136,12 +148,11 @@
 					totaloutcome = 0;
 					
 					taxinvoices = Taxinvoiceitem.where("extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and taxinvoice_id IS NOT NULL and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
-	
+
 					taxinvoices_generic = Taxgenericitem.where("extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{vehicle.id}").sum(:total) 
-	
+
 					inc_others = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Debit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
-	
-	
+
 					totalincome = taxinvoices.to_i + taxinvoices_generic.to_i + inc_others.to_i
 					totalgroupincome += totalincome
 
@@ -149,21 +160,34 @@
 					receiptreturnscount = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").count
 
 					receipts = Receipt.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total) 
-					  receiptreturns = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
-					  receiptpremis = Receiptpremi.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
-	
-					  receiptexpenses = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
-	
+					receiptreturns = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+					
+					#RECEIPT PREMI
+					premiold = Receiptpremi.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum("total")
+					preminew = Receipt.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:premi_allowance)
+					if preminew.to_i > premiold.to_i
+						receiptpremis = 0
+					else
+						receiptpremis = premiold.to_i
+					end
+
+					# if vehicle.id == 321
+					# 	render :partial => premiold.to_i
+					# 	return false
+					# end
+
+					receiptexpenses = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+
 					# productgroup aktifa 7
 					# productgroup ban 1 8 9 10 11
 					# productgroup selain Aktifa = Onderdil 2 3 4 5 6
 					
-					  productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id = 7)").sum(:total) 
-	
+					productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id = 7)").sum(:total) 
+
 					ban = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (1,8,9,10,11))").sum(:total) 
 					
 					onderdil = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (2,3,4,5,6))").sum(:total) 
-	
+
 					totalrit = receiptscount.to_i - receiptreturnscount.to_i
 					totalgroupban += ban.to_i
 					totalgrouponderdil += onderdil.to_i

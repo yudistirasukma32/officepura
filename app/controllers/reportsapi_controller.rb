@@ -141,6 +141,157 @@ class ReportsapiController < ApplicationController
 		
 	end
 
+	def vehicle_details
+		@year = params[:year]
+		@year = Date.today.year if @year.nil?
+		@month = params[:month]
+		@month = Date.today.strftime('%m') if @month.nil?
+
+		@vehicles = Vehicle.active.where("platform_type IS NOT NULL AND platform_type <> ''")
+		
+		@vehicleslist = @vehicles.map do |vehicle|
+			description_list = [
+				"Surat Jalan Sudah Tertagih",
+				"Surat Jalan Belum Tertagih",
+				"Surat Jalan Generic Sudah Tertagih",
+				"Lain-lain / Koreksi Debit",
+				"Uang Makan",
+				"Lain-lain",
+				"Solar Kontan",
+				"Premi"
+			]
+			group_list = [
+				"Pemasukan",
+				"Pemasukan",
+				"Pemasukan",
+				"Pemasukan",
+				"Pengeluaran",
+				"Pengeluaran",
+				"Pengeluaran",
+				"Pengeluaran"
+			]
+			total_list = []
+
+			#SUMMARY
+			##RITASE
+			receiptscount = Receipt.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").count
+			receiptreturnscount = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").count
+			totalrit = receiptscount.to_i - receiptreturnscount.to_i
+
+			##INCOME
+			taxinvoices = Taxinvoiceitem.where("extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+			taxinvoices_generic = Taxgenericitem.where("extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{vehicle.id}").sum(:total)
+			inc_others = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Debit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+			totalincome = taxinvoices.to_i + taxinvoices_generic.to_i + inc_others.to_i
+
+			##EXPENSE
+			receipts = Receipt.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total) 
+			receiptreturns = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+			receiptpremis = Receiptpremi.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+			receiptexpenses = Receiptexpense.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total)
+			productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id})").sum(:total) 
+			totaloutcome = receipts.to_i + receiptpremis.to_i + receiptexpenses.to_i + productrequests.to_i - receiptreturns.to_i
+			
+			ban = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (1,8,9,10,11))").sum(:total)
+
+			onderdil = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(year from date) = #{@year} and extract(month from date) = #{@month} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id in (2,3,4,5,6))").sum(:total)
+
+			totalprofitloss = totalincome.to_i - totaloutcome.to_i
+
+			###DETAILS
+			####PEMASUKAN
+			totalInvoice = Taxinvoiceitem.where("extract(month from date) = #{@month} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total).to_i
+			# totalGeneric = Taxgenericitem.where("extract(month from date) = #{@month} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{vehicle.id}").sum(:total)
+			# totalSudah = totalInvoice.to_i + totalGeneric.to_i
+
+			totalBelum = Taxinvoiceitem.where("extract(month from date) = #{@month} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NULL and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total).to_i
+
+			totalGeneric = Taxgenericitem.where("extract(month from date) = #{@month} and extract(year from date) = #{@year} and deleted = false and taxinvoice_id IS NOT NULL and vehicle_id = #{vehicle.id}").sum(:total).to_i
+
+			totalLain = Receiptexpense.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and expensetype = 'Debit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{vehicle.id})").sum(:total).to_i
+
+			####PENGELUARAN
+			totalReceiptMakan = Receipt.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum("driver_allowance + helper_allowance") 
+			receiptReturnMakan = Receiptreturn.where("extract(year from created_at) = #{@year} and extract(month from created_at) = #{@month} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum("driver_allowance + helper_allowance")
+			totalMakan = totalReceiptMakan.to_i - receiptReturnMakan.to_i
+
+			totalReceiptLain = Receipt.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum("misc_allowance + tol_fee + ferry_fee")
+			receiptReturnLain = Receiptreturn.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum("misc_allowance + tol_fee + ferry_fee")
+			totalExpenseLain = totalReceiptLain.to_i - receiptReturnLain.to_i
+
+			# totalSolar = Receipt.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum("gas_allowance").to_i
+			totalReceiptSolar = Receipt.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:gas_allowance)
+			receiptReturnSolar = Receiptreturn.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:gas_allowance)
+			totalSolar = totalReceiptSolar.to_i - receiptReturnSolar.to_i
+
+			premiold = Receiptpremi.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:total)
+			preminew = Receipt.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:premi_allowance)
+			receiptreturn = Receiptreturn.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{vehicle.id})").sum(:premi_allowance)
+			if preminew > premiold
+				totalPremi = preminew.to_i - receiptreturn.to_i
+			else
+				totalPremi = premiold.to_i - receiptreturn.to_i
+			end
+
+			total_list.concat([totalInvoice, totalBelum, totalGeneric, totalLain, totalMakan, totalExpenseLain, totalSolar, totalPremi])
+
+			@officeexpensegroups = Officeexpensegroup.order(:name)
+			@officeexpensegroups.each do |group|
+				totalExpenseGroup = Receiptexpense.where("extract(month from created_at) = #{@month} and extract(year from created_at) = #{@year} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where officeexpensegroup_id = #{group.id} and vehicle_id = #{vehicle.id})").sum(:total)
+				description_list.concat([group.name])
+				total_list.concat([totalExpenseGroup.to_i])
+				group_list.concat(["Pengeluaran"])
+			end
+
+			productGroups = Productgroup.order(:name)
+			productGroups.each do |pgroup|
+				totalExpenseProduct = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(month from date) = #{@month} and extract(year from date) = #{@year} and deleted = false and vehicle_id = #{vehicle.id} and productgroup_id = #{pgroup.id})").sum(:total)
+				description_list.concat(["Inventory: " + pgroup.name])
+				total_list.concat([totalExpenseProduct.to_i])
+				group_list.concat(["Pengeluaran"])
+			end
+
+			arr_details = []
+			new_item = {}
+			description_list.each_with_index do |desc, i|
+				new_item = {
+					:group => group_list[i], :description => description_list[i], :total => total_list[i]
+				}
+				arr_details.push(new_item)
+			end
+
+			arrDetails = []
+			# arrSummary.concat([vehicle.year_made, totalrit, totalincome, totaloutcome, ban.to_i, onderdil.to_i, totalprofitloss])
+			hashSummary = {
+				year: vehicle.year_made,
+				ritase: totalrit,
+				income: totalincome,
+				expense: totaloutcome,
+				ban: ban.to_i,
+				onderdil: onderdil.to_i,
+				profit_loss: totalprofitloss,
+				details: arr_details
+			}
+
+			{
+				id: vehicle.id,
+				nopol: vehicle.current_id,
+				jenis: vehicle.platform_type,
+				grup: vehicle.vehiclegroup.name,
+				tahun: vehicle.year_made,
+				kantor: vehicle.office.name,
+				origin: "pura",
+				summary: hashSummary
+			}
+		end
+ 
+		render json: {
+			message: 'Success',
+			status: 200,
+			vehicles: @vehicleslist,
+			}, status: 200
+	end
+
 	def get_today_invoice
 		today = Date.today
 		today = "2021-01-03"
