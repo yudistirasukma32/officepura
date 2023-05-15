@@ -609,6 +609,7 @@ OfficePuraErp::Application.routes.draw do
     get 'unpaid_invoice' => 'reports#unpaid_invoice'
       
     get "confirmed-invoices" => 'reports#confirmed_invoices'
+    get "collectible-invoices" => 'reports#collectible_invoices'
 
     get "isotanks-utilization" => 'reports#isotankutilization'
     get "containers-utilization" => 'reports#containerutilization'

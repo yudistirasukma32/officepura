@@ -678,7 +678,7 @@ class ReportsController < ApplicationController
     end
   end
     
-  def confirmed_invoices
+def confirmed_invoices
     role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
     if role
       @offices = Office.active        
@@ -762,6 +762,94 @@ class ReportsController < ApplicationController
       redirect_to root_path()
     end
 end  
+
+def collectible_invoices
+  role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
+  if role
+
+    @offices = Office.active        
+    @startdate = params[:startdate]
+    @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+    @enddate = params[:enddate]
+    @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+    @transporttype = params[:transporttype]
+    @invoices = Invoice.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
+    @invoicereturns = Invoicereturn.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order("created_at ASC")
+
+    @drivers = Driver.active.order('name')
+    @driver_id = params[:driver_id]
+
+    if checkroleonly 'Vendor Supir'
+
+      @vendor = Vendor.where('user_id = ?', current_user.id)
+      
+      if @vendor.present?
+        @drivers = Driver.order('name')
+        @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
+
+        @invoices = @invoices.where("driver_id in (select id from drivers where vendor_id = ?)", @vendor[0].id)
+      end
+
+    end
+
+    @vehicle_id = params[:vehicle_id]
+
+    @office_id = params[:office_id]
+    @is_premi = params[:is_premi]
+      
+    if @office_id.present? and @office_id != "all"
+      @invoices = @invoices.where("office_id = ?", @office_id)
+    end
+
+    if @driver_id.present? and @driver_id != "all"
+      @invoices = @invoices.where("driver_id = ?", @driver_id)
+    end
+
+    if @vehicle_id.present? and @vehicle_id != "all"
+      @invoices = @invoices.where("vehicle_id = ?", @vehicle_id)
+    end
+
+    if @transporttype == 'KERETA'
+
+      @invoices = @invoices.where("invoicetrain = true")
+        
+    elsif @transporttype == 'KOSONGAN'
+        
+      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+      @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
+
+    elsif @transporttype == 'STANDART'
+
+      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+      @invoices = @invoices.where("invoicetrain = false").where("customer_id NOT IN (?)", cust_kosongan).order(:id)
+
+    end
+
+    @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
+    @invoices = @invoices.where("id in (select taxinvoiceitems.invoice_id from taxinvoiceitems where taxinvoiceitems.deleted = false AND taxinvoiceitems.taxinvoice_id IS NOT NULL)")
+
+    if @is_premi.present?
+      
+      if @is_premi == '1'
+
+        @invoices = @invoices.where("premi_allowance > money(0)")
+
+      elsif @is_premi == '0'
+
+        @invoices = @invoices.where("premi = false")
+      
+      end
+
+    end
+
+    @section = "reports1"
+    @where = "collectible-invoices"
+    render "collectible_invoices"
+  else
+    redirect_to root_path()
+  end
+end  
+    
 
 def drivervehicles
   role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
