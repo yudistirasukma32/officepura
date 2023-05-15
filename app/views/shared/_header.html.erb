@@ -168,12 +168,14 @@
 						<li><%= link_to "Laporan Surat Jalan", "/reports/taxinvoiceitems_report" %></li>
 						<!-- <li><%= link_to "Laporan BKK ", "/reports/invoices" %></li> -->
 						<li><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>
+						<li><%= link_to "Laporan BKK Tertagih", "/reports/collectible-invoices" %></li>
 						<li><%= link_to "Laporan Pemakaian Nopol ", "/reports/drivervehicles" %></li> 
 					<% else %>
 						<% if checkrole 'Admin Keuangan, Admin Operasional, Vendor Supir' %>
 							<li><%= link_to "Laporan Surat Jalan", "/reports/taxinvoiceitems_report" %></li>
 							<!-- <li><%= link_to "Laporan BKK ", "/reports/invoices" %></li> -->
 							<li><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>
+							<li><%= link_to "Laporan BKK Tertagih", "/reports/collectible-invoices" %></li>
 							<li><%= link_to "Laporan Pemakaian Nopol ", "/reports/drivervehicles" %></li> 
 						<% end %>
 					<% end %>

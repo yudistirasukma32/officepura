@@ -2,6 +2,7 @@
 	<thead>
 		<tr>
 			<th>Nama Akun</th>
+			<th width="90">Kantor</th>
 			<th>Last Login</th>
 			<th width="60" class="{sorter: false}">Role</th>
 			<th width="60" class="{sorter: false} hideprint" >Aktif</th>
@@ -23,6 +24,7 @@
 				<% end %>
 			
 			</td>
+			<td><%= user.office.name rescue nil %></td>
 			<td><%= user.last_sign_in_at.nil? ? '-' : user.last_sign_in_at.strftime('%d-%m-%Y %H:%M:%S') %></td>
 
 			<td><%= user.userroles.count %></td>

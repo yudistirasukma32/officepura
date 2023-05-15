@@ -239,6 +239,9 @@ class EventsController < ApplicationController
     if customer_id == "50" || customer_id == "51" || customer_id == "144"
 
       @events = Event.active.where("end_date BETWEEN current_date - interval '9' day AND current_date + interval '4' day").order(:start_date)
+      if current_user.office_id.present? && !current_user.owner
+        @events = @events.where("office_id = ?", current_user.office_id)
+      end
       render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json; 
 
     else
@@ -246,11 +249,17 @@ class EventsController < ApplicationController
         if is_train == "0"
 
           @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval '1' day AND current_date + interval '2' day AND invoicetrain = false", params[:customer_id]).order(:start_date)
+          if current_user.office_id.present? && !current_user.owner
+            @events = @events.where("office_id = ?", current_user.office_id)
+          end
           render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json; 
 
         else
 
           @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval '9' day AND current_date + interval '4' day AND invoicetrain = true", params[:customer_id]).order(:start_date)
+          if current_user.office_id.present? && !current_user.owner
+            @events = @events.where("office_id = ?", current_user.office_id)
+          end
           render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json; 
             
         end
@@ -310,7 +319,11 @@ class EventsController < ApplicationController
         end
     else
       @events = Event.active.where("start_date >= ?", 3.months.ago).order(:id)
-        
+
+      if current_user.office_id.present? && !current_user.owner
+        @events = @events.where("office_id = ?", current_user.office_id)
+      end
+      
       invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)    
         
       @events = @events.map do |e|

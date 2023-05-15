@@ -1,0 +1,117 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+	
+	<h1><%=Setting.find_by_name("Client Name").value%> / Report BKK Tertagih: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+
+	<br class="clearfix" />
+
+	<div id="filter" style="padding: 5px 10px 5px 10px;">
+		<form id="filterform" name="filterform" action="" method="get">
+		<div class="field-row continue">
+
+			<label for="transporttype" style="float:none">&nbsp;&nbsp;&nbsp;&nbsp;Tipe BKK</label>
+			<select name="transporttype" class="short combo_route " style="margin-top: 0.25rem;">
+			<option value="">Semua Tipe</option>
+				<% ["STANDART", "KOSONGAN", "KERETA"].each do |type| %>
+				<option <%= type == params[:transporttype] ? 'selected' : '' %>><%=type%></option>
+				<% end %>
+			</select>
+            
+            <label for="office_id" class="middle" style="margin-top: 0.25rem; width: 40px; padding-right: 5px;">Kantor</label>
+            <select name="office_id" class="short left" style="margin-top: 0.25rem;">
+                <option value="all">Semua</option>
+                <% @offices.each do |office| %>
+                <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
+                <% end %>
+            </select>
+
+			<label for="driver_id" class="middle" style="margin-top: 0.25rem; width: 50px;">Supir</label>
+            <select name="driver_id" class="half left" style="margin-top: 0.25rem; width: 100px;">
+                <option value="all">Semua</option>
+                <% @drivers.each do |driver| %>
+                <option value="<%=driver.id%>" <% if @driver_id.to_i == driver.id %> name="driver_id" selected="selected"<% end %>><%=driver.name%></option>
+                <% end %>
+            </select>
+			
+			<label for="is_premi" class="middle" style="margin-top: 0.25rem; width: 50px;">Premi</label>
+			<select name="is_premi" class="short left" style="margin-top: 0.25rem;">
+				<option value="">Semua</option>
+				<option value="1" <%= @is_premi == '1' ? 'selected' : '' %>>Sudah Premi</option>
+				<option value="0" <%= @is_premi == '0' ? 'selected' : '' %>>Tanpa Premi</option>
+			</select>
+
+			&nbsp; &nbsp; <label class="" style="float:none">Tgl Awal</label> &nbsp; &nbsp;
+			<input type="text" name="startdate" class="short date-picker" value="<%=@startdate%>" />
+			&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:40px;float:none;padding-right: 5px;'>Akhir</label> &nbsp; &nbsp;
+			<input type="text" name="enddate" class="short date-picker" value="<%=@enddate%>" />&nbsp;
+			<input class="submit" type="submit" value="Filter" />
+		</div>
+		</form>
+	</div>
+
+	<br class="clearfix" />
+
+	<% if @invoices.any? %>
+		<table class="tablesorter row-view tablesorterFilters">
+		<tr>
+			<th width="30">No.</th>
+			<th width="30">Tgl</th>
+			<th>Keterangan</th>
+            <th width="150">No. DO</th>
+            <th width="40">KTR</th>
+<!--            <th width="40">Tgl Buat</th>-->
+			<th>BKK</th>
+			<th>ISO/KTNR</th>
+			<th width="80">No.Pol</th>
+			<th width="180">No. Inv</th>
+			<th width="100" class="right sorter:true, filter: false">Total Inv (Rp.)</th>
+		</tr>
+
+		<% total_header = 0 %>
+		<% @invoices.each_with_index do |invoice, i|
+
+			total = invoice.taxinvoiceitems[0].taxinvoice.total
+
+            total_header += total
+        %>
+		<tr<% if i % 2 == 0 %> class="even"<% end %>>
+			<td><%=i+1%></td>
+			<td><%=invoice.date.strftime('%d/%m')%></td>
+			<td><strong>#<%= invoice.id %></strong><br><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+            <td><strong><%=invoice.event.id rescue nil%></strong><br/><%=invoice.event.summary rescue nil%></td>
+            <% if invoice.office.abbr == '' %>
+            <td class="red"><%=invoice.office.abbr%></td>    
+            <% else %>
+            <td><%=invoice.office.abbr%></td>
+            <% end %>
+<!--            <td><%=invoice.created_at.strftime('%d/%m/%y')%></td>-->
+			<td><%= invoice.invoicetrain ? 'KERETA' : 'TRUK' %></td>
+			<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %>
+			<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %></td>
+			<td><%=invoice.vehicle.current_id rescue nil%></td>
+			<td align=""><%= invoice.taxinvoiceitems[0].taxinvoice.long_id rescue nil%></td>
+			<td align="right"><%=to_currency(invoice.taxinvoiceitems[0].taxinvoice.total)%></td>
+		</tr>
+			
+		<% end %>	
+
+		<% if @invoices %>
+		<tr class="footer">
+			<td class="total" colspan="9">TOTAL</td>
+			<td class="total" align="right"><%=to_currency(total_header)%></td>
+		</tr>
+		<% end %>
+	
+		</table>
+	<% end %>
+</div>
+
+

@@ -46,6 +46,19 @@
 
 		<br/>
 
+		<%
+		
+		total = @taxinvoice.total
+
+		if @taxinvoice.downpayment.to_i > 0
+			total = total.to_i - @taxinvoice.downpayment.to_i
+		end
+
+		total_in_words = moneytowordsrupiah(total)
+		
+		%>
+
+
 		<div class="field-row continue">
 			<label class="left" style="width: 120px;">Sudah diterima dari</label>
   			<input style="font-weight: bold;" type="text" class="disabled left" value=":  <%=@taxinvoice.customer.name%>" />
@@ -53,17 +66,18 @@
 
 		<div class="field-row continue">
 			<label class="left" style="width: 120px;">Banyaknya Uang</label>
-  			<input type="text" class="disabled left" value=":  <%=@taxinvoice.total_in_words%>" />
+  			<input type="text" class="disabled left" value=":  <%=total_in_words%>" />
 		</div>
 
 		<div class="field-row continue">
 			<label class="left" style="width: 120px;">Untuk Pembayaran</label>
 			<input type="text" class="disabled left" value=":  Jasa Angkutan" />
 		</div>
- 
+
+
 		<div class="field-row continue">
 			<label class="left" style="width: 120px; font-weight: bold;">Jumlah</label>
-			<input style="font-weight: bold;" type="text" class="disabled left" id="txt_total" value=":  Rp <%= @is_pembulatan ? to_currency(@taxinvoice.total) : to_currency_bank(@taxinvoice.total)%>" /> 
+			<input style="font-weight: bold;" type="text" class="disabled left" id="txt_total" value=":  Rp <%= @is_pembulatan ? to_currency(total) : to_currency_bank(total)%>" /> 
 		</div>
 
 		<br/><br/>
