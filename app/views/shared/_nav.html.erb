@@ -60,7 +60,7 @@
 	<% end %>
     
     <% if @section == 'taxinvoices' %>
-		<li class="<%= @where == 'taxinvoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan'), "Invoice Tagihan", "/taxinvoices" %></li>
+		<li class="<%= @where == 'taxinvoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan, Staff Invoice Tagihan'), "Invoice Tagihan", "/taxinvoices" %></li>
 	<% end %>
 
 	<% if @section == 'transactions' or @section == 'transactions2' %>

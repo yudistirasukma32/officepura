@@ -117,7 +117,9 @@
 
 		<% if taxinvoice.paiddate.nil? %>
 		<td>
-			<a class="cta" href="/taxinvoices/payment/<%=taxinvoice.id%>">Bayar</a>
+			<% if checkrole 'Admin Invoice Tagihan' %>
+				<a class="cta" href="/taxinvoices/payment/<%=taxinvoice.id%>">Bayar</a>
+			<% end %>
 		</td>
 		<% else %>
 		<td><%=taxinvoice.paiddate.strftime('%d-%m-%y')%> (<%=(taxinvoice.paiddate - taxinvoice.date).to_i%>)</td>

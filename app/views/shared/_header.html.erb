@@ -113,7 +113,7 @@
 			</li>
             
             <li class="<%= @section == 'taxinvoices' ? 'on' : '' %>">
-				<%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan'), "Inv. Tagihan", "/taxinvoices" %>
+				<%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan, Staff Invoice Tagihan'), "Inv. Tagihan", "/taxinvoices" %>
 			</li>
 
 			<li class="<%= @section == 'transactions2' ? 'on' : '' %>">
