@@ -141,6 +141,69 @@ class ReportsapiController < ApplicationController
 		
 	end
 
+	def customer_routes
+		customers = Customer.active.order(:id)
+		
+		new_customers = {}
+		@customerlist = customers.map do |customer|
+			routes = Route.active.where("customer_id = #{customer.id} AND LOWER(name) NOT LIKE LOWER('%kosongan%')").order(:id)
+			arr_routes = []
+			new_item = {}
+			routes.each do |route|
+				new_item = {
+					id: route.id,
+					name: route.name,
+					distance: route.distance,
+					price_per_type: route.price_per_type,
+					item_type: route.item_type,
+					description: route.description,
+					customer_id: route.customer_id,
+					routegroup_id: route.routegroup_id,
+					bonus: route.bonus.to_i,
+					tol_fee: route.tol_fee.to_i,
+					ferry_fee: route.ferry_fee.to_i,
+					price_per: route.price_per.to_i,
+					is_train: route.is_train,
+					is_sea: route.is_sea,
+					is_isotank: route.is_isotank,
+					transporttype: route.transporttype,
+					pos: route.pos,
+					route_id: route.route_id,
+					estimated_hour: route.estimated_hour,
+					office_id: route.office_id,
+					commodity_id: route.commodity_id
+				}
+				arr_routes.push(new_item)
+			end
+
+			{
+				id: customer.id,
+				name: customer.name,
+				address: customer.address,
+				city: customer.city,
+				contact: customer.contact,
+				phone: customer.phone,
+				mobile: customer.mobile,
+				fax: customer.fax,
+				npwp: customer.npwp,
+				terms_of_payment: customer.terms_of_payment_in_days,
+				description: customer.description,
+				wholesale_price: customer.wholesale_price.to_i,
+				email: customer.email,
+				email_alt: customer.email_alt,
+				load_hour: customer.load_hour,
+				unload_hour: customer.unload_hour,
+				route: arr_routes
+			}
+		end
+
+		render json: {
+			message: 'Success',
+			status: 200,
+			customer: @customerlist,
+		}, status: 200
+	end
+
 	def vehicle_details
 		@year = params[:year]
 		@year = Date.today.year if @year.nil?
