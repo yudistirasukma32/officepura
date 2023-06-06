@@ -41,8 +41,9 @@
 		<table id="reportevent" class="row-view tablesorter sortable tablesorterFilters">
 		<thead>
 		<tr>
-			<th class="{sorter:true, filter: true}">No</th>
-			<th class="{sorter:true, filter: true}">Tanggal</th>
+			<th class="{sorter:true, filter: true}" width="60">No</th>
+			<th class="{sorter:true, filter: true}">Tgl. Start</th>
+			<th class="{sorter:true, filter: true}">Tgl. DP</th>
 			<th class="{sorter:true, filter: true}">Pelanggan</th> 
 			<th class="{sorter:true, filter: true}">Jurusan DO</th>
 			<th class="{sorter:true, filter: true}">Moda</th>
@@ -111,12 +112,6 @@
 							completed = false
 							status = "Muat ST"
 							color = "8bc34a"
-                            
-                            if event.vendor_name != ""
-                                completed_by_vendor = true
-                                status = "Bgkr Vendor"
-                                color = "009688"
-                            end
 							
 						end
 						
@@ -162,7 +157,8 @@
 
 			<tr class="">
 				<td><%= event.id %></td>
-				<td><%= event.start_date %></td>
+				<td><%= event.start_date.strftime('%d / %m') rescue nil%></td>
+				<td><%= event.downpayment_date.strftime('%d / %m') rescue nil %></td>
 				<td><%= event.customer.name %></td>
 				<td><%= event.summary %></td>
 				<td><%= event.invoicetrain ? 'KERETA' : 'TRUK' %></td>
