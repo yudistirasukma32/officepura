@@ -21,8 +21,8 @@
 					<li><%= link_to_if (checkrole 'Admin HRD, Admin Operasional'), "Mekanik", "/mechanics" %></li>
                     <li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Kendaraan", "/vehicles" %></li>
-					<li><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Isotank", "/isotanks" %></li>
-					<li><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Kontainer", "/containers" %></li>
+					<li><%= link_to_if (checkrole 'Admin Kontainer'), "Isotank", "/isotanks" %></li>
+					<li><%= link_to_if (checkrole 'Admin Kontainer'), "Kontainer", "/containers" %></li>
                     <li class="divider"></li>
                     <li><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang'), "Supplier", "/suppliers" %></li>
                     <li><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang, Staf Permintaan Gudang, Staf Pembelian Gudang'), "Stok Barang", "/products" %></li>

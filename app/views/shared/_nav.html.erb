@@ -14,8 +14,8 @@
 		
 		<li class="<%= @where == 'routes' ? 'on' : '' %>"><%= link_to_if (checkrole 'Master Jurusan, User Jurusan, Admin Operasional'), "Jurusan", "/routes" %></li>
 		<li class="<%= @where == 'vehicles' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Kendaraan", "/vehicles" %></li>
-		<li class="<%= @where == 'isotanks' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Isotank", "/isotanks" %></li>
-		<li class="<%= @where == 'containers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Kontainer", "/containers" %></li>
+		<li class="<%= @where == 'isotanks' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Kontainer'), "Isotank", "/isotanks" %></li>
+		<li class="<%= @where == 'containers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Kontainer'), "Kontainer", "/containers" %></li>
 
 		<li class="<%= @where == 'assets' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Aktiva", "/assets" %></li>
 		<li class="<%= @where == 'suppliers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang'), "Supplier", "/suppliers" %></li>
