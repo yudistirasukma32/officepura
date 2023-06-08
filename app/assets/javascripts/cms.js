@@ -2328,7 +2328,7 @@ $(document).ready(function() {
 		if ($('#invoice_vehicle_id').val() == 0) {			
 			errors = addComma(errors, "<strong>Kendaraan</strong>");
 		}
-		if ($('#invoice_driver_id').val() == "") {			
+		if ($('#invoice_driver_id').val() == 0) {			
 			errors = addComma(errors, "<strong>Supir</strong>");
 		}
 
