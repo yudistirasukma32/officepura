@@ -2768,6 +2768,7 @@ $(document).ready(function(e){
 	$("#taxinvoice_customer_name").text($(this).data("customer"));
 	$("#taxinvoice_date").text($(this).data("date"));
 	$("#invoice_long_id").text($(this).data("code"));
+	$("#taxinvoice_description").text($(this).data("description"));
 	$("#taxinvoice_remarks").text($(this).data("remarks"));
 	$("#taxinvoice_insurance_cost").val($(this).data("insurance-cost"));
 	$("#taxinvoice_claim_cost").val($(this).data("claim-cost"));
