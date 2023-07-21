@@ -160,6 +160,7 @@
             </td> 
             <td><%=inv_bongkar[0].customer.name%></td>
             <td class="right"><%=invoice.weight_gross rescue nil%></td>
+            <td class="right"><%= invoice.weight_net rescue 0 %></td>
         </tr>
         <% end %>
         
