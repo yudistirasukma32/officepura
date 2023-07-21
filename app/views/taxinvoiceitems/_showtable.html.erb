@@ -7,14 +7,15 @@
         <th width="50">DO</th>
         <!-- <th class="{sorter: false}" width="50">BKK</th> -->
         <th class="{sorter: false}">Keterangan</th>
-        <th width="80">NoPol</th> 
-        <th width="150">Pelanggan</th>
+        <th width="70">NoPol</th> 
+        <th width="140">Pelanggan</th>
         <th width="50">Muat</th> 
-        <th width="70" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">S.Jalan</th>
-        <th width="70" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;" title="Surat Tagihan sudah di Invoice">SDH INV.
+        <th width="50">BKR</th> 
+        <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">S.Jalan</th>
+        <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;" title="Surat Tagihan sudah di Invoice">SDH INV.
         <!-- <i class="icon-lock red icon-large" title="Surat Tagihan sudah di Invoice"></i> -->
         </th>
-        <th width="70" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">Upload</th>
+        <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">Upload</th>
         <th width="50">USER</th>
         <th width="50" class="{sorter: false, filter: false} sorter-false"></th>
     </tr>
@@ -82,6 +83,13 @@
                 <%=invoice.taxinvoiceitems[0].weight_gross rescue nil%>
             <% else %>
                 <%=invoice.weight_gross rescue nil%>   
+            <% end %>
+            </td>
+            <td class="right">
+            <% if invoice.taxinvoiceitems.any? %>
+                <%=invoice.taxinvoiceitems[0].weight_net rescue 0%>
+            <% else %>
+                <%=invoice.weight_net rescue 0%>   
             <% end %>
             </td>
             <% if invoice.taxinvoiceitems.any? %>
