@@ -16,6 +16,7 @@
             <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
             <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
             <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
+			<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
         </td>
 		<td class="">
 		<%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%>
@@ -68,6 +69,7 @@
             <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
             <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
             <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
+			<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
         </td>
 		<td class="">
 		<%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%>

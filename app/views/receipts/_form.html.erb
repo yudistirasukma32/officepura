@@ -17,10 +17,18 @@
     <h3>Bukti Kas Keluar <%= @invoice.invoicetrain ? "Kereta" : ""%> #<%=zeropad(@invoice.id)%></h3>
 
     <table class="row-view no-border">
-      <tr>
+        <tr>
           <td width="100">Tanggal</td>
           <td><%=@invoice.date.strftime('%d %B %Y')%> &nbsp;(KTR: <%=@invoice.office.name%>)</td>
         </tr>
+
+        <% if @invoice.event_id.present? && @invoice.event_id != 0 %>
+        <tr>
+          <td width="100">DO</td>
+          <td><a style="color: #4e4edc; text-decoration: underline;" href="/events/<%=@invoice.event_id%>/edit" target="_blank"><%=@invoice.event_id%> (<%=@invoice.event.summary%>)</a></td>
+        </tr>
+        <% end %>
+
         <tr>
           <td>Pelanggan</td>
           <td><%=@invoice.customer.name%></td>
