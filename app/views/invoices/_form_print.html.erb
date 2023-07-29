@@ -1,0 +1,99 @@
+<div style="text-align:center;">
+  <h2 style="text-decoration: underline; font-weight: bold;">SURAT PERINTAH KERJA (SPK)</h2>
+</div>
+
+<table>
+  <tr>
+    <td style="width: 150px;">No. SPK</td>
+    <td>: <%= @invoice.id %></td>
+  </tr>
+  <tr>
+    <td>Tanggal</td>
+    <td>: <%= @invoice.date.strftime('%d %b %Y') %></td>
+  </tr>
+  <tr>
+    <td>Nama Supir & No. HP</td>
+    <td>: <%= @invoice.driver.name %> - <%= @invoice.driver.phone %> <%= @invoice.driver.mobile %></td>
+  </tr>
+  <tr>
+    <td>No Rekening Supir</td>
+    <td>: <%= @invoice.driver.bank_name %> - <%= @invoice.driver.bank_account %></td>
+  </tr>
+  <tr>
+    <td>Kendaraan</td>
+    <td>: <%= @invoice.vehicle.current_id %></td>
+  </tr>
+  <tr>
+    <td>Jurusan</td>
+    <td>: <%= @invoice.route.name rescue nil %></td>
+  </tr>
+  <tr>
+    <td>Jenis Pengiriman</td>
+    <td>: Industri / Distribusi</td>
+  </tr>
+  <tr>
+    <td>Komoditas</td>
+    <td>: <%= @invoice.event.commodity.name rescue nil %></td>
+  </tr>
+  <tr>
+    <td>Tanggal Ambil (Muat)</td>
+    <td>: <%= @invoice.event.load_date.strftime('%d %b %Y') %></td>
+  </tr>
+  <tr>
+    <td>Tanggal Bongkar (Tiba)</td>
+    <td>: <%= @invoice.event.unload_date.strftime('%d %b %Y') %></td>
+  </tr>
+  <tr>
+    <td>Estimasi Tonase</td>
+    <td>: <%= @invoice.event.estimated_tonage %> <%= @invoice.event.price_per_type %></td>
+  </tr>
+  <tr>
+    <td>Tipe Kargo</td>
+    <td>: <%= @invoice.event.cargo_type %></td>
+  </tr>
+  <tr>
+    <td>Tipe Tangki</td>
+    <td>: <%= @invoice.event.tanktype %></td>
+  </tr>
+  <tr>
+    <td>Jumlah Rit</td>
+    <td>: <%= @invoice.event.qty %></td>
+  </tr>
+</table>
+
+<hr/>
+
+<table>
+  <tr>
+    <% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
+    <td style="width: 150px;">Nominal Project</td>
+    <td>: Rp <%=to_currency(@invoice.total)%></td>
+  </tr>
+  <tr>
+    <td>Terbilang</td>
+    <td>: <%= moneytowordsrupiah(@invoice.total) %></td>
+  </tr>
+  <tr>
+    <td>Meliputi</td>
+    <td>: UM Supir, UM Kernet, Lain-lain, Solar, ASDP</td>
+  </tr>
+</table>
+<br/>
+
+<p style="padding-bottom: 0;">Dalam menjalankan <strong>SPK</strong> ini, <strong>MITRA PENGEMUDI</strong> diwajibkan mendukung perusahaan dalam pemenuhan persyaratan yang dijalankan sebagai berikut :</p>
+<p>1. <strong>SPK</strong> yang telah diterima dan di tandatangan oleh <strong>MITRA PENGEMUDI</strong> harus di kerjakan sesuai
+jadwal yang dicantumkan di dalam <strong>SPK</strong>.<br/>
+2. <strong>MITRA PENGEMUDI</strong> tidak diperkenankan untuk meninggalkan atau membatalkan saat proses
+pengiriman berlangsung.<br/>
+3. <strong>MITRA PENGEMUDI</strong> harus memastikan segala aspek pengiriman termasuk memastikan keadaan
+kendaraan dan Tangki Cargo dalam keadaan bersih dan layak.<br/>
+4. Bersedia membersihkan dan mengkondisikan kendaraan atau tangki sebelum dan sesudah
+pengiriman berlangsung yang tertuang di dalam <strong>SPK</strong>.<br/>
+5. Kendaraan yang di bawa untuk Mengantarkan dan atau mengirimkan atas dasar <strong>SPK</strong> diatas , 
+merupakan Aset Perusahaan, dan <strong>PT QUNCI</strong> yang diwakili <strong>MITRA PENGEMUDI</strong> wajib menjaga, dan melindungi aset tersebut<br/>
+6. Biaya yang timbul akibat kelalaian <strong>MITRA PENGEMUDI</strong> yang mengakibatkan Kecelakaan baik Tunggal ataupun Pihak ke 3 menjadi tanggung jawab <strong>MITRA PENGEMUDI</strong><br/>
+</p>
+
+<p style="padding-bottom: 0;">
+Demikian SURAT PERINTAH KERJA ini diperbuat untuk dilaksanakan dengan sebaik – baiknya, dan dapat
+dipergunakan seperlunya.</p><br/>

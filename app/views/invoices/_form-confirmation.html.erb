@@ -79,7 +79,13 @@
     <% if @invoice.container_id != 0 %>
       <tr>
         <td>No. Kontainer</td>
-        <td id="strContainer"><%=@invoice.container.containernumber rescue nil%></td>
+        <td id="strContainer">
+        <%=@invoice.container.containernumber rescue nil%>
+          <% if (@invoice.container.vendor_id.present?)%>
+						<br>
+						<%= @invoice.container.vendor.name rescue nil%>
+					<% end %>
+        </td>
       </tr>
     <% else %>
       <% if !@invoice.container_number.nil? %>

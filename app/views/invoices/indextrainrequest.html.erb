@@ -15,20 +15,26 @@
 			<form id="filterform" name="filterform" action="" method="get">
 			<div class="" style="margin-top: 3px; ">
 				<label for="date" style="margin-right: 13px;">Pilih Tanggal</label>
-				<input type="text" name="date" class="half date-picker" value="<%=@date%>"/>
+				<input type="text" name="date" class="half date-picker" style="width: 100px;" value="<%=@date%>"/>
 				<label for="" style="margin: 0 10px">s/d</label>
-				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>"/>
-				<label for="event_id" style="margin: 0 10px">No. DO</label>
-				<input type="text" name="event_id" class="half middle" value="<%=@event_id%>" style="width: 80px;">&nbsp;&nbsp;
-				<label for="office_id" class="middle">Pilih Kantor</label>
+				<input type="text" name="enddate" class="half date-picker" style="width: 100px;" value="<%=@enddate%>"/>&nbsp;&nbsp;
+				<label for="office_id" class="middle" style="margin: 0 6px">Kantor</label>
                 <select name="office_id" class="half middle ">
-                    <option value="">All</option>
+                    <option value="">Semua Ktr</option>
                     <% @offices.each do |office| %>
                     <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
                     <% end %>
-                </select> 
-				&nbsp;&nbsp;&nbsp;&nbsp;
-				<input class="submit" type="submit" value="Filter" style="vertical-align: bottom; margin-top: 2px;">
+                </select>&nbsp;&nbsp;
+				<label for="office_id" class="middle" style="margin: 0 6px">Stasiun</label>
+                <select name="office_id" class="half middle ">
+                    <option value="">Semua ST</option>
+                    <% Station.active.each do |station| %>
+                    <option value="<%=station.id%>" <% if @station_id.to_i == station.id %> name="station_id" selected="selected"<% end %>><%=station.name%></option>
+                    <% end %>
+                </select>  
+				<label for="event_id" style="margin: 0 10px">No. DO</label>
+				<input type="text" name="event_id" class="half middle" value="<%=@event_id%>" style="width: 80px;">&nbsp;&nbsp;
+				<input class="submit" type="submit" value="Filter" style="vertical-align: bottom; margin-top: -2px; margin-left: 5px; position: absolute;">
 			</div>
 			</form>
 		</div>
@@ -41,6 +47,7 @@
 				<th width="50">No.DO</th>
 				<th width="80">No.BKK</th>
 				<th>Keterangan</th>
+				<th>Komoditas</th>
 				<th width="40">Ktr</th>
 				<th width="80">ISO/CONTAINER</th>
 				<th width="80">No. Pol</th>
@@ -61,6 +68,7 @@
 					<td><%=invoice.event_id rescue nil%></td>
 					<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice, :train => true) %></td>
 					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+					<td><%=invoice.event.commodity.name rescue nil%></td>  
 					<% if 
 					# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
 					invoice.office.abbr == '' 
@@ -101,7 +109,7 @@
 						<%=invoice.event.station.name rescue nil%>
 					</td>
 					<td>
-						<%=invoice.event.load_date.strftime('%d.%m') rescue nil%>
+						<strong><%=invoice.event.load_date.strftime('%d.%m') rescue nil%></strong>
 					</td>
 					<td>
 						<%=invoice.event.unload_date.strftime('%d.%m') rescue nil%>
@@ -118,6 +126,7 @@
 						<td><%=invoice.event_id rescue nil%></td>
 						<td><span class="left"><i class="icon-signout"></i></span><span>   <%= link_to zeropad(invoice.id), edit_invoice_path(invoice, :train => true) %></span></td>
 						<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+						<td><%=invoice.event.commodity.name rescue nil%></td>  
 						<% if 
 						# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP'
 						invoice.office.abbr == '' 
@@ -153,13 +162,13 @@
 							<% end %>
 						</td>
 						<td>
-							<%=invoice.event.station.name rescue nil%>
+							<%=invoice.event.routetrain.destination_station.name rescue nil%>
 						</td>
 						<td>
 							<%=invoice.event.load_date.strftime('%d.%m') rescue nil%>
 						</td>
 						<td>
-							<%=invoice.event.unload_date.strftime('%d.%m') rescue nil%>
+							<strong><%=invoice.event.unload_date.strftime('%d.%m') rescue nil%></strong>
 						</td>
 						<td class="right">
 							<%=invoice.event.estimated_tonage rescue nil%>

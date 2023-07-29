@@ -1,0 +1,102 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>		
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		
+        <h1><a href="<%=events_path%>">Kalendar Event</a> / BKK Summary</h1>
+		
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="startdate" class="middle">Tanggal</label>
+				<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+				<label for="enddate" class="tiny">s/d</label>
+				<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+
+				<label for="customer_id" class="middle">Pelanggan</label>
+				<select name="customer_id" class="third left">
+					<option value="">Semua Pelanggan</option>
+					<% Customer.active.order(:name).each do |customer| %>
+					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
+					<% end %>
+				</select>
+
+				<label for="event_id" class="tiny">DO:</label>
+				<input type="text" name="event_id" class="short left" value="<%=params[:event_id]%>" />
+ 
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<% if @invoices.any? %>
+			<table class="row-view tablesorter sortable tablesorterFilters">
+			<thead>
+			<tr>
+				<th width="30">No.</th>
+				<th width="60">No. DO</th>
+				<th width="30">Tgl</th>
+				<th>Keterangan</th>
+				<th>Komoditas</th>
+				<th width="80">Supir</th>
+				<th width="80">NO.Pol</th>
+				<th>BKK</th>
+				<th class="{sorter:true, filter: true}">KARGO</th>
+				<th class="{sorter:true, filter: true}">TANGKI</th>
+				<th width="100">ISO/KTNR</th>
+				<th width="100" class="right sorter:true, filter: false">Total (Rp.)</th>
+				<th width="50"></th>
+			</tr>
+			</thead>
+	
+			<% total_header, driver_allowance_total, helper_allowance_total, gas_allowance_total, misc_allowance_total, tol_fee_total, ferry_fee_total, premi_allowance_total = 0, 0, 0, 0, 0, 0, 0, 0 %>
+
+			<% @invoices.each_with_index do |invoice, i| %>
+			<tr<% if i % 2 == 0 %> class="even"<% end %>>
+				<td><%=i+1%></td>
+				<td><%=invoice.event.id rescue nil%></td>
+				<td><%=invoice.date.strftime('%d/%m')%></td>
+				<td>#<%= invoice.id %><br><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%></td>
+				<td><%=invoice.event.commodity.name rescue nil%></td>
+				<td><%=invoice.driver.name rescue nil%></td>
+				<td><%=invoice.vehicle.current_id rescue nil%></td>
+				<td><%= invoice.invoicetrain ? 'KERETA' : 'TRUK' %></td>
+				<td><%=invoice.cargo_type%></td>
+				<td><%=invoice.tanktype != '0' ? invoice.tanktype : '' %></td>
+				<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %>
+				<% if (invoice.container_id.present? && invoice.container_id.to_i != 0) %>
+					<% if invoice.container.category == 'SEWA' %>
+						<span style="color: blue;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (SW)</span>
+					<% elsif invoice.container.category == 'FREEUSE' %>
+						<span style="color: red;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (FR)</span>
+					<% else %>
+						<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (BL)
+					<% end %>
+					
+					<% if (invoice.container.vendor_id.present?)%>
+						<br>
+						<%= invoice.container.vendor.abbr rescue nil%>
+					<% end %>
+				<% end %>
+				</td>
+				<td align="right"><%=to_currency(invoice.total)%></td>
+				<td align="right"><a href="invoices/printspk/<%= invoice.id %>" class="cta" style="float: right !important;">SPK</a></td>
+			</tr>
+				
+			<% end %>	
+	
+ 
+		
+			</table>
+		<% end %>
+	</div>
+	

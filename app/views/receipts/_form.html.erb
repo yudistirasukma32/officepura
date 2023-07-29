@@ -33,6 +33,7 @@
           <td>Pelanggan</td>
           <td><%=@invoice.customer.name%></td>
         </tr>
+        
         <tr>
           <td>Jurusan</td>
           <td><strong><%=@invoice.quantity%></strong> Rit: <%=@invoice.route.name%></td>
@@ -85,7 +86,14 @@
       <% if @invoice.container_id != 0 %>
         <tr>
           <td>No. Kontainer</td>
-          <td id="strIsotank"><%=@invoice.container.containernumber rescue nil%></td>
+          <td id="strIsotank">
+          <%=@invoice.container.containernumber rescue nil%>
+          
+          	<% if (@invoice.container.vendor_id.present?)%>
+						<br>
+						<%= @invoice.container.vendor.name rescue nil%>
+					<% end %>
+          </td>
         </tr>
       <% else %>
         <% if !@invoice.container_number.nil? %>
@@ -107,7 +115,6 @@
           <td>No. Rek. Supir</td>
           <td><%=@invoice.driver.bank_account rescue nil%></td>
         </tr>
-        
         <% if !@invoice.description.blank? %>
         <tr>
           <td>Keterangan</td>

@@ -242,6 +242,8 @@ OfficePuraErp::Application.routes.draw do
     end
   end
   
+  get 'invoices/printspk/:id' => 'invoices#printspk'
+
   match 'invoices/add_ship' => 'invoices#indexaddship'
   match 'invoices/add_ship/:invoice_id' => 'invoices#add_ship'
   post 'invoices/updateship/' => 'invoices#updateship'
@@ -249,6 +251,10 @@ OfficePuraErp::Application.routes.draw do
   match 'invoices/add_weight' => 'invoices#indexaddweight'
   match 'invoices/add_weight/:invoice_id' => 'invoices#add_weight'
   post 'invoices/updateaddweight/' => 'invoices#updateaddweight'
+
+  #kosonganProduktif
+  match 'invoices/add_kosongan/:invoice_id' => 'invoices#add_kosongan'
+  post 'invoices/createkosongan/' => 'invoices#createkosongan'
 
   match 'invoices/trainrequest' => 'invoices#indextrainrequest'
 
@@ -705,6 +711,7 @@ OfficePuraErp::Application.routes.draw do
     get 'report-events' => 'events#report_events'
     get 'report-dp-events' => 'events#report_dpevents'
     get 'report-events-summary' => 'events#event_summary' 
+    get 'report-invoices-summary' => 'invoices#invoice_summary'
 
     get 'api/login' => 'auth#login'
     get 'api/invoices' => 'invoicesapi#index'

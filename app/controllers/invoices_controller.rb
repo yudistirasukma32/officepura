@@ -14,6 +14,25 @@ class InvoicesController < ApplicationController
     @tanktypesCair = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK"]
   end
 
+  def invoice_summary
+    @section = 'events'
+    @where = 'report-invoices-summary'
+    @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
+    @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
+
+    @event_id = params[:event_id]
+    
+    if @event_id.present?
+      @events = Event.where('id = ?', @event_id).pluck(:id)
+    else
+      @events = Event.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date}).pluck(:id)
+    end
+
+    @invoices = Invoice.where("event_id IN (?)", @events).order(:event_id).order(:date)
+
+    render "report-invoices-summary"
+  end
+
   def form_event
     @section = "logs"
     @month = params[:month]
@@ -1373,6 +1392,12 @@ class InvoicesController < ApplicationController
         @invoices = @invoices.where("office_id = ?", office_id)
     end
 
+    station_id = params[:station_id]
+
+    if station_id.present?
+      @invoices = @invoices.joins(:events).where("station_id = ?", station_id)
+    end
+
     respond_to :html
 
   end
@@ -1453,6 +1478,7 @@ class InvoicesController < ApplicationController
 
     respond_to :html
   end
+
 
     def isotank
         @where = "invoice_isotank"
@@ -1577,9 +1603,36 @@ class InvoicesController < ApplicationController
 
   end
 
-end
+  def invoice_summary
+    @section = 'events'
+    @where = 'report-invoices-summary'
+    @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
+    @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
+  
+    @event_id = params[:event_id]
+    
+    if @event_id.present?
+      @events = Event.where('id = ?', @event_id).pluck(:id)
+    else
+      @events = Event.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date}).pluck(:id)
+    end
+  
+    @invoices = Invoice.where("event_id IN (?)", @events).order(:event_id).order(:date)
+  
+    render "report-invoices-summary"
+  end
+  
+  def printspk
+  
+    @section = 'events'
+    @where = 'report-invoices-summary'
+    @invoice = Invoice.find(params[:id])
+    
+    respond_to :html
+  
+  end
 
-       
+end
 
 def fetch_excel
       s = Roo::Excel.new("./db/bkkkereta.xls") 

@@ -1,0 +1,22 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="/report-invoices-summary"><i class="icon-remove"></i> Batal</a>
+
+		<h1><a href="<%=events_path%>">Kalendar Event</a> / <a href="/report-invoices-summary">Summary</a> / SPK <%= @invoice.id %></h1>
+
+		<br class="clearfix" />
+		
+		<%= render "form_print" %>
+		
+		<br class="clearfix" />
+		
+	</div>
+
+</div>
