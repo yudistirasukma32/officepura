@@ -1,3 +1,22 @@
+<style>
+.ctagreen {
+	display: inline-block;
+    background: #49c718;
+    text-transform: uppercase;
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 500;
+    -moz-border-radius: 4px !important;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    padding: 3px 10px !important;
+    opacity: 0.5;
+}
+.ctagreen:hover {
+	opacity: 1 !important;
+}
+</style>
+
 <%= render "shared/header" %>
 
 <div id="nav">
@@ -47,6 +66,7 @@
 				<th width="50">No. DO</th>
 				<th width="50">User</th>
 				<th width="90" class="right">Total</th>
+				<th width="70"></th>
 				<th width="100"></th>
 			</tr>
 
@@ -144,7 +164,9 @@
                 <td align="right">        
                     <%=to_currency(invoice.total)%>
                 </td>
-				
+				<td>
+					<a class="ctagreen" href="/invoices/add_kosongan/<%=invoice.id%>">+Addon</a>
+				</td>
                 <td class="right" width="60">
 					<% if !checkroleonly 'Vendor Supir' %>
 						<% if invoice.receipts.active.count == 0 %>
