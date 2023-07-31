@@ -1,20 +1,30 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+ 
+		<h1>Marketing / <a href="invoices/kosongan_approval">Approval BKK Kosongan Non-Produktif</a> / <%= @invoice.id%></h1>
+		
+		<br class="clearfix" />
+
 <% if @invoice %>
 
-<%= form_for(@receipt) do |f| %>
+<%= form_for(@invoice) do |f| %>
 
-  <%= f.hidden_field :process, :value => 'create' %>
+  <input type="hidden" id="process" name="process" value="kosongan_confirm" />
   <%= f.hidden_field :invoice_id, :value => @invoice.id %>
-
-   <% if @errors.include?'receipt' %>
-      <div class="field-row red">
-        <%=@errors['receipt']%>
-      </div>
-    <% end %>
-
+  <%= f.hidden_field :date, :value => @invoice.date %>
+  
+  <%= f.hidden_field :kosongan_confirmed, :value => true %>
 
   <div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
 
-    <h3>Bukti Kas Keluar <%= @invoice.invoicetrain ? "Kereta" : ""%> #<%=zeropad(@invoice.id)%></h3>
+    <h3>BKK Kosongan Non-Produktif #<%=zeropad(@invoice.id)%></h3>
 
     <table class="row-view no-border">
         <tr>
@@ -103,6 +113,7 @@
           </tr>
         <% end %>
       <% end %>
+
         <tr>
           <td>Supir</td>
           <td><%=@invoice.driver.name%> (<%=zeropad(@invoice.driver.id)%>)<% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
@@ -111,16 +122,17 @@
         <td>No. Telp. Supir</td>
           <td><%=@invoice.driver.mobile rescue nil%></td>
         </tr>
-        <tr>
-          <td>No. Rek. Supir</td>
-          <td><%=@invoice.driver.bank_account rescue nil%></td>
+
+		<tr>
+          <td>Operasional</td>
+          <td><%= @invoice.user_id.nil? ? current_user.username : @invoice.user.username%></td>
         </tr>
-        <% if !@invoice.description.blank? %>
-        <tr>
-          <td>Keterangan</td>
-          <td><%= @invoice.description %></td>
-        </tr>   
-        <% end %>       
+         
+		<tr>
+			<td>Keterangan / Alasan</td>
+			<td><%= @invoice.description %></td>
+		</tr>   
+             
     </table>
 
     <table class="row-view">
@@ -174,13 +186,17 @@
     </p>
 
     <div class="field-row continue">
-      <%= f.submit "Tambah Data", :class => 'submit right' %>    
+      <%= f.submit "Konfirmasi Data", :class => 'submit right' %>    
     </div>
-
-
 
   </div>
 
 <% end %>
 
 <% end %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

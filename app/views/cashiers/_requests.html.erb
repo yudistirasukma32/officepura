@@ -70,6 +70,118 @@
 		</tbody>
 	<% end %>
 
+	<% if @invoice_kosongan_p.any? %>
+	<% total = 0 %>
+		<tbody class="tablesorter-no-sort">
+			<tr class="subheading">
+				<th colspan="6" style="color:#000;">Bukti Kas Keluar Kosongan Produktif (<%=@invoice_kosongan_p.count%>)</th>
+			</tr>
+		</tbody>
+		<tbody>	
+		<% @invoice_kosongan_p.each_with_index do |invoice| %>
+		<% total += invoice.total %>
+			<tr>
+				<td><%=zeropad(invoice.id)%></td>
+				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%> <%=zeropad(invoice.driver.id) rescue nil%>) <%= invoice.invoicetrain ? '= Kereta =' : '' %> 
+                    <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
+                    <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
+                    <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
+					<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
+                </td>
+
+				<td class="<%= ([99].include? invoice.office_id) ? 'red' : '' %>">
+					<%=invoice.office.abbr if !invoice.office_id.nil?%>
+				</td>
+
+				<td>
+					<%=invoice.vehicle.current_id rescue nil%>
+					<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+						<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+					<% end %>
+				</td>
+				<td align="right" class="red">
+				<% if [99].include? invoice.office_id %>
+					<%=to_currency(0)%>
+				<% else %>
+					<%=to_currency(invoice.total)%>
+				<% end %>
+				</td>
+				<td class="right">
+					<% if [99].include? invoice.office_id%>
+						<a class="cta" style="background: #2196f3;" href="<%=new_receipt_path%>/<%=invoice.id%>">Konfirm</a>
+					<% else %>
+						<a class="cta" href="<%=new_receipt_path%>/<%=invoice.id%>">Konfirm</a>
+					<% end %>
+				</td>
+			</tr>
+		<% end %>
+		</tbody>
+		<tbody class="tablesorter-no-sort">
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="red"><strong><%=to_currency(total.abs)%></strong></td>
+				<td colspan="3">&nbsp;</td>
+			</tr>
+		</tbody>
+	<% end %>
+
+	<% if @invoice_kosongan_np.any? %>
+	<% total = 0 %>
+		<tbody class="tablesorter-no-sort">
+			<tr class="subheading">
+				<th colspan="6" style="color:#000;">Bukti Kas Keluar Kosongan Non-Produktif (<%=@invoice_kosongan_np.count%>)</th>
+			</tr>
+		</tbody>
+		<tbody>	
+		<% @invoice_kosongan_np.each_with_index do |invoice| %>
+		<% total += invoice.total %>
+			<tr>
+				<td><%=zeropad(invoice.id)%></td>
+				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%> <%=zeropad(invoice.driver.id) rescue nil%>) <%= invoice.invoicetrain ? '= Kereta =' : '' %> 
+                    <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
+                    <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
+                    <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
+					<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
+                </td>
+
+				<td class="<%= ([99].include? invoice.office_id) ? 'red' : '' %>">
+					<%=invoice.office.abbr if !invoice.office_id.nil?%>
+				</td>
+
+				<td>
+					<%=invoice.vehicle.current_id rescue nil%>
+					<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+						<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+					<% end %>
+				</td>
+				<td align="right" class="red">
+				<% if [99].include? invoice.office_id %>
+					<%=to_currency(0)%>
+				<% else %>
+					<%=to_currency(invoice.total)%>
+				<% end %>
+				</td>
+				<td class="right">
+					<% if [99].include? invoice.office_id%>
+						<a class="cta" style="background: #2196f3;" href="<%=new_receipt_path%>/<%=invoice.id%>">Konfirm</a>
+					<% else %>
+						<a class="cta" href="<%=new_receipt_path%>/<%=invoice.id%>">Konfirm</a>
+					<% end %>
+				</td>
+			</tr>
+		<% end %>
+		</tbody>
+		<tbody class="tablesorter-no-sort">
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="red"><strong><%=to_currency(total.abs)%></strong></td>
+				<td colspan="3">&nbsp;</td>
+			</tr>
+		</tbody>
+	<% end %>
+
 	<% if @invoicetrains.any? %>
 	<% total = 0 %>
 		<tbody class="tablesorter-no-sort">
@@ -79,6 +191,7 @@
 		</tbody>
 		<tbody>	
 		<% @invoicetrains.each_with_index do |invoice| %>
+		
 		<% total += invoice.total %>
 			<tr>
 				<td><%=zeropad(invoice.id)%></td>

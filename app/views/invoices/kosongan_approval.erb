@@ -7,12 +7,8 @@
 <div id="main">
 	
 	<div id="content-full">
-
-		<% if !checkroleonly 'Vendor Supir' %>
-			<a class="btn print" href="<%=new_invoice_path%>?kosongan=true"><i class="icon-plus-sign"></i> &nbsp;Tambah BKK Kosongan</a>
-		<% end %>
  
-		<h1>Transaksi / <a href="kosongan">BKK Kosongan Non-Produktif</a> / Index</h1>
+		<h1>Marketing / <a href="invoices/kosongan_approval">Approval BKK Kosongan Non-Produktif</a> / Index</h1>
 		
 		<br class="clearfix" />
 		
@@ -54,63 +50,105 @@
 
 			<tr class="subheading">
 				<th colspan="7" style="color:#000;">BKK Kosongan Non-Produktif <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%=@invoices.count%>)</span></th>
-				<th class="right" style="padding: 5px 10px 5px 0; color: #010101;"><%=to_currency(@invoices.where('deleted = false').sum('total'))%></th>
+				<th class="right" style="padding: 5px 10px 5px 0; color: #010101;"><%=to_currency(@invoices.sum('total'))%></th>
 			</tr>
 
 			<% @invoices.each do |invoice| %>
-			<% if invoice.deleted %>
-				<% if current_user.adminrole %>
-				<tr class="deleted">
-					<td><%=zeropad(invoice.id) %></td>
-					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
-					<% if invoice.by_vendor %>
-						<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
-					<% end %>
-					</td>
-                    <% if 
-						# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP' 
-						invoice.office.abbr == ''
-					%>
-                    <td class="red"><%=invoice.office.abbr%></td>    
-                    <% else %>
-                    <td><%=invoice.office.abbr%></td>
-                    <% end %>
-					
-					<td>
-						<%=invoice.vehicle.current_id rescue nil%>
-						<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
-							<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
-						<% end %>
-					</td>
-					<td>
-					<% if (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) %>
-						<% if invoice.isotank.category == 'SEWA' %>
-							<span style="color: blue;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (SW)</span>
-						<% elsif invoice.isotank.category == 'FREEUSE' %>
-							<span style="color: red;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (FR)</span>
-						<% else %>
-							<%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (BL)
-						<% end %>
-					<% end %>
-					<% if (invoice.container_id.present? && invoice.container_id.to_i != 0) %>
-						<% if invoice.container.category == 'SEWA' %>
-							<span style="color: blue;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (SW)</span>
-						<% elsif invoice.container.category == 'FREEUSE' %>
-							<span style="color: red;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (FR)</span>
-						<% else %>
-							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (BL)
-						<% end %>
-					<% end %> 
-					</td>
-                    <td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
-					<td align="right">        
-						<%=to_currency(invoice.total)%>
-					</td>
-					
-                    <td width="60">DIHAPUS</td>
-				</tr>
+
+			<tr>
+				<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice) %></td>
+				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> 
+				<% if invoice.by_vendor %>
+					<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
 				<% end %>
-			<% else %>
+				</td>
+				<% if 
+				# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP' 
+				invoice.office.abbr == ''
+				%>
+                <td class="red"><%=invoice.office.abbr%></td>    
+                <% else %>
+                <td><%=invoice.office.abbr%></td>
+                <% end %>
+				<td>
+					<%=invoice.vehicle.current_id rescue nil%>
+					<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+						<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+					<% end %>
+				</td>
+				<td>
+				<% if (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) %>
+					<% if invoice.isotank.category == 'SEWA' %>
+						<span style="color: blue;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (SW)</span>
+					<% elsif invoice.isotank.category == 'FREEUSE' %>
+						<span style="color: red;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (FR)</span>
+					<% else %>
+						<%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (BL)
+					<% end %>
+				<% end %>
+				<% if (invoice.container_id.present? && invoice.container_id.to_i != 0) %>
+					<% if invoice.container.category == 'SEWA' %>
+						<span style="color: blue;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (SW)</span>
+					<% elsif invoice.container.category == 'FREEUSE' %>
+						<span style="color: red;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (FR)</span>
+					<% else %>
+						<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (BL)
+					<% end %>
+				<% end %> 
+				</td>
+				<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
+				<td>
+				<%if !invoice.kosongan_confirmed %>
+					<% if invoice.receipts.active.count == 0 %>
+						<a class="cta" style="background: yellow; color: black; opacity: 1;">Menunggu Marketing</a>
+					<% else %>
+						<span style="background-color: skyblue; padding: 3px 5px; font-size: 12px; border-radius: 2px;">Terkonfirmasi Kasir</span>
+					<% end %>
+				<% else %>
+					<% if invoice.receipts.active.count == 0 %>
+						<span style="background-color: limegreen; padding: 3px 5px; font-size: 12px; border-radius: 2px;">Terkonfirmasi Marketing</span>
+					<% else %>
+						<span style="background-color: skyblue; padding: 3px 5px; font-size: 12px; border-radius: 2px;">Terkonfirmasi Kasir</span>
+					<% end %>
+				<% end %>
+				</td>
+				<td align="right">        
+                    <%=to_currency(invoice.total)%>
+                </td>
+                <td class="right" width="150">
+					<a href="/invoices/<%=invoice.id%>/confirmation?kosongan=true" class="cta" title="Lihat BKK Kosongan" style="background: grey;">lihat</a>&nbsp;&nbsp;
+					<a href="/invoices/kosongan_approve/<%=invoice.id%>" class="cta" title="Marketing Konfirmasi BKK" style="margin-left: 5px;">konfirm</a>
+				</td>
+			</tr>
+
+			<% end %>		
+		
+		</table>
+
+		<br class="clearfix" />
+		<br class="clearfix" />
+		<br class="clearfix" />
+		
+		<table class="row-view">
+			<tr>
+				<th width="50">No.</th>
+				<th>Keterangan</th>
+				<th width="40">Ktr</th>
+				<th width="80">NoPol</th>
+				<th width="150">ISO/KONTAINER</th>
+				<th width="50">User</th>
+				<th width="160">Status</th>
+				<th width="90" class="right">Total</th>
+				<th width="100"></th>
+			</tr>
+
+			<tr class="subheading">
+				<th colspan="7" style="color:#000;">BKK Kosongan Non-Produktif <span style="color:green;">Terkonfirmasi</span> <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%=@approved_invoices.count%>)</span></th>
+				<th class="right" style="padding: 5px 10px 5px 0; color: #010101;"><%=to_currency(@approved_invoices.sum('total'))%></th>
+			</tr>
+
+			<% @approved_invoices.each do |invoice| %>
+
 			<tr>
 				<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice) %></td>
 				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> 
@@ -167,36 +205,19 @@
 						<a class="cta" style="background: skyblue; color: black; opacity: 1;">Konfirm Kasir</a>
 					<% end %>
 				<% end %>
-
 				</td>
-				<td align="right">
+				<td align="right">        
                     <%=to_currency(invoice.total)%>
                 </td>
-
-                <td class="right" width="60">
-				<% if !checkroleonly 'Vendor Supir' %>
-					<% if invoice.kosongan_confirmed == false && invoice.receipts.active.count == 0 %>
-						<%= link_to '&#xf044;'.html_safe, edit_invoice_path(invoice), :class => "edit tipsy", :title => 'Edit' %> 
-					<% end %>
-				<% end %>
-					<a href="/invoices/<%=invoice.id%>/confirmation" class="delete tipsy" title="Print BKK"><i class="icon-print"></i></a>
-				<% if !checkroleonly 'Vendor Supir' %>
-					<% if invoice.kosongan_confirmed == false && invoice.receipts.active.count == 0 %>
-						<%= link_to '&#xf00d;'.html_safe, invoice, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
-					<% end %>
-				<% end %>
+                <td class="right" width="150">
+					<a href="/invoices/<%=invoice.id%>/confirmation?kosongan=true" class="cta" title="Lihat BKK Kosongan" style="background: grey;">lihat</a>&nbsp;&nbsp;
 				</td>
 			</tr>
-			<% end %>				
+
 			<% end %>		
 		
 		</table>
 
-		<% if !checkroleonly 'Vendor Supir' %>
-			<div class="actions">
-				<a class="btn-txt right" href="<%=new_invoice_path%>?kosongan=true"><i class="icon-plus-sign"></i> &nbsp;Tambah BKK Kosongan</a>
-			</div>
-		<% end %>
 	</div>
 
 </div>

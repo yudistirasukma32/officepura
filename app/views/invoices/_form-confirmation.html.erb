@@ -4,6 +4,12 @@
     <a class="left" href="javascript:print();"><i class="icon-print"></i> Print Normal</a>
     <a id="bkk_printmatrix" class="left" href="javascript:zebraprint('invoice');"><i class="icon-print"></i> Print Dot Matrix</a>
     <a class="back left" href="<%=invoices_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
+
+    <% if !@invoice.kosongan %>
+    <a class="back left success-btn" href="/invoices/add_kosongan/<%=@invoice.id%>">Tambah Add-On</a>
+    <a class="back left grey-btn" title="Tambah Add-On digunakan untuk membuat BKK Kosongan Produktif. Sebagai lanjutan BKK apabila tidak menuju garasi / pulang.">?</a>
+    <% end %>
+
   </div>  
 
   <div id="bkk-print" class="hideprint info-box bkk-paper" onLoad="javascript: LoadAppletPrinter();" style="width:560px; float:left; clear:left;">
@@ -11,7 +17,13 @@
     <table class="row-view no-border">
       <tr valign="top">
         <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
-        <td align="right" class="header">Bukti Kas Keluar <%= @invoice.invoicetrain ? "Kereta" : ""%><br/>#<%=zeropad(@invoice.id)%><input type="hidden" id="strInvoiceId" value="#<%=zeropad(@invoice.id)%>" /> <% if @invoice.is_insurance %><i class="icon-star-empty"></i><% end%></td>
+        <td align="right" class="header">
+        Bukti Kas Keluar 
+        <%= @invoice.kosongan ? "Kosongan [" + @invoice.kosongan_type[0] + "]" : ""%>
+        <%= @invoice.invoicetrain ? "Kereta" : ""%>
+        <br/>#<%=zeropad(@invoice.id)%><input type="hidden" id="strInvoiceId" value="#<%=zeropad(@invoice.id)%>" />
+        <% if @invoice.is_insurance %><i class="icon-star-empty"></i><% end%>
+        </td>
       </tr>
     </table>
     <hr style="width:600px;" />
@@ -97,12 +109,27 @@
     <% end %>
 
     <tr>
+      <td style="padding-top: 1.5rem;">
+        <strong>Supir</strong>
+      </td>
+    </tr>
+
+    <tr>
       <td>Supir</td>
       <td>
         <%=@invoice.driver.name rescue nil%> (<%= zeropad(@invoice.driver.id) rescue nil%>)
         <% if !@invoice.driver.helpers.first.nil? && @invoice.need_helper %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil %>)<% end %>
         <input type="hidden" id="strDriver" value="<%=@invoice.driver.name rescue nil%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil%>)<% end %>" />
       </td>
+    </tr>
+
+    <td>No. Telp.</td>
+      <td><%=@invoice.driver.phone rescue nil%> &nbsp; <%=@invoice.driver.mobile rescue nil%></td>
+    </tr>
+
+    <tr>
+      <td>No. Rek.</td>
+      <td><%=@invoice.driver.bank_account rescue nil%></td>
     </tr>
 
     <% if @invoice.event_id %>

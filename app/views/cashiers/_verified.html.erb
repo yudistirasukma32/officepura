@@ -18,6 +18,7 @@
             <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
 			<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
         </td>
+
 		<td class="">
 		<%=receipt.invoice.office.abbr if !receipt.invoice.office_id.nil?%>
 		</td>

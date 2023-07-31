@@ -1,0 +1,33 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt cancel" href="/invoices/"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Transaksi / <a href="/invoices/">BKK Kosongan Produktif</a></h1>
+
+		<br class="clearfix" />
+
+		<div style="background: #fff; padding: 1rem 1rem 0;">
+			<strong>Perhatian.</strong>
+			<p>Anda membuat <strong>BKK Kosongan (Produktif)</strong> dari BKK Sebelumnya
+			<a href="../../invoices/<%=@invoice_ori.id%>/edit" target="_blank" style="text-decoration: underline; color: #2c92b3;"><strong>#<%= @invoice_ori.id %></strong></a> 
+			(No. Do <%= @invoice_ori.event_id %>)
+			<%= @invoice_ori.route.name %>
+			</p>
+		</div>
+
+		<br class="clearfix" />
+
+		<%= render "form_addkosongan" %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

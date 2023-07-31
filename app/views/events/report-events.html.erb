@@ -87,8 +87,6 @@
 					if this_bkk.invoicetrain
 						
 						train = true
-
-						event_qty = event_qty.to_i*2
 						
 						if bkk.count >= event_qty.to_i*2
 							
@@ -112,12 +110,6 @@
 							completed = false
 							status = "Muat ST"
 							color = "8bc34a"
-                            
-                            if event.vendor_name != ""
-                                completed_by_vendor = true
-                                status = "Bgkr Vendor"
-                                color = "009688"
-                            end
 							
 						end
 						

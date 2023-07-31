@@ -30,8 +30,9 @@ class Invoice < ActiveRecord::Base
 	has_many :incentives
 	has_many :trainexpenses
 	has_many :shipexpenses
-	has_many :insuranceexpenses
 	has_many :mechaniclogs
+	has_many :insuranceexpenses
+	has_many :containerexpenses
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :enabled, :date, :ship_name, :driver_id, :customer_id, :vehicle_id, :trip_type, :price_per, :gas_start,
@@ -40,7 +41,8 @@ class Invoice < ActiveRecord::Base
   				:invoice_id, :misc_allowance, :user_id, :helper_allowance, :need_helper, :deleteuser_id, :spk_number, :invoicetrain, :isotank_id, 
 				:driver_phone, :transporttype, :port_id, :ship_id, :train_fee, :container_id, :tanktype, :isotank_number, :container_number, :event_id, 
 				:premi, :premi_allowance, :routetrain_id, :operator_id, :shipoperator_id, :routeship_id, :invoicemultimode, :cargo_type, :losing,
-				:vehicle_duplicate, :vehicle_duplicate_id, :weight_gross, :load_date, :is_insurance, :tsi_total, :by_vendor, :truckvendor_id
+				:vehicle_duplicate, :vehicle_duplicate_id, :weight_gross, :load_date, :is_insurance, :tsi_total, :by_vendor, :truckvendor_id,
+				:kosongan, :kosongan_type, :kosongan_confirmed, :kosongan_confirmed_by, :kosongan_previous_invoice_id
 
   	def sum_gasleftover
   		self.gas_leftover * self.gas_cost
@@ -66,7 +68,7 @@ class Invoice < ActiveRecord::Base
 	def get_tonage(offset, customer_35 = [])
 		# offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
 		if (self.event.present? && event != 0)
-			if (self.route.price_per || 0) >= offset 
+			if (self.event.price_per_type == 'Borongan')
 				tonage = "Borongan"
 			else
 				tonage = thousand(self.event.estimated_tonage.to_i)
@@ -127,3 +129,7 @@ class Invoice < ActiveRecord::Base
 	end
 
 end
+
+# price_per > offset = qty * price_per
+# invoicetrain.blank? & == 0 & price_per < offset
+# 

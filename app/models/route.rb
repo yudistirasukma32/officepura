@@ -16,7 +16,8 @@ class Route < ActiveRecord::Base
 	attr_accessible :enabled, :name, :distance, :bonus,
 								:tol_fee, :ferry_fee, :item_type, :price_per, :price_per_type, 
 								:description, :customer_id, :routegroup_id, :deleted, :transporttype, :pos, 
-								:route_id, :estimated_hour, :office_id, :commodity_id
+								:route_id, :estimated_hour, :office_id, :commodity_id, :kosongan, :kosongan_type,
+								:project
 
 	scope :active, lambda {where(:enabled => true, :deleted => false)}  					
 

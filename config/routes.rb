@@ -22,14 +22,14 @@ OfficePuraErp::Application.routes.draw do
       get 'disable'
     end  
   end
-  
+
   resources :routeships do
     member do
       get 'enable'
       get 'disable'
     end  
   end
-
+  
   resources :customers do
     member do
       get 'enable'
@@ -116,7 +116,6 @@ OfficePuraErp::Application.routes.draw do
 
       get "copy"
     end
-
     collection do
       get "index_api"
     end
@@ -240,21 +239,28 @@ OfficePuraErp::Application.routes.draw do
       get 'inReportEnable'
       get 'inReportDisable'
     end
-  end
-  
+  end  
+
+
   get 'invoices/printspk/:id' => 'invoices#printspk'
 
   match 'invoices/add_ship' => 'invoices#indexaddship'
   match 'invoices/add_ship/:invoice_id' => 'invoices#add_ship'
   post 'invoices/updateship/' => 'invoices#updateship'
-  
+
   match 'invoices/add_weight' => 'invoices#indexaddweight'
   match 'invoices/add_weight/:invoice_id' => 'invoices#add_weight'
   post 'invoices/updateaddweight/' => 'invoices#updateaddweight'
 
   #kosonganProduktif
-  match 'invoices/add_kosongan/:invoice_id' => 'invoices#add_kosongan'
+  match 'invoices/kosongan_prod' => 'invoices#kosongan_prod'
+  match 'invoices/add_kosongan(/:invoice_id)' => 'invoices#add_kosongan'
   post 'invoices/createkosongan/' => 'invoices#createkosongan'
+  
+  #kosongan non Produktif
+  match 'invoices/kosongan_approval' => 'invoices#kosongan_approval'
+  match 'invoices/kosongan_approve(/:invoice_id)' => 'invoices#kosongan_approve'
+  post 'invoices/kosongan_confirm/' => 'invoices#kosongan_confirm'
 
   match 'invoices/trainrequest' => 'invoices#indextrainrequest'
 
@@ -663,7 +669,6 @@ OfficePuraErp::Application.routes.draw do
   match 'deletes/trainexpense' => 'deletes#trainexpense' 
   match 'deletes/insuranceexpense' => 'deletes#insuranceexpense' 
 
-
   resources :containermemos do
     member do
       get 'enable'
@@ -719,13 +724,12 @@ OfficePuraErp::Application.routes.draw do
     get 'api/invoices/detail/:id' => 'invoicesapi#detail'
     get 'api/taxinvoices/duedate' => 'taxinvoicesapi#index'
   
-    
     post 'api/attachments/uploadtaxinvoice' => 'attachmentapi#uploadTaxInv'
     post 'api/attachments/remove/:id' => 'attachmentapi#remove'
     
     post 'api/taxinvoiceitems/create' => 'taxinvoiceitemapi#updateitems' 
     get 'api/taxinvoiceitems/detail/:id' => 'taxinvoiceitemapi#detail'
-
+    
     match 'trainexpenses-paid' => 'trainexpenses#paid'
     match 'trainexpenses/new/:invoice_id' => 'trainexpenses#new'
     match 'trainexpenses/delete/:invoice_id' => 'trainexpenses#delete'

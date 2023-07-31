@@ -212,7 +212,91 @@ class InvoicesController < ApplicationController
       @date = params[:date]
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
         
-      @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date)
+      @invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif'", @date.to_date)
+
+      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+
+      @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
+
+      #kosongan non-prod
+
+      # @invoices = @invoices.where("kosongan = true and kosongan_type = 'non-produktif'").order(:id)
+        
+      @office_id = params[:office_id]
+        
+      if @office_id.present? and @office_id != "all"
+          @invoices = @invoices.where("office_id = ?", @office_id)
+      end
+        
+      @offices = Office.active.order('id asc')  
+      @office_role = []
+        
+      if checkrole 'BKK Kantor Sidoarjo'
+          @office_role.push(1)
+      end
+      if checkrole 'BKK Kantor Jakarta'
+          @office_role.push(2)
+      end
+      if checkrole 'BKK Kantor Probolinggo'
+          @office_role.push(3)
+      end    
+      if checkrole 'BKK Kantor Semarang'
+          @office_role.push(4)
+      end
+      if checkrole 'BKK Kantor Surabaya'
+        @office_role.push(5)
+      end
+      if checkrole 'BKK Kantor Sumatera'
+        @office_role.push(6)
+      end
+      # if checkrole 'BKK Cargo Padat'
+      #   @office_role.push(7)
+      # end
+      
+      if checkrole 'Operasional BKK'
+          @offices = @offices.where('id != 7').order('id asc')
+      else
+          @offices = @offices.where('id IN (?)', @office_role).order('id asc')
+      end
+    
+    end
+ 
+  end
+
+  def kosongan_prod
+    @where = "invoices_kosongan_produktif"
+
+    if checkroleonly 'Vendor Supir'
+
+      @date = params[:date]
+      @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+
+      @offices = Office.active.order('id asc')
+
+      @vendor = Vendor.where('user_id = ?', current_user.id)
+        
+      if @vendor.present? 
+
+      # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+      @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
+                                      from invoices
+                                      join drivers ON invoices.driver_id = drivers.id 
+                                      join routes ON invoices.route_id = routes.id
+                                      join customers ON invoices.customer_id = customers.id
+                                      join vendors ON drivers.vendor_id = vendors.id
+                                      join vehicles ON invoices.vehicle_id = vehicles.id
+                                      join offices ON invoices.office_id = offices.id
+                                      where vendors.id = #{@vendor[0].id} AND date = '#{@date.to_date}'
+                                      AND invoices.customer_id IN (SELECT id from customers WHERE name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*') ORDER BY invoices.id")
+
+      end
+      
+    else
+
+      @date = params[:date]
+      @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+        
+      @invoices = Invoice.where("date = ? and invoicetrain = false and kosongan = true and kosongan_type = 'produktif'", @date.to_date)
 
       cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
@@ -257,6 +341,102 @@ class InvoicesController < ApplicationController
     
     end
  
+  end
+
+  def add_kosongan
+    @where = "invoices_kosongan_produktif"
+
+    @tanktypes = ["ISOTANK", "KONTAINER"]
+      
+    @isotanks = Isotank.active.order(:isotanknumber)
+
+    @offices = Office.active  
+    @office_role = []
+      
+    if checkrole 'BKK Kantor Sidoarjo'
+        @office_role.push(1)
+    end
+    if checkrole 'BKK Kantor Jakarta'
+        @office_role.push(2)
+    end
+    if checkrole 'BKK Kantor Probolinggo'
+        @office_role.push(3)
+    end    
+    if checkrole 'BKK Kantor Semarang'
+        @office_role.push(4)
+    end
+    if checkrole 'BKK Kantor Surabaya'
+      @office_role.push(5)
+    end
+    if checkrole 'BKK Kantor Sumatera'
+        @office_role.push(6)
+    end
+    if checkrole 'BKK Cargo Padat'
+        @office_role.push(7)
+    end
+    
+    if checkrole 'Operasional BKK'
+        @offices = @offices.order('id asc')
+    else
+        @offices = @offices.where('id IN (?)', @office_role).order('id asc')
+    end
+
+    # @errors = Hash.new
+
+    @invoice_id = params[:invoice_id]
+    @invoice_ori = Invoice.where(:id =>params[:invoice_id]).first rescue nil
+
+    @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
+    @invoice = Invoice.new
+    @invoice.assign_attributes({
+      container_id: @invoice_ori.container_id,
+      isotank_id: @invoice_ori.isotank_id,
+      tanktype: @invoice_ori.tanktype,
+      invoicetrain: @invoice_ori.invoicetrain,
+      # office_id: @invoice_ori.office_id,
+      date: @invoice_ori.date,
+    })
+    
+    # @invoice.office_id = current_user.office_id rescue nil || 0 
+    @iseditable = true
+    @invoice.enabled = true
+    @invoice.date = Date.today
+    @invoice.invoice_id = @invoice_id
+    @invoice.invoicetrain = true
+    @invoice.isotank_id = @invoice_ori.isotank_id
+    @invoice.container_id = @invoice_ori.container_id
+
+    respond_to :html
+  end
+
+  def kosongan_approval
+    @section = "marketing"
+    @where = "kosongan_approval"
+    
+    @date = params[:date]
+    @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+     
+    #kosongan non-prod
+    @invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif' and kosongan_confirmed is false", @date.to_date)
+
+    @invoices = @invoices.where("id not in (select invoice_id from receipts where deleted = false)")
+      
+    @offices = Office.active.order('id asc')
+
+
+    @approved_invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif' and kosongan_confirmed is true", @date.to_date)
+
+    respond_to :html
+
+  end
+
+  def kosongan_approve
+    @where = "kosongan_approval"
+    
+    @invoice = Invoice.find(params[:invoice_id])
+
+    respond_to :html
+
   end
 
   def new
@@ -887,6 +1067,22 @@ class InvoicesController < ApplicationController
       render :action => "edit"
     end        
   end
+
+  if params["process"] == 'kosongan_confirm'
+    
+    @invoice.kosongan_confirmed = true
+    @invoice.kosongan_confirmed_by = current_user.id
+
+    if @invoice.save
+      # redirect_to('invoices/kosongan', :notice => 'Data BKK Kosongan dikonfirmasi.')
+      redirect_to("/invoices/kosongan_approval", :notice => 'Data BKK Kosongan dikonfirmasi.')
+    else
+      to_flash(@invoice)
+      render :action => "edit"
+    end
+
+  end
+
   end
 
   def get_customer
@@ -1232,6 +1428,7 @@ class InvoicesController < ApplicationController
     if checkroleonly 'Vendor Supir'
       @date = params[:date]
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+      @enddate = params[:enddate]
       @enddate =  @enddate.nil? ? Date.today.strftime('%d-%m-%Y') : params[:enddate]
 
       @offices = Office.active.order('id asc')
@@ -1256,6 +1453,7 @@ class InvoicesController < ApplicationController
 
       @date = params[:date]
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+      @enddate = params[:enddate]
       @enddate =  @enddate.nil? ? Date.today.strftime('%d-%m-%Y') : params[:enddate]
       @container_id = params[:container_id]
       @isotank_id = params[:isotank_id]
@@ -1479,7 +1677,6 @@ class InvoicesController < ApplicationController
     respond_to :html
   end
 
-
     def isotank
         @where = "invoice_isotank"
         @date = params[:date]
@@ -1603,37 +1800,20 @@ class InvoicesController < ApplicationController
 
   end
 
-  def invoice_summary
-    @section = 'events'
-    @where = 'report-invoices-summary'
-    @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
-    @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
-  
-    @event_id = params[:event_id]
-    
-    if @event_id.present?
-      @events = Event.where('id = ?', @event_id).pluck(:id)
-    else
-      @events = Event.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date}).pluck(:id)
-    end
-  
-    @invoices = Invoice.where("event_id IN (?)", @events).order(:event_id).order(:date)
-  
-    render "report-invoices-summary"
-  end
-  
+
   def printspk
-  
+
     @section = 'events'
     @where = 'report-invoices-summary'
+
+    @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
     @invoice = Invoice.find(params[:id])
-    
     respond_to :html
-  
+
   end
 
 end
-
+      
 def fetch_excel
       s = Roo::Excel.new("./db/bkkkereta.xls") 
 

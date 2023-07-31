@@ -44,7 +44,12 @@
 					<!-- <li><%= link_to_if (checkrole 'Master Jurusan, User Jurusan'), "Jurusan", "/routes" %></li> -->
 				</ul>
 			</li>
-
+			<li class="<%= @section == 'marketing' ? 'on' : '' %>">
+				<a class="finger" onclick="javascript:toggleSub('marketing');">Marketing</a>
+				<ul id="sub-marketing" class="submenu" style="width:220px;">
+					<li><%= link_to_if (checkrole 'Admin Marketing'), "Approval BKK Kosongan", "/invoices/kosongan_approval" %></li>
+				</ul>
+			</li>
 			<li class="<%= @section == 'events' ? 'on' : '' %>">
 				<%= link_to "Kalender", "/events" %>
 			</li>
@@ -75,7 +80,8 @@
 				<ul id="sub-transactions" class="submenu" style="width:200px;">
 					<!-- <li><%= link_to_if (checkrole 'Admin Operasional'), "BKK (Uji Coba)", "/invoicetests" %></li> -->					
 					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Standart, Vendor Supir'), "Bukti Kas Keluar", "/invoices" %></li>
-                    <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir'), "BKK Kosongan", "/invoices/kosongan" %></li>			
+                    <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir'), "BKK Kosongan Non Produktif", "/invoices/kosongan" %></li>		
+                    <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir'), "BKK Kosongan Produktif", "/invoices/kosongan_prod" %></li>			
 					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kereta, Vendor Supir'), "BKK Kereta", "/invoices/indexinvoicetrain" %></li>
                     <li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Bukti Kas Masuk", "/invoicereturns" %></li>					
