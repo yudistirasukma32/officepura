@@ -26,7 +26,7 @@
     <span>(tgl/bln/thn)</span>
   </div>
 
-  <div class="field-row">
+  <div class="field-row" style="display: none;">
     <%=f.label :by_vendor, "Pakai Vendor" %>
     <input type="checkbox" onclick="toggleVendorCheckbox()" id="by_vendor" name="invoice[by_vendor]" value="Yes" <% if @invoice.by_vendor == true %> checked="checked" <% end %>" />
   </div>
@@ -184,7 +184,7 @@
 
   <% if params[:kosongan] || params[:kosongan] == true %>
 
-  <input type="hidden" name="invoice[kosongan]" value="true">
+  <input type="hidden" name="invoice[kosongan]" value="true" id="invoice_kosongan">
   <input type="hidden" name="invoice[kosongan_type]" value="non-produktif">
 
   <% end %>

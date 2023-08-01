@@ -1,6 +1,31 @@
-<%= form_for(@invoice) do |f| %>
+<%= form_for @invoice, url: createkosongan_url do |f| %>
   
   <%= render "info-box", :f => f %>
+
+  <h2>Surat Jalan BKK Sebelumnya</h2>
+  <div class="field-row first" style="float: none">
+    <label for="sku_id">No. Surat Jalan</label>
+    <input type="text" id="sku_id" class="double" name="sku_id" value="<%= @taxinvoiceitem.sku_id rescue nil %>" />
+  </div>
+
+  <div class="field-row" style="float:none; margin-bottom:1.5rem;">
+    <label for="load_date">Tgl Muat</label>
+    <input class="half left date-picker" id="load_date" name="load_date" type="text" value="<%= @taxinvoiceitem.load_date.strftime('%d-%m-%Y') rescue nil %>">
+    <label for="unload_date" class="middle">Tgl Bongkar</label>
+    <input class="half left date-picker" id="unload_date" name="unload_date" type="text" value="<%= @taxinvoiceitem.unload_date.strftime('%d-%m-%Y') rescue nil %>">
+  </div>
+
+  <div class="field-row" style="float: none">
+    <label for="weight_gross">Muat</label>
+    <input class="half left" id="weight_gross" name="weight_gross" type="text" value="<%= @taxinvoiceitem.weight_gross rescue nil %>">
+    <label for="weight_net" class="middle">Bongkar</label>
+    <input class="half left" id="weight_net" name="weight_net" type="text" value="<%= @taxinvoiceitem.weight_net rescue nil %>">
+  </div>
+
+  <br>
+  <br>
+  <hr>
+  <h2>BKK Kosongan Produktif</h2>
 
   <div class="field-row first">
     <%= f.label :office_id, "Kantor" %>
@@ -91,6 +116,7 @@
       <%= f.hidden_field :driver_id, :value => @invoice_ori.driver_id %>
       <%= f.hidden_field :isotank_id, :value => @invoice_ori.isotank_id %>
       <%= f.hidden_field :container_id, :value => @invoice_ori.container_id %>
+      <input type="hidden" name="invoice_id" value="<%= params[:invoice_id] %>">
 
   <% end %>
 
@@ -273,7 +299,7 @@
 
   <div class="actions">
     <% if @invoice.receipts.active.count == 0 %>
-    <%= f.submit "Lanjut ke Potongan Solar", :id => 'invoice_submit', :class => 'left' %>
+    <%= f.submit "Simpan", :id => 'invoice_submit', :class => 'left' %>
     <% end %>
     <a class="back left" href="<%=invoices_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
   </div>

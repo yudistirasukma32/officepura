@@ -128,6 +128,16 @@ class Invoice < ActiveRecord::Base
 		return estimation
 	end
 
+	def check_kosong_prod
+		kosongan = Invoice.active.where(kosongan_previous_invoice_id: self.id)
+		have_receipt = Receipt.active.where(invoice_id: self.id)
+		if kosongan.blank? && have_receipt.present?
+			return true
+		else
+			return false
+		end
+	end
+
 end
 
 # price_per > offset = qty * price_per

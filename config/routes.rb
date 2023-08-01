@@ -255,7 +255,7 @@ OfficePuraErp::Application.routes.draw do
   #kosonganProduktif
   match 'invoices/kosongan_prod' => 'invoices#kosongan_prod'
   match 'invoices/add_kosongan(/:invoice_id)' => 'invoices#add_kosongan'
-  post 'invoices/createkosongan/' => 'invoices#createkosongan'
+  post 'invoices/createkosongan/' => 'invoices#createkosongan', as: 'createkosongan'
   
   #kosongan non Produktif
   match 'invoices/kosongan_approval' => 'invoices#kosongan_approval'

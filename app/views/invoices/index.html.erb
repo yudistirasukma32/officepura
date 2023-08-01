@@ -165,7 +165,9 @@
                     <%=to_currency(invoice.total)%>
                 </td>
 				<td>
+				<% if invoice.check_kosong_prod %>
 					<a class="ctagreen" href="/invoices/add_kosongan/<%=invoice.id%>">+Addon</a>
+				<% end %>
 				</td>
                 <td class="right" width="60">
 					<% if !checkroleonly 'Vendor Supir' %>

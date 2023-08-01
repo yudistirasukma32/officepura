@@ -347,7 +347,8 @@ class InvoicesController < ApplicationController
     @where = "invoices_kosongan_produktif"
 
     @tanktypes = ["ISOTANK", "KONTAINER"]
-      
+    
+    @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
     @isotanks = Isotank.active.order(:isotanknumber)
 
     @offices = Office.active  
@@ -407,6 +408,33 @@ class InvoicesController < ApplicationController
     @invoice.container_id = @invoice_ori.container_id
 
     respond_to :html
+  end
+
+  def createkosongan
+    @invoice_ori = Invoice.find(params[:invoice_id])
+    @invoice = Invoice.new(params[:invoice])
+    @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
+
+    if @taxinvoiceitem.blank?
+      @taxinvoiceitem = Taxinvoiceitem.new
+      @taxinvoiceitem.customer_id = @invoice_ori.customer_id
+      @taxinvoiceitem.office_id = @invoice_ori.office_id
+      @taxinvoiceitem.price_per = @invoice_ori.route.price_per      
+    end
+
+    @taxinvoiceitem.sku_id = params[:sku_id]
+    @taxinvoiceitem.weight_gross = params[:weight_gross]
+    @taxinvoiceitem.weight_net = params[:weight_net]
+    @taxinvoiceitem.invoice_id = params[:invoice_id]
+    @taxinvoiceitem.total = params[:weight_net].to_i * @invoice_ori.route.price_per.to_f
+    @taxinvoiceitem.load_date = params[:load_date].to_date
+    @taxinvoiceitem.unload_date = params[:unload_date].to_date
+    @taxinvoiceitem.user_id = current_user.id
+
+    @taxinvoiceitem.save
+    @invoice.save
+
+    redirect_to("/invoices/kosongan_prod")
   end
 
   def kosongan_approval
