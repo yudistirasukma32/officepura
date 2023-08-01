@@ -2317,6 +2317,12 @@ $(document).ready(function() {
 		var errors = "";
 		var form = $(this).closest("form");
 
+		if($('#invoice_kosongan').val() == false || $('#invoice_kosongan').length == 0 ){
+			if ($('#invoice_event_id').val() == 0 || $('#invoice_event_id').val() == '')  {			
+				errors = addComma(errors, "<strong>Nomor DO</strong>");
+			}
+		}
+
 		if ($('#invoice_customer_id').val() == 0) {			
 			errors = addComma(errors, "<strong>Pelanggan</strong>");
 		}
