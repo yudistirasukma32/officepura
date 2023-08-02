@@ -2321,6 +2321,10 @@ $(document).ready(function() {
 			if ($('#invoice_event_id').val() == 0 || $('#invoice_event_id').val() == '')  {			
 				errors = addComma(errors, "<strong>Nomor DO</strong>");
 			}
+		} else {
+			if ($('#sku_id').val() == '' || $('#load_date').val() == '' || $('#unload_date').val() == '' || $('#weight_gross').val() == '' || $('#weight_net').val() == '') {
+				errors = addComma(errors, "<strong>Data Surat Jalan</strong>");
+			}
 		}
 
 		if ($('#invoice_customer_id').val() == 0) {			
