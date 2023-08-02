@@ -12,22 +12,39 @@
 		<h1>Transaksi / <a href="/invoices/">BKK Kosongan Produktif</a></h1>
 
 		<br class="clearfix" />
-
-		<div style="background: #fff; padding: 1rem 1rem 0;">
-			<strong>Perhatian.</strong>
-			<p>Anda membuat <strong>BKK Kosongan (Produktif)</strong> dari BKK Sebelumnya
-			<a href="../../invoices/<%=@invoice_ori.id%>/edit" target="_blank" style="text-decoration: underline; color: #2c92b3;"><strong>#<%= @invoice_ori.id %></strong></a> 
-			(No. Do <%= @invoice_ori.event_id %>)
-			<%= @invoice_ori.route.name %>
-			</p>
+		<div id="filter" style="margin-bottom: 1rem">
+			<form action="/invoices/add_kosongan/?invoice_id=<%= @invoice_id %>" method="get">
+				<div class="field-row continue">
+					<label for="invoice_id">No. BKK</label>
+					<input type="text" name="invoice_id" class="half left" value="<%= params[:invoice_id] %>" style="margin-right:10px;" />
+					<input type="submit" class="submit" value="Cari BKK" />    
+				</div>
+			</form>
 		</div>
 
-		<br class="clearfix" />
+		<% if @invoice_ori.present? && @have_kosongan.blank? && @have_receipt.present? %>
+			<div style="background: #fff; padding: 1rem 1rem 0;">
+				<strong>Perhatian.</strong>
+				<p>Anda membuat <strong>BKK Kosongan (Produktif)</strong> dari BKK Sebelumnya
+				<a href="../../invoices/<%=@invoice_ori.id%>/edit" target="_blank" style="text-decoration: underline; color: #2c92b3;"><strong>#<%= @invoice_ori.id %></strong></a> 
+				(No. Do <%= @invoice_ori.event_id %>)
+				<%= @invoice_ori.route.name %>
+				</p>
+			</div>
 
-		<%= render "form_addkosongan" %>
+			<br class="clearfix" />
 
-		<br class="clearfix" />
+			<%= render "form_addkosongan" %>
 
+			<br class="clearfix" />
+		<% elsif @invoice_id.blank? %>
+		<% elsif @have_kosongan.present? %>
+			<h3>BKK ini sudah dibuatkan BKK Kosongan</h3>
+		<% elsif @invoice_ori.present? && @have_receipt.blank? %>
+			<h3>BKK ini belum dikonfirmasi kasir</h3>
+		<% else %>
+			<h3>BKK ini tidak tersedia</h3>
+		<% end %>
 	</div>
 
 </div>

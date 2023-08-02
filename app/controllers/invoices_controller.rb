@@ -345,9 +345,7 @@ class InvoicesController < ApplicationController
 
   def add_kosongan
     @where = "invoices_kosongan_produktif"
-
     @tanktypes = ["ISOTANK", "KONTAINER"]
-    
     @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
     @isotanks = Isotank.active.order(:isotanknumber)
 
@@ -385,29 +383,32 @@ class InvoicesController < ApplicationController
     # @errors = Hash.new
 
     @invoice_id = params[:invoice_id]
-    @invoice_ori = Invoice.where(:id =>params[:invoice_id]).first rescue nil
+    @have_kosongan = Invoice.active.where(kosongan_previous_invoice_id: @invoice_id)
+	  @have_receipt = Receipt.active.where(invoice_id: @invoice_id)
+    @invoice_ori = Invoice.where("(id=#{@invoice_id} AND invoicetrain = FALSE) OR (id=#{@invoice_id} AND invoicetrain = TRUE AND invoice_id IS NOT NULL)").first rescue nil
+    if @invoice_ori.present?
+      @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
+      @invoice = Invoice.new
+      @invoice.assign_attributes({
+        container_id: @invoice_ori.container_id,
+        isotank_id: @invoice_ori.isotank_id,
+        tanktype: @invoice_ori.tanktype,
+        invoicetrain: @invoice_ori.invoicetrain,
+        # office_id: @invoice_ori.office_id,
+        date: @invoice_ori.date,
+      })
+      
+      # @invoice.office_id = current_user.office_id rescue nil || 0 
+      @iseditable = true
+      @invoice.enabled = true
+      @invoice.date = Date.today
+      @invoice.invoice_id = @invoice_id
+      @invoice.invoicetrain = true
+      @invoice.isotank_id = @invoice_ori.isotank_id
+      @invoice.container_id = @invoice_ori.container_id
 
-    @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
-    @invoice = Invoice.new
-    @invoice.assign_attributes({
-      container_id: @invoice_ori.container_id,
-      isotank_id: @invoice_ori.isotank_id,
-      tanktype: @invoice_ori.tanktype,
-      invoicetrain: @invoice_ori.invoicetrain,
-      # office_id: @invoice_ori.office_id,
-      date: @invoice_ori.date,
-    })
-    
-    # @invoice.office_id = current_user.office_id rescue nil || 0 
-    @iseditable = true
-    @invoice.enabled = true
-    @invoice.date = Date.today
-    @invoice.invoice_id = @invoice_id
-    @invoice.invoicetrain = true
-    @invoice.isotank_id = @invoice_ori.isotank_id
-    @invoice.container_id = @invoice_ori.container_id
-
-    respond_to :html
+      respond_to :html
+    end
   end
 
   def createkosongan

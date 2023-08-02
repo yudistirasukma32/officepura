@@ -2,7 +2,7 @@
   
   <%= render "info-box", :f => f %>
 
-  <h2>Surat Jalan BKK Sebelumnya</h2>
+  <h2 style="font-weight:bold">Surat Jalan BKK Sebelumnya</h2>
   <div class="field-row first" style="float: none">
     <label for="sku_id">No. Surat Jalan</label>
     <input type="text" id="sku_id" class="double" name="sku_id" value="<%= @taxinvoiceitem.sku_id rescue nil %>" />
@@ -25,7 +25,7 @@
   <br>
   <br>
   <hr>
-  <h2>BKK Kosongan Produktif</h2>
+  <h2 style="font-weight:bold">BKK Kosongan Produktif</h2>
 
   <div class="field-row first">
     <%= f.label :office_id, "Kantor" %>

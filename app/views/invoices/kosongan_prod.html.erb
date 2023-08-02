@@ -7,6 +7,9 @@
 <div id="main">
 	
 	<div id="content-full">
+		<% if !checkroleonly 'Vendor Supir' %>
+			<a class="btn print" href="/invoices/add_kosongan/"><i class="icon-plus-sign"></i> &nbsp;Tambah BKK Produktif</a>
+		<% end %>
  
 		<h1>Transaksi / <a href="kosongan">BKK Kosongan Produktif</a> / Index</h1>
 		
