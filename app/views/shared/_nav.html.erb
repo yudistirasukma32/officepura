@@ -82,14 +82,13 @@
 
 			<li class="<%= @where == 'indexinvoicetrain' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Vendor Supir'), "BKK Kereta", "/invoices/indexinvoicetrain" %></li>
     
-			<li class="<%= @where == 'invoicereturns' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Bukti Kas Masuk", "/invoicereturns" %></li>						
+			<!-- <li class="<%= @where == 'invoicereturns' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Bukti Kas Masuk", "/invoicereturns" %></li>						
 			<li class="<%= @where == 'invoiceadd' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Tambahan", "/invoices/indexadd" %></li>					
 			<li class="<%= @where == 'invoicereturnadd' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKM Tambahan", "/invoicereturns/add" %></li>	
-			<!--<li class="<%= @where == 'invoice_isotank' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Isotank", invoice_isotank_url %></li>-->
-			<!--<li class="<%= @where == 'invoice_kapal' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Kapal", invoice_ship_url %></li>-->
-			
+			<li class="<%= @where == 'invoice_isotank' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Isotank", invoice_isotank_url %></li>
+			<li class="<%= @where == 'invoice_kapal' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Kapal", invoice_ship_url %></li>
 			<li class="<%= @where == 'bonusreceipts' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Premi", "/bonusreceipts" %></li>
-			<li class="<%= @where == 'incentives' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Insentif", "/incentives" %></li>
+			<li class="<%= @where == 'incentives' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Insentif", "/incentives" %></li> -->
 		<% end %>
 
 		<% if ["payrolls", "payrollreturns", "driverexpenses"].include?@where %>
