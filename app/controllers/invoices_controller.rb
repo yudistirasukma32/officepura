@@ -412,15 +412,26 @@ class InvoicesController < ApplicationController
   end
 
   def createkosongan
+    # render json: params
+    # return false
     @invoice_ori = Invoice.find(params[:invoice_id])
     @invoice = Invoice.new(params[:invoice])
+    @invoice.driver_allowance = params[:invoice][:driver_allowance].delete('.')
+    @invoice.helper_allowance = params[:invoice][:helper_allowance].delete('.')
+    @invoice.misc_allowance = params[:invoice][:misc_allowance].delete('.')
+    @invoice.gas_allowance = params[:invoice][:gas_allowance].delete('.')
+    @invoice.gas_cost = params[:invoice][:gas_cost].delete('.')
+    @invoice.ferry_fee = params[:invoice][:ferry_fee].delete('.')
+    @invoice.tol_fee = params[:invoice][:tol_fee].delete('.')
+    @invoice.total = params[:invoice][:total].delete('.')
+    
     @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
 
     if @taxinvoiceitem.blank?
       @taxinvoiceitem = Taxinvoiceitem.new
       @taxinvoiceitem.customer_id = @invoice_ori.customer_id
       @taxinvoiceitem.office_id = @invoice_ori.office_id
-      @taxinvoiceitem.price_per = @invoice_ori.route.price_per      
+      @taxinvoiceitem.price_per = @invoice_ori.route.price_per.to_i 
     end
 
     @taxinvoiceitem.sku_id = params[:sku_id]
