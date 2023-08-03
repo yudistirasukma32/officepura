@@ -47,7 +47,7 @@
 			<li class="<%= @section == 'marketing' ? 'on' : '' %>">
 				<a class="finger" onclick="javascript:toggleSub('marketing');">Marketing</a>
 				<ul id="sub-marketing" class="submenu" style="width:220px;">
-					<li><%= link_to_if (checkrole 'Admin Marketing'), "Approval BKK Kosongan", "/invoices/kosongan_approval" %></li>
+					<li><%= link_to_if (checkrole 'Admin Marketing, Konfirm Kosongan'), "Approval BKK Kosongan", "/invoices/kosongan_approval" %></li>
 				</ul>
 			</li>
 			<li class="<%= @section == 'events' ? 'on' : '' %>">
