@@ -102,6 +102,8 @@ class TaxgenericinvoicesController < ApplicationController
     @taxinvoice.so_no = params[:so_no]
     @taxinvoice.do_no = params[:do_no]
       
+    @taxinvoice.bank_id = params[:bank_id]
+    
     @taxinvoice.extra_cost = params[:extra_cost].to_i
     @taxinvoice.extra_cost_info = params[:extra_cost_info]
     # @taxinvoice.total_in_words = params[:total_in_words]

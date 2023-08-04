@@ -116,10 +116,19 @@
 </div>
     
 <div class="field-row continue" style="padding-bottom:0px;">
-    
     <label for="do_no" class="half left">DO</label>
     <input type="text" class="half left" name="do_no" value="<%=@taxinvoice.do_no%>"/> 
+</div>
 
+<div class="field-row" style="padding: 15px 0 0;">
+  <label for="bank_id" class="half left">BANK</label>
+  <select id="" name="bank_id" class="double chzn-select">
+  <option value="0">- Pilih Bank -</option>
+  <% Bank.active.order(:id).each do |bank| %>
+  <option value="<%=bank.id%>"
+    <% if bank.id == @taxinvoice.bank_id %> selected="selected"<% end %>><%=bank.name%> (<%=bank.bank_account_number%>)</option>
+  <% end %>
+  </select>
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
