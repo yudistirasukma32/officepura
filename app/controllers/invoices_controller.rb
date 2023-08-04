@@ -455,16 +455,25 @@ class InvoicesController < ApplicationController
     
     @date = params[:date]
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
-     
+ 
     #kosongan non-prod
-    @invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif' and kosongan_confirmed is false", @date.to_date)
+    @invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif' and kosongan_confirmed is false and deleted = false", @date.to_date)
 
     @invoices = @invoices.where("id not in (select invoice_id from receipts where deleted = false)")
+
+    #kantor
+    @office_id = params[:office_id]
+    if @office_id.present? and @office_id != "all"
+      @invoices = @invoices.where("office_id = ?", @office_id)
+    end
       
     @offices = Office.active.order('id asc')
 
-
     @approved_invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif' and kosongan_confirmed is true", @date.to_date)
+    #kantor
+    if @office_id.present? and @office_id != "all"
+      @approved_invoices = @approved_invoices.where("office_id = ?", @office_id)
+    end
 
     respond_to :html
 
