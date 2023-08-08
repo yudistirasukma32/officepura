@@ -71,12 +71,12 @@ class TaxinvoicesController < ApplicationController
     @needupdate = false
     @taxinvoice.sentdate = params[:sentdate]
 
-     @customerlist = Customer.find_by_sql("Select distinct c.* from customers c inner join invoices iv on c.id = iv.customer_id " +
-                                     "where iv.id in (Select t.invoice_id from taxinvoiceitems t where money(t.total) > money(0) and taxinvoice_id is null) order by c.name")
+    @customerlist = Customer.find_by_sql("Select distinct c.* from customers c inner join invoices iv on c.id = iv.customer_id where iv.id in (Select t.invoice_id from taxinvoiceitems t where money(t.total) > money(0) and taxinvoice_id is null) UNION SELECT DISTINCT c.* FROM customers c INNER JOIN taxinvoiceitemvs tiv on c.id = tiv.customer_id WHERE tiv.deleted = FALSE ORDER BY name")
 
     if @customer
       romenumber = getromenumber (Date.today.month.to_i)
       @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date, :sku_id)
+      @taxinvoiceitemvs = @customer.taxinvoiceitemvs.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date, :sku_id)
       @taxinvoice.period_start = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).minimum(:date) || Date.today.strftime('%d-%m-%Y')
       @taxinvoice.period_end = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).maximum(:date) || Date.today.strftime('%d-%m-%Y')
       @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
@@ -125,6 +125,7 @@ class TaxinvoicesController < ApplicationController
 
     @customer = @taxinvoice.customer
     @taxinvoiceitems = @taxinvoice.taxinvoiceitems.order(:date, :sku_id)
+    @taxinvoiceitemvs = @taxinvoice.taxinvoiceitemvs.order(:date, :sku_id)
     @long_id = @taxinvoice.long_id
     @process = "edit"
     @needupdate = false
@@ -195,10 +196,12 @@ class TaxinvoicesController < ApplicationController
         @taxinvoice = Taxinvoice.find(params[:id])
         #@taxinvoiceitems = @taxinvoice.taxinvoiceitems
         @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND total > '$0.00'").order(:date)
+        @taxinvoiceitemvs = @customer.taxinvoiceitemvs.where("taxinvoice_id is null AND total > '$0.00'").order(:date)
         @taxinvoice.long_id = params[:long_id]
       else
         romenumber = getromenumber (Date.today.month.to_i)
         @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date)
+        @taxinvoiceitemvs = @customer.taxinvoiceitemvs.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date)
         @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
         @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / ' + Date.today.year.to_s 
         @taxinvoice = Taxinvoice.new
@@ -239,67 +242,149 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.booking_code = params[:booking_code]
       @taxinvoice.save
       
-      @taxinvoiceitems.each do |taxinvoiceitem|
-        if params["cb_" + taxinvoiceitem.id.to_s] == 'on'
-          taxinvoiceitem.taxinvoice_id = @taxinvoice.id
-          taxinvoiceitem.wholesale_price = customer_wholesaleprice
-          taxinvoiceitem.save
-        else
-          taxinvoiceitem.taxinvoice_id = nil
-          taxinvoiceitem.save 
-        end
-      end
-
-      @taxinvoice.taxinvoiceitems.each do |taxinvoiceitem|
-        if params["cb_" + taxinvoiceitem.id.to_s] == 'on'
-          taxinvoiceitem.total = taxinvoiceitem.wholesale_price
-          taxinvoiceitem.date = params["date_" + taxinvoiceitem.id.to_s] if !params["date_" + taxinvoiceitem.id.to_s].blank?
-          taxinvoiceitem.sku_id = params["sku_" + taxinvoiceitem.id.to_s] if !params["sku_" + taxinvoiceitem.id.to_s].blank?
-          taxinvoiceitem.weight_gross = params["gross_" + taxinvoiceitem.id.to_s] if !params["gross_" + taxinvoiceitem.id.to_s].blank?
-
-          if params["qty_" + taxinvoiceitem.id.to_s].to_i > 0
-            taxinvoiceitem.weight_net = params["qty_" + taxinvoiceitem.id.to_s]
-
-            total = 0
-
-            taxinvoiceitem.is_wholesale = false
-            taxinvoiceitem.is_gross = false
-            taxinvoiceitem.is_net = false
-
-            if params[:price_by] == 'is_wholesale'
-              taxinvoiceitem.is_wholesale = true
-              total = customer_wholesaleprice.to_f
-            elsif params[:price_by] == 'is_gross'
-              taxinvoiceitem.is_gross = true
-              if taxinvoiceitem.price_per >= 300000
-                total = taxinvoiceitem.price_per.to_f
-              else
-                total = params["gross_" + taxinvoiceitem.id.to_s].to_i * taxinvoiceitem.price_per.to_f
-              end
-            else
-              taxinvoiceitem.is_net = true
-              if taxinvoiceitem.price_per >= 300000
-                total = taxinvoiceitem.price_per.to_f
-              else
-                total = params["qty_" + taxinvoiceitem.id.to_s].to_i * taxinvoiceitem.price_per.to_f
-              end
-            end
-
-            taxinvoiceitem.total = total
-
+      if @taxinvoiceitems && @taxinvoiceitems.any?
+        @taxinvoiceitems.each do |taxinvoiceitem|
+          if params["cb_" + taxinvoiceitem.id.to_s] == 'on'
+            taxinvoiceitem.taxinvoice_id = @taxinvoice.id
+            taxinvoiceitem.wholesale_price = customer_wholesaleprice
+            taxinvoiceitem.save
+          else
+            taxinvoiceitem.taxinvoice_id = nil
+            taxinvoiceitem.save 
           end
-          
-          taxinvoiceitem.save
-        else
-          taxinvoiceitem.taxinvoice_id = nil
-          taxinvoiceitem.save 
+        end
+
+        @taxinvoice.taxinvoiceitems.each do |taxinvoiceitem|
+          if params["cb_" + taxinvoiceitem.id.to_s] == 'on'
+            taxinvoiceitem.total = taxinvoiceitem.wholesale_price
+            taxinvoiceitem.date = params["date_" + taxinvoiceitem.id.to_s] if !params["date_" + taxinvoiceitem.id.to_s].blank?
+            taxinvoiceitem.sku_id = params["sku_" + taxinvoiceitem.id.to_s] if !params["sku_" + taxinvoiceitem.id.to_s].blank?
+            taxinvoiceitem.weight_gross = params["gross_" + taxinvoiceitem.id.to_s] if !params["gross_" + taxinvoiceitem.id.to_s].blank?
+
+            if params["qty_" + taxinvoiceitem.id.to_s].to_i > 0
+              taxinvoiceitem.weight_net = params["qty_" + taxinvoiceitem.id.to_s]
+
+              total = 0
+
+              taxinvoiceitem.is_wholesale = false
+              taxinvoiceitem.is_gross = false
+              taxinvoiceitem.is_net = false
+
+              if params[:price_by] == 'is_wholesale'
+                taxinvoiceitem.is_wholesale = true
+                total = customer_wholesaleprice.to_f
+              elsif params[:price_by] == 'is_gross'
+                taxinvoiceitem.is_gross = true
+                if taxinvoiceitem.price_per >= 300000
+                  total = taxinvoiceitem.price_per.to_f
+                else
+                  total = params["gross_" + taxinvoiceitem.id.to_s].to_i * taxinvoiceitem.price_per.to_f
+                end
+              else
+                taxinvoiceitem.is_net = true
+                if taxinvoiceitem.price_per >= 300000
+                  total = taxinvoiceitem.price_per.to_f
+                else
+                  total = params["qty_" + taxinvoiceitem.id.to_s].to_i * taxinvoiceitem.price_per.to_f
+                end
+              end
+
+              taxinvoiceitem.total = total
+
+            end
+            
+            taxinvoiceitem.save
+          else
+            taxinvoiceitem.taxinvoice_id = nil
+            taxinvoiceitem.save 
+          end
         end
       end
-      
+
+      if @taxinvoiceitemvs && @taxinvoiceitemvs.any?
+        # render json: params
+        # return false
+        @taxinvoiceitemvs.each do |taxinvoiceitemv|
+          if params["vendorcb_" + taxinvoiceitemv.id.to_s] == 'on'
+            taxinvoiceitemv.taxinvoice_id = @taxinvoice.id
+            taxinvoiceitemv.wholesale_price = customer_wholesaleprice
+            taxinvoiceitemv.save
+          else
+            taxinvoiceitemv.taxinvoice_id = nil
+            taxinvoiceitemv.save 
+          end
+        end
+
+        @taxinvoice.taxinvoiceitemvs.each do |taxinvoiceitemv|
+          if params["vendorcb_" + taxinvoiceitemv.id.to_s] == 'on'
+            taxinvoiceitemv.total = taxinvoiceitemv.wholesale_price
+            taxinvoiceitemv.date = params["vendordate_" + taxinvoiceitemv.id.to_s] if !params["vendordate_" + taxinvoiceitemv.id.to_s].blank?
+            taxinvoiceitemv.sku_id = params["vendorsku_" + taxinvoiceitemv.id.to_s] if !params["vendorsku_" + taxinvoiceitemv.id.to_s].blank?
+            taxinvoiceitemv.weight_gross = params["gross_" + taxinvoiceitemv.id.to_s] if !params["gross_" + taxinvoiceitemv.id.to_s].blank?
+
+            if params["qty_" + taxinvoiceitemv.id.to_s].to_i > 0
+              taxinvoiceitemv.weight_net = params["qty_" + taxinvoiceitemv.id.to_s]
+
+              total = 0
+
+              taxinvoiceitemv.is_wholesale = false
+              taxinvoiceitemv.is_gross = false
+              taxinvoiceitemv.is_net = false
+
+              if params[:price_by] == 'is_wholesale'
+                taxinvoiceitemv.is_wholesale = true
+                total = customer_wholesaleprice.to_f
+              elsif params[:price_by] == 'is_gross'
+                taxinvoiceitemv.is_gross = true
+                if taxinvoiceitemv.price_per >= 300000
+                  total = taxinvoiceitemv.price_per.to_f
+                else
+                  total = params["gross_" + taxinvoiceitemv.id.to_s].to_i * taxinvoiceitemv.price_per.to_f
+                end
+              else
+                taxinvoiceitemv.is_net = true
+                if taxinvoiceitemv.price_per >= 300000
+                  total = taxinvoiceitemv.price_per.to_f
+                else
+                  total = params["qty_" + taxinvoiceitemv.id.to_s].to_i * taxinvoiceitemv.price_per.to_f
+                end
+              end
+
+              taxinvoiceitemv.total = total
+
+            end
+            
+            taxinvoiceitemv.save
+          else
+            taxinvoiceitemv.taxinvoice_id = nil
+            taxinvoiceitemv.save 
+          end
+        end
+      end
+
       #update total and tax
-      period_start = @taxinvoice.taxinvoiceitems.minimum("date")
-      period_end =  @taxinvoice.taxinvoiceitems.maximum("date")
-      subtotal = @taxinvoice.taxinvoiceitems.sum(:total)
+      if @taxinvoice.taxinvoiceitems.minimum("date").present? && @taxinvoice.taxinvoiceitemvs.minimum("date").present?
+        if @taxinvoice.taxinvoiceitems.minimum("date").to_date < @taxinvoice.taxinvoiceitemvs.minimum("date").to_date
+          period_start = @taxinvoice.taxinvoiceitems.minimum("date")
+        else
+          period_start = @taxinvoice.taxinvoiceitemvs.minimum("date")
+        end
+      else
+        period_start = @taxinvoice.taxinvoiceitems.minimum("date").present? ? @taxinvoice.taxinvoiceitems.minimum("date") : (@taxinvoice.taxinvoiceitemvs.minimum("date") rescue nil)
+      end
+
+      if @taxinvoice.taxinvoiceitems.maximum("date").present? && @taxinvoice.taxinvoiceitemvs.maximum("date").present?
+        if @taxinvoice.taxinvoiceitems.maximum("date").to_date > @taxinvoice.taxinvoiceitemvs.maximum("date").to_date 
+          period_end =  @taxinvoice.taxinvoiceitems.maximum("date")
+        else
+          period_end =  @taxinvoice.taxinvoiceitemvs.maximum("date")
+        end
+      else
+        period_end =  @taxinvoice.taxinvoiceitems.maximum("date").present? ? @taxinvoice.taxinvoiceitems.maximum("date") : (@taxinvoice.taxinvoiceitemvs.maximum("date") rescue nil)
+      end
+
+      subtotal = @taxinvoice.taxinvoiceitems.sum(:total) + @taxinvoice.taxinvoiceitemvs.sum(:total)
+      puts "LOG : #{subtotal}"
 
       # subtotal = subtotal.to_i
       extra_cost = @taxinvoice.extra_cost.to_f

@@ -1,0 +1,10 @@
+<div class="field-row">
+  <label for="event_vendor_id">Vendor</label>
+  <select class="chzn-select double" name="vendor_id" id="event_vendor_id" onchange="javascript:getDovVendorroute(this.value);">
+    <option value=>- Vendor -</option>
+    <% @vendors.each do |vendor| %>
+    <option value="<%=vendor[:id]%>"><%=vendor[:name]%> (<%= vendor[:abbr] if vendor[:abbr].present? %>)</option>
+    <% end %>
+  </select>
+  <small id="vendorcheck" style="color: red; display: none;" >Field Vendor harus dipilih</small>
+</div>

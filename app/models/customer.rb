@@ -4,6 +4,7 @@ class Customer < ActiveRecord::Base
 	has_many :invoices
 	has_many :taxinvoices
 	has_many :taxinvoiceitems
+	has_many :taxinvoiceitemvs
 	has_many :events
 
 	# Setup accessible (or protected) attributes for your model

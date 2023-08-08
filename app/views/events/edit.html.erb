@@ -180,6 +180,31 @@
             </tbody>
         </table>
         <% end %>
+
+        <% if @taxinvoiceitemvs.present? %> 
+        <h2 class="title" style="font-weight: bold;">List Surat Jalan Indolintas 8 Cemerlang</h2>
+        <br/>
+        <table class="row-view" style="margin-bottom: 3rem;">
+            <thead>
+                <tr>
+                <th>No.</th>
+                <th>Tgl.</th>
+                <th>Surat Jalan</th>
+                <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @taxinvoiceitemvs.each do |taxinvoiceitemv| %>
+                <tr>
+                    <td><%=zeropad(taxinvoiceitemv.id)%></td>
+                    <td><strong><%=taxinvoiceitemv.date.strftime('%d') rescue nil%></strong>.<%=taxinvoiceitemv.date.strftime('%m') rescue nil%></td>
+                    <td><%= taxinvoiceitemv.sku_id %></td>
+                    <td>[<%= taxinvoiceitemv.total > 0 ? 'OK' : 'Nominal 0' %>]</td>
+                </tr>
+                <% end %>
+            </tbody>
+        </table>
+        <% end %>
  
         <br/>
         </div>

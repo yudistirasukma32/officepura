@@ -1,0 +1,89 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>OPS / DO Vendor / Index</h1>
+
+		<p>DO yang muncul di bawah adalah DO yang belum pernah diinput sebagai "Pakai Vendor".</p>
+ 
+		
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="date" >Pilih Tanggal</label>
+				<input type="text" name="date" class="half left date-picker" value="<%=@date%>" onchange="javascript:submitFormFilter();" />
+                
+                <label for="office_id" class="middle">Pilih Kantor</label>
+                <select name="office_id" class="half left ">
+                    
+                    <option value="all">All</option>
+                    <% @offices.each do |office| %>
+                    <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
+                    <% end %>
+                </select> 
+
+				<label for="date" class="tiny">#DO:</label>
+				<input type="text" name="event_id" class="short left" value="<%=params[:event_id]%>" />
+                
+                <input class="submit" type="submit" value="Filter" style="vertical-align: bottom;">
+			</div>
+ 
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+			<table class="row-view">
+				<tr>
+					<th width="50">TGL</th>
+					<th width="50">No. DO</th>
+					<th width="70">Kantor</th>
+					<th>Pelanggan</th>
+                    <th>Jurusan</th>
+					<th width="50">Komoditas</th>
+					<th width="90"></th>
+				</tr>
+
+				<% @events.each do |event| %>
+					<% if event.deleted %>
+						<% if current_user.adminrole %>
+						<tr class="deleted">
+							<td><strong><%=event.created_at.strftime('%d')%></strong>.<%=event.created_at.strftime('%m')%></td>
+							<td><%= zeropad(event.id) %></td>
+							<td><%=event.office.name rescue nil%></td>
+							<td><%=event.customer.name rescue nil%></td>
+							<td><%= event.route.name rescue nil %></td>
+							<td><%= event.commodity.name rescue nil %></td>
+							<td class="right" width="60">&nbsp;</td>
+						</tr>
+						<% end %>
+
+					<% else %>
+
+						<tr>
+							<td><strong><%=event.created_at.strftime('%d')%></strong>.<%=event.created_at.strftime('%m')%></td>
+							<td><%= zeropad(event.id) %></td>
+							<td><%=event.office.name rescue nil%></td>
+							<td><%=event.customer.name rescue nil%></td>
+							<td><%= event.route.name rescue nil %></td>
+							<td><%= event.commodity.name rescue nil %></td>
+							<td class="right" width="60">
+								<a class="cta" style="background: #2196f3; float: right;" href="add_dovendor/<%=event.id%>">Kirim Ke IC8</a>
+							</td>
+						</tr>
+					<% end %>
+				<% end %>	
+			
+ 
+			</table>
+
+		<br class="clearfix" />
+		
+	</div>
+
+</div>

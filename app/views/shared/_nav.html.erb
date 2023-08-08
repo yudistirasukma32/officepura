@@ -238,6 +238,7 @@
 		<li class="<%= @where == 'mechaniclogs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Mekanik'), "Call Mekanik", "/mechaniclogs" %></li>
 		<li class="<%= @where == 'mechaniclogs-done' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Mekanik'), "Call Mekanik - Process", "/mechaniclogs-done" %></li>
 		<li class="<%= @where == 'addship' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Keuangan'), "Edit Operator Kapal", "/invoices/add_ship" %></li> 
+		<li class="<%= @where == 'adddovendor' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "DO Vendor", "/events/add_dovendor" %></li> 
 	<% end %>
  
 

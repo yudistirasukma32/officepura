@@ -1,0 +1,10 @@
+<div class="field-row">
+  <label for="event_vendorroute_id">Jurusan Vendor</label>
+  <select class="chzn-select double" name="vendorroute_id" id="event_vendorroute_id">
+    <option value=>- Jurusan Vendor -</option>
+    <% @vendorroutes.each do |route| %>
+    <option value="<%=route[:id]%>"><%=route[:name]%></option>
+    <% end %>
+  </select>
+  <small id="vendorroutecheck" style="color: red; display: none;" >Field Jurusan Vendor harus dipilih</small>
+</div>

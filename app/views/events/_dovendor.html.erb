@@ -1,0 +1,49 @@
+<div class="field-row">
+  <label for="event_customer_id">Pelanggan</label>
+  <select class="chzn-select double" name="customer_id" id="event_customer_id" onchange="javascript:getDovRoute(this.value);">
+    <option value=>- Pelanggan -</option>
+    <% @customers.each do |customer| %>
+    <option value="<%=customer[:id]%>"><%=customer[:name]%></option>
+    <% end %>
+  </select>
+  <small id="customercheck" style="color: red; display: none;" >Field Pelanggan harus dipilih</small>
+</div>
+
+<div id="div-dovroutes"></div>
+
+<div class="field-row">
+  <label for="multimoda">Multimoda</label>
+  <select class="chzn-select double" name="multimoda" id="event_multimoda" onchange="javascript:getDovVendor(this.value);">
+    <option value=>- Multimoda -</option>
+    <% @multimoda.each_with_index do |moda, i| %>
+    <option value="<%=i%>"><%=moda%></option>
+    <% end %>
+  </select>
+  <small id="multimodacheck" style="color: red; display: none;" >Field Multimoda harus dipilih</small>
+</div>
+
+<div id="div-dovvendor"></div>
+<div id="div-dovvendorroutes"></div>
+
+<div class="field-row">
+  <label for="event_commodity_id">Komoditas</label>
+  <select class="chzn-select double" name="commodity_id" id="event_commodity_id">
+    <option value=>- Komoditas -</option>
+    <% @commodities.each do |commodity| %>
+    <option value="<%=commodity[:id]%>"><%=commodity[:name]%></option>
+    <% end %>
+  </select>
+  <small id="commoditycheck" style="color: red; display: none;" >Field Komoditas harus dipilih</small>
+</div>
+
+<div class="field-row">
+  <% @quant = Array(0..50) %>
+  <label for="event_qty">Jumlah</label>
+  <select class="chzn-select double" name="event_qty" id="event_qty">
+    <% @quant.each do |qty| %>
+    <option value="<%=qty%>"><%=qty%></option>
+    <% end %>
+  </select>
+  <span style="position: absolute; margin-top: 0.5rem;"><strong>RIT</strong></span>
+  <small id="qtycheck" style="color: red; display: none;" >Field Jumlah tidak boleh nol</small>
+</div>

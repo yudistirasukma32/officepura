@@ -1,0 +1,191 @@
+<% if @event %>
+
+  <%= form_tag("/events/transferdov", method: "post") do |f| %>
+    <div class="" style="width: 590px; float:left; margin-bottom: 1rem;">
+
+      <div class="field-row">
+        <label for="event_need_vendor">Pakai Vendor</label>
+        <input id="event_need_vendor" name="event[need_vendor]" type="checkbox" value="1" onchange="javascript:getDoVendor(this.value);">
+      </div>
+
+      <div id="div-dovendor"></div>
+      <div id="dov-loader" class="loader main-dashboard d-block" style="margin:3rem auto 0 auto; display:none;"></div>
+    </div>
+
+    <div class="field-row continue">
+      <input class="submit" name="commit" style="margin-left: 0;" type="submit" value="Tambah Data">
+      <input type="hidden" name="event_id" value="<%=@event.id%>">
+      <small id="checkboxcheck" style="color: red; padding-left:0; display: none;" >Field Pakai Vendor harus dipilih untuk membuat DO Vendor baru ke Indolintas 8 Cemerlang</small>
+      <br/>
+    </div>
+  <% end %>
+
+  <div class="info-box" style="margin-bottom:30px; width:420px;position: absolute;left: 620px;">  
+
+    <table class="row-view no-border">
+      <tr valign="top">
+        <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+        <td align="right" class="header">Delivery Order<br/>#<%=zeropad(@event.id)%><input type="hidden" id="strInvoiceId" value="#<%=zeropad(@event.id)%>" /></td>
+      </tr>
+    </table>
+    <hr style="width:600px;" />
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Tanggal</td>
+        <td><span><%=@event.start_date.strftime('%d %B %Y')%></span> - <span><%=@event.end_date.strftime('%d %B %Y')%></span></td>
+      </tr>
+      <tr>
+        <td>Kantor</td>
+        <td id="strCustomer"><%=@event.office.name%></td>
+      </tr>
+      <tr>
+        <td>Pelanggan</td>
+        <td id="strCustomer"><%=@event.customer.name%></td>
+      </tr>
+      <tr>
+        <td>Jurusan</td>
+        <td>
+          <strong><span id="strQty"><%=@event.qty%></span></strong> Rit: <span id="strRoute"><%= @event.route.name rescue nil%></span>
+         </td>
+      </tr>
+      <tr>
+        <td>Tipe</td>
+        <td id="strType"><%=@event.route.routegroup.name%></td>
+      </tr>
+
+      <tr>
+        <td style="padding-top: 1.5rem;">
+          <strong>Target</strong>
+        </td>
+      </tr>
+      <tr>
+        <td>Tgl Muat</td>
+        <td><%= @event.load_date.strftime('%d %B %Y') rescue nil %></td>
+      </tr>
+
+      <tr>
+        <td>Tgl Bongkar</td>
+        <td><%= @event.unload_date.strftime('%d %B %Y') rescue nil %></td>
+      </tr>
+
+      <% if !@event.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td id="strDescription"><%= @event.description %></td>
+        </tr>   
+        <% end %>     
+      </table>
+  </div>
+<% end %>
+
+<%= content_for :js do %>
+  <script>
+    $(document).ready(function() {
+
+      $('.submit').click(function () {
+        if (validateCheckbox() && validateCustomer() && validateMultimoda() && validateCommodity() && validateQty() && validateRoute() && validateVendor() && validateVendorroute()) {
+          console.log(true);
+          return true;
+        } else {
+          console.log(false);
+          return false;
+        }
+      })
+
+    });
+
+    function validateCheckbox() {
+      let customer = $('#event_customer_id').val();
+      if ($('#event_need_vendor').prop('checked') == false) {
+        $("#checkboxcheck").show();
+        return false;
+      } else {
+        $("#checkboxcheck").hide();
+        return true
+      }
+    }
+
+    function validateCustomer() {
+      let customer = $('#event_customer_id').val();
+      if (customer.length == "") {
+        $("#customercheck").show();
+        return false;
+      } else {
+        $("#customercheck").hide();
+        return true
+      }
+    }
+
+    function validateRoute() {
+      let route = $('#event_route_id').val();
+      if (route == undefined) {
+        return false;
+      } else if (route.length == "") {
+        $("#routecheck").show();
+        return false;
+      } else {
+        $("#routecheck").hide();
+        return true
+      }
+    }
+
+    function validateMultimoda() {
+      let route = $('#event_multimoda').val();
+      if (route.length == "") {
+        $("#multimodacheck").show();
+        return false;
+      } else {
+        $("#multimodacheck").hide();
+        return true
+      }
+    }
+
+    function validateVendor() {
+      let vendor = $('#event_vendor_id').val();
+      if (vendor == undefined) {
+        return false;
+      } else if (vendor.length == "") {
+        $("#vendorcheck").show();
+        return false;
+      } else {
+        $("#vendorcheck").hide();
+        return true
+      }
+    }
+
+    function validateVendorroute() {
+      let vendorroute = $('#event_vendorroute_id').val();
+      if (vendorroute == undefined) {
+        return false;
+      } else if (vendorroute.length == "") {
+        $("#vendorroutecheck").show();
+        return false;
+      } else {
+        $("#vendorroutecheck").hide();
+        return true
+      }
+    }
+
+    function validateCommodity() {
+      let commodity = $('#event_commodity_id').val();
+      if (commodity.length == "") {
+        $("#commoditycheck").show();
+        return false;
+      } else {
+        $("#commoditycheck").hide();
+        return true
+      }
+    }
+
+    function validateQty() {
+      let qty = $('#event_qty').val();
+      if (qty == "0") {
+        $("#qtycheck").show();
+        return false;
+      } else {
+        $("#qtycheck").hide();
+        return true
+      }
+    }
+  </script>
+<% end %>

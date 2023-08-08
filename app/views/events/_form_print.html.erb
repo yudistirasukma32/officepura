@@ -1,0 +1,84 @@
+<div style="text-align:center;">
+  <h3 style="text-decoration: underline;">SURAT PERINTAH KERJA</h3>
+</div>
+
+<table>
+  <tr>
+    <td style="width: 150px;">No. SPK</td>
+    <td>: <%= @event.id %></td>
+  </tr>
+  <tr>
+    <td>Tanggal</td>
+    <td>: <%= @event.load_date %></td>
+  </tr>
+  <tr>
+    <td>Nama Supir & No. HP</td>
+    <td>:</td>
+  </tr>
+  <tr>
+    <td>Jurusan</td>
+    <td>: <%= @event.summary rescue nil %></td>
+  </tr>
+  <tr>
+    <td>Jenis Pengiriman</td>
+    <td>: Industri / Distribusi</td>
+  </tr>
+  <tr>
+    <td>Komoditas</td>
+    <td>: <%= @event.commodity.name rescue nil %></td>
+  </tr>
+  <tr>
+    <td>Tanggal Ambil (Muat)</td>
+    <td>: <%= @event.load_date %></td>
+  </tr>
+  <tr>
+    <td>Tanggal Bongkar (Tiba)</td>
+    <td>: <%= @event.unload_date %></td>
+  </tr>
+  <tr>
+    <td>Estimasi Tonase</td>
+    <td>: <%= @event.estimated_tonage %> <%= @event.price_per_type %></td>
+  </tr>
+  <tr>
+    <td>Tipe Kargo</td>
+    <td>: <%= @event.cargo_type %></td>
+  </tr>
+  <tr>
+    <td>Tipe Tangki</td>
+    <td>: <%= @event.tanktype %></td>
+  </tr>
+  <tr>
+    <td>Jumlah Rit</td>
+    <td>: <%= @event.qty %></td>
+  </tr>
+</table>
+
+<hr/>
+
+<table>
+  <tr>
+    <td style="width: 150px;">Nominal Project</td>
+    <td>: Rp 5.000.000,00</td>
+  </tr>
+  <tr>
+    <td>Terbilang</td>
+    <td>: Lima juta rupiah</td>
+  </tr>
+  <tr>
+    <td>Meliputi</td>
+    <td>: UM Supir, UM Kernet, Lain-lain, Solar, ASDP</td>
+  </tr>
+</table>
+<br/>
+
+<p style="padding-bottom: 0;">Dalam menjalankan SPK ini, Mitra Pengemudi diwajibkan mendukung perusahaan dalam pemenuhan persyaratan yang dijalankan sebagai berikut :</p>
+<p>1. SPK yang telah diterima dan di tandatangan oleh Mitra Pengemudi harus di kerjakan sesuai
+jadwal yang dicantumkan di dalam SPK.<br/>
+2. Mitra Pengemudi tidak diperkenankan untuk meninggalkan atau membatalkan saat proses
+pengiriman berlangsung.<br/>
+3. Mitra Pengemudi harus memastikan segala aspek pengiriman termasuk memastikan keadaan
+kendaraan dan Tangki Cargo dalam keadaan bersih dan layak.<br/>
+4. Bersedia membersihkan dan mengkondisikan kendaraan atau tangki sebelum dan sesudah
+pengiriman berlangsung yang tertuang di dalam SPK.<br/>
+Demikian SURAT PERINTAH KERJA ini diperbuat untuk dilaksanakan dengan sebaik – baiknya, dan dapat
+dipergunakan seperlunya. </p>

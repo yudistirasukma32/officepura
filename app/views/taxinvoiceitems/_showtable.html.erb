@@ -1,28 +1,28 @@
-<% if @invoices.any? %>
 <table class="tablesorter row-view tablesorterFilters">
     <thead>
-    <tr>
-        <th width="30">#</th>
-        <th width="50">TGL</th>
-        <th width="50">DO</th>
-        <!-- <th class="{sorter: false}" width="50">BKK</th> -->
-        <th class="{sorter: false}">Keterangan</th>
-        <th width="70">NoPol</th> 
-        <th width="140">Pelanggan</th>
-        <th width="50">Muat</th> 
-        <th width="50">BKR</th> 
-        <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">S.Jalan</th>
-        <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;" title="Surat Tagihan sudah di Invoice">SDH INV.
-        <!-- <i class="icon-lock red icon-large" title="Surat Tagihan sudah di Invoice"></i> -->
-        </th>
-        <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">Upload</th>
-        <th width="50">USER</th>
-        <th width="50" class="{sorter: false, filter: false} sorter-false"></th>
-    </tr>
+        <tr>
+            <th width="30">#</th>
+            <th width="50">TGL</th>
+            <th width="50">DO</th>
+            <!-- <th class="{sorter: false}" width="50">BKK</th> -->
+            <th class="{sorter: false}">Keterangan</th>
+            <th width="70">NoPol</th> 
+            <th width="140">Pelanggan</th>
+            <th width="50">Muat</th> 
+            <th width="50">BKR</th> 
+            <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">S.Jalan</th>
+            <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;" title="Surat Tagihan sudah di Invoice">SDH INV.
+            <!-- <i class="icon-lock red icon-large" title="Surat Tagihan sudah di Invoice"></i> -->
+            </th>
+            <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">Upload</th>
+            <th width="50">USER</th>
+            <th width="50" class="{sorter: false, filter: false} sorter-false"></th>
+        </tr>
     </thead>
     <tbody>
     <% i = 0 %>
     <% total_sj, total_sj_done, total_inv_done, run, second_driver, second_nopol = 0, 0, 0, false , nil, nil%>
+<% if @invoices.any? %>
     <% @invoices.each do |invoice| %>
         <% if invoice.invoicetrain %>
         
@@ -77,7 +77,7 @@
             <% end %>
             <%= second_nopol.nil? ? '' : ' ' +second_nopol %>
             </td> 
-            <td><%=invoice.customer.name%></td>
+            <td><%=invoice.customer.name rescue nil%></td>
             <td class="right">
             <% if invoice.taxinvoiceitems.any? %>
                 <%=invoice.taxinvoiceitems[0].weight_gross rescue nil%>
@@ -87,9 +87,9 @@
             </td>
             <td class="right">
             <% if invoice.taxinvoiceitems.any? %>
-                <%=invoice.taxinvoiceitems[0].weight_net rescue 0%>
+                <%= invoice.taxinvoiceitems[0].weight_net rescue 0 %>
             <% else %>
-                <%=invoice.weight_net rescue 0%>   
+                <%= invoice.weight_net rescue 0 %>   
             <% end %>
             </td>
             <% if invoice.taxinvoiceitems.any? %>
@@ -170,6 +170,56 @@
          %>
         <% end %>   
     <% end %>
+<% end %>
+
+<% if @taxinvoiceitemvs.any? %>
+
+    <% @taxinvoiceitemvs.each do |itemv| %>
+        <% qty = itemv.weight_gross %>
+        <% if qty > 0 %>
+        <tr>
+            <td><%=i+=1%>.</td>
+            <td><strong><%=itemv.date.strftime('%d')%></strong>.<%=itemv.date.strftime('%m')%></td>
+            <td><%= itemv.event_id %></td>
+            <td>
+            #<%=zeropad(itemv.id)%>: <%=qty%> Rit -> Jurusan (Vendor)
+            &nbsp;<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
+            </td>
+            <td><%= itemv.vehicle_number %></td> 
+            <td><%= itemv.customer.name rescue nil%></td>
+            <td class="right"><%=itemv.weight_gross rescue nil%></td>
+            <td class="right"><%= itemv.weight_net rescue 0 %></td>
+            <td align="center">
+                1 / 1
+                <% if itemv.rejected %>
+                    <a style="text-align: center;
+                    font-size: 11px;
+                    float: none;" title="<%= itemv.reject_reason %>">
+                    <span style="background: red;padding: 2px 5px;border-radius: 5px;font-size: 11px;color: white;opacity: 0.65;line-height: 1.75;">TOLAKAN</span>
+                    </a>
+                <% end %>
+            </td>
+            <td align="center"><%= itemv.taxinvoice_id.present? ? 1 : 0 %> / 1</td>
+            <td></td>
+            <td></td>
+            <td class="center">
+                <a class="cta" style="margin-top:1rem;" href="/taxinvoiceitems/new/<%=itemv.id%>">Detail</a>&nbsp;
+
+                <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
+                    <a class="cta" href="/taxinvoiceitems/print/<%=itemv.id%>" style="background-color: green; margin-left: 0.2rem; display: none;">Edit</a>
+                <% end %>    
+            </td>
+        </tr>
+        
+        <% 
+            total_sj += 1
+            total_sj_done += 1
+            total_inv_done += (itemv.taxinvoice_id.present? ? 1 : 0)
+        %>
+        <% end %>   
+    <% end %>
+<% end %>
+
         <tr>
             <td colspan="8"><strong>TOTAL</strong></td>
             <td align="center"><%= total_sj_done %> / <%= total_sj %></td>
@@ -177,6 +227,4 @@
             <td>&nbsp;</td>
         </tr>   
     </tbody>
-
 </table>
-<% end %>

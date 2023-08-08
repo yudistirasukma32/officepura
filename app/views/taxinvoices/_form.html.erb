@@ -240,10 +240,8 @@
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
-    
     <label for="waybill" class="half left">No. Resi Pengiriman</label>
     <input type="text" class="half left" name="waybill" value="<%=@taxinvoice.waybill%>"/> 
-
 </div>
 
 <div class="field-row continue" style="padding-bottom:20px;">
@@ -343,88 +341,149 @@
 </div>
 
 <br class="clear" />
-<% if @taxinvoiceitems and @taxinvoiceitems.any? %>
-
-<table class="row-view" id="tbItem">
-  <thead>
-  <tr id="0">
-    <th width="20"> <input type="checkbox" id="is_all_wholesale" <% if @taxinvoiceitems.where(:taxinvoice_id => [!@taxinvoice.id, nil]).count() == 0 %> checked="checked" <% end %> onchange="javascript: checkAllTaxinvoiceitems();" /></th>
-    <th width="30">No</th>
-    <th width="85">Tanggal</th>
-    <th width="70">No. Pol</th>
-    <th width="110">Surat Jalan</th>
-    <th>Jurusan</th>
-    <th width="30" class="right">Muat (Kg)</th>
-    <th width="30" class="right">Bkr (Kg)</th>
-    <th width="70" class="right">Total</th>
-    <th width="30" style="display:none">BRGN</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @taxinvoiceitems.order(:id).each_with_index do |taxinvoiceitem, i| %>
-  <tr id="<%=taxinvoiceitem.id%>">
-     <td>
-        <input type="checkbox" id="cb_<%=taxinvoiceitem.id%>" name="cb_<%=taxinvoiceitem.id%>" <%if taxinvoiceitem.taxinvoice_id == @taxinvoice.id && !taxinvoiceitem.taxinvoice_id.nil? %> checked="checked"<% end %> onchange="javascript: countTotalTaxInvoiceItems();" />
+<% if (@taxinvoiceitems && @taxinvoiceitems.any?) || (@taxinvoiceitemvs && @taxinvoiceitemvs.any?) %>
+  
+  <% if @taxinvoiceitems && @taxinvoiceitems.any? %>
+    <table class="row-view" id="tbItem">
+    <thead>
+    <tr id="0">
+      <th width="20"> <input type="checkbox" id="is_all_wholesale" <% if @taxinvoiceitems.where(:taxinvoice_id => [!@taxinvoice.id, nil]).count() == 0 %> checked="checked" <% end %> onchange="javascript: checkAllTaxinvoiceitems();" /></th>
+      <th width="30">No</th>
+      <th width="85">Tanggal</th>
+      <th width="70">No. Pol</th>
+      <th width="110">Surat Jalan</th>
+      <th>Jurusan</th>
+      <th width="30" class="right">Muat (Kg)</th>
+      <th width="30" class="right">Bkr (Kg)</th>
+      <th width="70" class="right">Total</th>
+      <th width="30" style="display:none">BRGN</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @taxinvoiceitems.order(:id).each_with_index do |taxinvoiceitem, i| %>
+    <tr id="<%=taxinvoiceitem.id%>">
+      <td>
+          <input type="checkbox" id="cb_<%=taxinvoiceitem.id%>" name="cb_<%=taxinvoiceitem.id%>" <%if taxinvoiceitem.taxinvoice_id == @taxinvoice.id && !taxinvoiceitem.taxinvoice_id.nil? %> checked="checked"<% end %> onchange="javascript: countTotalTaxInvoiceItems();" />
+        </td>
+      <td><%=i+1%>.</td>
+      <td>
+        <input type="text" id ="date_<%=taxinvoiceitem.id%>" name="date_<%=taxinvoiceitem.id%>" class="short date-picker" value="<%=taxinvoiceitem.date.strftime('%d-%m-%Y') if !taxinvoiceitem.date.nil?%>" />
       </td>
-    <td><%=i+1%>.</td>
-    <td>
-      <input type="text" id ="date_<%=taxinvoiceitem.id%>" name="date_<%=taxinvoiceitem.id%>" class="short date-picker" value="<%=taxinvoiceitem.date.strftime('%d-%m-%Y') if !taxinvoiceitem.date.nil?%>" />
-    </td>
-    <td> 
+      <td> 
 
-    <% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
-      <strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
-    <% else %>
-        <%=taxinvoiceitem.invoice.vehicle.current_id rescue nil%>
+      <% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
+        <strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+      <% else %>
+          <%=taxinvoiceitem.invoice.vehicle.current_id rescue nil%>
+      <% end %>
+      
+      <% if taxinvoiceitem.invoice.invoicetrain %>
+        <% if taxinvoiceitem.invoice.invoices.first %>,
+        
+          <% if taxinvoiceitem.invoice.invoices.first.vehicle_duplicate.present? && taxinvoiceitem.invoice.invoices.first.vehicle_duplicate_id != 0%>
+            <strong><%=taxinvoiceitem.invoice.invoices.first.vehicle_duplicate.current_id rescue nil%></strong>
+          <% else %>
+              <%=taxinvoiceitem.invoice.invoices.first.vehicle.current_id rescue nil%>
+          <% end %>
+
+        <% end %>
+      <% end %>
+
+      </td>
+      <td>
+        <input type="text" id ="sku_<%=taxinvoiceitem.id%>" name="sku_<%=taxinvoiceitem.id%>" class="half" value="<%=taxinvoiceitem.sku_id%>" />
+      </td>
+      <td>
+
+      <%
+        if taxinvoiceitem.invoice.event
+      %>
+          <strong><%=taxinvoiceitem.invoice.event.summary%></strong><br/> 
+      <%
+        end
+      %>
+
+        <%=taxinvoiceitem.invoice.route.name%><br>
+        <% if taxinvoiceitem.invoice.invoicetrain %>
+        <% if taxinvoiceitem.invoice.invoices.first %>
+        <%= taxinvoiceitem.invoice.invoices.first.route.name %> 
+        <% end %>
+        <% end %>
+  
+      </td>
+      <td align="right">
+        <input type="text" id="gross_<%=taxinvoiceitem.id%>" name="gross_<%=taxinvoiceitem.id%>" class="short right" value="<%=taxinvoiceitem.weight_gross%>" onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitem.id%>);" onkeypress="javascript:return isNumberKey(this);"/>
+      </td>
+      <td align="right">
+        <input type="text" id ="qty_<%=taxinvoiceitem.id%>" name="qty_<%=taxinvoiceitem.id%>" class="short right" value="<%=taxinvoiceitem.weight_net%>" onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitem.id%>);" onkeypress="javascript:return isNumberKey(this);" />
+        <input type="hidden" id="priceper_<%=taxinvoiceitem.id%>" value="<%=taxinvoiceitem.price_per%>" />
+      </td>   
+      <td align="right"><label id="total_<%=taxinvoiceitem.id%>"><%=to_currency_bank(taxinvoiceitem.total)%></label></td>
+      <td align="right" style="display:none">
+        <input type="checkbox" id="cbwholesale_<%=taxinvoiceitem.id%>" name="cbwholesale_<%=taxinvoiceitem.id%>" value="Yes" <% if taxinvoiceitem.is_wholesale %> checked = "checked"<% end %> onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitem.id%>);" />
+      </td>
+    
+    </tr>
     <% end %>
     
-    <% if taxinvoiceitem.invoice.invoicetrain %>
-      <% if taxinvoiceitem.invoice.invoices.first %>,
-      
-        <% if taxinvoiceitem.invoice.invoices.first.vehicle_duplicate.present? && taxinvoiceitem.invoice.invoices.first.vehicle_duplicate_id != 0%>
-          <strong><%=taxinvoiceitem.invoice.invoices.first.vehicle_duplicate.current_id rescue nil%></strong>
-        <% else %>
-            <%=taxinvoiceitem.invoice.invoices.first.vehicle.current_id rescue nil%>
-        <% end %>
+  <% end %>
 
+  <% if @taxinvoiceitemvs and @taxinvoiceitemvs.any? %>
+  </tbody>
+  </table>
+    <h3 style="margin-bottom:.1rem; text-align:center; font-weight:bold;">Surat jalan dari vendor</h3>
+    <hr>
+    <table class="row-view" id="vendortbItem">
+      <thead>
+      <tr id="0">
+        <th width="20"> <input type="checkbox" id="vendoris_all_wholesale" <% if @taxinvoiceitemvs.where(:taxinvoice_id => [!@taxinvoice.id, nil]).count() == 0 %> checked="checked" <% end %> onchange="javascript: checkAllTaxinvoiceitems();" /></th>
+        <th width="30">No</th>
+        <th width="85">Tanggal</th>
+        <th width="70">No. Pol</th>
+        <th width="110">Surat Jalan</th>
+        <th>Jurusan</th>
+        <th width="30" class="right">Muat (Kg)</th>
+        <th width="30" class="right">Bkr (Kg)</th>
+        <th width="70" class="right">Total</th>
+        <th width="30" style="display:none">BRGN</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @taxinvoiceitemvs.order(:id).each_with_index do |taxinvoiceitemv, i| %>
+        <tr id="<%=taxinvoiceitemv.id%>">
+          <td>
+              <input type="checkbox" id="vendorcb_<%=taxinvoiceitemv.id%>" name="vendorcb_<%=taxinvoiceitemv.id%>" <%if taxinvoiceitemv.taxinvoice_id == @taxinvoice.id && !taxinvoiceitemv.taxinvoice_id.nil? %> checked="checked"<% end %> onchange="javascript: countTotalTaxInvoiceItems();" />
+            </td>
+          <td><%=i+1%>.</td>
+          <td>
+            <input type="text" id ="vendordate_<%=taxinvoiceitemv.id%>" name="vendordate_<%=taxinvoiceitemv.id%>" class="short date-picker" value="<%=taxinvoiceitemv.date.strftime('%d-%m-%Y') if !taxinvoiceitemv.date.nil?%>" />
+          </td>
+          <td>
+            <%= taxinvoiceitemv.vehicle_number rescue nil %>
+          </td>
+          <td>
+            <input type="text" id ="vendorsku_<%=taxinvoiceitemv.id%>" name="vendorsku_<%=taxinvoiceitemv.id%>" class="half" value="<%=taxinvoiceitemv.sku_id%>" />
+          </td>
+          <td>
+            <% if taxinvoiceitemv.event %>
+              <%=taxinvoiceitemv.event.summary%><br/> 
+            <% end %>
+          </td>
+          <td align="right">
+            <input type="text" id="gross_<%=taxinvoiceitemv.id%>" name="gross_<%=taxinvoiceitemv.id%>" class="short right" value="<%=taxinvoiceitemv.weight_gross%>" onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitemv.id%>);" onkeypress="javascript:return isNumberKey(this);"/>
+          </td>
+          <td align="right">
+            <input type="text" id ="qty_<%=taxinvoiceitemv.id%>" name="qty_<%=taxinvoiceitemv.id%>" class="short right" value="<%=taxinvoiceitemv.weight_net%>" onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitemv.id%>);" onkeypress="javascript:return isNumberKey(this);" />
+            <input type="hidden" id="priceper_<%=taxinvoiceitemv.id%>" value="<%=taxinvoiceitemv.price_per%>" />
+          </td>   
+          <td align="right"><label id="total_<%=taxinvoiceitemv.id%>"><%=to_currency_bank(taxinvoiceitemv.total)%></label></td>
+          <td align="right" style="display:none">
+            <input type="checkbox" id="cbwholesale_<%=taxinvoiceitemv.id%>" name="cbwholesale_<%=taxinvoiceitemv.id%>" value="Yes" <% if taxinvoiceitemv.is_wholesale %> checked = "checked"<% end %> onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitemv.id%>);" />
+          </td>
+        
+        </tr>
       <% end %>
-    <% end %>
 
-    </td>
-    <td>
-      <input type="text" id ="sku_<%=taxinvoiceitem.id%>" name="sku_<%=taxinvoiceitem.id%>" class="half" value="<%=taxinvoiceitem.sku_id%>" />
-    </td>
-    <td>
-
-    <%
-      if taxinvoiceitem.invoice.event
-    %>
-        <strong><%=taxinvoiceitem.invoice.event.summary%></strong><br/> 
-    <%
-      end
-    %>
-
-      <%=taxinvoiceitem.invoice.route.name%><br>
-      <% if taxinvoiceitem.invoice.invoicetrain %>
-      <% if taxinvoiceitem.invoice.invoices.first %>
-      <%= taxinvoiceitem.invoice.invoices.first.route.name %> 
-      <% end %>
-      <% end %>
- 
-    </td>
-    <td align="right">
-      <input type="text" id="gross_<%=taxinvoiceitem.id%>" name="gross_<%=taxinvoiceitem.id%>" class="short right" value="<%=taxinvoiceitem.weight_gross%>" onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitem.id%>);" onkeypress="javascript:return isNumberKey(this);"/>
-    </td>
-    <td align="right">
-      <input type="text" id ="qty_<%=taxinvoiceitem.id%>" name="qty_<%=taxinvoiceitem.id%>" class="short right" value="<%=taxinvoiceitem.weight_net%>" onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitem.id%>);" onkeypress="javascript:return isNumberKey(this);" />
-      <input type="hidden" id="priceper_<%=taxinvoiceitem.id%>" value="<%=taxinvoiceitem.price_per%>" />
-    </td>   
-    <td align="right"><label id="total_<%=taxinvoiceitem.id%>"><%=to_currency_bank(taxinvoiceitem.total)%></label></td>
-    <td align="right" style="display:none">
-      <input type="checkbox" id="cbwholesale_<%=taxinvoiceitem.id%>" name="cbwholesale_<%=taxinvoiceitem.id%>" value="Yes" <% if taxinvoiceitem.is_wholesale %> checked = "checked"<% end %> onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitem.id%>);" />
-    </td>
-   
-  </tr>
   <% end %>
 
   <tr id="-1">

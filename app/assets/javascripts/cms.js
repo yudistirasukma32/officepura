@@ -554,21 +554,21 @@ function getRouteTrain(operator_id) {
 }
 
 function getRouteShip(operator_id) {
-		$.ajax({
-			type: "GET",
-			url: "/invoices/get_shiproute/" + operator_id,
-			success: function(data) {
-	            console.log("/invoices/get_shiproute/" + operator_id);
-				$('#div_routeships').html(data.html);
-				$(".chzn-select").chosen();
-			},
-			request: function() {
-				$('#div_routeships').html('<em>Mengunduh Data</em>');			
-			},
-			failure: function() {alert("Error. Mohon refresh browser Anda.");}
-		});
-	}
-	
+	$.ajax({
+		type: "GET",
+		url: "/invoices/get_shiproute/" + operator_id,
+		success: function(data) {
+            console.log("/invoices/get_shiproute/" + operator_id);
+			$('#div_routeships').html(data.html);
+			$(".chzn-select").chosen();
+		},
+		request: function() {
+			$('#div_routeships').html('<em>Mengunduh Data</em>');			
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
+}
+
 function getRouteTrain2(operator_id) {
 	$.ajax({
 		type: "GET",
@@ -1007,6 +1007,29 @@ function countTotalTaxInvoiceItems(){
 			}
 		});	
 	}
+
+	if($('#vendortbItem').length > 0){
+		$('#vendortbItem > tbody > tr').each(function() {
+			id = $(this).attr("id");
+			if($('#vendorcb_' + id).prop('checked')){
+				if($('#process').val() == 'edit'){
+					if(parseInt(id) > 0){
+						total += Number($('#total_'+id).html().split('.').join('').replace(',','.'));
+						totalqty += Number($('#qty_'+id).val());
+						totalgross += Number($('#gross_'+id).val());
+					}
+				}else{
+					if(parseInt(id) > 0){
+						if($('#vendorcb_' + id).prop('checked')){
+							total += Number($('#total_'+id).html().split('.').join('').replace(',','.'));
+							totalqty += Number($('#qty_'+id).val());
+							totalgross += Number($('#gross_'+id).val());
+						}
+					}
+				}
+			}
+		});	
+	}
 		
 	if($('#tbAdditional').length > 0){
 		$('#tbAdditional > tbody > tr').each(function() {
@@ -1169,6 +1192,28 @@ function checkAllTaxinvoiceitems(){
 				id = $(this).attr("id");
 				if (parseInt(id) > 0) {
 					$('#cb_' + id).attr('checked',false);
+				}
+			});
+		}
+	}
+
+	if($('#vendoris_all_wholesale').prop('checked'))
+	{
+		if($('#vendortbItem').length > 0){
+			$('#vendortbItem > tbody > tr').each(function() {
+				id = $(this).attr("id");
+				if (parseInt(id) > 0) {
+					$('#vendorcb_' + id).attr('checked',true);
+				}
+			});
+		}
+
+	}else{
+		if($('#vendortbItem').length > 0){
+			$('#vendortbItem > tbody > tr').each(function() {
+				id = $(this).attr("id");
+				if (parseInt(id) > 0) {
+					$('#vendorcb_' + id).attr('checked',false);
 				}
 			});
 		}
@@ -1508,6 +1553,66 @@ function getDataBookings(cl)
 		},
 		failure: function() {alert("Error. Mohon refresh browser Anda.");}
 	});		
+}
+
+function getDoVendor() {
+	if ($('#event_need_vendor').prop('checked') == true) {
+		$('#dov-loader').show();
+		$.ajax({
+			type: "GET",
+			url: "/events/getdovendor",
+			success: function(data) {
+				$('#div-dovendor').html(data.html);
+				$(".chzn-select").chosen();
+				$('#dov-loader').hide();
+			},
+			failure: function() {alert("Error. Mohon refresh browser Anda.");}
+		});
+	} else {
+		$('#div-dovendor').empty();
+	}
+}
+
+function getDovRoute(customer_id) {
+	$('#dov-loader').show();
+	$.ajax({
+		type: "GET",
+		url: "/events/getdovroutes/" + customer_id,
+		success: function(data) {
+			$('#div-dovroutes').html(data.html);
+			$(".chzn-select").chosen();
+			$('#dov-loader').hide();
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
+}
+
+function getDovVendor(multimoda) {
+	$('#dov-loader').show();
+	$.ajax({
+		type: "GET",
+		url: "/events/getdovvendors/" + multimoda,
+		success: function(data) {
+			$('#div-dovvendor').html(data.html);
+			$(".chzn-select").chosen();
+			$('#dov-loader').hide();
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
+}
+
+function getDovVendorroute(vendor_id) {
+	$('#dov-loader').show();
+	$.ajax({
+		type: "GET",
+		url: "/events/getdovvendorroutes/" + vendor_id,
+		success: function(data) {
+			$('#div-dovvendorroutes').html(data.html);
+			$(".chzn-select").chosen();
+			$('#dov-loader').hide();
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
 }
 
 function getGraphIncomeVehicle()
@@ -2338,7 +2443,8 @@ $(document).ready(function() {
 		if ($('#invoice_vehicle_id').val() == 0) {			
 			errors = addComma(errors, "<strong>Kendaraan</strong>");
 		}
-		if ($('#invoice_driver_id').val() == 0) {			
+
+		if ($('#invoice_driver_id').val() == 0)  {			
 			errors = addComma(errors, "<strong>Supir</strong>");
 		}
 

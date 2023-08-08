@@ -1,4 +1,8 @@
 class EventsController < ApplicationController
+  require "uri"
+  require "net/http"
+  require "openssl"
+  require 'json'
 	include ApplicationHelper
   include ActionView::Helpers::NumberHelper
 	layout "application", :except => [:getevents, :getestimatedtonage]
@@ -52,6 +56,7 @@ class EventsController < ApplicationController
     @eventmemos = Eventmemo.active.where('event_id = ?', @event.id)
     @eventcleaningmemos = Eventcleaningmemo.active.where('event_id = ?', @event.id)
 
+    @taxinvoiceitemvs = Taxinvoiceitemv.active.where(event_id: params[:id]).where("total > money(0)")
     @invoices = Invoice.active.where('event_id = ?', @event.id)
  
     if @invoices.present?
@@ -242,6 +247,7 @@ class EventsController < ApplicationController
       if current_user.office_id.present? && !current_user.owner
         @events = @events.where("office_id = ?", current_user.office_id)
       end
+
       render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json; 
 
     else
@@ -252,6 +258,7 @@ class EventsController < ApplicationController
           if current_user.office_id.present? && !current_user.owner
             @events = @events.where("office_id = ?", current_user.office_id)
           end
+
           render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json; 
 
         else
@@ -260,6 +267,7 @@ class EventsController < ApplicationController
           if current_user.office_id.present? && !current_user.owner
             @events = @events.where("office_id = ?", current_user.office_id)
           end
+
           render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json; 
             
         end
@@ -327,130 +335,127 @@ class EventsController < ApplicationController
       invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)    
         
       @events = @events.map do |e|
+        vendor = Taxinvoiceitemv.active.select('event_id, total').where("event_id IN (?) AND taxinvoiceitemvs.total > '0'", e.id)
           
-                half_completed = false
-                completed = false
-                invoiced = false
-                train = false
-                completed_by_vendor = false
+        half_completed = false
+        completed = false
+        invoiced = false
+        train = false
+        completed_by_vendor = false
+  
+        bkk = ''
+        taxinvoice = ''
+        event_qty = 1      
+  
+        if e.qty
+            event_qty = e.qty
+        end
+
+        if e.need_vendor && vendor.count > 0
+          if vendor.count >= event_qty / 2
+            invoiced = true
+          end
+        elsif e.need_vendor
+          completed_by_vendor = true
+        end
+        
+        if invoices.index(e.id)
+          bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').pluck(:id) 
+          # bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where().pluck(:id) 
           
-                bkk = ''
-                taxinvoice = ''
-                event_qty = 1      
-          
-                if e.qty
-                    event_qty = e.qty
+          if bkk.count > 0 || vendor.count > 0
+            this_bkk = Invoice.active.select('id, invoicetrain, quantity').find(bkk[0])
+            
+            #Check BKK train/not
+            if this_bkk.invoicetrain
+                
+              train = true
+              
+              #Check QTY of BKK match / not with QTY on event
+              if bkk.count >= event_qty.to_i*2
+                  
+                completed = true
+                
+                taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
+
+                if taxinvoices.count + vendor.count >= bkk.count / 2
+
+                  invoiced = true
+
                 end
 
-                if e.need_vendor
+              else
+                  
+                half_completed = true
+                completed = false
+                
+                if e.need_vendor && vendor.count > 0
+                  if vendor.count >= event_qty / 2
+                    invoiced = true
+                  end
+                elsif e.need_vendor
                   completed_by_vendor = true
                 end
-
-                if e.cancelled
-                  cancelled = true
-                end
+              end
+              
+            else
                 
-                if invoices.index(e.id)
-                    
-                    bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').pluck(:id) 
-#                    bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where().pluck(:id) 
-                    
-                    if bkk.count > 0
-                        
-                        this_bkk = Invoice.active.select('id, invoicetrain, quantity').find(bkk[0])
-                        
-                        #Check BKK train/not
-                        if this_bkk.invoicetrain
-                            
-                            train = true
-                            
-                            #Check QTY of BKK match / not with QTY on event
-                            if bkk.count >= event_qty.to_i*2
-                                
-                                completed = true
-                                
-                                taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
+              train = false
+              half_completed = true
+              
+              #Check QTY of BKK match / not with QTY on event
+              if bkk.count >= event_qty.to_i
+                  
+                completed = true
+                
+                taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
 
-                                if taxinvoices.count >= bkk.count / 2
+                if taxinvoices.count + vendor.count >= bkk.count
 
-                                  invoiced = true
+                  invoiced = true
 
-                                end
+                end
+              end
+            end
+            
+          else
+              completed = false
+          end
+        end
+
+        if e.company.nil?
+          company = ' [RDPI]'
+          summary = e.summary + company + ' / ' + e.user.username rescue nil
+        else
+
+          if e.office.nil?
+            company = e.company.abbr
+            summary = e.summary + ' ['+company+']' + ' / ' + e.user.username rescue nil
+          else
+            company = e.company.abbr
+            summary = e.summary + ' ['+company+'] / ' + e.office.abbr + ' / ' + e.user.username rescue nil
+          end
+
+        end
+
+        {
+          :id => e.id,
+          :authorised => e.authorised,
+          :summary => summary,
+          :cancelled => e.cancelled,
+          :start_date => e.start_date,
+          :end_date => e.end_date,
+          :customer_id => e.customer_id,
+          :bkk => bkk,
+          :invoicetrain => train,
+          :half_completed => half_completed,
+          :completed => completed,
+          :completed_by_vendor => completed_by_vendor,
+          :invoiced => invoiced,
+          :sj => taxinvoices
+        }
   
-                            else
-                                
-                                half_completed = true
-                                completed = false
-                                
-                                if e.need_vendor
-                                    completed_by_vendor = true
-                                end
-                                
-                            end
-                            
-                        else
-                            
-                            train = false
-                            half_completed = true
-                            
-                            #Check QTY of BKK match / not with QTY on event
-                            if bkk.count >= event_qty.to_i
-                                
-                                completed = true
-                                
-                                taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
-
-                                if taxinvoices.count >= bkk.count
-
-                                  invoiced = true
-
-                                end
-                                
-                            end
-                            
-                        end
-                        
-                    else
-                        
-                        completed = false
-         
-                    end
-                
-                end
-
-                if e.company.nil?
-                  company = ' [RDPI]'
-                  summary = e.summary + company + ' / ' + e.user.username rescue nil
-                else
-
-                  if e.office.nil?
-                    company = e.company.abbr
-                    summary = e.summary + ' ['+company+']' + ' / ' + e.user.username rescue nil
-                  else
-                    company = e.company.abbr
-                    summary = e.summary + ' ['+company+'] / ' + e.office.abbr + ' / ' + e.user.username rescue nil
-                  end
-
-                end
-
-                {
-                    :id => e.id,
-                    :authorised => e.authorised,
-                    :summary => summary,
-                    :cancelled => e.cancelled,
-                    :start_date => e.start_date,
-                    :end_date => e.end_date,
-                    :customer_id => e.customer_id,
-                    :bkk => bkk,
-                    :invoicetrain => train,
-                    :half_completed => half_completed,
-                    :completed => completed,
-                    :completed_by_vendor => completed_by_vendor,
-                    :invoiced => invoiced,
-                    :sj => taxinvoices
-                }
-          
-                end
+      end
     end
     
     respond_to do |format|
@@ -567,4 +572,270 @@ class EventsController < ApplicationController
     # }
   end
 
+  def add_dovendor
+    @section = "ops"
+    @where = "adddovendor"
+    @event = Event.find(params[:event_id])
+
+    if @event.load_date.nil?
+      @event.load_date = Date.today
+    end
+
+  end
+
+  def indexadddovendor
+    @section = "ops"
+    @where = "adddovendor"
+    @date = params[:date]
+    @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+    @events = Event.where("created_at::DATE = ? AND deleted=FALSE AND need_vendor=FALSE", @date.to_date)
+    # render json: @events.to_sql
+    # return false
+
+    cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+
+    @events = @events.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
+    # fetch_excel()
+      
+    @invoice_id = params[:invoice_id]
+
+    if @invoice_id.present?
+      @events = Event.where("id = ? and deleted = false", @invoice_id)
+    end
+
+    @office_id = params[:office_id]
+      
+    if @office_id.present? and @office_id != "all"
+        @events = @events.where("office_id = ?", @office_id)
+    end
+      
+    @offices = Office.active.order('id asc')  
+    @office_role = []
+      
+    if checkrole 'BKK Kantor Sidoarjo'
+        @office_role.push(1)
+    end
+    if checkrole 'BKK Kantor Jakarta'
+        @office_role.push(2)
+    end
+    if checkrole 'BKK Kantor Probolinggo'
+        @office_role.push(3)
+    end    
+    if checkrole 'BKK Kantor Semarang'
+        @office_role.push(4)
+    end
+    if checkrole 'BKK Kantor Surabaya'
+      @office_role.push(5)
+    end
+    if checkrole 'BKK Kantor Sumatera'
+      @office_role.push(6)
+    end
+    # if checkrole 'BKK Cargo Padat'
+    #   @office_role.push(7)
+    # end
+    
+    if checkrole 'Operasional BKK'
+        @offices = @offices.where('id != 7').order('id asc')
+    else
+        @offices = @offices.where('id IN (?)', @office_role).order('id asc')
+    end
+        
+  
+    respond_to :html
+  end
+
+  def getdovendor
+    url = URI("https://office.8cemerlang.com/events/api/setdovendor?target=pura")
+    # url = URI("http://localhost:3000/events/api/setdovendor?target=pura")
+		https = Net::HTTP.new(url.host, url.port)
+		https.read_timeout = 3600
+		https.use_ssl = true
+		https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+		request = Net::HTTP::Get.new(url.request_uri)
+		# request["Authorization"] = "Basic #{@api_token}"
+		request["Cookie"] = "user.id=Mzg1--7739d955677cf13c461689e01f95ba77f9b9d9f2"
+
+		response = https.request(request)
+		result = ActiveSupport::JSON.decode(response.read_body)
+		# render json: result['customer']
+    # return false
+
+    @customers = []
+    result['customer'].each_with_index.map do |customer, i|
+
+      new_customerhash = {
+        id: customer['id'],
+        name: customer['name']
+      }
+
+      @customers.push(new_customerhash)
+		end
+
+    @vendors = []
+    result['vendors'].each_with_index.map do |vendor, i|
+
+      new_vendorhash = {
+        id: vendor['id'],
+        name: vendor['name'],
+        abbr: vendor['abbr']
+      }
+
+      @vendors.push(new_vendorhash)
+		end
+
+    @commodities = []
+    result['commodities'].each_with_index.map do |commodity, i|
+
+      new_commodityhash = {
+        id: commodity['id'],
+        name: commodity['name']
+      }
+
+      @commodities.push(new_commodityhash)
+		end
+
+    @multimoda = ['Truk', 'Truk + Kereta', 'Truk + Kapal']
+    render :json => { :success => true, :html => render_to_string(:partial => "events/dovendor", :layout => false) }.to_json; 
+  end
+
+  def getdovvendors
+    url = URI("https://office.8cemerlang.com/events/api/setdovvendors?multimoda=#{params[:multimoda]}")
+    # url = URI("http://localhost:3000/events/api/setdovvendors?multimoda=#{params[:multimoda]}")
+		https = Net::HTTP.new(url.host, url.port)
+		https.read_timeout = 3600
+		https.use_ssl = true
+		https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+		request = Net::HTTP::Get.new(url.request_uri)
+		# request["Authorization"] = "Basic #{@api_token}"
+		request["Cookie"] = "user.id=Mzg1--7739d955677cf13c461689e01f95ba77f9b9d9f2"
+
+		response = https.request(request)
+		result = ActiveSupport::JSON.decode(response.read_body)
+		# render json: result['customer']
+    # return false
+
+    @vendors = []
+    result['vendors'].each_with_index.map do |vendor, i|
+
+      new_vendorhash = {
+        id: vendor['id'],
+        name: vendor['name'],
+        abbr: vendor['abbr']
+      }
+
+      @vendors.push(new_vendorhash)
+		end
+
+    render :json => { :success => true, :html => render_to_string(:partial => "events/dovvendors", :layout => false) }.to_json; 
+  end
+
+  def getdovroutes
+    url = URI("https://office.8cemerlang.com/events/api/setdovroutes?customer_id=#{params[:customer_id]}")
+    # url = URI("http://localhost:3000/events/api/setdovroutes?customer_id=#{params[:customer_id]}")
+		https = Net::HTTP.new(url.host, url.port)
+		https.read_timeout = 3600
+		https.use_ssl = true
+		https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+		request = Net::HTTP::Get.new(url.request_uri)
+		# request["Authorization"] = "Basic #{@api_token}"
+		request["Cookie"] = "user.id=Mzg1--7739d955677cf13c461689e01f95ba77f9b9d9f2"
+
+		response = https.request(request)
+		result = ActiveSupport::JSON.decode(response.read_body)
+		# render json: result['customer']
+    # return false
+
+    @routes = []
+    result['routes'].each_with_index.map do |route, i|
+
+      new_routehash = {
+        id: route['id'],
+        name: route['name']
+      }
+
+      @routes.push(new_routehash)
+		end
+
+    render :json => { :success => true, :html => render_to_string(:partial => "events/dovroutes", :layout => false) }.to_json; 
+  end
+
+  def getdovvendorroutes
+    url = URI("https://office.8cemerlang.com/events/api/setdovvendorroutes?vendor_id=#{params[:vendor_id]}")
+    # url = URI("http://localhost:3000/events/api/setdovvendorroutes?vendor_id=#{params[:vendor_id]}")
+		https = Net::HTTP.new(url.host, url.port)
+		https.read_timeout = 3600
+		https.use_ssl = true
+		https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+		request = Net::HTTP::Get.new(url.request_uri)
+		# request["Authorization"] = "Basic #{@api_token}"
+		request["Cookie"] = "user.id=Mzg1--7739d955677cf13c461689e01f95ba77f9b9d9f2"
+
+		response = https.request(request)
+		result = ActiveSupport::JSON.decode(response.read_body)
+		# render json: result['customer']
+    # return false
+
+    @vendorroutes = []
+    result['vendorroutes'].each_with_index.map do |route, i|
+
+      new_routehash = {
+        id: route['id'],
+        name: route['name']
+      }
+
+      @vendorroutes.push(new_routehash)
+		end
+
+    render :json => { :success => true, :html => render_to_string(:partial => "events/dovvendorroutes", :layout => false) }.to_json; 
+  end
+
+  def transferdov
+    orievent = Event.find(params[:event_id])
+
+    url = URI("https://office.8cemerlang.com/events/api/post-dovendor")
+    # url = URI("http://localhost:3000/events/api/post-dovendor")
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    request = Net::HTTP::Post.new(url.request_uri)
+    request["Content-Type"] = "application/json"
+    request.body = JSON.dump({
+      "event" => {
+        "start_date" => orievent.start_date,
+        "end_date" => orievent.end_date,
+        "company2" => 215,
+        "route_id" => params[:route_id],
+        "customer_id" => params[:customer_id],
+        "summary" => orievent.summary,
+        "multimoda" => params[:multimoda],
+        "losing" => orievent.losing,
+        "event_id" => "PURA DO ##{orievent.id}",
+        "vendor_id" => params[:vendor_id],
+        "vendorroute_id" => params[:vendorroute_id],
+        "commodity_id" => params[:commodity_id],
+        "load_date" => orievent.load_date,
+        "unload_date" => orievent.unload_date,
+        "price_per_type" => orievent.price_per_type,
+        "estimated_tonage" => orievent.estimated_tonage,
+        "cargo_type" => orievent.cargo_type,
+        "tanktype" => orievent.tanktype,
+        "qty" => params[:event_qty],
+        "truck_quantity" => params[:event_qty],
+        "volume" => orievent.volume,
+        "description" => orievent.description,
+        "oricustomer" => orievent.customer_id
+      }
+    })
+
+    response = http.request(request)
+    @response = response.read_body
+
+    orievent.need_vendor = true
+    orievent.save
+
+    render json: {
+      status: 200,
+      message: 'Permintaan DO Vendor ke Indolintas 8 Cemerlang berhasil',
+    }, status: 200
+  end
 end

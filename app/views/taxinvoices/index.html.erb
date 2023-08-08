@@ -19,7 +19,7 @@
 				<label for="customer_id">Pelanggan</label>
 				<select name="customer_id" class="third left">
 					<option value="">Semua Pelanggan</option>
-					<% @customers.each do |customer| %>
+					<% @customers.order(:name).each do |customer| %>
 					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
 					<% end %>
 				</select>

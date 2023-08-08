@@ -35,7 +35,7 @@
       <option value="0">- Pilih Pelanggan -</option>
       <% Customer.active.order(:name).each do |customer| %>
       <option value="<%=customer.id%>"
-        <% if customer.id == @event.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase%></option>
+        <% if customer.id == @event.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase if customer.city.present?%></option>
       <% end %>
     </select>
   </div>
@@ -284,11 +284,13 @@
  		<%= f.label :volume, "Volume" %>
  		<%= f.text_field :volume, :placeholder => '20000' %>
 	</div>
-
-	<div class="field-row">
- 		<%= f.label :need_vendor, "Pakai Vendor" %>
- 		<%= f.check_box :need_vendor %>
-	</div>
+  
+  <% if @process == 'edit' && @event.need_vendor %>
+    <div class="field-row">
+      <%= f.label :need_vendor, "Pakai Vendor" %>
+      <%= f.check_box :need_vendor, disabled: true %>
+    </div>
+  <% end %>
   
   <div class="field-row first event-vendor" id="event-vendors" <%= @event.need_vendor == true ? "" : 'style="display: none;"'.html_safe %>>
     <h3>Data Vendor</h3>

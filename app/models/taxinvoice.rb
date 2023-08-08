@@ -7,6 +7,7 @@ class Taxinvoice < ActiveRecord::Base
 	belongs_to :bank
 
 	has_many :taxinvoiceitems
+	has_many :taxinvoiceitemvs
 	has_many :taxgenericitems
 	has_many :taxinvoices
 

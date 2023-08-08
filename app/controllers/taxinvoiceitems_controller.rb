@@ -20,7 +20,7 @@ class TaxinvoiceitemsController < ApplicationController
     @plat_type = params[:plat_type] || ''
     @spk_number = params[:spk_number] || ''
     general_where = "(invoices.by_vendor = true and deleted = false) or (invoices.id in (select invoice_id from receipts where deleted = false) and invoices.id not in(select invoice_id from invoicereturns where deleted = false))"
-    
+
     if !@invoice_id.blank?
       @invoices = Invoice.where('deleted = false and id = ? ', params[:invoice_id]).where(general_where)
       # @invoices = @invoices.where("id not in(?)",bkm_invoice_id.join(",")) if bkm_invoice_id.present?
@@ -28,8 +28,10 @@ class TaxinvoiceitemsController < ApplicationController
       @invoices = Invoice.where('deleted = false and spk_number = ?', params[:spk_number]).where(general_where)
     elsif !@plat_type.blank?
       @invoices = Invoice.joins(:vehicle).where('vehicles.plat_type = ?', @plat_type).where('invoices.deleted = false and invoices.date BETWEEN :startdate AND :enddate', {:startdate => @startdate.to_date, :enddate => @enddate.to_date} ).where(general_where)
+      @taxinvoiceitemvs = Taxinvoiceitemv.active.where("date BETWEEN ? AND ? AND vehicle_number = ?", @startdate.to_date, @enddate.to_date, @plat_type)
     else
       @invoices = Invoice.where('date BETWEEN :startdate AND :enddate and deleted = false', {:startdate => @startdate.to_date, :enddate => @enddate.to_date}).where(general_where)
+      @taxinvoiceitemvs = Taxinvoiceitemv.active.where("date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
       # @invoices = Invoice.where('date BETWEEN :startdate AND :enddate and deleted = false', {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
     end
 
@@ -77,6 +79,7 @@ class TaxinvoiceitemsController < ApplicationController
     # confirmed_invoice_id = Receipt.joins(:invoice).where(deleted: false).where("invoices.deleted = false and invoices.date between ? and ?", @startdate.to_date, @enddate.to_date).pluck(:invoice_id)
     # @invoices = @invoices.where("id in(#{confirmed_invoice_id.join(",")})") if confirmed_invoice_id.present?
     
+
     if checkroleonly 'Vendor Supir'
 
       @vendor = Vendor.where('user_id = ?', current_user.id)
@@ -86,7 +89,7 @@ class TaxinvoiceitemsController < ApplicationController
       end
 
     end
-    
+
     @invoices = @invoices.order(:id)
     # render json: confirmed_invoice_id
     # return false
@@ -111,15 +114,20 @@ class TaxinvoiceitemsController < ApplicationController
         @errors["invoice"] = "BKK No. '#{zeropad(@invoice_id)}' tidak terdaftar." 
       end
 
-      if Invoicereturn.where(deleted: false, invoice_id: @invoice.id).count > 0
-        redirect_to taxinvoiceitems_url(startdate: (@invoice.date.strftime("%d-%m-%Y") rescue nil), enddate: (@invoice.date.strftime("%d-%m-%Y") rescue nil)), notice: "BKK No. '#{zeropad(@invoice_id)}' sudah di BKM kan." 
-        return false
+      if !@invoice.by_vendor?
+
+        if Invoicereturn.where(deleted: false, invoice_id: @invoice.id).count > 0
+          redirect_to taxinvoiceitems_url(startdate: (@invoice.date.strftime("%d-%m-%Y") rescue nil), enddate: (@invoice.date.strftime("%d-%m-%Y") rescue nil)), notice: "BKK No. '#{zeropad(@invoice_id)}' sudah diBKM." 
+          return false
+        end
+        
+        if Receipt.where(deleted: false, invoice_id: @invoice.id).count == 0
+          redirect_to taxinvoiceitems_url(startdate: (@invoice.date.strftime("%d-%m-%Y") rescue nil), enddate: (@invoice.date.strftime("%d-%m-%Y") rescue nil)), notice: "BKK No. '#{zeropad(@invoice_id)}' Belum dikonfirmasi kasir." 
+          return false
+        end
+
       end
-      
-      if Receipt.where(deleted: false, invoice_id: @invoice.id).count == 0
-        redirect_to taxinvoiceitems_url(startdate: (@invoice.date.strftime("%d-%m-%Y") rescue nil), enddate: (@invoice.date.strftime("%d-%m-%Y") rescue nil)), notice: "BKK No. '#{zeropad(@invoice_id)}' Belum di konfirmasi kasir." 
-        return false
-      end
+
     end 
 
     if @errors.length == 0
@@ -370,8 +378,8 @@ class TaxinvoiceitemsController < ApplicationController
   def destroy
     Taxinvoiceitem.destroy(params[:id])
     redirect_to request.referer
-  end
-  
+  end 
+
   def rejected
     inputs = params[:taxinvoiceitems]
     # render json: inputs

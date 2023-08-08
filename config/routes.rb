@@ -372,14 +372,14 @@ OfficePuraErp::Application.routes.draw do
   get 'invoices/getvehicle/:vehicle_id' => 'invoices#get_vehicle'
   get 'invoices/getvehiclesbyofficeid/:office_id' => 'invoices#get_vehicles_by_office_id'
   get 'invoices/gettanktype/:cargotype' => 'invoices#get_tanktype'
-  
+
+  get 'events/estimate_tonage/:price_per_type' => 'events#getestimatedtonage'
+
   get 'invoices/get_trainroute/:operator_id' => 'invoices#get_trainroute'
   get 'invoices/get_trainroute2/:operator_id' => 'invoices#get_trainroute2'
   get 'invoices/get_shiproute/:operator_id' => 'invoices#get_shiproute'
   get 'invoices/get_shiproute2/:operator_id' => 'invoices#get_shiproute2'
   get 'invoices/getroutesonly/:customer_id' => 'invoices#get_routesonly'
-
-  get 'events/estimate_tonage/:price_per_type' => 'events#getestimatedtonage'
 
   get 'invoices/getroutes/:customer_id' => 'invoices#get_routes'
   get 'invoices/getroutesbyoffice/:office_id' => 'invoices#get_routesbyoffice'
@@ -494,8 +494,19 @@ OfficePuraErp::Application.routes.draw do
   get 'cashiers/getrequests(/:date)' => 'cashiers#getrequests'
   resources :cashiers
   
+  match 'events/add_dovendor' => 'events#indexadddovendor'
+  match 'events/add_dovendor/:event_id' => 'events#add_dovendor'
+  match 'events/getdovendor'
+  match 'events/getdovroutes/:customer_id' => 'events#getdovroutes'
+  match 'events/getdovvendors/:multimoda' => 'events#getdovvendors'
+  match 'events/getdovvendorroutes/:vendor_id' => 'events#getdovvendorroutes'
+  match 'events/transferdov' => 'events#transferdov'
   get 'events/getevents(/:type)' => 'events#getevents'
-  resources :events 
+  resources :events do
+    collection do
+      get 'getdovendor' => 'events#getdovendor'
+    end
+  end
 
   get 'bookings/getbookings(/:type)' => 'bookings#getbookings'
   get 'bookings/report-bookings' => 'bookings#report_bookings'
@@ -708,14 +719,15 @@ OfficePuraErp::Application.routes.draw do
     get 'api/report/annualvehicle' => 'reportsapi#annualvehicle'
     get 'api/report/get_today_invoice' => 'reportsapi#get_today_invoice'
     get 'api/report/vehicledetails' => 'reportsapi#vehicle_details'
-
+    
     get 'api/customer/customerroutes' => 'reportsapi#customer_routes'
-  
+
     get 'taxinvoiceitems/downloadexcel/:id', to: 'taxinvoiceitems#downloadexcel'
 
-    get 'report-events' => 'events#report_events'
+    get 'report-events' => 'events#report_events' 
     get 'report-dp-events' => 'events#report_dpevents'
-    get 'report-events-summary' => 'events#event_summary' 
+    get 'report-events-summary' => 'events#event_summary'
+
     get 'report-invoices-summary' => 'invoices#invoice_summary'
 
     get 'api/login' => 'auth#login'
@@ -727,6 +739,7 @@ OfficePuraErp::Application.routes.draw do
     post 'api/attachments/uploadtaxinvoice' => 'attachmentapi#uploadTaxInv'
     post 'api/attachments/remove/:id' => 'attachmentapi#remove'
     
+    post 'taxinvoiceitemvs/api/post-taxinvoiceitemv' => 'taxinvoiceitemv#postapi_taxinvoiceitemv'
     post 'api/taxinvoiceitems/create' => 'taxinvoiceitemapi#updateitems' 
     get 'api/taxinvoiceitems/detail/:id' => 'taxinvoiceitemapi#detail'
     
