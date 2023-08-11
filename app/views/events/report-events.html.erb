@@ -148,18 +148,17 @@
 					color = "3a87ad"
 	 
 				end
-
-				if event.need_vendor
-					completed_by_vendor = true
-					status = "Vendor"
-					color = "009688"
-				end
 			end
 
+			if event.need_vendor
+				completed_by_vendor = true
+				status = "Vendor"
+				color = "009688"
+			end
         %>
 
 			<tr class="">
-				<td><%= event.id %></td>
+				<td><%= event.id %> <%= event.need_vendor %></td>
 				<td><%= event.start_date %></td>
 				<td><%= event.customer.name %></td>
 				<td><%= event.summary %></td>
