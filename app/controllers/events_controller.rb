@@ -589,6 +589,9 @@ class EventsController < ApplicationController
     @date = params[:date]
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
     @events = Event.where("created_at::DATE = ? AND deleted=FALSE AND need_vendor=FALSE", @date.to_date)
+    if params[:event_id].present?
+      @events = Event.where(id: params[:event_id], need_vendor: false)
+    end
     # render json: @events.to_sql
     # return false
 
