@@ -1861,6 +1861,16 @@ class InvoicesController < ApplicationController
 
   end
 
+  def cancelmarketing
+    @invoice = Invoice.find(params[:id])
+    
+    @invoice.kosongan_confirmed = false
+    @invoice.kosongan_confirmed_by = nil
+    @invoice.save
+
+    redirect_to(request.referer, :notice => "Konfirmasi Marketing Untuk BKK <br /><strong class='yellow'>#{@invoice.id}</strong> sudah dibatalkan.".html_safe)
+  end  
+
 end
       
 def fetch_excel

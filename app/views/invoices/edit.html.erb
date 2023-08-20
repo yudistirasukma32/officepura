@@ -7,8 +7,16 @@
 <div id="main">
 
 	<div id="content-full">
-		<a class="btn-txt cancel" href="<%=invoices_path%>"><i class="icon-remove"></i> Batal</a>
-
+		<% if params[:train] || params[:train] == true %>
+			<a class="btn-txt cancel" href="<%=invoices_indexinvoicetrain_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>"><i class="icon-remove"></i> Batal</a>
+		<% else %>
+			<% if params[:kosongan] || params[:kosongan] == true %>
+				<a class="btn-txt cancel" href="<%=invoices_kosongan_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>"><i class="icon-remove"></i> Batal</a>
+			<% else %>
+				<a class="btn-txt cancel" href="<%=invoices_path%>"><i class="icon-remove"></i> Batal</a>
+			<% end %>
+		<% end %>
+		
 		<h1>Transaksi / <a href="<%=invoices_path%>">Bukti Kas Keluar</a> / Edit</h1>
 
 		<br class="clearfix" />

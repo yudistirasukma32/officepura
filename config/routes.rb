@@ -286,6 +286,7 @@ OfficePuraErp::Application.routes.draw do
       get 'step2'
       get 'confirmation'
       get 'printversion'
+      get 'cancelmarketing'
     end
 
     collection do

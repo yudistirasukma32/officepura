@@ -29,7 +29,11 @@
 		<%  if params[:train] || params[:train] == true %>
 			<a class="btn-txt cancel" href="indexinvoicetrain"><i class="icon-remove"></i> Batal</a>
 		<% else %>
-			<a class="btn-txt cancel" href="<%=invoices_path%>"><i class="icon-remove"></i> Batal</a>
+			<%  if params[:kosongan] || params[:kosongan] == true %>
+				<a class="btn-txt cancel" href="<%=invoices_kosongan_path%>"><i class="icon-remove"></i> Batal</a>
+			<% else %>
+				<a class="btn-txt cancel" href="<%=invoices_path%>"><i class="icon-remove"></i> Batal</a>
+			<% end %>
 		<% end %>
 
 		<h1>Transaksi / <a href="<%=invoices_path%>">Bukti Kas Keluar <%=title%></a> / Tambah</h1>

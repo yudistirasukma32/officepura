@@ -120,10 +120,10 @@
   <% else %>
 
       <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
-        <%= f.radio_button :cargo_type, "padat", :checked => true  %> Padat
+        <%= f.radio_button :cargo_type, "padat", :checked => @invoice_ori.cargo_type == "padat" ? true : false, :disabled => @invoice_ori.cargo_type == "cair" ? true : false %> Padat
       <% end %>
       <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
-        <%= f.radio_button :cargo_type, "cair" %> Cair
+        <%= f.radio_button :cargo_type, "cair", :checked => @invoice_ori.cargo_type == "cair" ? true : false, :disabled => @invoice_ori.cargo_type == "padat" ? true : false %> Cair
       <% end %>
 
   <% end %>
@@ -139,11 +139,10 @@
 
 <% else %>
 
-<div id="div_tanktype">
-  <div class="field-row">
-    <%= f.label :tanktype, "Tipe Tangki"  %>
-    <input type="text" class="double disabled" value="<%= !@invoice.tanktype.nil? ? @invoice.tanktype : 'Harap memilih Tipe Kargo terlebih dahulu.' %>" />
-  </div>
+<div class="field-row">
+  <%= f.label :tanktype, "Tipe Tangki"  %>
+  <input type="text" class="double disabled" value="<%= !@invoice_ori.tanktype.nil? ? @invoice_ori.tanktype : 'Harap memilih Tipe Kargo terlebih dahulu.' %>" />
+  <%= f.hidden_field :tanktype, :value => @invoice_ori.tanktype %>
 </div>
 
 <% end %>
@@ -167,13 +166,29 @@
     <%= f.label :customer_id, "Pelanggan" %>
 
     <% if @iseditable or current_user.owner %>
-    <select id="invoice_customer_id" name="invoice[customer_id]" class="double combo_route chzn-select" onchange="javascript:getRoutes(this.value);">
-      <option value="0">- Pelanggan -</option>
-      <% @customers.each do |customer| %>
-      <option value="<%=customer.id%>"
-        <% if customer.id == @invoice.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase%></option>
-      <% end %>
-    </select>
+
+     <% if active_node == "edit" %>
+
+      <select id="invoice_customer_id" name="invoice[customer_id]" class="double combo_route chzn-select" onchange="javascript:getRoutes(this.value);">
+        <option value="0">- Pelanggan -</option>
+        <% @customers.each do |customer| %>
+        <option value="<%=customer.id%>"
+          <% if customer.id == @invoice.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase%></option>
+        <% end %>
+      </select>
+
+    <% else %>
+
+      <select id="invoice_customer_id" name="invoice[customer_id]" class="double combo_route chzn-select" onchange="javascript:getRoutes(this.value);">
+        <option value="0">- Pelanggan -</option>
+        <% @customers.each do |customer| %>
+        <option value="<%=customer.id%>"
+          <% if customer.id == @invoice_ori.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase%></option>
+        <% end %>
+      </select>
+
+    <% end %>
+
     <% else %>
       <input type="text" class="double disabled" value="<%=@invoice.customer.name%>" />
       <%= f.hidden_field :customer_id, :value => @invoice.customer_id %>
@@ -187,17 +202,45 @@
   <div id="div_events">
     <div class="field-row">
       <%= f.label :event_id, "DO Kalender Event" %>
+      <% if active_node == "edit" %>
+
       <input type="text" class="double disabled" value="<%= !@invoice.event.nil? ? "#"+@invoice.event.id.to_s+" "+@invoice.event.summary+" ("+@invoice.event.start_date.strftime('%d-%m-%y')+")" : 'Harap memilih pelanggan terlebih dahulu.' %>" />
       <%= f.hidden_field :event_id, :value => @invoice.event_id %>
+
+      <% else %>
+
+      <input type="text" class="double disabled" value="<%= !@invoice_ori.event.nil? ? "#"+@invoice_ori.event.id.to_s+" "+@invoice_ori.event.summary+" ("+@invoice_ori.event.start_date.strftime('%d-%m-%y')+")" : 'Harap memilih pelanggan terlebih dahulu.' %>" />
+      <%= f.hidden_field :event_id, :value => @invoice_ori.event_id %>
+
+      <% end %>
     </div>
   </div>
   
   <div id="div_routes">
+
+    <% if active_node == "edit" %>
     <div class="field-row">
       <%= f.label :route_id, "Jurusan" %>
       <input type="text" class="double disabled" value="<%= !@invoice.route.nil? ? @invoice.route.name : 'Harap memilih pelanggan terlebih dahulu.' %>" />
       <%= f.hidden_field :route_id, :value => @invoice.route_id %>
     </div>
+
+    <% else %>
+
+    <div class="field-row">
+      <label for="route_id">Jurusan</label>
+      <select id="invoice_route_id" name="invoice[route_id]" class="chzn-select double combo_route" onchange="javascript:getAllowances();">
+        <option value="0">- Pilih Jurusan -</option>
+        <% @routes = Route.active.where('customer_id = ?', @invoice_ori.customer_id).order(:name)%>
+        <% @routes.each do |route| %>
+        <option value="<%=route.id%>"><%=route.name%> (<%=route.routegroup.name%>)</option>
+        <% end %>
+      </select>
+      <small>*Jurusan yang ditampilkan diatas berdasarkan Pilihan Kantor.</small>
+    </div>
+
+    <% end %>
+
   </div>
 
   <div class="field-row">
@@ -283,15 +326,24 @@
     <span>(Uang Pertanggungan)</span>
   </div>  
 
+  <div id="div_ship" style="display: block;">
+    <div class="field-row">
+      <%= f.label :ship_id, "Nama Kapal" %>
+
+      <select id="invoice_ship_id" name="invoice[ship_id]" class="double chzn-select">
+      <option value="0">- Pilih Kapal -</option>
+      <% Ship.active.order(:name).each do |ship| %>
+      <option value="<%=ship.id%>"
+        <% if ship.id == @invoice.ship_id %> selected="selected"<% end %>><%=ship.name%></option>
+      <% end %>
+      </select>
+    </div>
+  </div>
+
   <div class="field-row">
     <%= f.label :spk_number, "Nomor SPK" %>
     <%= f.text_field :spk_number %>
-  </div>
-  
-  <div class="field-row">
-    <%= f.label :ship_name, "Nama Kapal" %>
-    <%= f.text_field :ship_name %>
-  </div>  
+  </div> 
   
   <div class="field-row">
     <%= f.label :description, "Keterangan" %>

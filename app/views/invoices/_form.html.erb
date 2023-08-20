@@ -389,7 +389,17 @@
     <% if @invoice.receipts.active.count == 0 %>
     <%= f.submit "Lanjut ke Potongan Solar", :id => 'invoice_submit', :class => 'left' %>
     <% end %>
-    <a class="back left" href="<%=invoices_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
+
+    <% if params[:train] || params[:train] == true %>
+      <a class="back left" href="<%=invoices_indexinvoicetrain_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index Kereta</a>
+    <% else %>
+      <% if params[:kosongan] || params[:kosongan] == true %>
+        <a class="back left" href="<%=invoices_kosongan_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index Kosongan</a>
+      <% else %>
+        <a class="back left" href="<%=invoices_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
+      <% end %>
+    <% end %>
+    
   </div>
 
 <% end %>

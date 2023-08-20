@@ -138,12 +138,13 @@
 				<th width="150">ISO/KONTAINER</th>
 				<th width="50">User</th>
 				<th width="160">Status</th>
+				<th width="70">Confirmed</th>
 				<th width="90" class="right">Total</th>
 				<th width="100"></th>
 			</tr>
 
 			<tr class="subheading">
-				<th colspan="7" style="color:#000;">BKK Kosongan Non-Produktif <span style="color:green;">Terkonfirmasi</span> <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%=@approved_invoices.count%>)</span></th>
+				<th colspan="8" style="color:#000;">BKK Kosongan Non-Produktif <span style="color:green;">Terkonfirmasi</span> <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%=@approved_invoices.count%>)</span></th>
 				<th class="right" style="padding: 5px 10px 5px 0; color: #010101;"><%=to_currency(@approved_invoices.sum('total'))%></th>
 			</tr>
 
@@ -206,11 +207,17 @@
 					<% end %>
 				<% end %>
 				</td>
+				<td width="50"><%= invoice.kosongan_confirmed_by.blank? ? '' : User.find(invoice.kosongan_confirmed_by).username %></td>
 				<td align="right">        
                     <%=to_currency(invoice.total)%>
                 </td>
                 <td class="right" width="150">
 					<a href="/invoices/<%=invoice.id%>/confirmation?kosongan=true" class="cta" title="Lihat BKK Kosongan" style="background: grey;">lihat</a>&nbsp;&nbsp;
+
+					<% if invoice.receipts.active.count == 0 %>
+						<a class="tipsy delete" title="Batal Konfirmasi" href="<%=cancelmarketing_invoice_url(invoice.id)%>"><i class="icon-ban"></i></a>
+					<% end %>
+
 				</td>
 			</tr>
 
