@@ -60,6 +60,8 @@ class TaxinvoicesController < ApplicationController
   end
 
   def new
+    @section = "taxinvoices"
+    @where = "taxinvoices"
     @errors = Hash.new
     @taxinvoice = Taxinvoice.new
     @taxinvoice.date = Date.today.strftime('%d-%m-%Y')
@@ -116,6 +118,8 @@ class TaxinvoicesController < ApplicationController
   end
 
   def edit
+    @section = "taxinvoices"
+    @where = "taxinvoices"
     @errors = Hash.new
     @taxinvoice = Taxinvoice.find(params[:id])
     # render json: @taxinvoice

@@ -27,6 +27,8 @@ class TaxgenericinvoicesController < ApplicationController
   end
 
   def new
+    @section = "taxinvoices"
+    @where = "taxinvoices"
     @taxinvoice = Taxinvoice.find(params[:id]) rescue nil
 
     if @taxinvoice.nil?
