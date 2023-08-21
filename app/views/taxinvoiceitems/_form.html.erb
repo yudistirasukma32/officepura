@@ -339,7 +339,7 @@
 
 	<tr id="<%=taxinvoiceitem.id%>">
 		<td><%=i+1%>.</td>
-    <td><input type="text" name="taxinvoiceitems[date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+    <td><input required type="text" name="taxinvoiceitems[date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
 		<td><input type="text" name="taxinvoiceitems[sku_id_<%=taxinvoiceitem.id%>]" style="width:120px;" class="<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.sku_id%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
     <td>
       <%

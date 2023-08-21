@@ -203,7 +203,7 @@ class TaxinvoicesController < ApplicationController
         @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date)
         @taxinvoiceitemvs = @customer.taxinvoiceitemvs.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date)
         @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
-        @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / ' + Date.today.year.to_s 
+        @long_id = ("%04d" % @long_id.to_s) + ' / TGH / RDPI / ' + romenumber + ' / ' + Date.today.year.to_s 
         @taxinvoice = Taxinvoice.new
         @taxinvoice.long_id = params[:long_id]
       end
@@ -257,9 +257,11 @@ class TaxinvoicesController < ApplicationController
         @taxinvoice.taxinvoiceitems.each do |taxinvoiceitem|
           if params["cb_" + taxinvoiceitem.id.to_s] == 'on'
             taxinvoiceitem.total = taxinvoiceitem.wholesale_price
-            taxinvoiceitem.date = params["date_" + taxinvoiceitem.id.to_s] if !params["date_" + taxinvoiceitem.id.to_s].blank?
-            taxinvoiceitem.sku_id = params["sku_" + taxinvoiceitem.id.to_s] if !params["sku_" + taxinvoiceitem.id.to_s].blank?
-            taxinvoiceitem.weight_gross = params["gross_" + taxinvoiceitem.id.to_s] if !params["gross_" + taxinvoiceitem.id.to_s].blank?
+
+            #update, unused if !params["date_" + taxinvoiceitem.id.to_s].blank?
+            taxinvoiceitem.date = params["date_" + taxinvoiceitem.id.to_s]
+            taxinvoiceitem.sku_id = params["sku_" + taxinvoiceitem.id.to_s]
+            taxinvoiceitem.weight_gross = params["gross_" + taxinvoiceitem.id.to_s]
 
             if params["qty_" + taxinvoiceitem.id.to_s].to_i > 0
               taxinvoiceitem.weight_net = params["qty_" + taxinvoiceitem.id.to_s]
@@ -474,7 +476,7 @@ class TaxinvoicesController < ApplicationController
 
   def gettaxinvoiceitems
     @customer = Customer.find(params[:customer_id]) rescue nil
-    @taxinvoiceitems = Taxinvoiceitem.where(:customer_id => params[:customer_id], :taxinvoice_id => nil).where("date > current_date - interval '1 year'").order(:date)
+    @taxinvoiceitems = Taxinvoiceitem.where(:customer_id => params[:customer_id], :taxinvoice_id => nil).where("date > current_date - interval '2 year'").order(:date)
 
     if params[:is_wholesale] == 'true'
       @taxinvoiceitems.each do |item|

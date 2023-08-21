@@ -15,4 +15,6 @@ class Taxinvoiceitem < ActiveRecord::Base
 
   	scope :active, lambda {where(:deleted => false)}
 
+	# validates :date, presence: true
+
 end
