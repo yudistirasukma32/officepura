@@ -261,11 +261,9 @@ class TaxinvoicesController < ApplicationController
         @taxinvoice.taxinvoiceitems.each do |taxinvoiceitem|
           if params["cb_" + taxinvoiceitem.id.to_s] == 'on'
             taxinvoiceitem.total = taxinvoiceitem.wholesale_price
-
-            #update, unused if !params["date_" + taxinvoiceitem.id.to_s].blank?
-            taxinvoiceitem.date = params["date_" + taxinvoiceitem.id.to_s]
-            taxinvoiceitem.sku_id = params["sku_" + taxinvoiceitem.id.to_s]
-            taxinvoiceitem.weight_gross = params["gross_" + taxinvoiceitem.id.to_s]
+            taxinvoiceitem.date = params["date_" + taxinvoiceitem.id.to_s] if !params["date_" + taxinvoiceitem.id.to_s].blank?
+            taxinvoiceitem.sku_id = params["sku_" + taxinvoiceitem.id.to_s] if !params["sku_" + taxinvoiceitem.id.to_s].blank?
+            taxinvoiceitem.weight_gross = params["gross_" + taxinvoiceitem.id.to_s] if !params["gross_" + taxinvoiceitem.id.to_s].blank?
 
             if params["qty_" + taxinvoiceitem.id.to_s].to_i > 0
               taxinvoiceitem.weight_net = params["qty_" + taxinvoiceitem.id.to_s]
