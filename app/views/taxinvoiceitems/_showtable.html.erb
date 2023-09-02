@@ -172,7 +172,7 @@
     <% end %>
 <% end %>
 
-<% if @taxinvoiceitemvs.any? %>
+<% if (@taxinvoiceitemvs.any? rescue false) %>
 
     <% @taxinvoiceitemvs.each do |itemv| %>
         <% qty = itemv.weight_gross %>
