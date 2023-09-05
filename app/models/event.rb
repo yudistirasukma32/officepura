@@ -24,7 +24,7 @@ class Event < ActiveRecord::Base
     :qty, :invoicetrain, :cargo_number, :cargo_type, :volume, :office_id, :pos_sby, :pos_smg, :pos_jkt, :pos_smt, :pos_lorry, 
     :vendor_name, :long_id, :station_id, :route_summary, :need_vendor, :user_id, :commodity_id, :route_id, :truck_quantity,
     :company_id, :estimated_tonage, :tanktype, :load_date, :unload_date, :routetrain_id, :operator_id, 
-    :downpayment_amount, :downpayment_date, :losing, :price_per_type
+    :downpayment_amount, :downpayment_date, :losing, :price_per_type, :invoiceship
 
     scope :active, lambda {where(:deleted => false)}  
 

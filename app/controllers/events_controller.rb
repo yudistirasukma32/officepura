@@ -98,6 +98,7 @@ class EventsController < ApplicationController
       
       inputs[:invoicetrain] = false
       inputs[:losing] = true
+      inputs[:invoiceship] = false
 
     end
 
@@ -105,8 +106,16 @@ class EventsController < ApplicationController
 
       inputs[:invoicetrain] = false
       inputs[:losing] = false
+      inputs[:invoiceship] = false
     
     end 
+
+    if inputs[:invoicetrain] == 'roro'
+
+      inputs[:invoicetrain] = false
+      inputs[:invoiceship] = true
+
+    end
 
     @event = Event.new(inputs)
 
@@ -165,6 +174,14 @@ class EventsController < ApplicationController
       inputs[:operator_id] = 0
       inputs[:routetrain_id] = 0
       inputs[:station_id] = 0
+      inputs[:invoiceship] = false
+
+    end
+
+    if inputs[:invoicetrain] == 'roro'
+
+      inputs[:invoicetrain] = false
+      inputs[:invoiceship] = true
 
     end
 

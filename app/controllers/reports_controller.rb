@@ -3002,10 +3002,16 @@ end
       end
 
       if @transporttype.present? and @transporttype != 'all'
-        if @transporttype == 'KERETA'
-          @eventsa = @eventsa.where('invoicetrain = true')
+        if @transporttype == 'RORO'
+          @eventsa = @eventsa.where('invoiceship = true')
+        elsif @transporttype == 'LOSING'
+          @eventsa = @eventsa.where('losing = true')
         else
-          @eventsa = @eventsa.where('invoicetrain = false')
+          if @transporttype == 'KERETA'
+            @eventsa = @eventsa.where('invoicetrain = true')
+          else
+            @eventsa = @eventsa.where('invoicetrain = false')
+          end
         end
       end
 
@@ -3082,6 +3088,7 @@ end
           route_name: (route.name rescue "Kosong"),
           route_price: (route.price_per rescue "Kosong"),
           route_id: event.route_id,
+          tanktype: event.tanktype,
           office: (event.office.abbr rescue "Kosong"),
           supir: supir,
           kernet: kernet,

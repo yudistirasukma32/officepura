@@ -45,21 +45,27 @@
       <%= f.text_field :summary, :placeholder => 'Berita Acara' %>
   </div>
 
-  <div class="field-row">
+<div class="field-row">
     <%= f.label :invoicetrain, "Multimoda" %>
     <% if active_node == "edit" %>
         <%= f.label :invoicetrain, :value => "false", :class => 'checkbox', :style => 'width: 150px;' do %>
-          <%= f.radio_button :invoicetrain, false, :checked => (@event.invoicetrain == false ? true : false), class: "moda-standart" %> Industri/Distribusi
+          <%= f.radio_button :invoicetrain, false, :checked => (@event.invoiceship == true ? false : @event.invoicetrain == false ? true : false), class: "moda-standart" %> Industri/Distribusi
         <% end %>
         <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
           <%= f.radio_button :invoicetrain, true, :checked => (@event.invoicetrain == true ? true : false),  class: "moda-kereta" %> Kereta
         <% end %>
+        <%= f.label :invoicetrain, :value => "roro", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, 'roro', :checked => (@event.invoicetrain == true ? false : @event.invoiceship == true ? true : false),  class: "moda-roro" %> Roro
+        <% end %>
     <% else %>
         <%= f.label :invoicetrain, :value => "false", :class => 'checkbox', :style => 'width: 150px;' do %>
-          <%= f.radio_button :invoicetrain, false, :checked => true, class: "moda-standart"  %> Industri/Distribusi
+          <%= f.radio_button :invoicetrain, false, :checked => true, class: "moda-standart" %> Industri/Distribusi
         <% end %>
         <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
           <%= f.radio_button :invoicetrain, true, class: "moda-kereta" %> Kereta
+        <% end %>
+        <%= f.label :invoicetrain, :value => "roro", :class => 'checkbox' do %>
+          <%= f.radio_button :invoicetrain, 'roro', class: "moda-roro" %> Roro
         <% end %>
     <% end %>
   </div>
