@@ -477,12 +477,18 @@ class TaxinvoicesController < ApplicationController
   def gettaxinvoiceitems
     @customer = Customer.find(params[:customer_id]) rescue nil
     @taxinvoiceitems = Taxinvoiceitem.where(:customer_id => params[:customer_id], :taxinvoice_id => nil).where("date > current_date - interval '2 year'").order(:date)
+    @taxinvoiceitemvs = Taxinvoiceitemv.where(:customer_id => params[:customer_id], :taxinvoice_id => nil).where("date > current_date - interval '2 year'").order(:date)
 
     if params[:is_wholesale] == 'true'
       @taxinvoiceitems.each do |item|
         item.wholesale_price = @customer.wholesale_price
         item.total = @customer.wholesale_price
         item.is_wholesale = true
+      end
+      @taxinvoiceitemvs.each do |itemv|
+        itemv.wholesale_price = @customer.wholesale_price
+        itemv.total = @customer.wholesale_price
+        itemv.is_wholesale = true
       end
     end
     render :json => {:success => true, :html => render_to_string(:partial => "taxinvoices/additionalitem"), :layout => false}.to_json; 
