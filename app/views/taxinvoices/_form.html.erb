@@ -352,6 +352,7 @@
       <th width="85">Tanggal</th>
       <th width="70">No. Pol</th>
       <th width="110">Surat Jalan</th>
+      <th width="40">No.DO</th>
       <th>Jurusan</th>
       <th width="30" class="right">Muat (Kg)</th>
       <th width="30" class="right">Bkr (Kg)</th>
@@ -393,6 +394,7 @@
       <td>
         <input type="text" id ="sku_<%=taxinvoiceitem.id%>" name="sku_<%=taxinvoiceitem.id%>" class="half" value="<%=taxinvoiceitem.sku_id%>" />
       </td>
+      <td><%=taxinvoiceitem.invoice.event_id rescue nil%></td>
       <td>
 
       <%
@@ -441,6 +443,7 @@
         <th width="85">Tanggal</th>
         <th width="70">No. Pol</th>
         <th width="110">Surat Jalan</th>
+        <th width="40">No.DO</th>
         <th>Jurusan</th>
         <th width="30" class="right">Muat (Kg)</th>
         <th width="30" class="right">Bkr (Kg)</th>
@@ -464,6 +467,7 @@
           <td>
             <input type="text" id ="vendorsku_<%=taxinvoiceitemv.id%>" name="vendorsku_<%=taxinvoiceitemv.id%>" class="half" value="<%=taxinvoiceitemv.sku_id%>" />
           </td>
+          <td><%=taxinvoiceitemv.event.id rescue nil%></td>
           <td>
             <% if taxinvoiceitemv.event %>
               <%=taxinvoiceitemv.event.summary%><br/> 
@@ -487,7 +491,7 @@
   <% end %>
 
   <tr id="-1">
-    <td colspan="5"></td>
+    <td colspan="6"></td>
     <td align="right">SUBTOTAL</td>
     <td align="right"><span id="lbl_grosstotal"><%=@taxinvoiceitems.where("taxinvoice_id IS NOT NULL").sum(:weight_gross)%></span></td>
     <td align="right"><span id="lbl_qtytotal"><%=@taxinvoiceitems.where("taxinvoice_id IS NOT NULL").sum(:weight_net)%></span></td>
@@ -496,7 +500,7 @@
   </tr>
 
   <tr id="-2">
-    <td colspan="5"></td>
+    <td colspan="6"></td>
     <td align="right">Biaya Tambahan</td>
     <td align="right">&nbsp;</td>
      <td align="right">&nbsp;</td>
@@ -504,7 +508,7 @@
   </tr>
 
   <tr id="-3">
-    <td colspan="5"></td>
+    <td colspan="6"></td>
     <td align="right">Potongan Asuransi</td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
@@ -512,7 +516,7 @@
   </tr>
 
   <tr id="-3">
-    <td colspan="5"></td>
+    <td colspan="6"></td>
     <td align="right">Potongan Klem Susut</td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
@@ -520,7 +524,7 @@
   </tr>
   
   <tr id="ppn-row" style="<%= taxinvoice_ppn == 0 ? "display: none;".html_safe : "" %>">
-    <td colspan="5"></td>
+    <td colspan="6"></td>
     <td align="right">PPN <span id="ppn_amount"><%= taxinvoice_ppn - taxinvoice_ppn.to_i > 0 ? taxinvoice_ppn.to_f : taxinvoice_ppn.to_i %></span>%</td>
     <td align="right">&nbsp;</td>
      <td align="right">&nbsp;</td>
@@ -528,7 +532,7 @@
   </tr>
 
   <tr id="-4">
-    <td colspan="5"></td>
+    <td colspan="6"></td>
     <td align="right">PPH 2%</td>
     <td align="right">&nbsp;</td>
      <td align="right">&nbsp;</td>
@@ -536,7 +540,7 @@
   </tr>
 
   <tr id="-5" class="footer">
-    <td colspan="5"></td>
+    <td colspan="6"></td>
     <td align="right" class="total">TOTAL</td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
