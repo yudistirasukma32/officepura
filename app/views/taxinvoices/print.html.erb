@@ -162,46 +162,67 @@
 		  <% weight_net = 0 %>
 		  <% if !@taxinvoice.generic %>
 			  <% @taxinvoice.taxinvoiceitems.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
-			  <% subtotal += taxinvoiceitem.total %>
-			  <% weight_gross += taxinvoiceitem.weight_gross %>
-			  <% weight_net += taxinvoiceitem.weight_net %>
-			  <tr>
-			    <td><%=i+1%>.</td>
-			    <td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
-                <td>
-				<% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
-					<strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
-				<% else %>
-					<%=taxinvoiceitem.invoice.vehicle.current_id rescue nil%>
-				<% end %>
-                    <span style="display: none;"><% if taxinvoiceitem.invoice.invoicetrain %>,<% if taxinvoiceitem.invoice.invoices.first %> <%= taxinvoiceitem.invoice.invoices.first.vehicle.current_id %> <% end %> <% end %></span>
-                </td>
-			    <td>
-			    	<% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
-			    <td align="right">
-			    	<% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxinvoiceitem.weight_gross)%> <% end %> </td>
-			    </td>
-			    <td align="right"><%=to_currency(taxinvoiceitem.weight_net)%></td>
-			    <% if @taxinvoice.is_weightlost %>
-			    <td align="right"><%= taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross%></td>
-			    <% end %>
-			    <td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
-			    <td colspan="2" style="text-align:left">
-				<% if taxinvoiceitem.invoice.event %>
-					<%=taxinvoiceitem.invoice.event.summary%> 
-				<% else %>
-			
-					<%=taxinvoiceitem.invoice.route.name%><br>
-						<% if taxinvoiceitem.invoice.invoicetrain %>
-							<% if taxinvoiceitem.invoice.invoices.first %>
-								<%= taxinvoiceitem.invoice.invoices.first.route.name %> 
-							<% end %>
+				<% subtotal += taxinvoiceitem.total %>
+				<% weight_gross += taxinvoiceitem.weight_gross %>
+				<% weight_net += taxinvoiceitem.weight_net %>
+				<tr>
+					<td><%=i+1%>.</td>
+					<td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
+					<td>
+					<% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
+						<strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+					<% else %>
+						<%=taxinvoiceitem.invoice.vehicle.current_id rescue nil%>
 					<% end %>
-			
-				<% end %>
-				</td>
-			    <td align="right"><%= to_currency(taxinvoiceitem.total)%>  </td>
-			  </tr>
+						<span style="display: none;"><% if taxinvoiceitem.invoice.invoicetrain %>,<% if taxinvoiceitem.invoice.invoices.first %> <%= taxinvoiceitem.invoice.invoices.first.vehicle.current_id %> <% end %> <% end %></span>
+					</td>
+					<td>
+						<% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
+					<td align="right">
+						<% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxinvoiceitem.weight_gross)%> <% end %> </td>
+					</td>
+					<td align="right"><%=to_currency(taxinvoiceitem.weight_net)%></td>
+					<% if @taxinvoice.is_weightlost %>
+					<td align="right"><%= taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross%></td>
+					<% end %>
+					<td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
+					<td colspan="2" style="text-align:left">
+					<% if taxinvoiceitem.invoice.event %>
+						<%=taxinvoiceitem.invoice.event.summary%> 
+					<% else %>
+				
+						<%=taxinvoiceitem.invoice.route.name%><br>
+							<% if taxinvoiceitem.invoice.invoicetrain %>
+								<% if taxinvoiceitem.invoice.invoices.first %>
+									<%= taxinvoiceitem.invoice.invoices.first.route.name %> 
+								<% end %>
+						<% end %>
+				
+					<% end %>
+					</td>
+					<td align="right"><%= to_currency(taxinvoiceitem.total)%>  </td>
+				</tr>
+			 <% end %>
+			 <% @taxinvoice.taxinvoiceitemvs.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
+				<% subtotal += taxinvoiceitem.total %>
+				<% weight_gross += taxinvoiceitem.weight_gross %>
+				<% weight_net += taxinvoiceitem.weight_net %>
+				<tr>
+					<td><%=i+1%>.</td>
+					<td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
+					<td><%= taxinvoiceitem.vehicle_number rescue nil %></td>
+					<td><% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
+					<td align="right">
+						<% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxinvoiceitem.weight_gross)%> <% end %> </td>
+					</td>
+					<td align="right"><%=to_currency(taxinvoiceitem.weight_net)%></td>
+					<% if @taxinvoice.is_weightlost %>
+					<td align="right"><%= taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross%></td>
+					<% end %>
+					<td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
+					<td colspan="2" style="text-align:left"><%=taxinvoiceitem.event.summary rescue nil%></td>
+					<td align="right"><%= to_currency(taxinvoiceitem.total)%>  </td>
+				</tr>
 			 <% end %>
 		  <% else %>
 		  	 <% @taxinvoice.taxgenericitems.active.order(:date, :sku_id).each_with_index do |taxgenericitem, i| %>

@@ -90,7 +90,7 @@
 
 
 		<% 
-			if @taxinvoice.bank_id.present?
+			if @taxinvoice.bank_id.present? && @taxinvoice.bank_id != 0
 			
 				bank_name = @taxinvoice.bank.name
 				bank_account_name = @taxinvoice.bank.bank_account_name
