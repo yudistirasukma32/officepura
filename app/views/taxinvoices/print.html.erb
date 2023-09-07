@@ -160,13 +160,14 @@
 		  <% subtotal = 0 %>
 		  <% weight_gross = 0 %>
 		  <% weight_net = 0 %>
+		  <% sort = 0 %>
 		  <% if !@taxinvoice.generic %>
 			  <% @taxinvoice.taxinvoiceitems.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
 				<% subtotal += taxinvoiceitem.total %>
 				<% weight_gross += taxinvoiceitem.weight_gross %>
 				<% weight_net += taxinvoiceitem.weight_net %>
 				<tr>
-					<td><%=i+1%>.</td>
+					<td><%= sort+=1 %>.</td>
 					<td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
 					<td>
 					<% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
@@ -208,7 +209,7 @@
 				<% weight_gross += taxinvoiceitem.weight_gross %>
 				<% weight_net += taxinvoiceitem.weight_net %>
 				<tr>
-					<td><%=i+1%>.</td>
+					<td><%= sort+=1 %>.</td>
 					<td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
 					<td><%= taxinvoiceitem.vehicle_number rescue nil %></td>
 					<td><% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
