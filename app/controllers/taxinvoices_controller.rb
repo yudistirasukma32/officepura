@@ -551,6 +551,12 @@ class TaxinvoicesController < ApplicationController
       taxinvoiceitem.taxinvoice_id = nil
       taxinvoiceitem.save
     end
+
+    @taxinvoice.taxinvoiceitemvs.each do |taxinvoiceitemv|
+      taxinvoiceitemv.taxinvoice_id = nil
+      taxinvoiceitemv.save
+    end
+
     @taxinvoice.deleted = true
     @taxinvoice.save
 
