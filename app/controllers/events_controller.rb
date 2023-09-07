@@ -271,7 +271,7 @@ class EventsController < ApplicationController
         
         if is_train == "0"
 
-          @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval '1' day AND current_date + interval '2' day AND invoicetrain = false", params[:customer_id]).order(:start_date)
+          @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval '9' day AND current_date + interval '4' day AND invoicetrain = false", params[:customer_id]).order(:start_date)
           if current_user.office_id.present? && !current_user.owner
             @events = @events.where("office_id = ?", current_user.office_id)
           end
