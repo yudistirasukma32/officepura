@@ -203,7 +203,7 @@
             <td></td>
             <td></td>
             <td class="center">
-                <a class="cta" style="margin-top:1rem;" href="/taxinvoiceitems/new/<%=itemv.id%>">Detail</a>&nbsp;
+                <a class="cta" style="margin-top:1rem;" href="/taxinvoiceitems/vendor_detail/<%=itemv.id%>">Detail</a>&nbsp;
 
                 <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
                     <a class="cta" href="/taxinvoiceitems/print/<%=itemv.id%>" style="background-color: green; margin-left: 0.2rem; display: none;">Edit</a>

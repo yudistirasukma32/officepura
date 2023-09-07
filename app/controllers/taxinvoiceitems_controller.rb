@@ -223,6 +223,10 @@ class TaxinvoiceitemsController < ApplicationController
     end    
   end
 
+  def vendor_detail
+    @itemv = Taxinvoiceitemv.find(params[:item_id])
+  end
+
   def getCustomerbyDate
     date = params[:date]
 

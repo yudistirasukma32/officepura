@@ -541,6 +541,7 @@ OfficePuraErp::Application.routes.draw do
     post 'taxinvoiceitems/updateitems' => 'taxinvoiceitems#updateitems'
     post 'taxinvoiceitems/rejected' => 'taxinvoiceitems#rejected'
     get 'taxinvoiceitems/getCustomerbyDate/:date' => 'taxinvoiceitems#getCustomerbyDate'
+    get 'taxinvoiceitems/vendor_detail/:item_id' => 'taxinvoiceitems#vendor_detail'
     match 'taxinvoices/new(/:customer_id)' => 'taxinvoices#new'
     match 'taxinvoices/updateitems' => 'taxinvoices#updateitems'
     match 'taxinvoices/payment/:taxinvoice_id' => 'taxinvoices#payment'

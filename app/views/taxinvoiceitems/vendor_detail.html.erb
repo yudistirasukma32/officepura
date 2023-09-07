@@ -1,0 +1,116 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=taxinvoiceitems_path%>"><i class="icon-remove"></i> Batal</a>
+		<h1>Transaksi / <a href="<%=taxinvoiceitems_path%>">Surat Jalan</a> / Vendor</h1>
+
+		<% if @itemv %>
+		<div class="info-box" style="width:560px; float:left; clear:left;margin-bottom:30px;">  
+			<h3 style="position: relative;">Surat Jalan Vendor #<%=zeropad(@itemv.id)%></h3>
+
+			<table class="row-view no-border">
+				<tr>
+					<td width="100">Nomor DO</td>
+					<td><%=@itemv.event_id%></td>
+				</tr>
+				<tr>
+					<td width="100">Kantor</td>
+					<td><%=@itemv.office.name rescue nil%></td>
+				</tr>
+				<tr>
+					<td width="100">Tgl. Bikin</td>
+					<td><%=@itemv.created_at.strftime('%d-%m-%Y')%></td>
+				</tr>
+				<tr>
+					<td>Pelanggan</td>
+					<td><%=@itemv.customer.name%></td>
+				</tr>
+				<tr>
+					<td>Jurusan</td>
+					<td>1 Rit: <%=@itemv.event.route.name%>, <%=@itemv.vehicle_number rescue nil%></td>
+				</tr>
+				<tr>
+					<td>Harga</td>
+					<td>Rp. <%= to_currency(@itemv.price_per) %></td>
+				</tr>
+
+				<tr><td colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td colspan="2" style="font-size:13px">* Secara default penghitungan total menggunakan harga bongkar. Perubahan penggunaan harga hitung dapat dirubah saat pembuatan tagihan invoice.</td>
+				</tr>
+			</table>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view" id="tabTaxinvoiceitems">
+			<thead>
+				<tr>
+					<th width="30">No.</th>
+				<th width="70">Tanggal</th>
+					<th width="120">Surat Jalan</th>
+				<th width="70">Tgl Muat</th>
+					<th width="70" class="right">Muat</th>
+				<th width="70">Tgl Bkr</th>
+					<th width="70" class="right">Bongkar</th>
+					<th width="70" class="right">Susut</th>
+					<th class="right">Total</th>
+				<th width="30"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<% date = @itemv.date.strftime('%d-%m-%Y') if !@itemv.date.blank? %>
+				<% load_date = @itemv.load_date.strftime('%d-%m-%Y') if !@itemv.load_date.blank? %>
+				<% unload_date = @itemv.unload_date.strftime('%d-%m-%Y') if !@itemv.unload_date.blank? %>
+
+				<tr id="<%=@itemv.id%>">
+				<td><%=1%>.</td>
+				<td><input required type="text" name="taxinvoiceitems[date_<%=@itemv.id%>]" class="short none" value="<%=date%>" readonly="readonly"/></td>
+					<td><input type="text" name="taxinvoiceitems[sku_id_<%=@itemv.id%>]" style="width:120px;" class="none" value="<%=@itemv.sku_id%>" readonly="readonly"/></td>
+				<td>
+				<%
+					if @itemv.load_date.nil?
+					if !@itemv.load_date.nil?
+						default_load_date = @itemv.load_date.strftime('%d-%m-%Y') rescue nil
+					end
+					else
+					default_load_date = load_date
+					end
+				%>
+				<input type="text" name="taxinvoiceitems[load_date_<%=@itemv.id%>]" class="short none" value="<%=default_load_date%>" readonly="readonly"/>
+				</td>
+					<td>
+				<%
+					default_weight_gross = 0
+					if @itemv.weight_gross == 0
+					if @itemv.weight_gross != 0
+						default_weight_gross = @itemv.weight_gross
+					end
+					else
+					default_weight_gross = @itemv.weight_gross
+					end
+				%>
+				<input type="text" id="weight_gross_<%=@itemv.id%>" name="taxinvoiceitems[weight_gross_<%=@itemv.id%>]" class="short weight-field none" value="<%=default_weight_gross%>" onchange="javascript:getWeightLost('<%=@itemv.id%>')" onkeypress="javascript:return isMoneyKey(this);" readonly="readonly"/>
+				</td>
+				<td><input type="text" name="taxinvoiceitems[unload_date_<%=@itemv.id%>]" class="short none" value="<%=unload_date%>" readonly="readonly"/></td>
+				<td><input type="text" id="weight_net_<%=@itemv.id%>" name="taxinvoiceitems[weight_net_<%=@itemv.id%>]" class="short weight-field none" value="<%=@itemv.weight_net%>" onchange="javascript:getWeightLost('<%=@itemv.id%>')" onkeypress="javascript:return isMoneyKey(this);" readonly="readonly"/></td>
+				<td align="right"><span id="txt_weight_lost_<%=@itemv.id%>"><%=@itemv.weight_gross - @itemv.weight_net%></span></td>
+				<td align="right"><span id="txt_total_<%=@itemv.id%>"><%=to_currency_bank(@itemv.total)%></span><input type="hidden" id="total_<%=@itemv.id%>" name="taxinvoiceitems[total_<%=@itemv.id%>]" value="<%=@itemv.total%>" /></td>
+				<td align="right"><i class="icon-lock red icon-large"></i></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="actions">
+		<a class="btn right" href="<%=taxinvoiceitems_path({:startdate => $globalStartdate, :enddate => $globalEnddate})%>">Kembali ke Index</a>
+		</div>
+		<% end %>
+
+		<br class="clearfix" />
+	</div>
+</div>
