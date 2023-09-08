@@ -76,14 +76,14 @@
 			</li>
 
 			<li class="<%= @section == 'transactions' ? 'on' : '' %>">
-				<%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan, Admin HRD, Operasional BKK, BKK Standart, BKK Kosongan, BKK Kereta, Vendor Supir'), "Kas", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('transactions');".html_safe %>
+				<%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan, Admin HRD, Operasional BKK, BKK Standart, BKK Kosongan, BKK Kereta, Vendor Supir, Admin Hutang Operator'), "Kas", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('transactions');".html_safe %>
 
 				<ul id="sub-transactions" class="submenu" style="width:200px;">
 					<!-- <li><%= link_to_if (checkrole 'Admin Operasional'), "BKK (Uji Coba)", "/invoicetests" %></li> -->					
-					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Standart, Vendor Supir'), "Bukti Kas Keluar", "/invoices" %></li>
-                    <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir'), "BKK Kosongan Non Produktif", "/invoices/kosongan" %></li>		
-                    <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir'), "BKK Kosongan Produktif", "/invoices/kosongan_prod" %></li>			
-					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kereta, Vendor Supir'), "BKK Kereta", "/invoices/indexinvoicetrain" %></li>
+					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Standart, Vendor Supir, Admin Hutang Operator'), "Bukti Kas Keluar", "/invoices" %></li>
+                    <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir, Admin Hutang Operator'), "BKK Kosongan Non Produktif", "/invoices/kosongan" %></li>		
+                    <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir, Admin Hutang Operator'), "BKK Kosongan Produktif", "/invoices/kosongan_prod" %></li>			
+					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kereta, Vendor Supir, Admin Hutang Operator'), "BKK Kereta", "/invoices/indexinvoicetrain" %></li>
                     <li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Bukti Kas Masuk", "/invoicereturns" %></li>					
 					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Standart'), "BKK Tambahan", "/invoices/indexadd" %></li>					
@@ -108,10 +108,10 @@
 					<li><%= link_to_if (checkrole 'Admin Keuangan'), "Jurnal Umum", "/bankexpenses" %></li>
 
 					<li class="divider"></li>
-					<li><%= link_to_if (checkrole 'Admin Operasional'), "Memo Kontainer", "/containermemos" %></li>
+					<li><%= link_to_if (checkrole 'Admin Operasional, Admin Hutang Operator'), "Memo Kontainer", "/containermemos" %></li>
 					<li class="divider"></li>
-					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional'), "Hutang Operator Kereta", "/trainexpenses" %></li>
-					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional'), "Hutang Operator Ro-Ro", "/shipexpenses" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin Hutang Operator'), "Hutang Operator Kereta", "/trainexpenses" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin Hutang Operator'), "Hutang Operator Ro-Ro", "/shipexpenses" %></li>
 				</ul>
 			</li>
             
