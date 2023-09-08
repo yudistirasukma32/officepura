@@ -75,12 +75,12 @@
 		
 		<% if ["invoicetests","invoices", "invoices_kosongan", "invoices_kosongan_produktif", "invoicereturns", "invoiceadd", "bonusreceipts", "invoicereturnadd", "incentives","indexinvoicetrain", "invoicereturntrain",'invoice_isotank','invoice_kapal'].include?@where %>
     
-            <li class="<%= @where == 'invoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Standart, Vendor Supir'), "Bukti Kas Keluar", "/invoices" %></li>
+            <li class="<%= @where == 'invoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Standart, Vendor Supir, Admin Hutang Operator'), "Bukti Kas Keluar", "/invoices" %></li>
             
-			<li class="<%= @where == 'invoices_kosongan' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir'), "Kosongan Non-Produktif", "/invoices/kosongan" %></li>
-			<li class="<%= @where == 'invoices_kosongan_produktif' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir'), "Kosongan Produktif", "/invoices/kosongan_prod" %></li>
+			<li class="<%= @where == 'invoices_kosongan' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir, Admin Hutang Operator'), "Kosongan Non-Produktif", "/invoices/kosongan" %></li>
+			<li class="<%= @where == 'invoices_kosongan_produktif' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir, Admin Hutang Operator'), "Kosongan Produktif", "/invoices/kosongan_prod" %></li>
 
-			<li class="<%= @where == 'indexinvoicetrain' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Vendor Supir'), "BKK Kereta", "/invoices/indexinvoicetrain" %></li>
+			<li class="<%= @where == 'indexinvoicetrain' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Vendor Supir, Admin Hutang Operator'), "BKK Kereta", "/invoices/indexinvoicetrain" %></li>
     
 			<li class="<%= @where == 'invoicereturns' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Bukti Kas Masuk", "/invoicereturns" %></li>						
 			<!-- <li class="<%= @where == 'invoiceadd' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Tambahan", "/invoices/indexadd" %></li>					

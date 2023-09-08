@@ -51,7 +51,7 @@
 				</ul>
 			</li>
 			<li class="<%= @section == 'events' ? 'on' : '' %>">
-				<%= link_to "Kalender", "/events" %>
+				<%= link_to_if (!(checkrole 'Admin Hutang Operator') || current_user.owner), "Kalender", "/events" %>
 			</li>
 
 			<li class="<%= @section == 'cashiers' ? 'on' : '' %>">
