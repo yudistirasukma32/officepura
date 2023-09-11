@@ -151,6 +151,7 @@ class TaxinvoicesController < ApplicationController
       extra_cost = @taxinvoice.extra_cost.to_f
       subtotal += extra_cost
 
+      insurance_cost = 0
       insurance_cost += @taxinvoice.insurance_cost.to_i
       subtotal -=insurance_cost
         
