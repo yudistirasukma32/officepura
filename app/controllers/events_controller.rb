@@ -589,6 +589,11 @@ class EventsController < ApplicationController
     # }
   end
 
+  def getdodetail
+    @event = Event.find(params[:event_id])
+    render json: { operator_id: @event.operator_id }, status: 200
+  end
+
   def add_dovendor
     @section = "ops"
     @where = "adddovendor"

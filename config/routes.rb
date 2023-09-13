@@ -186,7 +186,8 @@ OfficePuraErp::Application.routes.draw do
   get 'bankexpenses/getbankexpensegroupcredit/:group_id' => 'bankexpenses#getbankexpensegroupcredit'
     
   get 'events/get_event_by_customer/:customer_id' =>'events#get_event_by_customer' 
-
+  get 'events/getdodetail' => 'events#getdodetail'
+  
   resources :mechaniclogs do
     member do
       get 'enable'
