@@ -209,9 +209,9 @@
 	<% end %>
 
 	<% if @section == "logs" %> 
-		<li class="<%= @where == 'vehiclelogs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Mekanik'), "Check Kendaraan", "/vehiclelogs" %></li>
-		<li class="<%= @where == 'driverlogs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Mekanik'), "Check Supir", "/driverlogs" %></li>
-		<li class="<%= @where == 'vehicledates' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Mekanik'), "Tanggal Penting", "/vehicledates" %></li>
+		<li class="<%= @where == 'vehiclelogs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Mekanik, Admin Checker'), "Check Kendaraan", "/vehiclelogs" %></li>
+		<li class="<%= @where == 'driverlogs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Mekanik, Admin Checker'), "Check Supir", "/driverlogs" %></li>
+		<li class="<%= @where == 'vehicledates' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Mekanik, Admin Checker'), "Tanggal Penting", "/vehicledates" %></li>
 		<li class="<%= @where == 'report-events' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Marketing, Auditor, Admin Marketing, Admin Operasional'), "Report DO", "/report-events" %></li>
 		<li class="<%= @where == 'report-dp-events' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Marketing, Auditor, Admin Marketing, Admin Operasional'), "Report DP DO", "/report-dp-events" %></li>
 		<li class="<%= @where == 'invoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Kalender Event BKK", "/invoices/form_event" %></li>
