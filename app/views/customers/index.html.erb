@@ -25,6 +25,7 @@
 				<th>Kota</th>
                 <th>Email</th>
 				<% if (checkrole 'Admin Keuangan, Admin Marketing, Marketing, Admin Invoice Tagihan, Staff Invoice Tagihan') %>
+				<th>Nama Kontak</th>
 				<th>Kontak Person</th>
 				<% end %>
 				<th width="100" class="{sorter: false}" style="text-align:center;">Jurusan</th>
@@ -42,6 +43,7 @@
 					<td><%= customer.name %></td>
 					<td><%= customer.city %></td>
                     <td><%= customer.email %></td>
+                    <td><%= customer.contact %></td>
 					<td><%= customer.phone.present? ? customer.phone : (customer.mobile.present? ? customer.mobile : '') %></td>
 					<td align="center"><%=customer.routes.count %></td>
                     <td align="center"><%=customer.terms_of_payment_in_days %></td>
@@ -59,6 +61,7 @@
 					<td><%= link_to customer.name, edit_customer_path(customer) %></td>
 					<td><%= customer.city %></td>
                     <td><%= customer.email %></td>
+					<td><%= customer.contact %></td>
 					<td><%= customer.phone.present? ? customer.phone : (customer.mobile.present? ? customer.mobile : '') %></td>
 					<td align="center"><%=customer.routes.count %></td>
                     <td align="center"><%=customer.terms_of_payment_in_days %></td>
