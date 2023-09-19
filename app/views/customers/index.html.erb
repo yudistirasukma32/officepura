@@ -24,6 +24,9 @@
 				<th>Nama</th>
 				<th>Kota</th>
                 <th>Email</th>
+				<% if (checkrole 'Admin Keuangan, Admin Marketing, Marketing, Admin Invoice Tagihan, Staff Invoice Tagihan') %>
+				<th>Kontak Person</th>
+				<% end %>
 				<th width="100" class="{sorter: false}" style="text-align:center;">Jurusan</th>
                 <th width="60" data-sorter="false" class="sorter-false">Batas Hutang</th>
 				<th width="60" data-sorter="false" class="sorter-false">Aktif</th>
@@ -39,6 +42,7 @@
 					<td><%= customer.name %></td>
 					<td><%= customer.city %></td>
                     <td><%= customer.email %></td>
+					<td><%= customer.phone.present? ? customer.phone : (customer.mobile.present? ? customer.mobile : '') %></td>
 					<td align="center"><%=customer.routes.count %></td>
                     <td align="center"><%=customer.terms_of_payment_in_days %></td>
 					<% if customer.enabled %>
@@ -50,11 +54,12 @@
 				</tr>
 				<% end %>
 			<% else %>
-				<% if checkrole 'Admin Keuangan, Admin Marketing, Marketing' %>
+				<% if checkrole 'Admin Keuangan, Admin Marketing, Marketing, Admin Invoice Tagihan, Staff Invoice Tagihan' %>
 				<tr>
 					<td><%= link_to customer.name, edit_customer_path(customer) %></td>
 					<td><%= customer.city %></td>
                     <td><%= customer.email %></td>
+					<td><%= customer.phone.present? ? customer.phone : (customer.mobile.present? ? customer.mobile : '') %></td>
 					<td align="center"><%=customer.routes.count %></td>
                     <td align="center"><%=customer.terms_of_payment_in_days %></td>
 					<% if customer.enabled %>

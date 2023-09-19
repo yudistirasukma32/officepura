@@ -195,6 +195,13 @@
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
+  <label for="customer_phone" class="left" style>No. Telp</label>
+  <input type="text" class="half left" name="customer_phone" value="<%= @customer.phone %>" />
+  <label for="customer_mobile" class="middle half">No. HP</label>
+  <input type="text" class="middle half" name="customer_mobile" value="<%= @customer.mobile %>" />
+</div>  
+
+<div class="field-row continue" style="padding-bottom:0px;">
   <label for="product_name" class="left" style>Barang</label>
   <input type="text" class="half left" name="product_name" value="<%=@taxinvoice.product_name%>" />
   <label for="spk_no" class="middle half">SPK</label>
