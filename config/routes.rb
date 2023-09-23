@@ -716,6 +716,7 @@ OfficePuraErp::Application.routes.draw do
     get 'api/driversapi/invoicesj/:id' => 'driversapi#invoiceSJ'
     get 'api/driversapi/invoicehistory/:id' => 'driversapi#history'
     get 'api/driversapi/list' => 'driversapi#driverFormList'
+    get 'api/driversapi/getdriver_by_idcard' => 'driversapi#getdriver_by_idcard'
     
     get 'api/dashboard' => 'dashboards#widget'
       
@@ -736,6 +737,7 @@ OfficePuraErp::Application.routes.draw do
     get 'api/login' => 'auth#login'
     get 'api/invoices' => 'invoicesapi#index'
     get 'api/invoices/confirmed' => 'invoicesapi#confirmed'
+    get 'api/invoices/getapi_invoices' => 'invoicesapi#getapi_invoices'
     get 'api/invoices/detail/:id' => 'invoicesapi#detail'
     get 'api/taxinvoices/duedate' => 'taxinvoicesapi#index'
   

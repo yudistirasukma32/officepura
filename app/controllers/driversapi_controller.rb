@@ -245,8 +245,50 @@ class DriversapiController < ApplicationController
 			status: 200,
 			count: count_driver,
 			drivers: @driverslist,
-			}, status: 200
-  end
+		}, status: 200
+	end
 
- 
+	def getdriver_by_idcard
+		@drivers = Driver.active.where("id_card IS NOT NULL").order('name')
+		count_driver = @drivers.count
+		
+		@driverslist = @drivers.map do |u|
+			{
+				:id => u.id,
+				:name => u.name,
+				:address => u.address,
+				:city => u.city,
+				:phone => u.phone,
+				:mobile => u.mobile,
+				:emergency_number => u.emergency_number,
+				:driver_license => u.driver_licence,
+				:driver_license_expiry => u.driver_licence_expiry,
+				:id_card => u.id_card,
+				:id_card_expiry => u.id_card_expiry,
+				:salary => u.salary,
+				:jamsostek => u.min_wages,
+				:start_working => u.start_working,
+				:status => u.status,
+				:accident => u.accident.to_i,
+				:weight_loss => u.weight_loss.to_i,
+				:sparepart => u.sparepart.to_i,
+				:bon => u.bon.to_i,
+				:saving => u.saving.to_i,
+				:bank_name => u.bank_name,
+				:bank_account => u.bank_account,
+				:bankexpensegroup_id => u.bankexpensegroup_id,
+				:origin => u.origin,
+				:vendor_id => u.vendor_id,
+				:is_resign => u.is_resign,
+				:description => u.description
+			}
+		end
+		
+		render json: {
+			message: 'Success',
+			status: 200,
+			count: count_driver,
+			drivers: @driverslist,
+		}, status: 200
+	end
 end

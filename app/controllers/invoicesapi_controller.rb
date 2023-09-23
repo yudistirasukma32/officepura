@@ -893,4 +893,59 @@ class InvoicesapiController < ApplicationController
 		}
 	end
 
+	def getapi_invoices
+		@startdate = params[:startdate]
+		@startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
+		@enddate = params[:enddate]
+		@enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
+
+		if params[:invoice_id].present?
+			@invoices = Invoice.where("id = ?", params[:invoice_id])
+		else
+			@invoices = Invoice.active.where("date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date).order(:id)
+		end
+
+		if @invoices.empty?
+			render json: {
+			message: 'Not Found',
+			status: 404,
+			}, status: 404
+
+		else
+			@invoicelist = @invoices.map do |u|
+				{ 
+				:id => u.id,
+				:do => u.event_id,
+				:office => u.office.name,    
+				:deleted => u.deleted, 
+				:date => u.date, 
+				:quantity => u.quantity,
+				:office => u.office.name,
+				:total => u.total,
+				:user => (u.user.username rescue nil),
+				:vehicle => u.vehicle.current_id, 
+				:driver_name => u.driver.name, 
+				:driver_phone => u.driver.phone, 
+				:driver_mobile => u.driver.mobile, 
+				:route => u.route.name, 
+				:customer_name => u.customer.name,
+				:invoicetrain => u.invoicetrain,
+				:tanktype => u.tanktype,
+				:isotank_number => (u.isotank.isotanknumber rescue nil),
+				:isotank_category => (u.isotank.category rescue nil),
+				:container_number => (u.container.containernumber  rescue nil),
+				:vehicle_duplicate => (u.vehicle_duplicate.current_id rescue nil),
+				:by_vendor => u.by_vendor,
+				:description => u.description
+				}
+			end
+
+			render json: {
+				message: 'Success',
+				status: 200,
+				count: @invoicelist.count,
+				invoices: @invoicelist,
+			}, status: 200
+		end
+	end
 end

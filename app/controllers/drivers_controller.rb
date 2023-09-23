@@ -1,6 +1,11 @@
 class DriversController < ApplicationController
+  require "uri"
+  require "net/http"
+  require "openssl"
+  require 'json'
 	include ApplicationHelper
 	layout "application"
+  protect_from_forgery :except => [:create, :update]
   before_filter :authenticate_user!, :set_section, :set_role
 
   def set_section
@@ -118,6 +123,19 @@ class DriversController < ApplicationController
     @driver.is_resign = inputs[:is_resign] == "1" ? true : false
 
     if @driver.save
+      inputs[:origin_id] = @driver.id
+      url = URI("https://finance.quncinesia.id/people/api/postapi_people")
+      # url = URI("http://localhost:3001/people/api/postapi_people")
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      request = Net::HTTP::Post.new(url.request_uri)
+      request["Content-Type"] = "application/json"
+      request.body = JSON.dump(inputs)
+
+      response = http.request(request)
+      @response = response.read_body
+
       redirect_to(edit_driver_url(@driver), :notice => 'Data Supir sukses ditambah.')
     else
       to_flash(@driver)
@@ -132,8 +150,20 @@ class DriversController < ApplicationController
     @driver.is_resign = inputs[:is_resign] == "1" ? true : false
 
     if @driver.update_attributes(inputs)
-
       @driver.save
+      inputs[:origin_id] = @driver.id
+      url = URI("https://finance.quncinesia.id/people/api/postapi_people")
+      # url = URI("http://localhost:3001/people/api/postapi_people")
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      request = Net::HTTP::Post.new(url.request_uri)
+      request["Content-Type"] = "application/json"
+      request.body = JSON.dump(inputs)
+
+      response = http.request(request)
+      @response = response.read_body
+      
       redirect_to(edit_driver_url(@driver), :notice => 'Data Supir sukses disimpan.')
     else
       to_flash(@driver)
