@@ -3,7 +3,8 @@ class TaxinvoicesController < ApplicationController
 	include ApplicationHelper
   include ActionView::Helpers::NumberHelper
 	layout "application", :except => [:gettaxinvoiceitems]
-  protect_from_forgery :except => [:updateitems, :updatepayment, :downpayment, :canceldownpayment, :transfer]
+  # protect_from_forgery :except => [:updateitems, :updatepayment, :downpayment, :canceldownpayment, :transfer]
+  protect_from_forgery :except => [:updateitems, :updatepayment, :downpayment, :canceldownpayment, :secondpayment, :cancelsecondpayment, :transfer]
   before_filter :authenticate_user!, :set_section
 
   ID_GROUP_PPH = 11
@@ -503,6 +504,7 @@ class TaxinvoicesController < ApplicationController
     @taxinvoice_id = @taxinvoice.id
 
     @taxinvoice.downpayment_date = Date.today.strftime('%d-%m-%Y') if @taxinvoice.downpayment_date.nil?
+    @taxinvoice.secondpayment_date = Date.today.strftime('%d-%m-%Y') if @taxinvoice.secondpayment_date.nil?
   end
 
   def updatepayment
@@ -540,11 +542,44 @@ class TaxinvoicesController < ApplicationController
 
     @taxinvoice.downpayment_date = nil
     @taxinvoice.downpayment = '$0.00'
+
+    @taxinvoice.secondpayment_date = nil
+    @taxinvoice.secondpayment = '$0.00'
     
     bankexpensecanceldownpayment @taxinvoice, old_amount if @taxinvoice.save
 
     redirect_to(request.referer, :notice => "Down Payment untuk Pelanggan <br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses dihapus.".html_safe)
   end  
+
+  def secondpayment
+    inputs = params[:taxinvoice]
+
+    @taxinvoice = Taxinvoice.find(inputs[:taxinvoice_id]) rescue nil
+
+    old_amount = @taxinvoice.secondpayment
+
+    @taxinvoice.secondpayment_date = inputs[:secondpayment_date]
+    @taxinvoice.secondpayment = clean_currency(inputs[:secondpayment])    
+    
+    bankexpensesecondpayment @taxinvoice, old_amount if @taxinvoice.save
+
+    redirect_to(request.referer, :notice => "Angsuran untuk pelanggan<br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses disimpan.".html_safe)
+  end
+
+  def cancelsecondpayment
+    inputs = params[:taxinvoice]
+
+    @taxinvoice = Taxinvoice.find(inputs[:taxinvoice_id]) rescue nil
+
+    old_amount = @taxinvoice.secondpayment
+
+    @taxinvoice.secondpayment_date = nil
+    @taxinvoice.secondpayment = '$0.00'
+    
+    bankexpensecancelsecondpayment @taxinvoice, old_amount if @taxinvoice.save
+
+    redirect_to(request.referer, :notice => "Angsuran untuk Pelanggan <br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses dihapus.".html_safe)
+  end   
 
   def destroy
     @taxinvoice = Taxinvoice.find(params[:id])
@@ -628,6 +663,69 @@ class TaxinvoicesController < ApplicationController
   def bankexpensecanceldownpayment taxinvoice, old_amount
 
     bankexpense = Bankexpense.where(:taxinvoice_id => taxinvoice.id, :deleted => false).where("description LIKE 'Down Payment Invoice %'").first rescue nil
+
+    if !bankexpense.nil?
+      bankexpense.deleted = true
+
+      if bankexpense.save
+        debit_to = Bankexpensegroup.find(bankexpense.debitgroup_id) 
+        if !debit_to.nil?
+          debit_to.total -= old_amount
+          debit_to.save
+        end
+
+        credit_to = Bankexpensegroup.find(bankexpense.creditgroup_id) 
+        if !credit_to.nil?
+          credit_to.total += old_amount
+          credit_to.save
+        end
+      end
+    end
+  end 
+
+  def bankexpensesecondpayment taxinvoice, old_amount
+    inputBank = params[:bank_id]
+    inputBank = 5 if inputBank.nil? 
+    
+    inputPiutang = params[:piutang_id]
+    inputPiutang = 6 if inputPiutang.nil?
+
+    bankexpense = Bankexpense.where(:taxinvoice_id => taxinvoice.id, :creditgroup_id => inputPiutang, :debitgroup_id => inputBank, :deleted => false).where("description LIKE 'Angsuran Invoice %'").first rescue nil
+    bankexpense = Bankexpense.new if bankexpense.nil?
+    
+    bankexpense.debitgroup_id = inputBank
+    bankexpense.creditgroup_id = inputPiutang
+    bankexpense.taxinvoice_id = taxinvoice.id
+    bankexpense.total = taxinvoice.secondpayment
+    bankexpense.description = "Angsuran Invoice " + taxinvoice.long_id + ", " + taxinvoice.customer.name
+    bankexpense.date = taxinvoice.secondpayment_date
+
+    bank = Bankexpense.where(:taxinvoice_id => bankexpense.taxinvoice_id, :debitgroup_id => inputPiutang, :deleted => false).first rescue nil    
+    if bank
+      bankexpense.bankexpense_id = bank.id 
+    end
+
+    if bankexpense.save
+
+      debit_to = Bankexpensegroup.find(bankexpense.debitgroup_id) rescue nil
+      if !debit_to.nil?
+        debit_to.total -= old_amount
+        debit_to.total += bankexpense.total
+        debit_to.save
+      end
+
+      credit_to = Bankexpensegroup.find(bankexpense.creditgroup_id) rescue nil
+      if !credit_to.nil?
+        credit_to.total += old_amount
+        credit_to.total -= bankexpense.total
+        credit_to.save
+      end
+    end
+  end
+
+  def bankexpensecancelsecondpayment taxinvoice, old_amount
+
+    bankexpense = Bankexpense.where(:taxinvoice_id => taxinvoice.id, :deleted => false).where("description LIKE 'Angsuran Invoice %'").first rescue nil
 
     if !bankexpense.nil?
       bankexpense.deleted = true

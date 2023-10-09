@@ -17,7 +17,7 @@
 		<th class="{sorter:true, filter: false}" width="100">Lunas</th>
 		<th class="{sorter:false, filter: false}" width="40">&nbsp;</th>
 		<th class="{sorter:true, filter: true}" width="40">User</th>
-		<th class="{sorter:false, filter: false}" width="90">&nbsp;</th>
+		<th class="{sorter:false, filter: false}" width="120">&nbsp;</th>
 	</tr>
 	</thead>
 
@@ -32,13 +32,13 @@
 	<% if current_user.adminrole %>
 	<tr class="deleted" id="<%=taxinvoice.id%>">
 		<td width="20"> <input type="checkbox" id="cb_<%=taxinvoice.id%>" name="cb_<%=taxinvoice.id%>" <% if !taxinvoice.paiddate.nil? %> checked="checked" disabled="disabled" <% end %> /></td>
-		<td><%=taxinvoice.created_at.strftime('%d-%m-%y')%></td>
+		<td><%=taxinvoice.created_at.strftime('%d-%m')%></td>
 		<td><%=taxinvoice.long_id[0,4].gsub(' /', '')%> </td>
 		<td><%=taxinvoice.customer.name%> <% if !taxinvoice.ship_name.blank? %> (<%=taxinvoice.ship_name%>) <% end %> <% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
-		<td><%=taxinvoice.sentdate.strftime('%d-%m-%y') rescue nil%></td>
-		<td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td>
+		<td><%=taxinvoice.sentdate.strftime('%d-%m') rescue nil%></td>
+		<td><%=taxinvoice.confirmeddate.strftime('%d-%m') rescue nil%></td>
 		<% different = (taxinvoice.duedate - Date.today).to_i %> 
-		<td<% if different < 0 %> class="red"<% end %>><%=taxinvoice.duedate.strftime('%d-%m-%y')%> (<%=different%>)</td>
+		<td<% if different < 0 %> class="red"<% end %>><%=taxinvoice.duedate.strftime('%d-%m')%> (<%=different%>)</td>
 		<td align="right">
 		<% if !taxinvoice.generic %>
 			<%=to_currency_bank(taxinvoice.taxinvoiceitems.sum(:total))%>
@@ -52,10 +52,11 @@
 		<td align="right">
 			<%=to_currency_bank(taxinvoice.price_tax)%>
 		</td>
-		<td align="right"><%=to_currency_bank(taxinvoice.total)%>
-			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment)%>)<% end %>
+		<td align="right">
+			<strong><%=to_currency_bank(taxinvoice.total)%></strong>
+			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment + taxinvoice.secondpayment)%>)<% end %>
 		</td>
-		<td><% if !taxinvoice.paiddate.nil? %><%=taxinvoice.paiddate.strftime('%d-%m-%y')%> (<%=(taxinvoice.paiddate - taxinvoice.date).to_i%>) <% end %></td>
+		<td><% if !taxinvoice.paiddate.nil? %><%=taxinvoice.paiddate.strftime('%d-%m')%> (<%=(taxinvoice.paiddate - taxinvoice.date).to_i%>) <% end %></td>
 		<td class="right" width="60">&nbsp;</td>
 		<td class="right" width="30">
 			<%= taxinvoice.user.username rescue nil  %>
@@ -73,13 +74,13 @@
 
 	<tr id="<%=taxinvoice.id%>">
 		<td width="20"> <% if taxinvoice.paiddate.nil? %> <input type="checkbox" id="cb_<%=taxinvoice.id%>" name="cb_<%=taxinvoice.id%>" /><% end %></td>
-		<td><%=taxinvoice.created_at.strftime('%d-%m-%y')%></td>
+		<td><%=taxinvoice.created_at.strftime('%d-%m')%></td>
 		<td><%=taxinvoice.long_id[0,4].gsub(' /', '')%> </td>
 		<td><%=taxinvoice.customer.name rescue nil%> <% if !taxinvoice.ship_name.blank? %>(<%=taxinvoice.ship_name%>) <% end %><% if taxinvoice.generic %>&nbsp;<i class="icon-star grey"></i><% end %> 
-			<% if taxinvoice.downpayment > 0 %><br />Deposit <%=to_currency_bank(taxinvoice.downpayment_date.strftime('%d-%m-%y'))%><% end %>
+			<% if taxinvoice.downpayment > 0 %><br />Deposit <%=to_currency_bank(taxinvoice.downpayment_date.strftime('%d-%m'))%><% end %>
 		</td>
-		<td><%=taxinvoice.sentdate.strftime('%d-%m-%y') rescue nil%></td>
-		<td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td>
+		<td><%=taxinvoice.sentdate.strftime('%d-%m') rescue nil%></td>
+		<td><%=taxinvoice.confirmeddate.strftime('%d-%m') rescue nil%></td>
         
         <%
             if taxinvoice.sentdate 
@@ -91,9 +92,9 @@
         
 		<td<% if taxinvoice.paiddate.nil? and different < 0 %> class="red"<% end %>>
             <% if taxinvoice.sentdate %>
-                <%=(taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+                <%=(taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
             <% else %>
-                <%=(taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+                <%=(taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
             <% end %>
         </td>
         
@@ -111,8 +112,8 @@
 			<%=to_currency_bank(taxinvoice.price_tax)%>
 		</td>
 		<td align="right">
-			<%=to_currency_bank(taxinvoice.total)%>
-			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment)%>)<% end %>
+			<strong><%=to_currency_bank(taxinvoice.total)%></strong>
+			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment + taxinvoice.secondpayment)%>)<% end %>
 		</td>
 
 		<% if taxinvoice.paiddate.nil? %>
@@ -122,7 +123,7 @@
 			<% end %>
 		</td>
 		<% else %>
-		<td><%=taxinvoice.paiddate.strftime('%d-%m-%y')%> (<%=(taxinvoice.paiddate - taxinvoice.date).to_i%>)</td>
+		<td><%=taxinvoice.paiddate.strftime('%d-%m')%> (<%=(taxinvoice.paiddate - taxinvoice.date).to_i%>)</td>
 		<% end %>
 
         <td class="right" width="30">
@@ -132,7 +133,7 @@
 			<% else %>
 			<% remarks = taxinvoice.remarks %>
 			<% end %>
-            <%= link_to 'Edit'.html_safe, "#", :class => "cta btn-edit-tax", :style => "background: #000f64;", data: { customer: customer.name, long_id: taxinvoice.long_id, description: taxinvoice.description, remarks: remarks, insurance_cost: taxinvoice.insurance_cost.to_i, claim_cost: taxinvoice.claim_cost.to_i, date: taxinvoice.date.strftime("%d-%m-%Y"), subtotal: (!taxinvoice.generic ? taxinvoice.taxinvoiceitems.sum(:total).to_i : taxinvoice.taxgenericitems.sum(:total).to_i), gst_tax: taxinvoice.gst_tax.to_f, price_tax: taxinvoice.price_tax.to_f, extra_cost: taxinvoice.extra_cost.to_i, id: taxinvoice.id, sentdate: (taxinvoice.sentdate.strftime("%d-%m-%Y") rescue nil), confirmeddate: (taxinvoice.confirmeddate.strftime("%d-%m-%Y") rescue nil), gst_percentage: taxinvoice.gst_percentage.to_f, code: (taxinvoice.long_id[0,4].gsub(' /', '') rescue nil) }, :title => 'Edit Cepat' %>
+            <%= link_to 'Edit'.html_safe, "#", :class => "cta btn-edit-tax", :style => "background: #000f64;", data: { customer: customer.name, long_id: taxinvoice.long_id, remarks: remarks, insurance_cost: taxinvoice.insurance_cost.to_i, claim_cost: taxinvoice.claim_cost.to_i, date: taxinvoice.date.strftime("%d-%m"), subtotal: (!taxinvoice.generic ? taxinvoice.taxinvoiceitems.sum(:total).to_i : taxinvoice.taxgenericitems.sum(:total).to_i), gst_tax: taxinvoice.gst_tax.to_f, price_tax: taxinvoice.price_tax.to_f, extra_cost: taxinvoice.extra_cost.to_i, id: taxinvoice.id, sentdate: (taxinvoice.sentdate.strftime("%d-%m") rescue nil), confirmeddate: (taxinvoice.confirmeddate.strftime("%d-%m") rescue nil), gst_percentage: taxinvoice.gst_percentage.to_f, code: (taxinvoice.long_id[0,4].gsub(' /', '') rescue nil) }, :title => 'Edit Cepat' %>
         <% end %>
 		</td>
 		<td class="right" width="30">

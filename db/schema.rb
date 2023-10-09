@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20230905040337) do
+ActiveRecord::Schema.define(:version => 20231003220129) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -1456,18 +1456,18 @@ ActiveRecord::Schema.define(:version => 20230905040337) do
   end
 
   create_table "taxinvoices", :force => true do |t|
-    t.boolean   "deleted",                                                      :default => false
+    t.boolean   "deleted",                                                        :default => false
     t.date      "date"
     t.string    "long_id"
     t.string    "ship_name"
     t.text      "description"
     t.integer   "customer_id"
     t.integer   "office_id"
-    t.timestamp "created_at",       :limit => 6,                                                   :null => false
-    t.timestamp "updated_at",       :limit => 6,                                                   :null => false
-    t.decimal   "total",                         :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "gst_tax",                       :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "price_tax",                     :precision => 19, :scale => 2, :default => 0.0
+    t.timestamp "created_at",         :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",         :limit => 6,                                                   :null => false
+    t.decimal   "total",                           :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "gst_tax",                         :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "price_tax",                       :precision => 19, :scale => 2, :default => 0.0
     t.date      "duedate"
     t.date      "paiddate"
     t.date      "period_start"
@@ -1476,29 +1476,31 @@ ActiveRecord::Schema.define(:version => 20230905040337) do
     t.string    "spk_no"
     t.string    "po_no"
     t.string    "tank_name"
-    t.decimal   "extra_cost",                    :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "extra_cost",                      :precision => 19, :scale => 2, :default => 0.0
     t.text      "extra_cost_info"
     t.text      "total_in_words"
     t.string    "price_by"
     t.boolean   "is_weightlost"
     t.string    "spo_no"
     t.date      "sentdate"
-    t.boolean   "generic",                                                      :default => false
-    t.decimal   "downpayment",                   :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "generic",                                                        :default => false
+    t.decimal   "downpayment",                     :precision => 19, :scale => 2, :default => 0.0
     t.date      "downpayment_date"
     t.string    "so_no"
     t.string    "sto_no"
     t.string    "do_no"
     t.string    "waybill"
     t.date      "confirmeddate"
-    t.float     "gst_percentage",                                               :default => 0.0
+    t.float     "gst_percentage",                                                 :default => 0.0
     t.text      "remarks"
-    t.decimal   "insurance_cost",                :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "claim_cost",                    :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "insurance_cost",                  :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "claim_cost",                      :precision => 19, :scale => 2, :default => 0.0
     t.integer   "company_id"
     t.integer   "user_id"
     t.integer   "bank_id"
     t.string    "booking_code"
+    t.decimal   "secondpayment",                   :precision => 19, :scale => 2, :default => 0.0
+    t.date      "secondpayment_date"
   end
 
   create_table "tirebudgets", :force => true do |t|
