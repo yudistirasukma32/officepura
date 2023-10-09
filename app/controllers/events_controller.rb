@@ -257,10 +257,12 @@ class EventsController < ApplicationController
     customer_id = params[:customer_id]
     is_train = params[:train]
 
+    @intervalago = Setting.find_by_name("DO Days Interval Ago").value rescue nil || 10
+    @intervalnext = Setting.find_by_name("DO Days Interval Next").value rescue nil || 5
 
     if customer_id == "50" || customer_id == "51" || customer_id == "144"
 
-      @events = Event.active.where("end_date BETWEEN current_date - interval '9' day AND current_date + interval '4' day").order(:start_date)
+      @events = Event.active.where("end_date BETWEEN current_date - interval ? day AND current_date + interval ? day", @intervalago, @intervalnext).order(:start_date)
       if current_user.office_id.present? && !current_user.owner
         @events = @events.where("office_id = ?", current_user.office_id)
       end
@@ -271,7 +273,7 @@ class EventsController < ApplicationController
         
         if is_train == "0"
 
-          @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval '9' day AND current_date + interval '4' day AND invoicetrain = false", params[:customer_id]).order(:start_date)
+          @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval ? day AND current_date + interval ? day AND invoicetrain = false", params[:customer_id], @intervalago, @intervalnext).order(:start_date)
           if current_user.office_id.present? && !current_user.owner
             @events = @events.where("office_id = ?", current_user.office_id)
           end
@@ -280,7 +282,7 @@ class EventsController < ApplicationController
 
         else
 
-          @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval '9' day AND current_date + interval '4' day AND invoicetrain = true", params[:customer_id]).order(:start_date)
+          @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval ? day AND current_date + interval ? day AND invoicetrain = true", params[:customer_id], @intervalago, @intervalnext).order(:start_date)
           if current_user.office_id.present? && !current_user.owner
             @events = @events.where("office_id = ?", current_user.office_id)
           end
