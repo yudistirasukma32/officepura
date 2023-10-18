@@ -8,7 +8,7 @@
 	
 	<div id="content-full">
 
-		<% if checkrole 'Admin Keuangan' %>
+		<% if checkrole 'Admin Keuangan, Admin Pelanggan' %>
 		<a class="btn print" href="<%=new_customer_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
 		<% end %>
 		<h1>Master / <a href="<%=customers_path%>">Pelanggan</a> / Index</h1>
