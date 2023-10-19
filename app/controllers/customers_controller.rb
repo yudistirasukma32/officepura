@@ -25,12 +25,14 @@ class CustomersController < ApplicationController
   end
 
   def new
+    @process = 'new'
     @customer = Customer.new
     @customer.enabled = true
     @customer.wholesale_price = @customer.wholesale_price.to_i 
   end
 
   def edit
+    @process = 'edit'
     @customer = Customer.find(params[:id])
     @routes = @customer.routes.active.order(:name)
     @customer.wholesale_price = @customer.wholesale_price.to_i
