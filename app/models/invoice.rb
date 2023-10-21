@@ -38,8 +38,8 @@ class Invoice < ActiveRecord::Base
   attr_accessible :enabled, :date, :ship_name, :driver_id, :customer_id, :vehicle_id, :trip_type, :price_per, :gas_start,
   				:gas_litre, :gas_voucher, :gas_leftover, :ferry_fee, :tol_fee, :gas_cost, :insurance, :insurance_rate, :bonus, :incentive,
   				:quantity, :driver_allowance, :gas_allowance, :total, :description, :route_id, :vehiclegroup_id, :office_id, :deleted,
-  				:invoice_id, :misc_allowance, :user_id, :helper_allowance, :need_helper, :deleteuser_id, :spk_number, :invoicetrain, :isotank_id, 
-				:driver_phone, :transporttype, :port_id, :ship_id, :train_fee, :container_id, :tanktype, :isotank_number, :container_number, :event_id, 
+  				:invoice_id, :misc_allowance, :user_id, :helper_allowance, :need_helper, :deleteuser_id, :spk_number, :invoicetrain, :isotank_id,
+				:driver_phone, :transporttype, :port_id, :ship_id, :train_fee, :container_id, :tanktype, :isotank_number, :container_number, :event_id,
 				:premi, :premi_allowance, :routetrain_id, :operator_id, :shipoperator_id, :routeship_id, :invoicemultimode, :cargo_type, :losing,
 				:vehicle_duplicate, :vehicle_duplicate_id, :weight_gross, :load_date, :is_insurance, :tsi_total, :by_vendor, :truckvendor_id,
 				:kosongan, :kosongan_type, :kosongan_confirmed, :kosongan_confirmed_by, :kosongan_previous_invoice_id
@@ -64,7 +64,7 @@ class Invoice < ActiveRecord::Base
 		extend ActionView::Helpers::NumberHelper
 		number_with_delimiter(number, :delimiter => '.')
 	end
-	
+
 	def get_tonage(offset, customer_35 = [])
 		# offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
 		if (self.event.present? && event != 0)
@@ -74,11 +74,11 @@ class Invoice < ActiveRecord::Base
 				tonage = thousand(self.event.estimated_tonage.to_i)
 			end
 		elsif self.route.present?
-			if (self.route.price_per || 0) >= offset 
+			if (self.route.price_per || 0) >= offset
 				tonage = "Borongan"
 			elsif customer_35.include? self.customer_id
 				tonage = "35.000"
-			elsif(self.invoicetrain && self.isotank_id.present? && self.route.price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage dibuat 20,000 kg 
+			elsif(self.invoicetrain && self.isotank_id.present? && self.route.price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage dibuat 20,000 kg
 				tonage = "20.000"
 			elsif(self.office_id == 7)
 				tonage = "30.000" #BKK Cargo Padat
@@ -109,12 +109,12 @@ class Invoice < ActiveRecord::Base
 			end
 		elsif route.present?
 			qty = self.quantity
-			qty -= self.receiptreturns.where(:deleted => false).sum(:quantity) if self.receiptreturns.where(:deleted => false).any? 
-			if (route.price_per || 0) >= offset 
+			qty -= self.receiptreturns.where(:deleted => false).sum(:quantity) if self.receiptreturns.where(:deleted => false).any?
+			if (route.price_per || 0) >= offset
 				estimation = qty * (route.price_per.to_i || 0)
 			elsif customer_35.include? self.customer_id
 				estimation = qty * 35000 * (route.price_per.to_i || 0)
-			elsif(self.invoicetrain && self.isotank_id.to_i != 0 && route.price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage dibuat 20,000 kg 
+			elsif(self.invoicetrain && self.isotank_id.to_i != 0 && route.price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage dibuat 20,000 kg
 				estimation = qty * 20000 * (route.price_per.to_i || 0)
 			elsif (self.office_id == 7)
 				estimation = qty * 30000 * (route.price_per.to_i || 0)
@@ -129,7 +129,7 @@ class Invoice < ActiveRecord::Base
 	end
 
 	def check_kosong_prod
-		kosongan = Invoice.active.where(kosongan_previous_invoice_id: self.id)
+		kosongan = Invoice.active.where(kosongan_previous_invoice_id: self.id).where("id NOT IN (SELECT invoice_id FROM invoicereturns WHERE deleted = 'f')")
 		have_receipt = Receipt.active.where(invoice_id: self.id)
 		if kosongan.blank? && have_receipt.present?
 			return true
@@ -142,4 +142,4 @@ end
 
 # price_per > offset = qty * price_per
 # invoicetrain.blank? & == 0 & price_per < offset
-# 
+#
