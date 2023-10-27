@@ -21,7 +21,7 @@ class InvoicesController < ApplicationController
     @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
 
     @event_id = params[:event_id]
-    
+
     if @event_id.present?
       @events = Event.where('id = ?', @event_id).pluck(:id)
     else
@@ -53,47 +53,47 @@ class InvoicesController < ApplicationController
     # @invoice = @driver.invoices.active.where("to_char(date, 'mm-yyyy')='#{@month}-#{@year}' AND id IN (SELECT invoice_id FROM receipts WHERE deleted=False)") if @driver && !@vehicle
 
     if @vehicle && !@driver
-      @invoices = Invoice.find_by_sql("SELECT a.*, b.current_id, c.name as route_name, d.name as driver_name  
-                                       FROM invoices a 
+      @invoices = Invoice.find_by_sql("SELECT a.*, b.current_id, c.name as route_name, d.name as driver_name
+                                       FROM invoices a
                                        INNER JOIN vehicles b ON b.id=a.vehicle_id
                                        INNER JOIN routes c ON c.id=a.route_id
-                                       INNER JOIN drivers d ON d.id=a.driver_id  
-                                       WHERE a.deleted=False AND 
-                                             to_char(a.date, 'mm-yyyy')='#{@month}-#{@year}' AND 
+                                       INNER JOIN drivers d ON d.id=a.driver_id
+                                       WHERE a.deleted=False AND
+                                             to_char(a.date, 'mm-yyyy')='#{@month}-#{@year}' AND
                                              a.id IN (SELECT invoice_id FROM receipts WHERE deleted=False) AND
                                              a.vehicle_id=#{@vehicle_id}
                                        ORDER BY a.date")
     elsif @driver && !@vehicle
-      @invoices = Invoice.find_by_sql("SELECT a.*, b.current_id, c.name as route_name, d.name as driver_name  
-                                       FROM invoices a 
+      @invoices = Invoice.find_by_sql("SELECT a.*, b.current_id, c.name as route_name, d.name as driver_name
+                                       FROM invoices a
                                        INNER JOIN vehicles b ON b.id=a.vehicle_id
                                        INNER JOIN routes c ON c.id=a.route_id
-                                       INNER JOIN drivers d ON d.id=a.driver_id  
-                                       WHERE a.deleted=False AND 
-                                             to_char(a.date, 'mm-yyyy')='#{@month}-#{@year}' AND 
+                                       INNER JOIN drivers d ON d.id=a.driver_id
+                                       WHERE a.deleted=False AND
+                                             to_char(a.date, 'mm-yyyy')='#{@month}-#{@year}' AND
                                              a.id IN (SELECT invoice_id FROM receipts WHERE deleted=False) AND
                                              a.driver_id=#{@driver_id}
                                        ORDER BY a.date")
     elsif @vehicle && @driver
-      @invoices = Invoice.find_by_sql("SELECT a.*, b.current_id, c.name as route_name, d.name as driver_name  
-                                       FROM invoices a 
+      @invoices = Invoice.find_by_sql("SELECT a.*, b.current_id, c.name as route_name, d.name as driver_name
+                                       FROM invoices a
                                        INNER JOIN vehicles b ON b.id=a.vehicle_id
                                        INNER JOIN routes c ON c.id=a.route_id
-                                       INNER JOIN drivers d ON d.id=a.driver_id  
-                                       WHERE a.deleted=False AND 
-                                             to_char(a.date, 'mm-yyyy')='#{@month}-#{@year}' AND 
+                                       INNER JOIN drivers d ON d.id=a.driver_id
+                                       WHERE a.deleted=False AND
+                                             to_char(a.date, 'mm-yyyy')='#{@month}-#{@year}' AND
                                              a.id IN (SELECT invoice_id FROM receipts WHERE deleted=False) AND
                                              a.vehicle_id=#{@vehicle_id} AND
                                              a.driver_id=#{@driver_id}
                                        ORDER BY a.date")
     else
-      @invoices = Invoice.find_by_sql("SELECT a.*, b.current_id, c.name as route_name, d.name as driver_name  
-                                       FROM invoices a 
+      @invoices = Invoice.find_by_sql("SELECT a.*, b.current_id, c.name as route_name, d.name as driver_name
+                                       FROM invoices a
                                        INNER JOIN vehicles b ON b.id=a.vehicle_id
                                        INNER JOIN routes c ON c.id=a.route_id
-                                       INNER JOIN drivers d ON d.id=a.driver_id  
-                                       WHERE a.deleted=False AND 
-                                             to_char(a.date, 'mm-yyyy')='#{@month}-#{@year}' AND 
+                                       INNER JOIN drivers d ON d.id=a.driver_id
+                                       WHERE a.deleted=False AND
+                                             to_char(a.date, 'mm-yyyy')='#{@month}-#{@year}' AND
                                              a.id IN (SELECT invoice_id FROM receipts WHERE deleted=False)
                                        ORDER BY a.date")
     end
@@ -109,11 +109,11 @@ class InvoicesController < ApplicationController
 
       @vendor = Vendor.where('user_id = ?', current_user.id)
 
-      if @vendor.present? 
+      if @vendor.present?
       # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
       @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
-                                      join drivers ON invoices.driver_id = drivers.id 
+                                      join drivers ON invoices.driver_id = drivers.id
                                       join routes ON invoices.route_id = routes.id
                                       join customers ON invoices.customer_id = customers.id
                                       join vendors ON drivers.vendor_id = vendors.id
@@ -121,7 +121,7 @@ class InvoicesController < ApplicationController
                                       join offices ON invoices.office_id = offices.id
                                       where vendors.id = #{@vendor[0].id} AND date = '#{@date.to_date}'
                                       AND invoices.customer_id NOT IN (SELECT id from customers WHERE name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*') ORDER BY invoices.id")
-      
+
       end
 
     else
@@ -130,21 +130,21 @@ class InvoicesController < ApplicationController
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
       # @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date).order(:id)
       @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date)
-      
+
       cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
-  
+
       @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
       # fetch_excel()
-        
+
       @office_id = params[:office_id]
-        
+
       if @office_id.present? and @office_id != "all"
           @invoices = @invoices.where("office_id = ?", @office_id)
       end
-        
-      @offices = Office.active.order('id asc')  
+
+      @offices = Office.active.order('id asc')
       @office_role = []
-        
+
       if checkrole 'BKK Kantor Sidoarjo'
           @office_role.push(1)
       end
@@ -153,7 +153,7 @@ class InvoicesController < ApplicationController
       end
       if checkrole 'BKK Kantor Probolinggo'
           @office_role.push(3)
-      end    
+      end
       if checkrole 'BKK Kantor Semarang'
           @office_role.push(4)
       end
@@ -166,7 +166,7 @@ class InvoicesController < ApplicationController
       # if checkrole 'BKK Cargo Padat'
       #   @office_role.push(7)
       # end
-      
+
       if checkrole 'Operasional BKK'
           @offices = @offices.where('id != 7').order('id asc')
       else
@@ -175,10 +175,10 @@ class InvoicesController < ApplicationController
 
 
     end
-  
+
     respond_to :html
   end
-    
+
   def kosongan
     @where = "invoices_kosongan"
 
@@ -190,13 +190,13 @@ class InvoicesController < ApplicationController
       @offices = Office.active.order('id asc')
 
       @vendor = Vendor.where('user_id = ?', current_user.id)
-        
-      if @vendor.present? 
+
+      if @vendor.present?
 
       # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
       @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
-                                      join drivers ON invoices.driver_id = drivers.id 
+                                      join drivers ON invoices.driver_id = drivers.id
                                       join routes ON invoices.route_id = routes.id
                                       join customers ON invoices.customer_id = customers.id
                                       join vendors ON drivers.vendor_id = vendors.id
@@ -206,12 +206,12 @@ class InvoicesController < ApplicationController
                                       AND invoices.customer_id IN (SELECT id from customers WHERE name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*') ORDER BY invoices.id")
 
       end
-      
+
     else
 
       @date = params[:date]
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
-        
+
       @invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif'", @date.to_date)
 
       cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
@@ -221,16 +221,16 @@ class InvoicesController < ApplicationController
       #kosongan non-prod
 
       # @invoices = @invoices.where("kosongan = true and kosongan_type = 'non-produktif'").order(:id)
-        
+
       @office_id = params[:office_id]
-        
+
       if @office_id.present? and @office_id != "all"
           @invoices = @invoices.where("office_id = ?", @office_id)
       end
-        
-      @offices = Office.active.order('id asc')  
+
+      @offices = Office.active.order('id asc')
       @office_role = []
-        
+
       if checkrole 'BKK Kantor Sidoarjo'
           @office_role.push(1)
       end
@@ -239,7 +239,7 @@ class InvoicesController < ApplicationController
       end
       if checkrole 'BKK Kantor Probolinggo'
           @office_role.push(3)
-      end    
+      end
       if checkrole 'BKK Kantor Semarang'
           @office_role.push(4)
       end
@@ -252,15 +252,15 @@ class InvoicesController < ApplicationController
       # if checkrole 'BKK Cargo Padat'
       #   @office_role.push(7)
       # end
-      
+
       if checkrole 'Operasional BKK'
           @offices = @offices.where('id != 7').order('id asc')
       else
           @offices = @offices.where('id IN (?)', @office_role).order('id asc')
       end
-    
+
     end
- 
+
   end
 
   def kosongan_prod
@@ -274,13 +274,13 @@ class InvoicesController < ApplicationController
       @offices = Office.active.order('id asc')
 
       @vendor = Vendor.where('user_id = ?', current_user.id)
-        
-      if @vendor.present? 
+
+      if @vendor.present?
 
       # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
       @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
-                                      join drivers ON invoices.driver_id = drivers.id 
+                                      join drivers ON invoices.driver_id = drivers.id
                                       join routes ON invoices.route_id = routes.id
                                       join customers ON invoices.customer_id = customers.id
                                       join vendors ON drivers.vendor_id = vendors.id
@@ -290,27 +290,27 @@ class InvoicesController < ApplicationController
                                       AND invoices.customer_id IN (SELECT id from customers WHERE name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*') ORDER BY invoices.id")
 
       end
-      
+
     else
 
       @date = params[:date]
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
-        
+
       @invoices = Invoice.where("date = ? and invoicetrain = false and kosongan = true and kosongan_type = 'produktif'", @date.to_date)
 
       cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
       @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
-        
+
       @office_id = params[:office_id]
-        
+
       if @office_id.present? and @office_id != "all"
           @invoices = @invoices.where("office_id = ?", @office_id)
       end
-        
-      @offices = Office.active.order('id asc')  
+
+      @offices = Office.active.order('id asc')
       @office_role = []
-        
+
       if checkrole 'BKK Kantor Sidoarjo'
           @office_role.push(1)
       end
@@ -319,7 +319,7 @@ class InvoicesController < ApplicationController
       end
       if checkrole 'BKK Kantor Probolinggo'
           @office_role.push(3)
-      end    
+      end
       if checkrole 'BKK Kantor Semarang'
           @office_role.push(4)
       end
@@ -332,15 +332,15 @@ class InvoicesController < ApplicationController
       # if checkrole 'BKK Cargo Padat'
       #   @office_role.push(7)
       # end
-      
+
       if checkrole 'Operasional BKK'
           @offices = @offices.where('id != 7').order('id asc')
       else
           @offices = @offices.where('id IN (?)', @office_role).order('id asc')
       end
-    
+
     end
- 
+
   end
 
   def add_kosongan
@@ -349,9 +349,9 @@ class InvoicesController < ApplicationController
     @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
     @isotanks = Isotank.active.order(:isotanknumber)
 
-    @offices = Office.active  
+    @offices = Office.active
     @office_role = []
-      
+
     if checkrole 'BKK Kantor Sidoarjo'
         @office_role.push(1)
     end
@@ -360,7 +360,7 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Probolinggo'
         @office_role.push(3)
-    end    
+    end
     if checkrole 'BKK Kantor Semarang'
         @office_role.push(4)
     end
@@ -373,7 +373,7 @@ class InvoicesController < ApplicationController
     if checkrole 'BKK Cargo Padat'
         @office_role.push(7)
     end
-    
+
     if checkrole 'Operasional BKK'
         @offices = @offices.order('id asc')
     else
@@ -383,7 +383,7 @@ class InvoicesController < ApplicationController
     # @errors = Hash.new
 
     @invoice_id = params[:invoice_id]
-    @have_kosongan = Invoice.active.where(kosongan_previous_invoice_id: @invoice_id)
+    @have_kosongan = Invoice.active.where(kosongan_previous_invoice_id: @invoice_id).where("id NOT IN (SELECT invoice_id FROM invoicereturns WHERE deleted = 'f')")
 	  @have_receipt = Receipt.active.where(invoice_id: @invoice_id)
     @invoice_ori = Invoice.where("(id=#{@invoice_id} AND invoicetrain = FALSE) OR (id=#{@invoice_id} AND invoicetrain = TRUE AND invoice_id IS NOT NULL)").first rescue nil
     if @invoice_ori.present?
@@ -397,8 +397,8 @@ class InvoicesController < ApplicationController
         # office_id: @invoice_ori.office_id,
         date: @invoice_ori.date,
       })
-      
-      # @invoice.office_id = current_user.office_id rescue nil || 0 
+
+      # @invoice.office_id = current_user.office_id rescue nil || 0
       @iseditable = true
       @invoice.enabled = true
       @invoice.date = Date.today
@@ -424,14 +424,14 @@ class InvoicesController < ApplicationController
     @invoice.ferry_fee = params[:invoice][:ferry_fee].delete('.')
     @invoice.tol_fee = params[:invoice][:tol_fee].delete('.')
     @invoice.total = params[:invoice][:total].delete('.')
-    
+
     @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
 
     if @taxinvoiceitem.blank?
       @taxinvoiceitem = Taxinvoiceitem.new
       @taxinvoiceitem.customer_id = @invoice_ori.customer_id
       @taxinvoiceitem.office_id = @invoice_ori.office_id
-      @taxinvoiceitem.price_per = @invoice_ori.route.price_per.to_i 
+      @taxinvoiceitem.price_per = @invoice_ori.route.price_per.to_i
     end
 
     @taxinvoiceitem.sku_id = params[:sku_id]
@@ -452,10 +452,10 @@ class InvoicesController < ApplicationController
   def kosongan_approval
     @section = "marketing"
     @where = "kosongan_approval"
-    
+
     @date = params[:date]
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
- 
+
     #kosongan non-prod
     @invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif' and kosongan_confirmed is false and deleted = false", @date.to_date)
 
@@ -466,7 +466,7 @@ class InvoicesController < ApplicationController
     if @office_id.present? and @office_id != "all"
       @invoices = @invoices.where("office_id = ?", @office_id)
     end
-      
+
     @offices = Office.active.order('id asc')
 
     @approved_invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif' and kosongan_confirmed is true", @date.to_date)
@@ -481,7 +481,7 @@ class InvoicesController < ApplicationController
 
   def kosongan_approve
     @where = "kosongan_approval"
-    
+
     @invoice = Invoice.find(params[:invoice_id])
 
     respond_to :html
@@ -491,24 +491,24 @@ class InvoicesController < ApplicationController
   def new
 #    @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
 
-    if params[:train] || params[:train] == true 
+    if params[:train] || params[:train] == true
       @where = "indexinvoicetrain"
       @tanktypes = ["ISOTANK", "KONTAINER"]
     end
-		
+
     @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
     @invoice = Invoice.new
-    # @invoice.office_id = current_user.office_id rescue nil || 1 
+    # @invoice.office_id = current_user.office_id rescue nil || 1
     @iseditable = true
     @invoice.enabled = true
     @invoice.date = Date.today
-      
+
     @isotanks = Isotank.active.order(:isotanknumber)
     # @isotanks = @isotanks.where("isotanknumber IN ('NLLU 2902068','NLLU 2902073','NLLU 2902089','NLLU 2902094','NLLU 2902108','NLLU 2902113','NLLU 2902129','NLLU 2902134','NLLU 2902140','NLLU 2902155','NLLU 2902284','NLLU 2902290','NLLU 2902303','NLLU 2902319','NLLU 2902324','NLLU 2902330','NLLU 2902345','NLLU 2902350','NLLU 2902366','NLLU 2902371','NLLU 2900764','NLLU 2900770','NLLU 2900785','NLLU 2900790','NLLU 2900804','NLLU 2900810','NLLU 2900825','NLLU 2900830','NLLU 2900846','NLLU 2900851','NLLU 2901380','NLLU 2901415','NLLU 2901800','NLLU 2901816','NLLU 2901842','NLLU 2901159','NLLU 2901190','NLLU 2901210','NLLU 2901225','NLLU 9700027','NLLU 2800277','NLLU 2800282','NLLU 2800298','SAXU 2705112','SAXU 2705468','NLLU 2900907','NLLU 2900912','NLLU 2900928','NLLU 2900949','NLLU 2901077','NLLU 2901082','NLLU 2901117','NLLU 2901122','NLLU 2901138','NLLU 2901164','NLLU 2902746','NLLU 2902751','NLLU 2902767','NLLU 2902772','NLLU 2902788','NLLU 2902793','NLLU 2902807','NLLU 2902812','NLLU 2902828','NLLU 2902833','NLLU 2902849','NLLU 2902854','NLLU 2902860','NLLU 2902875','NLLU 2900070','NLLU 2900105','NLLU 2900173','NLLU 2900189','NLLU 2900424','NLLU 2900430')")
-      
-    @offices = Office.active  
+
+    @offices = Office.active
     @office_role = []
-      
+
     if checkrole 'BKK Kantor Sidoarjo'
         @office_role.push(1)
     end
@@ -517,7 +517,7 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Probolinggo'
         @office_role.push(3)
-    end    
+    end
     if checkrole 'BKK Kantor Semarang'
         @office_role.push(4)
     end
@@ -530,13 +530,13 @@ class InvoicesController < ApplicationController
     # if checkrole 'BKK Cargo Padat'
     #     @office_role.push(7)
     # end
-    
+
     if checkrole 'Operasional BKK'
         @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
     end
- 
+
   end
 
   def indexaddweight
@@ -546,21 +546,21 @@ class InvoicesController < ApplicationController
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
     # @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date).order(:id)
     @invoices = Invoice.where("date = ? and deleted = false", @date.to_date)
-    
+
     cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
     @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
     # fetch_excel()
-      
+
     @office_id = params[:office_id]
-      
+
     if @office_id.present? and @office_id != "all"
         @invoices = @invoices.where("office_id = ?", @office_id)
     end
-      
-    @offices = Office.active.order('id asc')  
+
+    @offices = Office.active.order('id asc')
     @office_role = []
-      
+
     if checkrole 'BKK Kantor Sidoarjo'
         @office_role.push(1)
     end
@@ -569,7 +569,7 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Probolinggo'
         @office_role.push(3)
-    end    
+    end
     if checkrole 'BKK Kantor Semarang'
         @office_role.push(4)
     end
@@ -582,14 +582,14 @@ class InvoicesController < ApplicationController
     # if checkrole 'BKK Cargo Padat'
     #   @office_role.push(7)
     # end
-    
+
     if checkrole 'Operasional BKK'
         @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
     end
-        
-  
+
+
     respond_to :html
   end
 
@@ -609,9 +609,9 @@ class InvoicesController < ApplicationController
     inputs = params[:invoice]
 
     @invoice = Invoice.find(inputs[:invoice_id])
-    
+
     @invoice.shipoperator_id = inputs[:shipoperator_id]
-    @invoice.routeship_id = inputs[:routeship_id] 
+    @invoice.routeship_id = inputs[:routeship_id]
 
     if @invoice.save
       redirect_to("/invoices/add_ship/"+@invoice.id.to_s)
@@ -624,16 +624,16 @@ class InvoicesController < ApplicationController
     @where = "addship"
     @date = params[:date]
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
-    
+
     @invoices = Invoice.where("date = ? and deleted = false", @date.to_date)
 
     @invoices = @invoices.where("invoices.id not in (select invoice_id from shipexpenses where deleted = false)")
-    
+
     cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
     @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
     # fetch_excel()
-      
+
     @invoice_id = params[:invoice_id]
 
     if @invoice_id.present?
@@ -641,14 +641,14 @@ class InvoicesController < ApplicationController
     end
 
     @office_id = params[:office_id]
-      
+
     if @office_id.present? and @office_id != "all"
         @invoices = @invoices.where("office_id = ?", @office_id)
     end
-      
-    @offices = Office.active.order('id asc')  
+
+    @offices = Office.active.order('id asc')
     @office_role = []
-      
+
     if checkrole 'BKK Kantor Sidoarjo'
         @office_role.push(1)
     end
@@ -657,7 +657,7 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Probolinggo'
         @office_role.push(3)
-    end    
+    end
     if checkrole 'BKK Kantor Semarang'
         @office_role.push(4)
     end
@@ -670,14 +670,14 @@ class InvoicesController < ApplicationController
     # if checkrole 'BKK Cargo Padat'
     #   @office_role.push(7)
     # end
-    
+
     if checkrole 'Operasional BKK'
         @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
     end
-        
-  
+
+
     respond_to :html
   end
 
@@ -695,11 +695,11 @@ class InvoicesController < ApplicationController
   def edit
     @invoice = Invoice.find(params[:id])
     @invoice_ori = Invoice.where(:id =>params[:invoice_id]).first rescue nil
-    @gascost = @invoice.gas_cost.to_i 
+    @gascost = @invoice.gas_cost.to_i
     @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0 if @invoice.gas_cost.nil?
     @iseditable = false
-      
-    if params[:train] || params[:train] == true 
+
+    if params[:train] || params[:train] == true
       @where = "indexinvoicetrain"
       @tanktypes = ["ISOTANK", "KONTAINER"]
     end
@@ -710,11 +710,11 @@ class InvoicesController < ApplicationController
 
     @isotanks = Isotank.active.order(:isotanknumber)
     @isotanks = @isotanks.where("isotanknumber IN ('NLLU 2902068','NLLU 2902073','NLLU 2902089','NLLU 2902094','NLLU 2902108','NLLU 2902113','NLLU 2902129','NLLU 2902134','NLLU 2902140','NLLU 2902155','NLLU 2902284','NLLU 2902290','NLLU 2902303','NLLU 2902319','NLLU 2902324','NLLU 2902330','NLLU 2902345','NLLU 2902350','NLLU 2902366','NLLU 2902371','NLLU 2900764','NLLU 2900770','NLLU 2900785','NLLU 2900790','NLLU 2900804','NLLU 2900810','NLLU 2900825','NLLU 2900830','NLLU 2900846','NLLU 2900851','NLLU 2901380','NLLU 2901415','NLLU 2901800','NLLU 2901816','NLLU 2901842','NLLU 2901159','NLLU 2901190','NLLU 2901210','NLLU 2901225','NLLU 9700027','NLLU 2800277','NLLU 2800282','NLLU 2800298','SAXU 2705112','SAXU 2705468','NLLU 2900907','NLLU 2900912','NLLU 2900928','NLLU 2900949','NLLU 2901077','NLLU 2901082','NLLU 2901117','NLLU 2901122','NLLU 2901138','NLLU 2901164','NLLU 2902746','NLLU 2902751','NLLU 2902767','NLLU 2902772','NLLU 2902788','NLLU 2902793','NLLU 2902807','NLLU 2902812','NLLU 2902828','NLLU 2902833','NLLU 2902849','NLLU 2902854','NLLU 2902860','NLLU 2902875','NLLU 2900070','NLLU 2900105','NLLU 2900173','NLLU 2900189','NLLU 2900424','NLLU 2900430')")
-      
 
-    @offices = Office.active  
+
+    @offices = Office.active
     @office_role = []
-      
+
     if checkrole 'BKK Kantor Sidoarjo'
         @office_role.push(1)
     end
@@ -723,7 +723,7 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Probolinggo'
         @office_role.push(3)
-    end    
+    end
     if checkrole 'BKK Kantor Semarang'
         @office_role.push(4)
     end
@@ -736,7 +736,7 @@ class InvoicesController < ApplicationController
     # if checkrole 'BKK Cargo Padat'
     #   @office_role.push(7)
     # end
-    
+
     if checkrole 'Operasional BKK'
         @offices = @offices.where('id != 7').order('id asc')
     else
@@ -763,12 +763,12 @@ class InvoicesController < ApplicationController
     # ssl = request.ssl?
     # if ssl
     #   # respond_to :html
-    # redirect_to :protocol => 'http://', 
-    #         :controller => 'invoices', 
+    # redirect_to :protocol => 'http://',
+    #         :controller => 'invoices',
     #         :action => 'confirmation'
     # end
     respond_to :html
-    
+
   end
 
   def create
@@ -830,7 +830,7 @@ class InvoicesController < ApplicationController
               premi_allowance = quantity * @route.bonus
           else
               premi_allowance = 0
-          end 
+          end
           @invoice.premi_allowance = premi_allowance
 
           misc_allowance = quantity * @allowances.misc_allowance
@@ -899,7 +899,7 @@ class InvoicesController < ApplicationController
   puts '===========> update'
 
   inputs = params[:invoice]
- 
+
   slug_currency(inputs)
   @invoice = Invoice.find(params[:id])
   @invoice_exist = Invoice.where(:route_id => inputs[:route_id], :vehicle_id => inputs[:vehicle_id], :date => inputs[:date].to_date, :deleted => false, :invoice_id => nil).first()
@@ -956,7 +956,7 @@ class InvoicesController < ApplicationController
             premi_allowance = quantity * @invoice.premi_allowance
           else
             premi_allowance = 0
-          end 
+          end
           @invoice.premi_allowance = premi_allowance
 
           misc_allowance = quantity * @allowances.misc_allowance
@@ -1046,13 +1046,13 @@ class InvoicesController < ApplicationController
             helper_allowance = 0
           end
 
-          @invoice.helper_allowance = helper_allowance  
+          @invoice.helper_allowance = helper_allowance
 
           if @invoice.premi
             premi_allowance = quantity * @route.bonus
           else
             premi_allowance = 0
-          end 
+          end
 
           @invoice.premi_allowance = premi_allowance
 
@@ -1076,7 +1076,7 @@ class InvoicesController < ApplicationController
           @invoice.total = total
 
           @invoice.gas_leftover = 0
-          @invoice.gas_voucher = 0 
+          @invoice.gas_voucher = 0
         end
 
       if @invoice.save
@@ -1086,7 +1086,7 @@ class InvoicesController < ApplicationController
         render :action => "edit"
       end
     else
-      redirect_to(invoices_path, :notice => 'BKK dengan Jurusan dan Nopol yang sama telah diinput dengan id #' + zeropad(@invoice_exist.id))  
+      redirect_to(invoices_path, :notice => 'BKK dengan Jurusan dan Nopol yang sama telah diinput dengan id #' + zeropad(@invoice_exist.id))
     end
 
   end
@@ -1114,11 +1114,11 @@ class InvoicesController < ApplicationController
     else
       to_flash(@invoice)
       render :action => "edit"
-    end        
+    end
   end
 
   if params["process"] == 'kosongan_confirm'
-    
+
     @invoice.kosongan_confirmed = true
     @invoice.kosongan_confirmed_by = current_user.id
 
@@ -1137,18 +1137,18 @@ class InvoicesController < ApplicationController
   def get_customer
     @route = Route.find(params[:route_id]) rescue nil
     @customer = Customer.find(@route.customer_id) rescue nil if @route
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/customer"), :layout => false }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/customer"), :layout => false }.to_json;
   end
 
   def get_vehiclegroup
     @vehicle = Vehicle.find(params[:vehicle_id]) rescue nil
     @vehiclegroup = Vehiclegroup.find(@vehicle.vehiclegroup_id) rescue nil if @vehicle
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehiclegroup"), :layout => false }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehiclegroup"), :layout => false }.to_json;
   end
 
   def get_vehicles
     @vehicles = Vehicle.where(:vehiclegroup_id => params[:vehiclegroup_id], :enabled => true, :deleted => false) rescue nil
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles"), :layout => false }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles"), :layout => false }.to_json;
   end
 
   def get_vehicles_by_office_id
@@ -1156,7 +1156,7 @@ class InvoicesController < ApplicationController
     if params[:office_id] == '3' || params[:office_id] == '5' || params[:office_id] == '6' || params[:office_id] == '7'
         @vehicles = Vehicle.where(:office_id => params[:office_id], :enabled => true, :deleted => false).order('current_id ASC') rescue nil
         render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles_new"), :layout => false }.to_json;
-    else  
+    else
         @vehicles = Vehicle.where('enabled = true AND deleted = false AND office_id NOT IN (3,5,6,7)').order('current_id ASC') rescue nil
         render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles_new"), :layout => false }.to_json;
     end
@@ -1169,55 +1169,55 @@ class InvoicesController < ApplicationController
     render :json => { :success => true, :gas_leftover => gas_leftover, :year_made => year_made, :layout => false }.to_json;
 		@vehicle_year = @vehicle.year_made
 		puts "Test ya"+@vehicle_year
-		
+
   end
 
   def get_routes
-      
+
     is_train = params[:train]
-    customer_id = params[:customer_id]  
-      
+    customer_id = params[:customer_id]
+
     if is_train == "0"
-        
+
         #customer kosongan pura / rdpi
         cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
         if cust_kosongan.include? params[:customer_id].to_i
-            
+
             @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
-        
+
         else
-            
+
             @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
-            
+
         end
-        
+
     else
-        
+
         @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name ~* '.*depo.*'").order(:name)
-        
+
     end
-        
-    render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json; 
+
+    render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json;
   end
 
   def get_routesbyoffice
-    
+
     is_train = params[:train]
-    office_id = params[:office_id]  
-      
+    office_id = params[:office_id]
+
     if is_train == "0"
 
         @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).order(:name)
         # @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
-        
+
     else
-        
+
         @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).where("name ~* '.*depo.*'").order(:name)
-        
+
     end
-        
-    render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json; 
+
+    render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json;
   end
 
   def get_routeswithtype
@@ -1225,7 +1225,7 @@ class InvoicesController < ApplicationController
     # return false
     # @routes = Route.where(:customer_id => params[:customer_id], :transporttype => params[:transporttype], :enabled => true, :deleted => false).order(:name)
     @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json;
   end
 
   def get_routesonly
@@ -1233,41 +1233,41 @@ class InvoicesController < ApplicationController
     # return false
     # @routes = Route.where(:customer_id => params[:customer_id], :transporttype => params[:transporttype], :enabled => true, :deleted => false).order(:name)
     @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes_for_events", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes_for_events", :layout => false) }.to_json;
   end
 
   def get_trainroute
     @routes = Routetrain.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains", :layout => false) }.to_json;
   end
 
   def get_trainroute2
     @routes = Routetrain.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains_for_events", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routetrains_for_events", :layout => false) }.to_json;
   end
 
   def get_shiproute
     @routes = Routeship.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routeships", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routeships", :layout => false) }.to_json;
   end
 
   def get_shiproute2
     @routes = Routeship.where(:operator_id => params[:operator_id], :enabled => true, :deleted => false).order(:name)
-    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routeships_for_events", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "invoices/routeships_for_events", :layout => false) }.to_json;
   end
 
   def get_routes2
     @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
     if params[:type] == "0"
-      render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes2", :layout => false) }.to_json; 
+      render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes2", :layout => false) }.to_json;
     else
-      render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes3", :layout => false) }.to_json; 
+      render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes3", :layout => false) }.to_json;
     end
   end
 
   def get_driverphone
     @driver = Driver.find(params[:driver_id]) rescue nil
-    render :json => { :success => true, :driver_phone => @driver.mobile, :layout => false }.to_json; 
+    render :json => { :success => true, :driver_phone => @driver.mobile, :layout => false }.to_json;
   end
 
 
@@ -1275,14 +1275,14 @@ class InvoicesController < ApplicationController
     if params[:cargotype] == 'padat'
       @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER", "MULTIFUNGSI"]
       @tanktypes = @tanktypesPadat
-      render :json => { :success => true, :html => render_to_string(:partial => "invoices/tanktypes", :layout => false) }.to_json; 
+      render :json => { :success => true, :html => render_to_string(:partial => "invoices/tanktypes", :layout => false) }.to_json;
     else
       @tanktypesCair = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK"]
       @tanktypes = @tanktypesCair
-      render :json => { :success => true, :html => render_to_string(:partial => "invoices/tanktypes", :layout => false) }.to_json; 
+      render :json => { :success => true, :html => render_to_string(:partial => "invoices/tanktypes", :layout => false) }.to_json;
     end
-    
-    
+
+
   end
 
   def get_allowances
@@ -1300,14 +1300,14 @@ class InvoicesController < ApplicationController
 		else
 			puts "tahun tak ada"
 		end
-		
+
     @allowances = Allowance.where(:route_id => params[:route_id], :vehiclegroup_id => vehiclegroup_id, :deleted => false).first
     if !@allowances.nil?
       @route = Route.find(params[:route_id])
 
       premi_allowance = params[:ispremi] == 'true' ? quantity * @route.bonus : 0
       helper_allowance = params[:ishelper] == 'true' ? quantity * @allowances.helper_trip : 0
-      
+
       driver_allowance = quantity * (@allowances.driver_trip || 0)
       misc_allowance = quantity * (@allowances.misc_allowance || 0)
 			gas_litre_ori = quantity * (@allowances.gas_trip || 0)
@@ -1321,13 +1321,13 @@ class InvoicesController < ApplicationController
         additional_gas_detail = gas_litre - gas_litre_ori
         additional_gas_allowance = (gas_litre.to_i*10/100) * @gascost
       end
-			
+
 			# if year_diff >= 15
 			# 	gas_litre = gas_litre + (gas_litre.to_i*year_diff.to_i/100)
 			# 	additional_gas_detail = gas_litre - gas_litre_ori
 			# 	additional_gas_allowance = (gas_litre.to_i*year_diff.to_i/100) * @gascost
 			# end
-			
+
       gas_allowance = gas_litre * @gascost
       ferry_fee = @route.ferry_fee || 0
       tol_fee = quantity * (@route.tol_fee || 0)
@@ -1341,28 +1341,28 @@ class InvoicesController < ApplicationController
 
     incentive = @vehicle.vehicleincentivegroup.incentive rescue 0
 
-    render :json => { :success => true, :layout => false, 
-        :incentive => to_currency(incentive), 
-        :price_per => to_currency(price_per) || 0, 
-        :gas_allowance => to_currency(gas_allowance), 
-        :gas_litre => gas_litre, 
-        :driver_allowance => to_currency(driver_allowance), 
+    render :json => { :success => true, :layout => false,
+        :incentive => to_currency(incentive),
+        :price_per => to_currency(price_per) || 0,
+        :gas_allowance => to_currency(gas_allowance),
+        :gas_litre => gas_litre,
+        :driver_allowance => to_currency(driver_allowance),
         :helper_allowance => to_currency(helper_allowance),
-        :misc_allowance => to_currency(misc_allowance) || 0, 
-        :ferry_fee => to_currency(ferry_fee), 
-        :tol_fee => to_currency(tol_fee), 
-        :gas_detail => '(' + gas_litre.to_s + ' liter @ ' + @gascost.to_s + ')', 
-        :additional_gas_detail => '(' + additional_gas_detail.to_s + ' liter)', 
+        :misc_allowance => to_currency(misc_allowance) || 0,
+        :ferry_fee => to_currency(ferry_fee),
+        :tol_fee => to_currency(tol_fee),
+        :gas_detail => '(' + gas_litre.to_s + ' liter @ ' + @gascost.to_s + ')',
+        :additional_gas_detail => '(' + additional_gas_detail.to_s + ' liter)',
         :additional_gas_allowance => to_currency(additional_gas_allowance),
         :train_trip => to_currency(train_trip),
         :premi_allowance => to_currency(premi_allowance),
-        :total => to_currency(total) 
-      }.to_json; 
+        :total => to_currency(total)
+      }.to_json;
   end
 
   def destroy
     @invoice = Invoice.find(params[:id])
-    
+
     if @invoice.receipts.where(:deleted => false).any? or @invoice.receiptreturns.where(:deleted => false).any? or @invoice.receiptpremis.where(:deleted => false).any?
       redirect_to(invoices_path, :notice => 'BKK No. #' + zeropad(@invoice.id) +' tidak dapat dihapus. Harap hapus data yang sudah dikonfirmasi kasir terlebih dahulu.')
     else
@@ -1370,7 +1370,7 @@ class InvoicesController < ApplicationController
         @child_inv = @invoice.invoices.first
 
         if @child_inv.invoicereturns.any?
-          @child_inv.invoicereturns.each do |invoicereturn|  
+          @child_inv.invoicereturns.each do |invoicereturn|
             invoicereturn.deleted = true
             invoicereturn.deleteuser_id = current_user.id
             invoicereturn.save
@@ -1379,7 +1379,7 @@ class InvoicesController < ApplicationController
         if @child_inv.taxinvoiceitems.any?
           @child_inv.taxinvoiceitems.each do |taxinvoiceitem|
             taxinvoiceitem.deleted = true
-            taxinvoiceitem.save 
+            taxinvoiceitem.save
           end
         end
 
@@ -1401,11 +1401,11 @@ class InvoicesController < ApplicationController
 
         @child_inv.deleteuser_id = current_user.id
         @child_inv.deleted = true
-        @child_inv.save        
+        @child_inv.save
       end
 
       if @invoice.invoicereturns.any?
-        @invoice.invoicereturns.each do |invoicereturn|  
+        @invoice.invoicereturns.each do |invoicereturn|
           invoicereturn.deleted = true
           invoicereturn.deleteuser_id = current_user.id
           invoicereturn.save
@@ -1414,7 +1414,7 @@ class InvoicesController < ApplicationController
       if @invoice.taxinvoiceitems.any?
         @invoice.taxinvoiceitems.each do |taxinvoiceitem|
           taxinvoiceitem.deleted = true
-          taxinvoiceitem.save 
+          taxinvoiceitem.save
         end
       end
 
@@ -1439,14 +1439,14 @@ class InvoicesController < ApplicationController
       @invoice.save
       redirect_to request.referrer
     end
-  end  
-  
+  end
+
   def enable
     @invoice = Invoice.find(params[:id])
     @invoice.update_attributes(:enabled => true)
     redirect_to(invoices_url)
   end
-  
+
   def disable
     @invoice = Invoice.find(params[:id])
     @invoice.update_attributes(:enabled => false)
@@ -1465,7 +1465,7 @@ class InvoicesController < ApplicationController
     @where = "invoiceadd"
     @date = params[:date]
     @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
-  
+
     @invoices = Invoice.where("deleted = false and invoicetrain = false and date = ? and invoice_id IS NULL", @date.to_date).order(:id)
     respond_to :html
 
@@ -1484,11 +1484,11 @@ class InvoicesController < ApplicationController
 
       @vendor = Vendor.where('user_id = ?', current_user.id)
 
-      if @vendor.present? 
+      if @vendor.present?
       # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
       @invoices = Invoice.find_by_sql("select routes.name, invoices.route_id, invoices.office_id, invoices.vehicle_id, invoices.driver_id, drivers.name, invoices.id, invoices.deleted, invoices.date, invoices.quantity, invoices.description, offices.abbr, invoices.isotank_id, invoices.container_id, invoices.event_id, invoices.total, invoices.by_vendor
                                       from invoices
-                                      join drivers ON invoices.driver_id = drivers.id 
+                                      join drivers ON invoices.driver_id = drivers.id
                                       join routes ON invoices.route_id = routes.id
                                       join customers ON invoices.customer_id = customers.id
                                       join vendors ON drivers.vendor_id = vendors.id
@@ -1496,7 +1496,7 @@ class InvoicesController < ApplicationController
                                       join offices ON invoices.office_id = offices.id
                                       where vendors.id = #{@vendor[0].id} AND date between '#{@date.to_date}' and '#{@enddate.to_date}'
                                       AND invoicetrain = true and invoice_id IS NULL ORDER BY invoices.id")
-      
+
       end
     else
 
@@ -1507,18 +1507,18 @@ class InvoicesController < ApplicationController
       @container_id = params[:container_id]
       @isotank_id = params[:isotank_id]
       @event_id = params[:event_id]
-  
+
       @invoices = Invoice.where("invoicetrain = true and invoice_id IS NULL AND date between ? and ?", @date.to_date, @enddate.to_date).order(:id)
-          
+
       @office_id = params[:office_id]
-    
+
       if @office_id.present? and @office_id != ''
           @invoices = @invoices.where("office_id = ?", @office_id)
       end
-        
-      @offices = Office.active.order('id asc')  
+
+      @offices = Office.active.order('id asc')
       @office_role = []
-        
+
       if checkrole 'BKK Kantor Sidoarjo'
           @office_role.push(1)
       end
@@ -1527,7 +1527,7 @@ class InvoicesController < ApplicationController
       end
       if checkrole 'BKK Kantor Probolinggo'
           @office_role.push(3)
-      end    
+      end
       if checkrole 'BKK Kantor Semarang'
           @office_role.push(4)
       end
@@ -1540,27 +1540,27 @@ class InvoicesController < ApplicationController
       # if checkrole 'BKK Cargo Padat'
       #   @office_role.push(7)
       # end
-      
+
       if checkrole 'Operasional BKK'
           @offices = @offices.where('id != 7').order('id asc')
       else
           @offices = @offices.where('id IN (?)', @office_role).order('id asc')
       end
-  
+
       if @isotank_id.present?
         @invoices = @invoices.where('isotank_id = ?', @isotank_id)
       end
-  
+
       if @container_id.present?
         @invoices = @invoices.where('container_id = ?', @container_id)
       end
-  
+
       if @event_id.present?
         @invoices = @invoices.where('event_id = ?', @event_id)
       end
-      
+
       office_id = params[:office_id]
-  
+
       if office_id.present?
           @invoices = @invoices.where("office_id = ?", office_id)
       end
@@ -1583,16 +1583,16 @@ class InvoicesController < ApplicationController
     @event_id = params[:event_id]
 
     @invoices = Invoice.where("invoicetrain = true and invoice_id IS NULL AND date between ? and ?", @date.to_date, @enddate.to_date).order(:id)
-        
+
     @office_id = params[:office_id]
-  
+
     if @office_id.present? and @office_id != ''
         @invoices = @invoices.where("office_id = ?", @office_id)
     end
-      
-    @offices = Office.active.order('id asc')  
+
+    @offices = Office.active.order('id asc')
     @office_role = []
-      
+
     if checkrole 'BKK Kantor Sidoarjo'
         @office_role.push(1)
     end
@@ -1601,7 +1601,7 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Probolinggo'
         @office_role.push(3)
-    end    
+    end
     if checkrole 'BKK Kantor Semarang'
         @office_role.push(4)
     end
@@ -1614,7 +1614,7 @@ class InvoicesController < ApplicationController
     # if checkrole 'BKK Cargo Padat'
     #   @office_role.push(7)
     # end
-    
+
     if checkrole 'Operasional BKK'
         @offices = @offices.where('id != 7').order('id asc')
     else
@@ -1632,7 +1632,7 @@ class InvoicesController < ApplicationController
     if @event_id.present?
       @invoices = @invoices.where('event_id = ?', @event_id)
     end
-    
+
     office_id = params[:office_id]
 
     if office_id.present?
@@ -1663,13 +1663,13 @@ class InvoicesController < ApplicationController
     @where = "invoiceaddriver"
 
     @tanktypes = ["ISOTANK", "KONTAINER"]
-      
+
     @isotanks = Isotank.active.order(:isotanknumber)
     @isotanks = @isotanks.where("isotanknumber IN ('NLLU 2902068','NLLU 2902073','NLLU 2902089','NLLU 2902094','NLLU 2902108','NLLU 2902113','NLLU 2902129','NLLU 2902134','NLLU 2902140','NLLU 2902155','NLLU 2902284','NLLU 2902290','NLLU 2902303','NLLU 2902319','NLLU 2902324','NLLU 2902330','NLLU 2902345','NLLU 2902350','NLLU 2902366','NLLU 2902371','NLLU 2900764','NLLU 2900770','NLLU 2900785','NLLU 2900790','NLLU 2900804','NLLU 2900810','NLLU 2900825','NLLU 2900830','NLLU 2900846','NLLU 2900851','NLLU 2901380','NLLU 2901415','NLLU 2901800','NLLU 2901816','NLLU 2901842','NLLU 2901159','NLLU 2901190','NLLU 2901210','NLLU 2901225','NLLU 9700027','NLLU 2800277','NLLU 2800282','NLLU 2800298','SAXU 2705112','SAXU 2705468','NLLU 2900907','NLLU 2900912','NLLU 2900928','NLLU 2900949','NLLU 2901077','NLLU 2901082','NLLU 2901117','NLLU 2901122','NLLU 2901138','NLLU 2901164','NLLU 2902746','NLLU 2902751','NLLU 2902767','NLLU 2902772','NLLU 2902788','NLLU 2902793','NLLU 2902807','NLLU 2902812','NLLU 2902828','NLLU 2902833','NLLU 2902849','NLLU 2902854','NLLU 2902860','NLLU 2902875','NLLU 2900070','NLLU 2900105','NLLU 2900173','NLLU 2900189','NLLU 2900424','NLLU 2900430')")
-      
-    @offices = Office.active  
+
+    @offices = Office.active
     @office_role = []
-      
+
     if checkrole 'BKK Kantor Sidoarjo'
         @office_role.push(1)
     end
@@ -1678,7 +1678,7 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Probolinggo'
         @office_role.push(3)
-    end    
+    end
     if checkrole 'BKK Kantor Semarang'
         @office_role.push(4)
     end
@@ -1691,7 +1691,7 @@ class InvoicesController < ApplicationController
     if checkrole 'BKK Cargo Padat'
         @office_role.push(7)
     end
-    
+
     if checkrole 'Operasional BKK'
         @offices = @offices.order('id asc')
     else
@@ -1713,8 +1713,8 @@ class InvoicesController < ApplicationController
       # office_id: @invoice_ori.office_id,
       date: @invoice_ori.date,
     })
-    
-    # @invoice.office_id = current_user.office_id rescue nil || 0 
+
+    # @invoice.office_id = current_user.office_id rescue nil || 0
     @iseditable = true
     @invoice.enabled = true
     @invoice.date = Date.today
@@ -1747,19 +1747,19 @@ class InvoicesController < ApplicationController
     end
 
   def updateinvoice
-		
+
 		puts '~~~~> update inv <~~~~'
-		
+
     inputs = params[:invoice]
     @invoice = Invoice.new
     @invoice_ori = Invoice.find(inputs[:invoice_id])
 
     if inputs[:process] == 'create'
       @invoice = @invoice_ori.dup
-  
+
       quantity = inputs[:quantity].to_i
       @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
-			
+
 			@vehicle = @invoice_ori.vehicle
 			vehiclegroup_id = @vehicle.vehiclegroup_id if @vehicle
 			year_made = @vehicle.year_made.to_i if @vehicle
@@ -1768,7 +1768,7 @@ class InvoicesController < ApplicationController
 			if !year_made.blank? && year_made.to_i > 1000
 				year_diff = Date.current.year - year_made
 			end
- 
+
       @allowances = Allowance.where(:route_id => @invoice.route_id, :vehiclegroup_id => @invoice.vehiclegroup_id, :deleted => false).first
       if !@allowances.nil?
         @route = Route.find(@invoice.route_id)
@@ -1782,29 +1782,29 @@ class InvoicesController < ApplicationController
         end
 
         misc_allowance = quantity * @allowances.misc_allowance
-				
+
         gas_litre = quantity * @allowances.gas_trip
-				
+
 				puts "===> gas litre ori"
 				puts gas_litre
 				puts "===> year diff"
 				puts year_diff
-				
+
 				if year_diff >= 15
 					gas_litre += gas_litre.to_i * year_diff.to_i / 100
 					puts "===> gas litre >= 15y"
 					puts gas_litre
 				end
-				
+
         gas_allowance = gas_litre * @gascost
-				
+
 				puts "===> gas_allowance"
 				puts gas_allowance
-				
+
         ferry_fee = @route.ferry_fee
         tol_fee = quantity * @route.tol_fee
         total = gas_allowance + driver_allowance + misc_allowance + tol_fee + helper_allowance
-				
+
 				puts "===> total"
 				puts total
 
@@ -1839,9 +1839,9 @@ class InvoicesController < ApplicationController
     # render json: inputs
 
     @invoice = Invoice.find(inputs[:invoice_id])
-    
+
     @invoice.load_date = inputs[:load_date]
-    @invoice.weight_gross = inputs[:weight_gross] 
+    @invoice.weight_gross = inputs[:weight_gross]
 
     if @invoice.save
       redirect_to("/invoices/add_weight/"+@invoice.id.to_s)
@@ -1863,18 +1863,18 @@ class InvoicesController < ApplicationController
 
   def cancelmarketing
     @invoice = Invoice.find(params[:id])
-    
+
     @invoice.kosongan_confirmed = false
     @invoice.kosongan_confirmed_by = nil
     @invoice.save
 
     redirect_to(request.referer, :notice => "Konfirmasi Marketing Untuk BKK <br /><strong class='yellow'>#{@invoice.id}</strong> sudah dibatalkan.".html_safe)
-  end  
+  end
 
 end
-      
+
 def fetch_excel
-      s = Roo::Excel.new("./db/bkkkereta.xls") 
+      s = Roo::Excel.new("./db/bkkkereta.xls")
 
       s.default_sheet = s.sheets.first
 
@@ -1914,7 +1914,7 @@ def fetch_excel
 
 
           @invoice = Invoice.new
-    
+
           gas_litre = ferry_fee = tol_fee = gas_allowance = driver_allowance  = total = 0
 
           @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
@@ -1942,7 +1942,7 @@ def fetch_excel
           @invoice.user_id = current_user.id
 
           @invoice.incentive = @invoice.vehicle.vehicleincentivegroup.incentive.to_f rescue 0
-          
+
           @allowances = Allowance.where(:route_id => @route.id, :vehiclegroup_id => @vehicle.vehiclegroup_id, :deleted => false).first
 
           if !@allowances.nil?
@@ -1959,11 +1959,11 @@ def fetch_excel
 
             misc_allowance = quantity * @allowances.misc_allowance
             @invoice.misc_allowance = misc_allowance
-            
+
             gas_litre = quantity * @allowances.gas_trip
             @invoice.gas_litre = gas_litre
             @invoice.gas_start = gas_litre
-            
+
             gas_allowance = gas_litre * @gascost
             @invoice.gas_allowance = gas_allowance
 
@@ -2002,7 +2002,7 @@ def fetch_excel
 
 
           @invoice = Invoice.new
-    
+
           gas_litre = ferry_fee = tol_fee = gas_allowance = driver_allowance  = total = 0
 
           @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
@@ -2031,7 +2031,7 @@ def fetch_excel
           @invoice.user_id = current_user.id
 
           @invoice.incentive = @invoice.vehicle.vehicleincentivegroup.incentive.to_f rescue 0
-          
+
           @allowances = Allowance.where(:route_id => @route.id, :vehiclegroup_id => @vehicle.vehiclegroup_id, :deleted => false).first
 
           if !@allowances.nil?
@@ -2048,11 +2048,11 @@ def fetch_excel
 
             misc_allowance = quantity * @allowances.misc_allowance
             @invoice.misc_allowance = misc_allowance
-            
+
             gas_litre = quantity * @allowances.gas_trip
             @invoice.gas_litre = gas_litre
             @invoice.gas_start = gas_litre
-            
+
             gas_allowance = gas_litre * @gascost
             @invoice.gas_allowance = gas_allowance
 
@@ -2070,9 +2070,9 @@ def fetch_excel
           start += 3
 
         end
-        
+
       end
 
 
-      
+
     end
