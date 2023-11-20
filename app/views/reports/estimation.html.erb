@@ -92,6 +92,7 @@
 			<tr>
 				<th width="30">No.</th>
 				<th>Keterangan</th>
+				<th width="45">Komoditas</th>
 				<th width="45">Ktr</th>
 				<th width="80">No Pol</th>
 				<th width="90" class="right">Tonage (KG/LT/M3)</th>
@@ -108,7 +109,8 @@
 				qty -= invoice.receiptreturns.where(:deleted => false).sum(:quantity) if invoice.receiptreturns.where(:deleted => false).any? 
 			%>
 			<% 
-			total_estimation += invoice.get_estimation(offset,@customer_35) 
+			total_estimation += invoice.get_estimation(offset,@customer_35)
+			total_estimation -= invoice.get_estimation(offset,@customer_35)  if invoice.receiptreturns.where(:deleted => false).any?  
 			%>
 
 			<% if invoice.date.day > day %>
@@ -129,6 +131,7 @@
 					<br/>
 					<%= invoice.customer.name %>
 				</td>
+				<td><%=invoice.event.commodity.name rescue nil%></td>
 				<td><%=invoice.office.abbr%></td>
 				<td><%=invoice.vehicle.current_id%></td>
 				<td align="right"><%= invoice.get_tonage(offset,@customer_35) %></td>
