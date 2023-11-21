@@ -708,8 +708,14 @@ OfficePuraErp::Application.routes.draw do
   match '/media/:dragonfly/:file_name', :to => Dragonfly[:images]  
   post 'attachments/upload' => 'attachments#upload', :as => :attachments_upload
 	post 'attachments/uploadTaxInv' => 'attachments#uploadTaxInv', :as => :attachments_uploadTaxInv
+  post 'attachments/uploadQuot' => 'attachments#uploadQuot', :as => :attachments_uploadQuot
+
   get 'attachments/remove/:id' => 'attachments#remove', :as => :attachments_remove
 	get 'attachments/removeTaxInv/:id' => 'attachments#removeTaxInv', :as => :attachments_removeTaxInv
+	get 'attachments/removeQuot/:id' => 'attachments#removeQuot', :as => :attachments_removeQuot
+
+
+  
 
   match 'deletes/action' => 'deletes#action'
   match 'deletes/money' => 'deletes#money'
