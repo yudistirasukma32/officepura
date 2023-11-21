@@ -30,11 +30,9 @@
 		    <div class="sliding_container">
 
 			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
-					<div class="">
-						<%= render "form" %>
-					</div>
-					<div class="">
-						<div class="hideprint" style="width:300px; float:right; clear:right;">
+					<%= render "form" %>
+
+					<div style="float: left; width: 300px;">
 							<% if @quotationgroup %>
 
 							<h3 class="zone" style="font-weight: bold;">Upload attachment</h3>
@@ -81,11 +79,9 @@
 							</div>
 
 							</form>
-						<% end %>
-					
-						</div>
-					<div>
-					
+						<% end %>	
+					</div>
+				
 				</div>
 
 			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
