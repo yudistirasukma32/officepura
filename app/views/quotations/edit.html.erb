@@ -1,0 +1,23 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=edit_quotationgroup_path(@quotationgroup.id)%>"><i class="icon-remove"></i> Kembali Ke Penawaran</a>
+		<h1>Edit Penawaran Jurusan #<%=@quotationgroup.id%></h1>
+
+		<div style="background: #fff; padding: 1rem 1rem 0;">
+			<strong>Perhatian.</strong>
+			<p>Anda membuat penawaran jurusan dari penawaran 
+			<a href=<%= edit_quotationgroup_path(@quotationgroup.id) %> target="_blank" style="text-decoration: underline; color: #2c92b3;"><strong><%= @quotationgroup.long_id %></strong></a> 
+			</p>
+		</div>
+		
+		<%= render "form" %>
+		
+		<br class="clearfix" />
+	</div>
+</div>

@@ -1,0 +1,169 @@
+<style>
+  #description {
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  #infowindow-content .title {
+    font-weight: bold;
+  }
+
+  #infowindow-content {
+    display: none;
+  }
+
+  #map #infowindow-content, #mapFinish #infowindow-content {
+    display: inline;
+  }
+
+  .history {
+    width: 40%;
+    display: table-row;
+  }
+  .history label {
+    display: table-cell;
+    padding-right: 20px;
+    line-height: 26px;
+  }
+  .history textarea {
+    min-width: auto;
+    max-width: 285px;
+  }
+
+  .pac-card, .pac-card2 {
+    background-color: #fff;
+    border: 0;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+    margin: 10px;
+    padding: 0 0.5em;
+    font: 400 18px Roboto, Arial, sans-serif;
+    overflow: hidden;
+    font-family: Roboto;
+    padding: 0;
+  }
+
+  #pac-container, #pac-container2 {
+    margin-top: -24px;
+    padding-bottom: 16px;
+    margin-right: 12px;
+  }
+
+  .pac-controls {
+    display: inline-block;
+    padding: 5px 11px;
+  }
+
+  .pac-controls label {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  #pac-input, #pac-input2 {
+    background-color: #fff;
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+    margin-left: 12px;
+    padding: 0 11px 0 13px;
+    text-overflow: ellipsis;
+    width: 400px;
+  }
+
+  #pac-input:focus, #pac-input2:focus {
+    border-color: #4d90fe;
+  }
+
+  #title {
+    color: #fff;
+    background-color: #4d90fe;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 6px 12px;
+  }
+</style>
+
+<%= form_for(@quotationgroup, :html => { :style => 'float: left; margin-right: 5rem;'}) do |f| %>
+
+  <% if @process == 'edit' && @quotationgroup.status == 'rejected' %>
+    <div class="field-row first">
+      <%= f.label :status, "Status" %>
+      <input class="half left" readonly="readonly" size="30" style="color: red" type="text" value="rejected">
+      <%= f.hidden_field :status, :value => 'unconfirmed' %>
+    </div>
+  <% else %>
+    <%= f.hidden_field :status, :value => 'unconfirmed' %>
+  <% end %>
+
+  <div class="field-row">
+    <%= f.label :long_id, "Nomor" %>
+    <%= f.text_field :long_id, required: true%>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :date, "Tanggal" %>
+    <%= f.text_field :date, :class => 'half date-picker' %>
+  </div>
+  
+  <% if @process == 'edit' && @quotationgroup.customer_id.present? %>
+    <div id="div-customer" class="field-row">
+      <%= f.label :customer_id, "Pelanggan" %>
+      <%= f.select :customer_id, options_for_select(Customer.active.order(:name).collect {|g| [g.name, g.id]}, @quotationgroup.customer_id), {:include_blank => '- Pelanggan -'}, :class => 'double chzn-select' %>
+    </div>
+  <% elsif @process == 'edit' && @quotationgroup.customer_name.present? %>
+    <div id="div-customer" class="field-row">
+      <%= f.label :customer_name, "Pelanggan" %>
+      <%= f.text_field :customer_name %>
+    </div>
+  <% else %>
+    <div class="field-row">
+      <label for="jeniscustomer" >Jenis Pelanggan</label>
+      <label class="checkbox" for="jeniscustomer" style="width: 150px;" onchange="javascript:getCustomerForQuotation(true);">
+        <input name="jeniscustomer" type="radio" value="true" checked> Pelanggan Lama
+      </label>
+      <label class="checkbox" for="jeniscustomer" style="width: 150px;" onchange="javascript:getCustomerForQuotation(false);">
+        <input name="jeniscustomer" type="radio" value="false"> Pelanggan Baru
+      </label>
+    </div>
+
+    <div id="div-customer" class="field-row">
+      <%= f.label :customer_id, "Pelanggan" %>
+      <%= f.select :customer_id, options_for_select(Customer.active.order(:name).collect {|g| [g.name, g.id]}, @quotationgroup.customer_id), {:include_blank => '- Pelanggan -'}, :class => 'double chzn-select' %>
+    </div>
+  <% end %>
+
+  <div class="field-row">
+    <%= f.label :customer_pic, "PIC Pelanggan" %>
+    <%= f.text_field :customer_pic %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :customer_number, "Nomor Telp" %>
+    <%= f.text_field :customer_number %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :customer_email, "Email" %>
+    <%= f.text_field :customer_email %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description, rows: 2 %>
+  </div>
+  
+  <div class="field-row">
+    <%= f.label :notes, "Catatan" %>
+    <%= f.text_area :notes, rows: 2, readonly: !current_user.owner or !checkrole 'Marketing, Admin Marketing' ? true : false%>
+    <small>Catatan dari pemeriksa penawaran</small>
+  </div>
+
+  <div class="actions">
+    <% if !params[:confirmed] %>
+    <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Operasional, Marketing, Admin Marketing' %>
+    <% end %>
+    <a class="back left" href="<%= quotationgroups_url%>">Kembali ke Penawaran</a>
+  </div>
+<% end %>

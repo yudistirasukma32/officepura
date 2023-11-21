@@ -113,11 +113,38 @@ OfficePuraErp::Application.routes.draw do
     member do
       get 'enable'
       get 'disable'
-
       get "copy"
     end
     collection do
       get "index_api"
+    end
+  end
+
+  resources :quotationgroups do
+    member do
+      get 'print'
+    end
+    collection do
+      get 'confirmed' => 'quotationgroups#indexconfirm'
+      get "getcustomer/:value" => 'quotationgroups#getcustomer'
+      get "getquotation/:id" => 'quotationgroups#getquotation'
+      get "index_api"
+      get "indexconfirm_api"
+      post "confirmation"
+    end
+  end
+
+  get 'quotations/confirmed' => 'quotations#indexconfirm'
+  resources :quotations do
+    member do
+      get 'enable'
+      get 'disable'
+      get "copy"
+    end
+    collection do
+      get "index_api"
+      get "indexconfirm_api"
+      post "confirmation"
     end
   end
 
@@ -248,7 +275,7 @@ OfficePuraErp::Application.routes.draw do
   match 'invoices/add_ship' => 'invoices#indexaddship'
   match 'invoices/add_ship/:invoice_id' => 'invoices#add_ship'
   post 'invoices/updateship/' => 'invoices#updateship'
-  
+
   match 'invoices/add_train' => 'invoices#indexaddtrain'
   match 'invoices/add_train/:invoice_id' => 'invoices#add_train'
   post 'invoices/updatetrain/' => 'invoices#updatetrain'

@@ -1,0 +1,77 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<%
+	creator = User.where(id: @quotationgroup.created_by).first
+	confirmation = User.where(id: @quotationgroup.confirmed_by).first
+%>
+<div id="main">
+	<div id="content-full">
+		<a class="btn-txt cancel" href="/quotationgroup/confirmed"><i class="icon-remove"></i> Kembali Ke Penawaran</a>
+		<h1>Marketing / <a href="/quotationgroup/confirmed">Penawaran Terkonfirmasi</a> / Detail</h1>
+
+		<div class="info-box" style="margin-bottom:30px; width:420px; float:left; margin-top: 1.5rem;">  
+			<table class="row-view no-border">
+			<tr valign="top">
+				<td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+				<td align="right" class="header">Penawaran <br><%= @quotationgroup.long_id rescue nil %></td>
+			</tr>
+			</table>
+			<hr style="width:600px;" />
+			<table class="row-view no-border">
+			<tr>
+				<td width="100">Tanggal Buat</td>
+				<td><span id="strDate"><%=@quotationgroup.created_at.strftime('%d %B %Y')%></td>
+			</tr>
+			<tr>
+				<td>Tgl Konfirmasi</td>
+				<td><%=@quotationgroup.confirmed_date.strftime('%d %B %Y') rescue nil%></td>
+			</tr>
+			<tr>
+				<td>Dibuat</td>
+				<td><%= creator.username rescue nil %></td>
+			</tr>
+			<tr>
+				<td>Dikonfirmasi</td>
+				<td><%= confirmation.username rescue nil %></td>
+			</tr>
+			<tr>
+				<td>Pelanggan</td>
+				<td id="strCustomer"><%=@quotationgroup.customer_id.present? ? @quotationgroup.customer.name : @quotationgroup.customer_name%></td>
+			</tr>
+
+			<tr>
+				<td style="padding-top: 1.5rem;"><strong>Jurusan</strong></td>
+			</tr>
+			</table>
+
+			<table class="row-view more-pad" id="tbItem" style="width: 100%;">
+				<thead>
+					<tr style="border-bottom: 2px solid; line-height:1rem">
+						<th style="width:30px" align="left">No.</th>
+						<th>Jurusan</th>
+						<th class="text-right right" style="width:40px" align="right">Tarif</th>
+					</tr>
+				</thead>
+				<tbody id="tquotation">
+				</tbody>
+				<% if @quotations.any? %>
+					<% no=0 %>
+					<% @quotations.each do |quotation|%>
+						<% no=no+1 %>
+						<tr style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">
+							<td><%= no %></td>
+							<td><%= quotation.name %></td>
+							<td align="right"><%= quotation.price_per.present? ? to_currency_bank(quotation.price_per) : 0 %></td>
+						</tr>
+					<% end %>
+				<% end %>
+			</table>
+
+		</div>
+		<br class="clearfix" />
+	</div>
+</div>

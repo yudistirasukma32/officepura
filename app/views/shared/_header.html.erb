@@ -47,6 +47,8 @@
 			<li class="<%= @section == 'marketing' ? 'on' : '' %>">
 				<a class="finger" onclick="javascript:toggleSub('marketing');">Marketing</a>
 				<ul id="sub-marketing" class="submenu" style="width:220px;">
+					<li class="<%= @where == 'quotation' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Marketing, Marketing'), "Penawaran", "/quotationgroups" %></li>
+					<li class="<%= @where == 'quotation-confirm' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Marketing, Marketing'), "Penawaran Terkonfirmasi", "/quotationgroups/confirmed" %></li>
 					<li><%= link_to_if (checkrole 'Admin Marketing, Konfirm Kosongan'), "Approval BKK Kosongan", "/invoices/kosongan_approval" %></li>
 				</ul>
 			</li>

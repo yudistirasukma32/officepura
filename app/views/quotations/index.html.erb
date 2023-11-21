@@ -1,0 +1,268 @@
+<style>
+	.btn-styled {
+		border-radius: 3px;
+		border: 0;
+		padding: 7px 10px;
+		text-decoration: none;
+		color: #fff;
+		font-size: 13px;
+		font-weight: 900;
+		cursor: pointer;
+		letter-spacing: 0.05em;
+		background-color: #24748f !important;
+		background-repeat: repeat-x;
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#2d95b7", endColorstr="#23748e");
+		background-image: -khtml-gradient(linear, left top, left bottom, from(#2d95b7), to(#23748e));
+		background-image: -moz-linear-gradient(top, #2d95b7, #23748e);
+		background-image: -ms-linear-gradient(top, #2d95b7, #23748e);
+		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2d95b7), color-stop(100%, #23748e));
+		background-image: -webkit-linear-gradient(top, #2d95b7, #23748e);
+		background-image: -o-linear-gradient(top, #2d95b7, #23748e);
+		background-image: linear-gradient(#2d95b7, #23748e);
+		border-color: #23748e #23748e #216c85;
+		color: #fff !important;
+		text-shadow: 0 -1px 0 rgb(0 0 0 / 16%);
+		-webkit-font-smoothing: antialiased;
+	}
+
+	.btn-no {
+		border-radius: 3px;
+		border: 0;
+		padding: 7px 10px;
+		text-decoration: none;
+		color: #fff;
+		font-size: 13px;
+		font-weight: 900;
+		cursor: pointer;
+		letter-spacing: 0.05em;
+		background-color: #24748f !important;
+		background-repeat: repeat-x;
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#b72d2d", endColorstr="#8e2323");
+		background-image: linear-gradient(#b72d2d, #8e2323);
+		border-color: #8e2323 #8e2323 #852121;
+		color: #fff !important;
+		text-shadow: 0 -1px 0 rgb(0 0 0 / 16%);
+		-webkit-font-smoothing: antialiased;
+	}
+
+	.pagination {
+	width: 100%;
+    display: flex;
+    justify-content: center;
+	}
+
+	.pagination a {
+	color: black;
+	float: left;
+	padding: 8px 16px;
+	text-decoration: none;
+	}
+
+	.pagination a.active {
+	background-color: #4CAF50;
+	color: white;
+	}
+
+	.pagination a:hover:not(.active) {background-color: #ddd;}
+</style>
+<%= render "shared/header" %>
+
+<div id="nav">
+		<%= render "shared/nav" %>
+	</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a href="<%= new_quotation_url %>" class="btn print">Tambah Penawaran</a>
+		<h1>Marketing / <a href="<%=quotations_path%>">Penawaran</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+
+				<label for="customer" class="middle">Customer</label>
+				<select name="customer" class="half left chzn-select customer_id">
+					<option value="all">All</option>
+					<% @customers.each do |customer| %>
+					<option value="<%=customer.id%>" <%= params[:custoemr_id].to_i == customer.id ? "selected" : "" %>><%=customer.name%></option>
+					<% end %>
+				</select>
+				<label for="query-name" class="middle">Jurusan</label>
+				<input type="text" name="search" id="query-name" class="half left" placeholder="" style="margin-left: 10px;">
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<div id="content-table">
+
+		</div>
+		<br class="clearfix"/>
+
+	</div>
+
+</div>
+
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content" style="width: 30%; height: 60%;">
+	<span class="close">&times;</span>
+	<%= form_tag(confirmation_quotations_url, method: :post) do |f|%>
+		<h3 class="text-center" style="text-align: center; margin-top: unset; font-weight: bold;">Konfirmasi Penawaran</h3>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">No. Penawaran</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="quotation_long_id">#Quotation Long Id</span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Pelanggan</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="quotation_customer"></span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Tanggal</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="quotation_date"></span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Moda</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="quotation_moda"></span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Jurusan</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="quotation_route"></span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Tipe</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="quotation_routegroup"></span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Komoditas</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="quotation_commodity"></span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Jarak</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="quotation_distance"></span>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Tarif</label>
+			</div>
+			<div style="width: 50%; display: flex; align-items: center;">
+				<span id="quotation_price"></span>
+			</div>
+		</div>
+ 
+		<input type="hidden" class="half left" id="quootation_id" name="id"/>
+
+		<div class="" style="padding-bottom:0px; text-align: right; margin-top: 1rem;">
+			<input id="quotation_id" type="hidden" name="id" value="" />
+			<input type="submit" name="newstatus" value="reject" class="btn btn-no"/>
+			<input style="margin-left: .3rem" type="submit" name="newstatus" value="confirm" class="btn btn-styled"/>
+		</div>
+	<% end %>
+  </div>
+
+</div>
+
+<%= content_for :js do %>
+	<script>
+		global_page = 1;
+		old_customer_id = "";
+		old_query = "";
+		
+		function show_data() {
+			query  = $("#query-name").val();
+			customer_id  = $(".customer_id").val();
+			if (old_customer_id != customer_id || old_query != query) {
+				global_page = 1;
+			}
+			old_customer_id = customer_id;
+			old_query = query;
+
+			$.ajax({
+				url: "<%= index_api_quotations_url %>",
+				method: "get",
+				data:{
+					query,customer_id,page: global_page
+				},
+				dataType: "html",
+				success:function(data){
+					$("#content-table").html(data);
+				}
+			});
+		}
+
+		$(document).ready(function(){
+			element = $("[name=customer]").next();
+			$(element).addClass("left");
+			show_data();
+		})
+		.on("submit","#filterform",function(e){
+			e.preventDefault();
+			show_data();
+		})
+		.on("click",".pagination-link",function(e){
+			e.preventDefault();
+			global_page = $(this).data("page");
+			show_data();
+		})
+		.on("click",".btn-confirmation",function(e){
+			var status = $(this).data("status")
+			e.preventDefault();
+
+			if(status == 'rejected') {
+				$(".btn-no").hide();
+			} else {
+				$(".btn-no").show();
+			}
+
+			$("#quotation_id").val($(this).data("id"));
+			$("#quotation_long_id").text($(this).data("longid"));
+			$("#quotation_customer").text($(this).data("customer"));
+			$("#quotation_date").text($(this).data("date"));
+			$("#quotation_moda").text($(this).data("moda"));
+			$("#quotation_commodity").text($(this).data("commodity"));
+			$("#quotation_route").text($(this).data("route"));
+			$("#quotation_routegroup").text($(this).data("routegroup"));
+			$("#quotation_distance").text($(this).data("distance")+' KM');
+			$("#quotation_price").text($(this).data("price")+'/'+$(this).data("pricetype"));
+
+			$("#myModal").show();
+		});
+	</script>
+<% end %>

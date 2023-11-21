@@ -1,0 +1,21 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+
+	<% if params[:operational] || params[:operational] == true %>
+		<a class="btn-txt cancel" href="<%= quotationgroups_url %>"><i class="icon-remove"></i> Kembali Ke Penawaran</a>
+		<h1>Marketing / <a href="<%=quotations_path%>">Penawaran</a> / Form</h1>
+	<% else %>
+		<a class="btn-txt cancel" href="<%= quotationgroups_url %>" ><i class="icon-remove"></i> Kembali Ke Penawaran</a>
+		<h1>Buat Penawaran</h1>		
+	<% end %>
+
+		<%= render "form" %>
+		<br class="clearfix" />
+	</div>
+</div>

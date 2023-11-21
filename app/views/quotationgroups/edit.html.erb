@@ -1,0 +1,45 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+
+		<% if params[:operational] || params[:operational] == true %>
+			<a class="btn-txt cancel" href="<%= quotationgroups_url %>"><i class="icon-remove"></i> Kembali Ke Penawaran</a>
+			<h1>Marketing / <a href="<%=quotationgroups_path%>">Penawaran</a> / Edit</h1>
+		<% else %>
+			<a class="btn-txt cancel" href="<%=quotationgroups_url%>"><i class="icon-remove"></i> Kembali Ke Penawaran</a>
+			<h1>Edit Penawaran</h1>
+		<% end %>
+
+		<% tab = 0 %>
+		<ul class="rounded" id="tabbed">
+			<li><a id="link_<%=tab+=1%>" href="">Data Penawaran</a></li>
+			<% if checkrole 'Admin Jurusan, Admin Marketing, Marketing' %>
+			<li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
+			<% end %>
+		</ul>
+
+		<br class="clearfix" />
+ 
+		<% tab = 0 %>
+		<div id="sliding_window">
+		    <div class="sliding_container">
+
+			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+						<%= render "form" %>
+				</div>
+
+			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+						<%= render "quotationitem" %>
+			    </div>
+				
+			</div>
+		</div>
+
+		<br class="clearfix" />
+	</div>
+</div>
