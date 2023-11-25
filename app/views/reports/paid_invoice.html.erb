@@ -15,7 +15,7 @@
     
         <div id="content-full">
             <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
-            <h1><%=Setting.find_by_name("Client Name").value%> / Piutang Pelanggan: <span class="red"><%=@year%></span></h1>
+            <h1><%=Setting.find_by_name("Client Name").value%> / Piutang Pelanggan Lunas: <span class="red"><%=@year%></span></h1>
     
             <br class="clearfix" />
             
@@ -75,7 +75,8 @@
                     <th class="center {sorter:true, filter: false}" width="200">No Invoice</th>
                     <th class="{sorter:true, filter: false}" width="90">Kirim</th>
                     <th class="{sorter:true, filter: false}" width="90">Konfirm</th>
-                    <th class="{sorter:false, filter: false}" width="110">Jatuh Tempo</th>
+                    <th class="{sorter:false, filter: false}" width="90">J. Tempo</th>
+                    <th class="{sorter:false, filter: false}" width="90">Lunas</th>
                     <th width="80" class="center {sorter:true, filter: false}">DPP</th>
                     <th width="80" class="center {sorter:true, filter: false}">PPN</th>
                     <th width="80" class="center {sorter:true, filter: false}">PPH</th>
@@ -110,7 +111,7 @@
                             <% end %>
                         </td>
                         
-                        
+                        <td><%=taxinvoice.paiddate.strftime('%d-%m-%y') rescue nil%></td>
                         <td align="right"><%= to_currency(taxinvoice.downpayment) %></td>
                         <td align="right"><%= to_currency(taxinvoice.gst_tax) %></td>
                         <td align="right"><%= to_currency(taxinvoice.price_tax) %></td>
@@ -126,7 +127,7 @@
                 <tfoot>
                 <tr>
                     <td colspan="2"><strong>Total</strong></td>
-                    <td colspan="7" align="right"><strong><%= to_currency(total) %></strong></td>
+                    <td colspan="8" align="right"><strong><%= to_currency(total) %></strong></td>
     
                 </tr>
               </tfoot>

@@ -2879,6 +2879,53 @@ end
     end
   end    
   
+  def paid_invoice
+    
+    role = cek_roles 'Admin Keuangan, Auditor'
+      
+    if role
+      
+      @month = params[:month]
+      @month = "%02d" % Date.today.month.to_s if @month.nil?
+      @day = "01"
+      @year = params[:year]
+      @year = Date.today.year if @year.nil?
+
+      @monthEnd = params[:monthEnd]
+      @monthEnd = "%02d" % Date.today.month.to_s if @monthEnd.nil?
+      @dayEnd = getlastday (@monthEnd.to_s)
+      @yearEnd = params[:yearEnd]
+      @yearEnd = Date.today.year if @yearEnd.nil?
+
+      @taxinvoices = Taxinvoice.active.joins(:customer)
+
+      # @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'DD-MM-YYYY') BETWEEN ? AND ?", "#{@day}-#{@month}-#{@year}","#{@dayEnd}-#{@monthEnd}-#{@yearEnd}")
+      @taxinvoices = @taxinvoices.where("paiddate is not null AND date BETWEEN ? AND ?", "#{@year}-#{@month}-#{@day}-","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
+
+      @customer = Customer.find(params[:customer_id]) rescue nil
+
+      if @customer.present?
+        @taxinvoices = @taxinvoices.where("customer_id = ?", @customer.id)
+      end  
+      
+      if params[:due_date_order].present?
+        if params[:due_date_order] == "asc"
+          @taxinvoices = @taxinvoices.order("((case when sentdate is not null then sentdate else date end) + (interval '1' day * COALESCE(customers.terms_of_payment_in_days,0))) asc")
+        elsif params[:due_date_order] == "desc"
+          @taxinvoices = @taxinvoices.order("((case when sentdate is not null then sentdate else date end) + (interval '1' day * COALESCE(customers.terms_of_payment_in_days,0))) desc")
+        end
+      else
+        @taxinvoices = @taxinvoices.order(:long_id)
+      end
+      # render json: @taxinvoices
+      @section = "reports2"
+      @where = "reports-paidinvoice"
+        
+    else
+      redirect_to root_path()
+    end
+  end    
+
   def estimation_event_expense_backup
     role = cek_roles 'Admin Keuangan'
     if role

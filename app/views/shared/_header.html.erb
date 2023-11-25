@@ -213,6 +213,7 @@
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Auditor'), "Omset Penjualan", "/reports/customers" %></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Auditor'), "Piutang Pelanggan", "/reports/customercredits" %></li>
                     <li><%= link_to_if (checkrole 'Admin Keuangan, Auditor' || current_user.owner), "Report Piutang Pelanggan", unpaid_invoice_url %></li>
+                    <li><%= link_to_if (checkrole 'Admin Keuangan, Auditor' || current_user.owner), "Report Piutang Lunas", paid_invoice_url %></li>
 					<li><%= link_to_if (current_user.owner || (checkrole 'Owner Report')), "Hutang Supplier", "/reports/suppliercredits" %></li>
 					<!-- <li><%= link_to_if (current_user.owner || (checkrole 'Owner Report')), "Target Ban Tahunan", "/reports/tiretargets" %></li> -->
 					<li class="divider"></li>

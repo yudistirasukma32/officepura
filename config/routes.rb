@@ -668,6 +668,7 @@ OfficePuraErp::Application.routes.draw do
     match 'shrinkreport' => 'reports#shrinkreport'
     get "driver-rit" => 'reports#driver_rit'
     get 'unpaid_invoice' => 'reports#unpaid_invoice'
+    get 'paid_invoice' => 'reports#paid_invoice'
       
     get "confirmed-invoices" => 'reports#confirmed_invoices'
     get "collectible-invoices" => 'reports#collectible_invoices'
