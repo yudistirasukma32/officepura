@@ -22,6 +22,8 @@ class Attachment < ActiveRecord::Base
 			Invoice.find(self.imageable_id) rescue nil
     when "Taxinvoice"
 			Taxinvoice.find(self.imageable_id) rescue nil
+    when "Quotationgroup"
+			Quotationgroup.find(self.imageable_id) rescue nil
     default
       nil
     end

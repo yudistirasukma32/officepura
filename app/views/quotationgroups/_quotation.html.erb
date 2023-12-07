@@ -1,0 +1,18 @@
+<% if @quotations.any? %>
+    <% no=0 %>
+    <% @quotations.each do |quotation|%>
+        <% no=no+1 %>
+        <tr style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">
+            <td align="right" style="padding: 10px;"><%= no %></td>
+            <td style="padding-left: 1rem;"><%= quotation.name %></td>
+            <td style="padding-left: 1rem;"><%= quotation.commodity.name rescue nil %></td>
+            <td align="right" style="padding-left: 1rem; width: 30px; "><%= quotation.distance rescue 0 %></td>
+            <td align="right" style="padding-right: 1rem; width: 100px; "><%= quotation.price_per.present? ? to_currency_bank(quotation.price_per) : 0 %></td>
+            <td style=""><%= quotation.price_per_type rescue nil %></td>
+        </tr>
+    <% end %>
+    <% else %>
+    <tr>
+        <td colspan="6" align="center" style="padding: 10px;">Belum Ada Data Jurusan</td>
+    </tr>
+<% end %>

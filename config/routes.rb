@@ -113,11 +113,38 @@ OfficePuraErp::Application.routes.draw do
     member do
       get 'enable'
       get 'disable'
-
       get "copy"
     end
     collection do
       get "index_api"
+    end
+  end
+
+  resources :quotationgroups do
+    member do
+      get 'print'
+    end
+    collection do
+      get 'confirmed' => 'quotationgroups#indexconfirm'
+      get "getcustomer/:value" => 'quotationgroups#getcustomer'
+      get "getquotation/:id" => 'quotationgroups#getquotation'
+      get "index_api"
+      get "indexconfirm_api"
+      post "confirmation"
+    end
+  end
+
+  get 'quotations/confirmed' => 'quotations#indexconfirm'
+  resources :quotations do
+    member do
+      get 'enable'
+      get 'disable'
+      get "copy"
+    end
+    collection do
+      get "index_api"
+      get "indexconfirm_api"
+      post "confirmation"
     end
   end
 
@@ -248,6 +275,10 @@ OfficePuraErp::Application.routes.draw do
   match 'invoices/add_ship' => 'invoices#indexaddship'
   match 'invoices/add_ship/:invoice_id' => 'invoices#add_ship'
   post 'invoices/updateship/' => 'invoices#updateship'
+
+  match 'invoices/add_train' => 'invoices#indexaddtrain'
+  match 'invoices/add_train/:invoice_id' => 'invoices#add_train'
+  post 'invoices/updatetrain/' => 'invoices#updatetrain'
 
   match 'invoices/add_weight' => 'invoices#indexaddweight'
   match 'invoices/add_weight/:invoice_id' => 'invoices#add_weight'
@@ -637,6 +668,7 @@ OfficePuraErp::Application.routes.draw do
     match 'shrinkreport' => 'reports#shrinkreport'
     get "driver-rit" => 'reports#driver_rit'
     get 'unpaid_invoice' => 'reports#unpaid_invoice'
+    get 'paid_invoice' => 'reports#paid_invoice'
       
     get "confirmed-invoices" => 'reports#confirmed_invoices'
     get "collectible-invoices" => 'reports#collectible_invoices'
@@ -677,8 +709,14 @@ OfficePuraErp::Application.routes.draw do
   match '/media/:dragonfly/:file_name', :to => Dragonfly[:images]  
   post 'attachments/upload' => 'attachments#upload', :as => :attachments_upload
 	post 'attachments/uploadTaxInv' => 'attachments#uploadTaxInv', :as => :attachments_uploadTaxInv
+  post 'attachments/uploadQuot' => 'attachments#uploadQuot', :as => :attachments_uploadQuot
+
   get 'attachments/remove/:id' => 'attachments#remove', :as => :attachments_remove
 	get 'attachments/removeTaxInv/:id' => 'attachments#removeTaxInv', :as => :attachments_removeTaxInv
+	get 'attachments/removeQuot/:id' => 'attachments#removeQuot', :as => :attachments_removeQuot
+
+
+  
 
   match 'deletes/action' => 'deletes#action'
   match 'deletes/money' => 'deletes#money'

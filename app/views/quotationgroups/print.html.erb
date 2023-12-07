@@ -1,0 +1,162 @@
+<style type="text/css">
+	p {
+		font-size: 12pt;
+		padding: 0;
+		margin-top: .5rem;
+		margin-bottom: .5rem;
+	}
+
+	table {
+		border: 1px solid;
+	}
+
+	th {
+		border: 1px solid;
+	}
+
+	td {
+		border: 1px solid #888;
+	}
+
+	.headsignature {margin-top:0px;margin-left: 250px;}
+
+	.pleft {
+		display: inline-block;
+		width: 125px;
+	}
+
+	.pright {
+		display: inline-block;
+	}
+
+	.pttdleft {
+		display: inline-block;
+		width: 40%;
+	}
+
+	.pttdright {
+		display: inline-block;
+		margin-left: 5rem;
+	}
+
+	@media print{
+		@page { margin-top:120px;margin-bottom:120px; }
+
+		.d-none-print {
+			display: none;
+		}
+	}
+
+	label {
+		width: 120px;
+	}
+</style>
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+
+<div id="main">
+	<div id="content-full" class="invoice-paper">
+		<a class="btn-txt cancel hideprint" href="<%=quotationgroups_path({:customer_id => $globalCustomer_id, :month => $globalMonth, :year => $globalYear})%>"><i class="icon-remove"></i> Batal</a>
+		
+
+		<% if !@quotationgroup.nil? %>
+		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+
+		<h1 class="hideprint"><%=Setting.find_by_name("Client Name").value%> / Penawaran</h1>
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<p class="left" style="width: 100%;margin-bottom:2rem">Nomor : <%=@quotationgroup.long_id%><span class="right">Surabaya, <%= @quotationgroup.confirmed_date.strftime('%d') %> <%= @month %> <%= @quotationgroup.confirmed_date.strftime('%Y') %></span></p>
+
+		<p>Kepada Yth.</p>
+		<%
+			if @quotationgroup.customer_id.present?
+				customer = @quotationgroup.customer.name
+			elsif @quotationgroup.customer_name.present?
+				customer = @quotationgroup.customer_name
+			end
+		%>
+		<p style="font-weight:700; margin-bottom:2rem;"><%= customer %></p>
+
+		<%
+			if @quotationgroup.customer_pic.present?
+				pic = @quotationgroup.customer_pic
+			else
+				pic = customer
+			end
+		%>
+		<div>
+			<p class="pleft">u.p.</p>
+			<p class="pright">: <%= pic %></p>
+		</div>
+
+		<div style="margin-bottom:2rem">
+			<p class="pleft">Perihal</p>
+			<p class="pright">: <span style="font-weight:700;text-decoration-line: underline;text-decoration-thickness: 3px;">Penawaran Harga</span></p>
+		</div>
+
+		<p style="line-height: 20pt;">Dengan hormat,<br>Menindaklanjuti permintaan jasa angkutan untuk pemenuhan kebutuhan di perusahaan Bapak, berikut kami ajukan penawaran jasa angkutan PT Rajawali Dwi Putra Indonesia Tbk.</p>
+
+ 		<br class="clear" />
+ 		<br class="clear" />
+
+		<table class="row-view">
+			<thead>
+				<tr>
+					<th colspan="2" style="text-align:center">RUTE</th>
+					<th rowspan="2" style="text-align:center" width="100">Tarif/Rit</th>
+				</tr>
+				<tr>
+					<th style="text-align:center">Tempat Muat</th>
+					<th style="text-align:center">Tempat Bongkar</th>
+				</tr>
+			</thead>
+
+			<% if @quotations.present? %>
+			<tbody>
+				<% @quotations.each do |quotation| %>
+				<tr>
+					<td><%= quotation.name rescue nil %> <%= quotation.address_start rescue nil %></td>
+					<td><%= quotation.address_end rescue nil %></td>
+					<td align="right"><%= to_currency_bank(quotation.price_per) %></td>
+				</tr>
+				<% end %>
+			</tbody>
+			<% end %>
+		</table>
+
+		<% if @quotationgroup.description.present? %>
+			<p>Keterangan : <%= nl2br(@quotationgroup.description).html_safe%></p>
+		<% end %>
+
+		<p style="line-height:20pt; margin-top:2rem;">Jika Bapak memerlukan informasi lebih lanjut, Bapak dapat menghubungi Indra Susanto telepon 08113001598 email indra@rdpitrans.com atas perhatian Bapak, kami sampaikan terima kasih.</p>
+		
+		<div style="margin-top:3rem">
+			<p class="pttdleft">Hormat kami,</p>
+			<p class="pttdright">Menerima dan Menyetujui</p>
+		</div>
+
+		<% if @confirmation.username == 'admin' %>
+			<%= image_tag('ttd_developer.png', size: '175x75') %>
+		<% elsif @confirmation.username == 'ariel' %>
+			<%= image_tag('ttd_pak_ariel.png', size: '175x75') %>
+		<% elsif @confirmation.username == 'indra' %>
+			<%= image_tag('ttd_pak_indra.png', size: '175x75') %>
+		<% elsif @confirmation.username == 'yonathan' %>
+			<%= image_tag('ttd_pak_yonathan.png', size: '175x75') %>
+		<% end %>
+
+		<div>
+			<p class="pttdleft"><u><%= @confirmation.username.upcase %></u></p>
+			<p class="pttdright"><u><%= customer %></u></p>
+		</div>
+		<p style="margin-top:0"><%= @confirmation_role.name rescue nil %></p>
+	</div>
+	<% end %>
+</div>

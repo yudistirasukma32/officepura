@@ -1,0 +1,14 @@
+
+<% if params['value'] == 'true' %>
+    <label for="customer_id">Pelanggan</label>
+    <select id="quotationgroup_customer_id" name="quotationgroup[customer_id]" class="chzn-select double combo_customer">
+        <option value=>- Pelanggan -</option>
+        <% @customers.each do |customer| %>
+        <option value="<%=customer.id%>"><%=customer.name%></option>
+        <% end %>
+    </select>
+<% elsif params['value'] == 'false' %>
+    <label for="customer_id">Pelanggan</label>
+    <input id="quotationgroup_customer_name" name="quotationgroup[customer_name]" size="30" type="text">
+    <small>Pastikan pelanggan baru tidak ada di list pelanggan lama</small>
+<% end %>

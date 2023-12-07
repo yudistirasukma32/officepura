@@ -89,7 +89,7 @@ class TrainexpensesController < ApplicationController
     # render json: inputs
     # return false
     @trainexpense = Trainexpense.new(inputs)
-    @trainexpense.date = Date.today
+    # @trainexpense.date = Date.today
 
     if @trainexpense.save
       redirect_to(trainexpenses_url(), :notice => 'Data Biaya Kereta sukses ditambah.')

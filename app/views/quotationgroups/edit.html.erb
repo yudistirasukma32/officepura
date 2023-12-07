@@ -1,0 +1,96 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+
+		<% if params[:operational] || params[:operational] == true %>
+			<a class="btn-txt cancel" href="<%= quotationgroups_url %>"><i class="icon-remove"></i> Kembali Ke Penawaran</a>
+			<h1>Marketing / <a href="<%=quotationgroups_path%>">Penawaran</a> / Edit</h1>
+		<% else %>
+			<a class="btn-txt cancel" href="<%=quotationgroups_url%>"><i class="icon-remove"></i> Kembali Ke Penawaran</a>
+			<h1>Edit Penawaran</h1>
+		<% end %>
+
+		<% tab = 0 %>
+		<ul class="rounded" id="tabbed">
+			<li><a id="link_<%=tab+=1%>" href="">Data Penawaran</a></li>
+			<% if checkrole 'Admin Jurusan, Admin Marketing, Marketing' %>
+			<li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
+			<% end %>
+		</ul>
+
+		<br class="clearfix" />
+ 
+		<% tab = 0 %>
+		<div id="sliding_window">
+		    <div class="sliding_container">
+
+			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+					<%= render "form" %>
+
+					<div style="float: left; width: 300px;">
+							<% if @quotationgroup %>
+
+							<h3 class="zone" style="font-weight: bold;">Upload attachment</h3>
+
+							<% if @quotationgroup.images.where("file_uid is not null and file_uid <> ''").any? %>
+							<% @quotationgroup.images.where("file_uid is not null and file_uid <> ''").each do |img| %>
+							<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+						
+							<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+							
+								<a href="<%= img.file.url() %>" target="_blank">
+									<%= image_tag img.file.thumb('480x320').url(:suffix => "/#{img.name}") if img.file_uid %>
+								</a>
+								
+								<% else %>
+								
+									<a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
+								
+								<% end %>
+
+								<br /><br /><%= link_to '&raquo; Hapus File'.html_safe, '/attachments/removeQuot/' + @quotationgroup.images.first.id.to_s %>
+								<br>
+								<br>
+								<% end %>
+
+							<% end %>
+
+							<form action="/attachments/uploadQuot" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+							<input type="hidden" name="model_name" value="quotationgroup" />
+							<input type="hidden" name="item_id" value="<%=@quotationgroup.id%>" />
+
+							<div class="field-row" style="width: 300px;">
+								<label for="name">Nama</label>
+								<input type="text" name="attachment[name]" style="width: 100%; max-width: 280px;"/>
+							</div>
+
+							<div class="field-row continue" style="width: 100%;">
+								<label for="file">Browse File</label>
+								<input type="file" name="attachment[file]"/>
+							</div>
+
+							<div class="actions" style="text-align: center; padding: 1rem; margin-bottom: 1.5rem;">
+								<input type="submit" value="Simpan File" />
+							</div>
+
+							</form>
+						<% end %>	
+					</div>
+				
+				</div>
+
+			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+					<%= render "quotationitem" %>
+			    </div>
+				
+			</div>
+		</div>
+
+		<br class="clearfix" />
+	</div>
+</div>

@@ -83,6 +83,11 @@
             <td><%= @invoice.routetrain.container_type rescue nil %></td>
         </tr>
         <tr>
+          <td>Tgl Bayar</td>
+          <td><%= f.text_field :date, :class => 'half date-picker', :value => @invoice.date.strftime('%d-%m-%Y') %>
+          <span>(tgl/bln/thn)</span></td>
+        </tr>
+        <tr>
           <td>Memo</td>
           <td><%= f.text_area :description, :class => '', style: "border: 2px solid #d7d7d7; height: 50px;".html_safe, rows: 10 %></td>
         </tr>

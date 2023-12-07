@@ -40,18 +40,18 @@ class ShipexpensesController < ApplicationController
     @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
 
     @operator_id = params[:operator_id]
-        @containertype = params[:containertype]
-    
-        # @shipexpenses = Invoice.where('invoiceship = true AND routeship_id is not null AND routeship_id !=0  AND date between ? and ? AND invoices.id in (select invoice_id from shipexpenses where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
-        @shipexpenses = Shipexpense.where('shipexpenses.date between ? and ? and shipexpenses.deleted = false', @startdate.to_date, @enddate.to_date).order(:id)
-    
-        if @operator_id.present?
-          @shipexpenses = @shipexpenses.joins(:invoice).where('invoices.operator_id = ?', @operator_id)
-        end
-    
-        if @containertype.present?
-          @shipexpenses = @shipexpenses.joins(:routeship).where('routeships.container_type = ?', @containertype)
-        end
+    @containertype = params[:containertype]
+
+    # @shipexpenses = Invoice.where('invoiceship = true AND routeship_id is not null AND routeship_id !=0  AND date between ? and ? AND invoices.id in (select invoice_id from shipexpenses where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
+    @shipexpenses = Shipexpense.where('shipexpenses.date between ? and ? and shipexpenses.deleted = false', @startdate.to_date, @enddate.to_date).order(:id)
+
+    if @operator_id.present?
+      @shipexpenses = @shipexpenses.joins(:invoice).where('invoices.shipoperator_id = ?', @operator_id)
+    end
+
+    if @containertype.present?
+      @shipexpenses = @shipexpenses.joins(:routeship).where('routeships.container_type = ?', @containertype)
+    end
 
   end
 

@@ -40,6 +40,9 @@
 	<% end %>
 
 	<% if @section == 'marketing' %>
+		<li class="<%= @where == 'quotation' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Marketing, Marketing'), "Penawaran", "/quotationgroups" %></li>
+		<li class="<%= @where == 'quotation-confirm' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Marketing, Marketing'), "Penawaran Terkonfirmasi", "/quotationgroups/confirmed" %></li>
+
 		<li class="<%= @where == 'kosongan_approval' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Marketing, Marketing, Konfirm Kosongan'), "Approval BKK Kosongan", "/invoices/kosongan_approval" %></li>
 	<% end %>
 
@@ -237,7 +240,9 @@
 		<li class="<%= @where == 'addweight' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Berat Muat", "/invoices/add_weight" %></li> 
 		<li class="<%= @where == 'mechaniclogs' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Mekanik'), "Call Mekanik", "/mechaniclogs" %></li>
 		<li class="<%= @where == 'mechaniclogs-done' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Mekanik'), "Call Mekanik - Process", "/mechaniclogs-done" %></li>
-		<li class="<%= @where == 'addship' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Keuangan'), "Edit Operator Kapal", "/invoices/add_ship" %></li> 
+
+		<li class="<%= @where == 'addtrain' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Keuangan'), "Edit Op Kereta", "/invoices/add_train" %></li> 
+		<li class="<%= @where == 'addship' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Keuangan'), "Edit Op Kapal", "/invoices/add_ship" %></li> 
 		<li class="<%= @where == 'adddovendor' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "DO Vendor", "/events/add_dovendor" %></li> 
 	<% end %>
  

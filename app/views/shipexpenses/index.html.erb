@@ -28,10 +28,9 @@
 				<select name="operator_id" class="middle short">
 					<option value="">Semua</option>
 					<% Operator.multimode.active.order(:name).each do |ope| %>
-					<option value="<%=ope.id%>"<% if ope.id == @ope %> selected='selected'<% end %>><%=ope.abbr%></option>
+					<option value="<%=ope.id%>"<% if ope.id.to_s == @operator_id %> selected='selected'<% end %>><%=ope.abbr%></option>
 					<% end %>
 				</select>
-				
 				<input class="submit" type="submit" value="Filter" />
 			</div>
 			</form>

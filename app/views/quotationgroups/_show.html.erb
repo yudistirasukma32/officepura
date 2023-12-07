@@ -1,0 +1,9 @@
+<%
+	creator = User.where(id: @quotationgroup.created_by).first
+	confirmation = User.where(id: @quotationgroup.confirmed_by).first
+%>
+<div id="content-full">
+	<br class="clearfix" />
+		[Print Module]
+	<br class="clearfix" />
+</div>

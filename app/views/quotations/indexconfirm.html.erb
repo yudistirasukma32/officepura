@@ -1,0 +1,106 @@
+<style>
+	.pagination {
+	width: 100%;
+    display: flex;
+    justify-content: center;
+	}
+
+	.pagination a {
+	color: black;
+	float: left;
+	padding: 8px 16px;
+	text-decoration: none;
+	}
+
+	.pagination a.active {
+	background-color: #4CAF50;
+	color: white;
+	}
+
+	.pagination a:hover:not(.active) {background-color: #ddd;}
+</style>
+<%= render "shared/header" %>
+
+<div id="nav">
+		<%= render "shared/nav" %>
+	</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<h1>Marketing / Penawaran Diterima</a></h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+
+				<label for="customer" class="middle">Customer</label>
+				<select name="customer" class="half left chzn-select customer_id">
+					<option value="all">All</option>
+					<% @customers.each do |customer| %>
+					<option value="<%=customer.id%>" <%= params[:customer_id].to_i == customer.id ? "selected" : "" %>><%=customer.name%></option>
+					<% end %>
+				</select>
+				<label for="query-name" class="middle">Jurusan</label>
+				<input type="text" name="search" id="query-name" class="half left" placeholder="" style="margin-left: 10px;">
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+		<div id="content-table">
+
+		</div>
+		<br class="clearfix"/>
+
+	</div>
+
+</div>
+
+<%= content_for :js do %>
+	<script>
+		global_page = 1;
+		old_customer_id = "";
+		old_query = "";
+		
+		function show_data() {
+			query  = $("#query-name").val();
+			customer_id  = $(".customer_id").val();
+			if (old_customer_id != customer_id || old_query != query) {
+				global_page = 1;
+			}
+			old_customer_id = customer_id;
+			old_query = query;
+
+			$.ajax({
+				url: "<%= indexconfirm_api_quotations_url %>",
+				method: "get",
+				data:{
+					query,customer_id,page: global_page
+				},
+				dataType: "html",
+				success:function(data){
+					$("#content-table").html(data);
+				}
+			});
+		}
+
+		$(document).ready(function(){
+			element = $("[name=customer]").next();
+			$(element).addClass("left");
+			show_data();
+		})
+		.on("submit","#filterform",function(e){
+			e.preventDefault();
+			show_data();
+		})
+		.on("click",".pagination-link",function(e){
+			e.preventDefault();
+			global_page = $(this).data("page");
+			show_data();
+		});
+	</script>
+<% end %>

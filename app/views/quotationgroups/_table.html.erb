@@ -1,0 +1,315 @@
+<style>
+    .label {
+        padding: 0;
+        margin: 0;
+        display: -webkit-inline-box;
+        display: -ms-inline-flexbox;
+        display: inline-flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        font-size: 0.8rem;
+        background-color: #EBEDF3;
+        color: #3F4254;
+        font-weight: 400;
+        height: 20px;
+        width: 20px;
+        font-size: 0.8rem; }
+        .label.label-primary {
+            color: #FFFFFF;
+            background-color: #6993FF; }
+        .label.label-outline-primary {
+            background-color: transparent;
+            color: #6993FF;
+            border: 1px solid #6993FF; }
+            .label.label-outline-primary.label-outline-2x {
+            border: 2px solid #6993FF; }
+        .label.label-light-primary {
+            color: #6993FF;
+            background-color: #E1E9FF; }
+        .label.label-secondary {
+            color: #3F4254;
+            background-color: #E4E6EF; }
+        .label.label-outline-secondary {
+            background-color: transparent;
+            color: #3F4254;
+            border: 1px solid #E4E6EF; }
+            .label.label-outline-secondary.label-outline-2x {
+            border: 2px solid #E4E6EF; }
+        .label.label-light-secondary {
+            color: #E4E6EF;
+            background-color: #EBEDF3; }
+        .label.label-success {
+            color: #ffffff;
+            background-color: #37c435; }
+        .label.label-outline-success {
+            background-color: transparent;
+            color: #1BC5BD;
+            border: 1px solid #1BC5BD; }
+            .label.label-outline-success.label-outline-2x {
+            border: 2px solid #1BC5BD; }
+        .label.label-light-success {
+            color: #1BC5BD;
+            background-color: #C9F7F5; }
+        .label.label-info {
+            color: #ffffff;
+            background-color: #8950FC; }
+        .label.label-outline-info {
+            background-color: transparent;
+            color: #8950FC;
+            border: 1px solid #8950FC; }
+            .label.label-outline-info.label-outline-2x {
+            border: 2px solid #8950FC; }
+        .label.label-light-info {
+            color: #8950FC;
+            background-color: #EEE5FF; }
+        .label.label-warning {
+            color: #ffffff;
+            background-color: #FFA800; }
+        .label.label-outline-warning {
+            background-color: transparent;
+            color: #FFA800;
+            border: 1px solid #FFA800; }
+            .label.label-outline-warning.label-outline-2x {
+            border: 2px solid #FFA800; }
+        .label.label-light-warning {
+            color: #FFA800;
+            background-color: #FFF4DE; }
+        .label.label-danger {
+            color: #ffffff;
+            background-color: #F64E60; }
+        .label.label-outline-danger {
+            background-color: transparent;
+            color: #F64E60;
+            border: 1px solid #F64E60; }
+            .label.label-outline-danger.label-outline-2x {
+            border: 2px solid #F64E60; }
+        .label.label-light-danger {
+            color: #F64E60;
+            background-color: #FFE2E5; }
+        .label.label-light {
+            color: #7E8299;
+            background-color: #F3F6F9; }
+        .label.label-outline-light {
+            background-color: transparent;
+            color: #3F4254;
+            border: 1px solid #F3F6F9; }
+            .label.label-outline-light.label-outline-2x {
+            border: 2px solid #F3F6F9; }
+        .label.label-light-light {
+            color: #F3F6F9;
+            background-color: #F3F6F9; }
+        .label.label-dark {
+            color: #ffffff;
+            background-color: #181C32; }
+        .label.label-outline-dark {
+            background-color: transparent;
+            color: #181C32;
+            border: 1px solid #181C32; }
+            .label.label-outline-dark.label-outline-2x {
+            border: 2px solid #181C32; }
+        .label.label-light-dark {
+            color: #181C32;
+            background-color: #D1D3E0; }
+        .label.label-white {
+            color: #3F4254;
+            background-color: #ffffff; }
+        .label.label-outline-white {
+            background-color: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff; }
+            .label.label-outline-white.label-outline-2x {
+            border: 2px solid #ffffff; }
+        .label.label-light-white {
+            color: #ffffff;
+            background-color: #ffffff; }
+        .label.label-inline {
+            width: auto;
+            padding: 0.15rem 0.75rem;
+            border-radius: 0.42rem; }
+            .label.label-inline.label-md {
+            padding: 0.8rem 0.6rem; }
+            .label.label-inline.label-lg {
+            padding: 0.9rem 0.75rem; }
+            .label.label-inline.label-xl {
+            padding: 1rem 0.85rem; }
+        .label.label-pill {
+            border-radius: none; }
+        .label.label-rounded {
+            border-radius: 0.42rem; }
+        .label.label-square {
+            border-radius: 0; }
+        .label.label-dot {
+            display: inline-block;
+            font-size: 0 !important;
+            vertical-align: middle;
+            text-align: center; }
+        .label.label-inline {
+            width: auto; }
+        .label.label-dot {
+            line-height: 6px;
+            min-height: 6px;
+            min-width: 6px;
+            height: 6px;
+            width: 6px; }
+        .label.label-sm {
+            height: 16px;
+            width: 16px;
+            font-size: 0.75rem; }
+            .label.label-sm.label-inline {
+            width: auto; }
+            .label.label-sm.label-dot {
+            line-height: 4px;
+            min-height: 4px;
+            min-width: 4px;
+            height: 4px;
+            width: 4px; }
+        .label.label-lg {
+            height: 24px;
+            width: 24px;
+            font-size: 0.9rem; }
+            .label.label-lg.label-inline {
+            width: auto; }
+            .label.label-lg.label-dot {
+            line-height: 8px;
+            min-height: 8px;
+            min-width: 8px;
+            height: 8px;
+            width: 8px; }
+        .label.label-xl {
+            height: 28px;
+            width: 28px;
+            font-size: 1rem; }
+            .label.label-xl.label-inline {
+            width: auto; }
+            .label.label-xl.label-dot {
+            line-height: 10px;
+            min-height: 10px;
+            min-width: 10px;
+            height: 10px;
+            width: 10px; }
+</style>
+
+<% 
+	page = params[:page].blank? ? 1 : params[:page].to_i 
+	if @total_page > 6
+		start_page = page - 3
+		start_page = 2 if start_page <= 1
+		end_page = page + 4
+		end_page = @total_page if end_page >= @total_page
+		max_page = @total_page	
+		first_page = 1
+
+	else
+		start_page = 1
+		end_page = @total_page + 1
+	end
+	
+%>
+
+
+<table class="row-view report-view tablesorter tablesorterFilters">
+    <thead>
+        <tr>
+            <th class="{sorter:true, filter: true}" >TGL</th>
+            <th class="{sorter:true, filter: true}" >Nomor</th>
+            <th class="{sorter:true, filter: true}" >Nama Pelanggan</th>
+            <th class="{sorter:true, filter: true}" >Nama PIC</th>
+            <th class="{sorter: false, filter: false}" align="right" style="padding-right: 1rem; text-align: right; ">Jurusan</th>
+            <th class="{sorter:true, filter: true}" >Dibuat Oleh</th>
+            <th class="{sorter: false, filter: false}">Status</th>
+            <th width="90" class="{sorter: false, filter: false}"></th>
+        </tr>
+    </thead>
+
+    <tbody class="tablesorter-sort">
+    <%
+    @quotationgroups.each do |group|
+    creator = User.find(group.created_by) rescue nil
+    %>
+    <tr>
+        <td><strong><%= group.date.strftime('%d') rescue nil %>.</strong><%= group.date.strftime('%m') rescue nil %></td>
+        <td><% if checkrole 'Master Jurusan, Admin Marketing' %><%= link_to group.long_id, edit_quotationgroup_path(group) %> <% else %> <%= group.long_id %> <% end %></td>
+        <td><%= group.customer_id.present? ? group.customer.name : (group.customer_name.present? ? group.customer_name : '') %></td>
+        <td><%= group.customer_pic rescue nil %></td>
+        <td align="right" style="padding-right: 1rem; "><%= group.quotations.count %></td>
+        <td><%= creator.username if !creator.blank? %></td>
+
+        <% if group.status != 'confirmed' %>
+            <td><a href="#" class="btn-confirmation label label-inline label-<%= group.status=='unconfirmed' ? 'primary' : (group.status=='rejected' ? 'danger' : (group.status=='confirmed' ? 'success' : '')) %> p-4" style="padding-top: .2rem; padding-bottom: .2rem; padding-left: 1rem; padding-right: 1rem; color: white;" data-id="<%=group.id%>" data-longid="<%=group.long_id%>" data-customer="<%=group.customer.name rescue nil%>" data-date="<%=group.date.strftime('%d-%m-%Y') rescue nil%>" data-status="<%=group.status%>" data-notes="<%=group.notes rescue nil%>" data-routecount="<%=group.quotations.count%>" data-cstmname="<%=group.customer_name%>"><%= group.status %></a></td>
+        <% else %>
+            <td><div class="label label-inline label-success p-4"><%= group.status %></div></td>
+        <% end %>
+
+        <td class="right">
+            <% if group.status=='confirmed' && current_user.owner %>
+                <%= link_to '&#xf044;'.html_safe, edit_quotationgroup_path(group, :confirmed => true), :class => "edit tipsy", :title => 'Edit' %>
+                <%= link_to '&#xf06e;'.html_safe, quotationgroup_path(group), :class => "edit tipsy", :title => 'Show' %>
+                <%= link_to '&#xf02f;' .html_safe, print_quotationgroup_path(group), :class => "delete tipsy", :title => 'Print' %>
+                <%= link_to '&#xf00d;'.html_safe, group, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+            <% elsif group.status=='confirmed' %>
+                <%= link_to '&#xf06e;'.html_safe, quotationgroup_path(group), :class => "edit tipsy", :title => 'Show' %>
+                <%= link_to '&#xf02f;' .html_safe, print_quotationgroup_path(group), :class => "delete tipsy", :title => 'Print' %>
+            <% else %>
+                <%= link_to '&#xf044;'.html_safe, edit_quotationgroup_path(group, :operational => true), :class => "edit tipsy", :title => 'Edit' %>
+                <%= link_to '&#xf00d;'.html_safe, group, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+            <% end %> 
+        </td>
+    </tr>
+    <% end %>
+    </tbody>	
+
+</table>
+
+<% 
+page = params[:page].blank? ? 1 : params[:page].to_i 
+if @total_page > 6
+    start_page = page - 3
+    start_page = 2 if start_page <= 1
+    end_page = page + 4
+    end_page = @total_page if end_page >= @total_page
+    max_page = @total_page	
+    first_page = 1
+
+else
+    start_page = 1
+    end_page = @total_page + 1
+end
+
+%>
+<div class="pagination">
+
+<% if page > 1 %>
+    <a data-page="<%= page - 1 %>" href="<%= quotationgroups_url(office_id: params[:office_id], page: page - 1) %>" class="pagination-link">&laquo;</a>
+<% end %>
+
+<% if first_page.present? %>
+    <a data-page="<%= first_page %>" href="<%= quotationgroups_url(office_id: params[:office_id], page: first_page) %>" class="pagination-link <%= page == first_page ? "active" : "" %>"><%= first_page %></a>
+<% end %>
+
+<% if page > 5 %>
+    <a href="#" class="pagination-link">...</a>
+<% end %>
+
+<% until start_page == end_page  do %>
+    <a data-page="<%= start_page %>" href="<%= quotationgroups_url(office_id: params[:office_id], page: start_page) %>" class="pagination-link <%= page == start_page ? "active" : "" %>"><%= start_page %></a>
+    <% start_page += 1 %>
+<% end %>
+
+<% if max_page.present? %>
+    <% if page < max_page - 4 %>
+        <a onclick="" href="#" class="">...</a>
+    <% end %>
+<a data-page="<%= max_page %>" href="<%= quotationgroups_url(office_id: params[:office_id], page: max_page) %>" class="pagination-link <%= page == max_page ? "active" : "" %>"><%= max_page %></a>
+<% end %>
+
+<% if page < @total_page %>
+    <a data-page="<%= page + 1 %>" href="<%= quotationgroups_url(office_id: params[:office_id], page: page + 1) %>" class="pagination-link">&raquo;</a>
+<% end %>
+</div>

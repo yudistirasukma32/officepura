@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20231003220129) do
+ActiveRecord::Schema.define(:version => 20231113071631) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -263,6 +263,20 @@ ActiveRecord::Schema.define(:version => 20231003220129) do
     t.timestamp "updated_at",      :limit => 6,                    :null => false
     t.string    "category"
     t.integer   "vendor_id"
+  end
+
+  create_table "contracts", :force => true do |t|
+    t.boolean  "deleted",       :default => false
+    t.boolean  "enabled",       :default => true
+    t.string   "name"
+    t.string   "code"
+    t.date     "date_start"
+    t.date     "date_end"
+    t.integer  "customer_id"
+    t.string   "contract_type"
+    t.string   "description"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
   end
 
   create_table "customers", :force => true do |t|
@@ -928,6 +942,64 @@ ActiveRecord::Schema.define(:version => 20231003220129) do
     t.timestamp "updated_at", :limit => 6,                    :null => false
   end
 
+  create_table "quotationgroups", :force => true do |t|
+    t.boolean  "deleted",                                        :default => false
+    t.boolean  "enabled",                                        :default => true
+    t.string   "long_id"
+    t.date     "date"
+    t.date     "confirmed_date"
+    t.integer  "customer_id"
+    t.datetime "created_at",                                                        :null => false
+    t.datetime "updated_at",                                                        :null => false
+    t.string   "status"
+    t.integer  "created_by"
+    t.integer  "confirmed_by"
+    t.integer  "rejected_by"
+    t.text     "description"
+    t.text     "notes"
+    t.decimal  "total",           :precision => 19, :scale => 2, :default => 0.0
+    t.string   "customer_name"
+    t.string   "customer_pic"
+    t.string   "customer_number"
+    t.string   "customer_email"
+  end
+
+  create_table "quotationlogs", :force => true do |t|
+    t.boolean  "deleted",                                      :default => false
+    t.boolean  "enabled",                                      :default => true
+    t.integer  "quotation_id"
+    t.integer  "updated_by"
+    t.string   "name"
+    t.text     "description"
+    t.datetime "created_at",                                                      :null => false
+    t.datetime "updated_at",                                                      :null => false
+    t.decimal  "old_price_per", :precision => 19, :scale => 2, :default => 0.0
+    t.decimal  "new_price_per", :precision => 19, :scale => 2, :default => 0.0
+  end
+
+  create_table "quotations", :force => true do |t|
+    t.boolean  "deleted",                                          :default => false
+    t.boolean  "enabled",                                          :default => true
+    t.string   "name"
+    t.integer  "commodity_id"
+    t.integer  "office_id"
+    t.integer  "routegroup_id"
+    t.string   "transporttype"
+    t.integer  "distance"
+    t.string   "price_per_type"
+    t.datetime "created_at",                                                          :null => false
+    t.datetime "updated_at",                                                          :null => false
+    t.string   "longitude_start"
+    t.string   "latitude_start"
+    t.string   "address_start"
+    t.string   "longitude_end"
+    t.string   "latitude_end"
+    t.string   "address_end"
+    t.decimal  "price_per",         :precision => 19, :scale => 2, :default => 0.0
+    t.text     "description"
+    t.integer  "quotationgroup_id"
+  end
+
   create_table "receiptcontainers", :force => true do |t|
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
@@ -1215,6 +1287,7 @@ ActiveRecord::Schema.define(:version => 20231003220129) do
     t.boolean   "kosongan",                                                   :default => false
     t.string    "kosongan_type"
     t.boolean   "project",                                                    :default => false
+    t.integer   "quotation_id"
   end
 
   add_index "routes", ["name", "customer_id", "office_id"], :name => "route_office"

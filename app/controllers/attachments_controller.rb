@@ -1,7 +1,7 @@
 class AttachmentsController < ApplicationController
 	include ApplicationHelper
 	layout "application"
-  protect_from_forgery :except => [:upload, :remove, :uploadTaxInv]
+  protect_from_forgery :except => [:upload, :remove, :uploadTaxInv, :uploadQuot]
 
   def upload
     inputs = params[:attachment]
@@ -23,6 +23,26 @@ class AttachmentsController < ApplicationController
     redirect_to(path)
   end
 
+  def uploadQuot
+		inputs = params[:attachment]
+    @attachment = Attachment.new()
+    @attachment.file = inputs[:file]
+    @attachment.name = inputs[:name]
+    @attachment.imageable_type = params[:model_name].capitalize
+    @attachment.imageable_id = params[:item_id]
+    @attachment.enabled = true
+    @attachment.media = false
+    @attachment.save
+#    redirect_to(get_parent_edit_path(params[:model_name].capitalize, params[:item_id]), :notice => 'File sukses di simpan.')
+		redirect_to("/quotationgroups/" + params[:item_id] +'/edit',  :notice => 'File sukses disimpan.')    
+	end
+
+  def removeQuot
+    @attachment = Attachment.find(params[:id])
+    @attachment.destroy
+    redirect_to("/quotationgroups/" + @attachment.imageable_id.to_s + '/edit', :notice => 'File berhasil dihapus.')        
+	end
+
   def uploadTaxInv
 		inputs = params[:attachment]
     @attachment = Attachment.new()
@@ -34,18 +54,17 @@ class AttachmentsController < ApplicationController
     @attachment.media = false
     @attachment.save
 #    redirect_to(get_parent_edit_path(params[:model_name].capitalize, params[:item_id]), :notice => 'File sukses di simpan.')
-		redirect_to("/taxinvoiceitems/new/" + params[:item_id], :notice => 'File sukses di simpan.')    
+		redirect_to("/taxinvoiceitems/new/" + params[:item_id], :notice => 'File sukses disimpan.')    
 	end
 
 	def removeTaxInv
     @attachment = Attachment.find(params[:id])
     @attachment.destroy
-    redirect_to("/taxinvoiceitems/new/" + @attachment.imageable_id.to_s)    
+    redirect_to("/taxinvoiceitems/new/" + @attachment.imageable_id.to_s, :notice => 'File berhasil dihapus.')  
 	end
 
   def showimages
   end
-
 
   def get_parent_edit_path name, id
     case name
@@ -67,6 +86,8 @@ class AttachmentsController < ApplicationController
 			edit_invoice_url(id)
     when "Taxinvoice"
 			edit_taxinvoice_url(id)    
+    when "Quotationgroup"
+			edit_quotationgroup_url(id)    
     end
   end
 
