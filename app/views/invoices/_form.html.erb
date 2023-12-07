@@ -94,6 +94,41 @@
     <% end %>
 
   </div>
+  <% if active_node == 'edit' %>
+    <% if params[:train] || params[:train] == true %>
+      <div class="field-row">
+        <%= f.label :payment_train, "Pembayaran Kereta" %>
+        <%= f.label :payment_train, :value => "hutang", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_train, "hutang", :checked => true  %> Hutang
+        <% end %>
+        <%= f.label :payment_train, :value => "cash", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_train, "cash" %> Cash
+        <% end %>
+      </div>
+    <% else %>
+      <div class="field-row">
+        <%= f.label :payment_train, "Pembayaran Kereta" %>
+        <%= f.label :payment_train, :value => "hutang", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_train, "hutang", :checked => true  %> Hutang
+        <% end %>
+        <%= f.label :payment_train, :value => "cash", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_train, "cash" %> Cash
+        <% end %>
+      </div>
+    <% end %>
+  <% else %>
+    <% if params[:train] || params[:train] == true %>
+      <div class="field-row">
+        <%= f.label :payment_train, "Pembayaran Kereta" %>
+        <%= f.label :payment_train, :value => "hutang", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_train, "hutang", :checked => true  %> Hutang
+        <% end %>
+        <%= f.label :payment_train, :value => "cash", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_train, "cash" %> Cash
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
 <% else %>
   <div class="field-row">
     <%= f.label :invoicetrain, "Tipe BKK" %>
@@ -361,11 +396,11 @@
     </div>
   </div>
   
-  <div id="div_ship" style="display: block;">
+  <div id="div_ship" class="div_ship" style="display: block;">
     <div class="field-row">
       <%= f.label :ship_id, "Nama Kapal" %>
 
-      <select id="invoice_ship_id" name="invoice[ship_id]" class="double chzn-select">
+      <select id="invoice_ship_id" name="invoice[ship_id]" class="double chzn-select" onchange="javascript:showPaymentship();">
       <option value="0">- Pilih Kapal -</option>
       <% Ship.active.order(:name).each do |ship| %>
       <option value="<%=ship.id%>"
@@ -374,6 +409,32 @@
       </select>
     </div>
   </div>
+
+  <% if @invoice.payment_ship.present? %>
+    <div id="div_payment_ship" style="display: block;">
+      <div class="field-row">
+        <%= f.label :payment_ship, "Pembayaran Kapal" %>
+        <%= f.label :payment_ship, :value => "hutang", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_ship, "hutang", :checked => true  %> Hutang
+        <% end %>
+        <%= f.label :payment_ship, :value => "cash", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_ship, "cash" %> Cash
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div id="div_payment_ship" style="display: none;">
+      <div class="field-row">
+        <%= f.label :payment_ship, "Pembayaran Kapal" %>
+        <%= f.label :payment_ship, :value => "hutang", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_ship, "hutang", :checked => true  %> Hutang
+        <% end %>
+        <%= f.label :payment_ship, :value => "cash", :class => 'checkbox' do %>
+          <%= f.radio_button :payment_ship, "cash" %> Cash
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
   <div class="field-row">
     <%= f.label :spk_number, "Nomor SPK" %>

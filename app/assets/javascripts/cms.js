@@ -811,6 +811,12 @@ function checkAllowances() {
 	}	
 }
 
+function showPaymentship(){
+	if ($('#div_ship').hasClass("div_ship")) {
+		$('#div_payment_ship').show()
+	}
+}
+
 function changeDriverAllowance(qty) {
 	$('#invoicereturn_driver_allowance').val(Number($('#invoicereturn_price_per').val()) * parseInt(qty));
 	$('#invoicereturn_helper_allowance').val(Number($('#invoicereturn_helper_trip').val()) * parseInt(qty));

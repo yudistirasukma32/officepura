@@ -15,7 +15,7 @@ class DriversController < ApplicationController
   end
 
   def set_role
-    @user_role = 'Admin Operasional, Admin HRD, Admin Keuangan, Operasional BKK, Vendor Supir'
+    @user_role = 'Admin Operasional, Admin HRD, Admin Keuangan, Operasional BKK, Vendor Supir, Admin Supir'
     @vendor = 'Vendor Supir'
   end
 
