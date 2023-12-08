@@ -20,9 +20,9 @@ class TaxgenericinvoicesController < ApplicationController
   def generic_vehicles
     @vehicle = Vehicle.active.order(:current_id).pluck(:current_id)
 
-    render :json => { :success => true, :layout => false, 
+    render :json => { :success => true, :layout => false,
         :vehicle => @vehicle
-      }.to_json; 
+      }.to_json;
     # render :json => Vehicle.active.order(:current_id).pluck(:current_id)
   end
 
@@ -45,11 +45,11 @@ class TaxgenericinvoicesController < ApplicationController
       if @customer
         romenumber = getromenumber (Date.today.month.to_i)
         @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
-        @long_id = ("%04d" % @long_id.to_s) + ' / INV / RI / ' + romenumber + ' / BAK / ' + Date.today.year.to_s 
+        @long_id = ("%04d" % @long_id.to_s) + ' / INV / RI / ' + romenumber + ' / BAK / ' + Date.today.year.to_s
 
         @taxinvoice.long_id = @long_id
       end
-      
+
       @process = "new"
     else
       @customer = @taxinvoice.customer
@@ -99,13 +99,13 @@ class TaxgenericinvoicesController < ApplicationController
     @taxinvoice.po_no = params[:po_no]
     @taxinvoice.tank_name = params[:tank_name]
     @taxinvoice.spo_no = params[:spo_no]
-      
+
     @taxinvoice.sto_no = params[:sto_no]
     @taxinvoice.so_no = params[:so_no]
     @taxinvoice.do_no = params[:do_no]
-      
+
     @taxinvoice.bank_id = params[:bank_id]
-    
+
     @taxinvoice.extra_cost = params[:extra_cost].to_i
     @taxinvoice.extra_cost_info = params[:extra_cost_info]
     # @taxinvoice.total_in_words = params[:total_in_words]
@@ -114,12 +114,13 @@ class TaxgenericinvoicesController < ApplicationController
     @taxinvoice.is_weightlost = params[:is_weightlost] == "Yes" ? true : false
     @taxinvoice.generic = true
     @taxinvoice.sentdate = params[:sentdate]
+    @taxinvoice.user_id = current_user.id
 
     if @taxinvoice.save
 
       # ----- update values ----- #
-      if params[:process] == "edit"        
-        taxgenericitems = @taxinvoice.taxgenericitems.active.order(:date)       
+      if params[:process] == "edit"
+        taxgenericitems = @taxinvoice.taxgenericitems.active.order(:date)
         taxgenericitems.each do |item|
           if params["_vehicle_#{item.id}"] != ''
             vehicle = Vehicle.find_by_current_id(params["_vehicle_#{item.id}"]) rescue nil
@@ -143,7 +144,7 @@ class TaxgenericinvoicesController < ApplicationController
             item.deleted = true
           end
 
-          item.save          
+          item.save
         end
       end
 
@@ -189,8 +190,8 @@ class TaxgenericinvoicesController < ApplicationController
       #ppn_new
       ppn = Setting.where(name: 'ppn')
       ppn = ppn.blank? ? 10 : ppn[0].value
-      
-      # @taxinvoice.gst_tax = params[:gst_tax] == "Yes" ? subtotal.to_f * (ppn.to_f / 100) : 0  
+
+      # @taxinvoice.gst_tax = params[:gst_tax] == "Yes" ? subtotal.to_f * (ppn.to_f / 100) : 0
       @taxinvoice.price_tax = params[:price_tax] == "Yes" ? subtotal.to_f * 0.02 : 0
       ppn_percentage = params[:gst_tax].to_f
       if ppn_percentage > 0
@@ -204,8 +205,8 @@ class TaxgenericinvoicesController < ApplicationController
       else
         @taxinvoice.total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f
       end
-      
-      
+
+
 
       @taxinvoice.total_in_words = moneytowordsrupiah(@taxinvoice.total)
 
@@ -224,15 +225,15 @@ class TaxgenericinvoicesController < ApplicationController
   end
 
   def destroy
-  end  
+  end
 
   def createbankexpenserecord taxinvoice_id, create=false
      @taxinvoice = Taxinvoice.find(taxinvoice_id) rescue nil
      if @taxinvoice
         if create
           description = "Invoice " + @taxinvoice.long_id
-          
-          #record bank pendapatan 
+
+          #record bank pendapatan
           @bankexpensependapatan = Bankexpense.where(:taxinvoice_id => taxinvoice_id,  :creditgroup_id => ID_GROUP_PENDAPATAN, :deleted => false).first rescue nil
           needupdate = @bankexpensependapatan.nil? ? false : true
           @bankexpensependapatan = Bankexpense.new if @bankexpensependapatan.nil?
@@ -241,15 +242,15 @@ class TaxgenericinvoicesController < ApplicationController
           @bankexpensependapatan.description = description
           @bankexpensependapatan.date = @taxinvoice.date
 
-          credit_to = Bankexpensegroup.find(ID_GROUP_PENDAPATAN) rescue nil          
+          credit_to = Bankexpensegroup.find(ID_GROUP_PENDAPATAN) rescue nil
           credit_to.total += @bankexpensependapatan.total if needupdate && !credit_to.nil?
 
           @bankexpensependapatan.total = @taxinvoice.total.to_f - @taxinvoice.gst_tax.to_f + @taxinvoice.price_tax.to_f
-          
+
           credit_to.total -= @bankexpensependapatan.total if !credit_to.nil?
           credit_to.save if @bankexpensependapatan.save
 
-          #record bank ppn 
+          #record bank ppn
           if @taxinvoice.gst_tax.to_i > 0
             @bankexpenseppn = Bankexpense.where(:taxinvoice_id => taxinvoice_id,  :creditgroup_id => ID_GROUP_PPN, :deleted => false).first rescue nil
             needupdate = @bankexpenseppn.nil? ? false : true
@@ -263,7 +264,7 @@ class TaxgenericinvoicesController < ApplicationController
             credit_to.total += @bankexpenseppn.total if needupdate && !credit_to.nil?
 
             @bankexpenseppn.total = @taxinvoice.gst_tax.to_i
-            
+
             credit_to.total -= @bankexpenseppn.total if !credit_to.nil?
             credit_to.save if @bankexpenseppn.save
           end
@@ -282,7 +283,7 @@ class TaxgenericinvoicesController < ApplicationController
             debit_to.total -= @bankexpensepph.total if needupdate && !debit_to.nil?
 
             @bankexpensepph.total = @taxinvoice.price_tax.to_i
-            
+
             debit_to.total += @bankexpensepph.total if !debit_to.nil?
             debit_to.save if @bankexpensepph.save
           end
@@ -300,10 +301,10 @@ class TaxgenericinvoicesController < ApplicationController
           debit_to.total -= @bankexpensepiutang.total if needupdate && !debit_to.nil?
 
           @bankexpensepiutang.total = @taxinvoice.total
-          
+
           debit_to.total += @bankexpensepiutang.total if !debit_to.nil?
           debit_to.save if @bankexpensepiutang.save
-          
+
         else
           #record bank pembayaran
           @bankexpensebayar = Bankexpense.where(:taxinvoice_id => taxinvoice_id, :creditgroup_id => ID_GROUP_PIUTANG ,:debitgroup_id => ID_GROUP_MANDIRI, :deleted => false).first
