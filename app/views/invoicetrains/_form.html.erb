@@ -1,0 +1,113 @@
+<%= form_for(@invoicetrain) do |f| %>
+  
+  <div class="field-row first">
+    <%= f.label :date, "Tanggal" %>
+    <%= f.text_field :date, :class => 'half date-picker', :value => @invoicetrain.date.strftime('%d-%m-%Y') %>
+    <span>(tgl/bln/thn)</span>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :train_status, "Status Kereta" %>
+    <%= f.label :train_status, :value => "empty", :class => 'checkbox' do %>
+      <%= f.radio_button :train_status, "empty", :checked => true %> Empty
+    <% end %>
+    <%= f.label :train_status, :value => "titip", :class => 'checkbox' do %>
+      <%= f.radio_button :train_status, "titip" %> Titip
+    <% end %>
+  </div>
+
+  <div class="field-row ">
+    <%= f.label :operator_id, "Nama Operator" %>
+    <%= f.select :operator_id, options_for_select(Operator.train.active.collect {|g| [g.name, g.id]}, @invoicetrain.operator_id), {}, :class => 'double chzn-select', :id => 'operator'%>
+  </div>
+
+  <div class="field-row ">
+    <%= f.label :station_id, "Nama Stasiun" %>
+    <%= f.select :station_id, options_for_select(Station.where(:enabled => true, :deleted => false).collect {|g| [g.name, g.id]}, @invoicetrain.station_id), {}, :class => 'double chzn-select', :id => 'station'%>
+  </div>
+
+  <div class="field-row ">
+    <%= f.label :route_id, "Jurusan" %>
+    <%= f.select :route_id, options_for_select(Route.where(:enabled => true, :deleted => false).collect {|r| [r.name, r.id]}, @invoicetrain.route_id), {}, :class => 'double chzn-select', :id => 'jurusan'%>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :container_type, "Tipe BKK" %>
+    <%= f.label :container_type, :value => "Container", :class => 'checkbox' do %>
+      <%= f.radio_button :container_type, 'Container', :checked => @invoicetrain.container_type == 'Container' ? true : false, :onchange => 'javascript: checkRadio2();' %> Dry Container
+    <% end %>
+    <%= f.label :container_type, :value => "Isotank", :class => 'checkbox' do %>
+      <%= f.radio_button :container_type, 'Isotank', :checked => @invoicetrain.container_type == 'Isotank' ? true : false, :onchange => 'javascript: checkRadio();' %>  Isotank
+    <% end %>
+  </div>
+
+
+  <% if @process == 'edit' %>
+    <% if @invoicetrain.isotank_id.present?  %>
+      <div class="field-row" id="divIso" style="display:block;">
+        <%= f.label :isotank_id, "Isotank" %>
+        <%= f.select :isotank_id, options_for_select(Isotank.active.collect {|g| [g.isotanknumber, g.id]}, @invoicetrain.isotank_id), {}, :class => 'double chzn-select', :id => 'iso'%>
+      </div>
+      
+      <div class="field-row" id="divContainer" style="display:none;">
+        <%= f.label :container_id, "Container" %>
+        <%= f.select :container_id, options_for_select(Container.active.collect {|g| [g.containernumber, g.id]}, @invoicetrain.container_id), {}, :class => 'double chzn-select', :id => 'cont'%>
+      </div>
+    <% else %>
+      <div class="field-row" id="divIso" style="display:none;">
+        <%= f.label :isotank_id, "Isotank" %>
+        <%= f.select :isotank_id, options_for_select(Isotank.active.collect {|g| [g.isotanknumber, g.id]}, @invoicetrain.isotank_id), {}, :class => 'double chzn-select', :id => 'iso'%>
+      </div>
+
+      <div class="field-row" id="divContainer" style="display:block;">
+        <%= f.label :container_id, "Container" %>
+        <%= f.select :container_id, options_for_select(Container.active.collect {|g| [g.containernumber, g.id]}, @invoicetrain.container_id), {}, :class => 'double chzn-select', :id => 'cont'%>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="field-row" id="divIso" style="display:none;">
+      <%= f.label :isotank_id, "Isotank" %>
+      <%= f.select :isotank_id, options_for_select(Isotank.active.collect {|g| [g.isotanknumber, g.id]}, @invoicetrain.isotank_id), {}, :class => 'double chzn-select', :id => 'iso'%>
+    </div>
+
+    <div class="field-row" id="divContainer" style="display:block;">
+      <%= f.label :container_id, "Container" %>
+      <%= f.select :container_id, options_for_select(Container.active.collect {|g| [g.containernumber, g.id]}, @invoicetrain.container_id), {}, :class => 'double chzn-select', :id => 'cont'%>
+    </div>
+  <% end %>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <%= f.hidden_field :user_id, :value => current_user.id %>
+
+  <div class="actions">
+    <%= f.submit "Simpan", :id => 'invoicetrain_submit', :class => 'left' %>
+  </div>
+
+<% end %>
+
+
+<script>
+function checkRadio(){
+  if(document.getElementById("invoicetrain_container_type_isotank").checked = true){
+    document.getElementById("divIso").style.display = 'block';
+    document.getElementById("divContainer").style.display = 'none';
+  } else {
+    document.getElementById("divIso").style.display = 'none';
+    document.getElementById("divContainer").style.display = 'block';
+  }
+}
+
+function checkRadio2(){
+  if(document.getElementById("invoicetrain_container_type_container").checked = true){
+    document.getElementById("divIso").style.display = 'none';
+    document.getElementById("divContainer").style.display = 'block';
+  } else {
+    document.getElementById("divIso").style.display = 'block';
+    document.getElementById("divContainer").style.display = 'none';
+  }
+}
+</script>

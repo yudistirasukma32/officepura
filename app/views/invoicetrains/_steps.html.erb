@@ -1,0 +1,5 @@
+<ul id="steps">
+  <li<% if step == 1 %> class="on"<% end %>><% if !@invoicetrain.id.nil? %><a href="<%=edit_invoicetrain_url(@invoicetrain)%>"><% end %><span>1</span> Data BKK<% if !@invoicetrain.id.nil? %></a><% end %></li>
+  <li class="separator"><i class="icon-chevron-right"></i></li>
+  <li<% if step == 2 %> class="on"<% end %>><% if !@invoicetrain.id.nil? %><a href="<%=confirmation_invoicetrain_url(@invoicetrain)%>"><% end %><span>2</span> Konfirmasi<% if !@invoicetrain.id.nil? %></a><% end %></li>
+</ul>

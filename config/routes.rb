@@ -326,6 +326,8 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
+  resources :invoicetrains
+
   resources :invoicetests do
     member do
       get 'enable'

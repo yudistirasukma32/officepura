@@ -84,9 +84,10 @@
 				<ul id="sub-transactions" class="submenu" style="width:200px;">
 					<!-- <li><%= link_to_if (checkrole 'Admin Operasional'), "BKK (Uji Coba)", "/invoicetests" %></li> -->					
 					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Standart, Vendor Supir, Admin Hutang Operator'), "Bukti Kas Keluar", "/invoices" %></li>
-                    <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir, Admin Hutang Operator'), "BKK Kosongan Non Produktif", "/invoices/kosongan" %></li>		
-                    <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir, Admin Hutang Operator'), "BKK Kosongan Produktif", "/invoices/kosongan_prod" %></li>			
+					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir, Admin Hutang Operator'), "BKK Kosongan Non Produktif", "/invoices/kosongan" %></li>		
+					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kosongan, Vendor Supir, Admin Hutang Operator'), "BKK Kosongan Produktif", "/invoices/kosongan_prod" %></li>			
 					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Kereta, Vendor Supir, Admin Hutang Operator'), "BKK Kereta", "/invoices/indexinvoicetrain" %></li>
+					<li class="<%= @where == 'invoicetrains' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Truk via Kereta", "/invoicetrains" %></li>
                     <li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Bukti Kas Masuk", "/invoicereturns" %></li>					
 					<!--  <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, BKK Standart'), "BKK Tambahan", "/invoices/indexadd" %></li> -->				

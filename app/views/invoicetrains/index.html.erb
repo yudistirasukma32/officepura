@@ -1,0 +1,99 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn print" href="<%=new_invoicetrain_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<h1>Transaksi / <a href="<%=invoicetrains_path%>">Bukti Kas Keluar Truk Via Kereta</a> / Index</h1>
+		
+		<br class="clearfix" />
+		
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div>
+				<label for="date" style="margin-right: 13px;">Pilih Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" style="width: 80px;"/>
+				<label for="" style="margin: 0 10px">s/d</label>
+				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" style="width: 80px;"/>
+				<label for="operator_id" class="middle">&nbsp; &nbsp; Operator &nbsp; </label>
+          <select name="operator_id" class="half middle ">
+            <option value="">All</option>
+            <% Operator.active.each do |operator| %>
+            <option value="<%=operator.id%>" <% if @operator_id.to_i == operator.id %> name="operator_id" selected="selected"<% end %>><%=operator.name%></option>
+            <% end %>
+          </select> 
+				<label for="station_id" class="middle">&nbsp; &nbsp; Stasiun &nbsp; </label>
+          <select name="station_id" class="half middle " style="width: 100px;"/>
+            <option value="">All</option>
+            <% Station.active.each do |station| %>
+            <option value="<%=station.id%>" <% if @station_id.to_i == station.id %> name="station_id" selected="selected"<% end %>><%=station.name%></option>
+            <% end %>
+          </select> 
+				<label for="train_status" class="middle">&nbsp; &nbsp; Status Kereta &nbsp; </label>
+          <select name="train_status" class="half middle " style="width: 100px;"/>
+            <option value="">All</option>
+            <% @train_status.each do |act| %>
+            <option value="<%=act%>" <% if @activity == act %> name="train_status" selected="selected"<% end %>><%=act%></option>
+            <% end %>
+          </select>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<input class="submit" type="submit" value="Filter" style="vertical-align: bottom; margin-top: 2px;">
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view">
+			<tr>
+				<th width="50">No.</th>
+				<th>Operator</th>
+				<th>Status Kereta</th>
+				<th>Stasiun</th>
+				<th>Operator</th>
+				<th>Tipe</th>
+				<th>Iso / Kontainer</th>
+				<th>User</th>
+				<th width="80"></th>
+			</tr>
+
+			<tr class="subheading">
+				<th colspan="8" style="color:#000;">Bukti Kas Keluar Stasiun <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%= @invoicetrains.count %>)</span></th>
+			</tr>
+
+			<% @invoicetrains.each do |invoice| %>
+			<tr>
+				<td><%= link_to zeropad(invoice.id), edit_invoicetrain_path(invoice) %></td>
+				<td><%=invoice.operator.name rescue nil%></td>
+				<td><%=invoice.train_status rescue nil%></td>
+				<td><%=invoice.station.name rescue nil%></td>
+				<td><%=invoice.operator.name rescue nil%></td>
+				<td><%=invoice.container_type rescue nil%></td>
+				<td>
+					<% if invoice.container_type == 'Isotank' %>
+					<%=invoice.isotank.isotanknumber rescue nil%>
+					<% else %>
+					<%=invoice.container.containernumber rescue nil%>
+					<% end %>
+				</td>
+				<td><%=invoice.user.username rescue nil%></td>
+				<td class="right" width="60">
+					<%= link_to '&#xf044;'.html_safe, edit_invoicetrain_path(invoice), :class => "edit tipsy", :title => 'Edit' %> 
+					<a href="/invoices/<%=invoice.id%>/confirmation" class="delete tipsy d-none" title="Print BKK"><i class="icon-print"></i></a>
+					<%= link_to '&#xf00d;'.html_safe, invoice, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+				</td>
+			</tr>			
+			<% end %>	
+		
+		</table>
+
+		<div class="actions">
+			<a class="btn-txt right" href="<%=new_invoicetrain_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		</div>
+	</div>
+
+</div>
