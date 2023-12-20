@@ -2,7 +2,7 @@ class ContainersController < ApplicationController
 	include ApplicationHelper
 	layout "application"
   before_filter :authenticate_user!, :set_section, :set_role
-  protect_from_forgery :except => [:update_asset]
+  protect_from_forgery :except => [:get_container_pura]
 
   def set_section
     @section = "masters"
@@ -76,5 +76,29 @@ class ContainersController < ApplicationController
     @container = Container.find(params[:id])
     @container.update_attributes(:enabled => false)
     redirect_to(containers_url)
+  end
+
+  def get_container_pura
+		@containers = Container.order('containernumber').where('deleted = false')
+		count_container = @containers.count
+
+		@containerlist = @containers.map do |c|
+			{
+				:id => c.id,
+				:enabled => c.enabled,
+				:containernumber => c.containernumber,
+				:category => c.category,
+				:vendor_id => c.vendor_id,
+				:origin_company => 'Office PURA',
+				:origin_id => c.id
+			}
+		end
+
+		render json: {
+			message: 'Success',
+			status: 200,
+			count: count_container,
+			containers: @containerlist,
+			}, status: 200
   end
 end

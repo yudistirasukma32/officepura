@@ -749,6 +749,9 @@ OfficePuraErp::Application.routes.draw do
 	get 'api/vehiclesapi/list' => 'vehiclesapi#vehicleFormList'
 	get 'api/vehiclesapi/current_bkk' => 'vehiclesapi#current_bkk'
 	get 'api/vehiclesapi/vehicle_invoice_list' => 'vehiclesapi#vehicle_invoice_list'
+
+  get 'api/get_container_pura' => 'containers#get_container_pura'
+  get 'api/containersapi/get_container_pura' => 'containersapi#get_container_pura'
     
     get 'api/driversapi' => 'driversapi#index'
     get 'api/driversapi/detail/:id' => 'driversapi#detail'
