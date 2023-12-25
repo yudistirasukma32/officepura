@@ -1,0 +1,81 @@
+<style>
+  button.btn-txt {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: 0;
+    margin-right: 10px;
+    padding: 7px 10px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    background-color: #24748f !important;
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#2d95b7", endColorstr="#23748e");
+    background-image: -khtml-gradient(linear, left top, left bottom, from(#2d95b7), to(#23748e));
+    background-image: -moz-linear-gradient(top, #2d95b7, #23748e);
+    background-image: -ms-linear-gradient(top, #2d95b7, #23748e);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2d95b7), color-stop(100%, #23748e));
+    background-image: -webkit-linear-gradient(top, #2d95b7, #23748e);
+    background-image: -o-linear-gradient(top, #2d95b7, #23748e);
+    background-image: linear-gradient(#2d95b7, #23748e);
+    border-color: #23748e #23748e #216c85;
+    color: #fff !important;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.16);
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  button.btn-green {
+    background-color: #21733c !important;
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#38c166", endColorstr="#21723c");
+    background-image: -khtml-gradient(linear, left top, left bottom, from(#38c166), to(#21723c));
+    background-image: -moz-linear-gradient(top, #38c166, #21723c);
+    background-image: -ms-linear-gradient(top, #38c166, #21723c);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #38c166), color-stop(100%, #21723c));
+    background-image: -webkit-linear-gradient(top, #38c166, #21723c);
+    background-image: -o-linear-gradient(top, #38c166, #21723c);
+    background-image: linear-gradient(#38c166, #21723c);
+    border-color: #21723c #21723c #1c5f32;
+    color: #fff !important;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.33);
+  }
+</style>
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Rekap BKK</h1>
+		<br class="clearfix" />
+
+		<%= form_tag(excelbyroutes_recapinvoicebyroutes_url, method: "get") do |f| %>
+    <div class="field-row">
+      <label for="year">Tahun</label>
+        <select class="chzn-select double" name="year">
+          <% (2022..(Date.today.year.to_i + 3)).each do |i| %>
+          <option value="<%= i %>" <%= i == Date.today.year.to_i ? 'selected' : '' %>><%= i %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="field-row continue">
+        <button type="submit" class="btn-txt btn-green">
+          <i class="icon-file"></i> Excel
+        </button>
+        <br/>
+      </div>
+    <% end %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

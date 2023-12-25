@@ -8,10 +8,10 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
-  devise_for :users,  
+  devise_for :users,
     :controllers => { sessions: 'devise/sessions' },
     :path => "user",
-    :path_names => { 
+    :path_names => {
       :sign_in => 'login',
       :sign_out => 'logout'
     }
@@ -20,23 +20,23 @@ OfficePuraErp::Application.routes.draw do
     member do
       get 'enable'
       get 'disable'
-    end  
+    end
   end
 
   resources :routeships do
     member do
       get 'enable'
       get 'disable'
-    end  
+    end
   end
-  
+
   resources :customers do
     member do
       get 'enable'
       get 'disable'
       get 'addroute'
       get 'clone'
-    end  
+    end
   end
 
   resources :suppliers do
@@ -160,7 +160,7 @@ OfficePuraErp::Application.routes.draw do
   end
 
   resources :vehiclelogs
-  
+
   match 'vehiclelogs/new/:vehicle_id' => 'vehiclelogs#new'
   match "vehicledates" => "vehiclelogs#vehicledates"
 
@@ -169,7 +169,7 @@ OfficePuraErp::Application.routes.draw do
       get 'enable'
       get 'disable'
     end
-  end  
+  end
 
   resources :assets do
     member do
@@ -177,7 +177,7 @@ OfficePuraErp::Application.routes.draw do
       get 'disable'
     end
   end
-  
+
   resources :commodities do
     member do
       get 'enable'
@@ -192,7 +192,7 @@ OfficePuraErp::Application.routes.draw do
 
   resources :tirebudgets
   post 'tirebudgets/updateitems' => 'tirebudgets#updateitems'
-  
+
   resources :settings
 
   match 'generalexpenses/new(/:officeexpense_id)' => 'generalexpenses#new'
@@ -211,16 +211,16 @@ OfficePuraErp::Application.routes.draw do
 
   get 'bankexpenses/getbankexpensegroupdebit/:group_id' => 'bankexpenses#getbankexpensegroupdebit'
   get 'bankexpenses/getbankexpensegroupcredit/:group_id' => 'bankexpenses#getbankexpensegroupcredit'
-    
-  get 'events/get_event_by_customer/:customer_id' =>'events#get_event_by_customer' 
+
+  get 'events/get_event_by_customer/:customer_id' =>'events#get_event_by_customer'
   get 'events/getdodetail' => 'events#getdodetail'
-  
+
   resources :mechaniclogs do
     member do
       get 'enable'
       get 'disable'
     end
-  end 
+  end
 
   resources :shipexpenses do
     member do
@@ -243,7 +243,7 @@ OfficePuraErp::Application.routes.draw do
       get 'enable'
       get 'disable'
     end
-  end  
+  end
 
   resources :bankexpenses do
     member do
@@ -267,7 +267,7 @@ OfficePuraErp::Application.routes.draw do
       get 'inReportEnable'
       get 'inReportDisable'
     end
-  end  
+  end
 
 
   get 'invoices/printspk/:id' => 'invoices#printspk'
@@ -288,7 +288,7 @@ OfficePuraErp::Application.routes.draw do
   match 'invoices/kosongan_prod' => 'invoices#kosongan_prod'
   match 'invoices/add_kosongan' => 'invoices#add_kosongan'
   post 'invoices/createkosongan/' => 'invoices#createkosongan', as: 'createkosongan'
-  
+
   #kosongan non Produktif
   match 'invoices/kosongan_approval' => 'invoices#kosongan_approval'
   match 'invoices/kosongan_approve(/:invoice_id)' => 'invoices#kosongan_approve'
@@ -310,7 +310,7 @@ OfficePuraErp::Application.routes.draw do
   match 'invoices/kereta' => 'invoices#kereta', as: "invoice_train"
   match 'invoices/kapal' => 'invoices#kapal', as: "invoice_ship"
   match 'invoices/:invoice_id/editupdated' => 'invoices#edit_updated'
-  
+
   resources :invoices do
     member do
       get 'enable'
@@ -359,7 +359,7 @@ OfficePuraErp::Application.routes.draw do
     member do
       get 'enable'
       get 'disable'
-    end  
+    end
   end
 
   resources :trainexpenses do
@@ -367,14 +367,14 @@ OfficePuraErp::Application.routes.draw do
       get 'enable'
       get 'disable'
       get "print"
-    end  
+    end
   end
 
   resources :insurancevendors do
     member do
       get 'enable'
       get 'disable'
-    end  
+    end
   end
 
   resources :insuranceexpenses do
@@ -382,7 +382,7 @@ OfficePuraErp::Application.routes.draw do
       get 'enable'
       get 'disable'
       get "print"
-    end  
+    end
   end
 
   match 'vendors/driver_activities' => 'vendors#driver_activities'
@@ -391,16 +391,16 @@ OfficePuraErp::Application.routes.draw do
     member do
       get 'enable'
       get 'disable'
-    end  
+    end
   end
 
   resources :vendorvehicles do
     member do
       get 'enable'
       get 'disable'
-    end  
-  end  
-  
+    end
+  end
+
   get 'invoices/getcustomer/:route_id' => 'invoices#get_customer'
   get 'invoices/getvehiclegroup/:vehicle_id' => 'invoices#get_vehiclegroup'
   get 'invoices/getvehicles/:vehiclegroup_id' => 'invoices#get_vehicles'
@@ -424,16 +424,16 @@ OfficePuraErp::Application.routes.draw do
   get 'invoices/get_routesonly/:customer_id' => 'invoices#get_routesonly'
   get 'invoices/getdriverphone/:driver_id' => 'invoices#get_driverphone'
 
-  
+
   get 'invoices/getallowances/:route_id/:vehicle_id/:trip/:quantity/:ishelper/:ispremi' => 'invoices#get_allowances'
-  
+
   match 'invoicereturns/index_confirmed' => 'invoicereturns#index_confirmed'
   match 'invoicereturns/add/(:invoice_id)' => 'invoicereturns#add'
   match 'invoicereturns/train/(:invoice_id)' => 'invoicereturns#train'
   match 'invoicereturns/index_confirmedtrain' => 'invoicereturns#index_confirmedtrain'
 
   post 'invoicereturns/saveadd' => 'invoicereturns#saveadd'
-  resources :invoicereturns 
+  resources :invoicereturns
 
   match 'receiptorders/new/:productorder_id' => 'receiptorders#new'
   match 'receiptreturns/new/:invoicereturn_id' => 'receiptreturns#new'
@@ -442,7 +442,7 @@ OfficePuraErp::Application.routes.draw do
   match 'receiptdrivers/new/:driverexpense_id' => 'receiptdrivers#new'
   match 'receiptincentives/new/:invoice_id' => 'receiptincentives#new'
   match 'driverexpenses/getdrivers/:type' => 'driverexpenses#getdrivers'
-  
+
   get 'taxinvoiceitems/index-2' => 'taxinvoiceitems#index2'
 
   resources :receiptincentives
@@ -455,7 +455,7 @@ OfficePuraErp::Application.routes.draw do
   resources :driverexpenses
   resources :taxinvoiceitems
   resources :users
-  resources :driverlogs 
+  resources :driverlogs
   resources :supplierpayments
   resources :assetgroups
   resources :assetorders
@@ -497,7 +497,7 @@ OfficePuraErp::Application.routes.draw do
 
       post 'secondpayment' => 'taxinvoices#secondpayment'
       post 'cancelsecondpayment' => 'taxinvoices#cancelsecondpayment'
-      
+
       post 'import_excel'
     end
   end
@@ -508,13 +508,13 @@ OfficePuraErp::Application.routes.draw do
     member do
       get 'confirmation'
     end
-  end 
+  end
 
   match 'incentives/index_confirmed' => 'incentives#index_confirmed'
-  resources :incentives 
+  resources :incentives
 
   resources :productsales
-  
+
   get 'sales/getpriceproductsale/:productsale_id' => 'sales#getpriceproductsale'
 
   resources :sales do
@@ -525,14 +525,14 @@ OfficePuraErp::Application.routes.draw do
 
   match 'receiptsales/new/:sale_id' => 'receiptsales#new'
   resources :receiptsales
-  
+
   get 'paymentchecks/new/:supplier_id' => 'paymentchecks#new'
   get 'paymentchecks/indexchecks' => 'paymentchecks#indexchecks'
   resources :paymentchecks
 
   get 'cashiers/getrequests(/:date)' => 'cashiers#getrequests'
   resources :cashiers
-  
+
   match 'events/add_dovendor' => 'events#indexadddovendor'
   match 'events/add_dovendor/:event_id' => 'events#add_dovendor'
   match 'events/getdovendor'
@@ -549,7 +549,7 @@ OfficePuraErp::Application.routes.draw do
 
   get 'bookings/getbookings(/:type)' => 'bookings#getbookings'
   get 'bookings/report-bookings' => 'bookings#report_bookings'
-  resources :bookings 
+  resources :bookings
 
   get 'productrequests/getproductstocks/:product_id' => 'productrequests#getproductstocks'
   get 'productrequests/getrangetires/:productgroup_id/:vehicle_id/:date' => 'productrequests#getrangetires'
@@ -624,7 +624,7 @@ OfficePuraErp::Application.routes.draw do
     match "incomes-statement-nocharge" => 'reports#incomes_statement_nocharge'
     match "incomes-cashinout" => 'reports#incomes_cashinout'
     match "incomes-cashinoutdetail/:year/:month" => 'reports#incomes_cashinoutdetail', :as => :incomes_cashinoutdetail
-    
+
     match "expenses-bank" => 'reports#expenses_bank'
     match "expenses-office" => 'reports#expenses_office'
     match "productstocks" => 'reports#productstocks'
@@ -644,7 +644,7 @@ OfficePuraErp::Application.routes.draw do
     match "customercredits" => 'reports#customercredits'
     match "suppliercredits" => 'reports#suppliercredits'
     match "tiretargets" => 'reports#tiretargets'
-    match "getcustomerdata/:year" => 'reports#getcustomerdata' 
+    match "getcustomerdata/:year" => 'reports#getcustomerdata'
     match "assets" => 'reports#assets'
     match "suppliers" => 'reports#suppliers'
     match "estimation" => 'reports#estimation'
@@ -662,16 +662,16 @@ OfficePuraErp::Application.routes.draw do
     match "taxinvoiceitems" => 'reports#taxinvoiceitems', :as => :report_taxinvoiceitems
     match "downloadexcelproductstocks" => 'reports#downloadexcelproductstocks'
     match "downloadexcelproductorder/:startdate&:enddate" => 'reports#downloadexcelproductorder'
-    
+
     match 'estimation-income-expense' => 'reports#estimationincomeexpense'
     match 'estimationdashboard' => 'reports#estimationdashboard'
     match 'estimation-event-expense' => 'reports#estimation_event_expense'
-    
+
     match 'shrinkreport' => 'reports#shrinkreport'
     get "driver-rit" => 'reports#driver_rit'
     get 'unpaid_invoice' => 'reports#unpaid_invoice'
     get 'paid_invoice' => 'reports#paid_invoice'
-      
+
     get "confirmed-invoices" => 'reports#confirmed_invoices'
     get "collectible-invoices" => 'reports#collectible_invoices'
 
@@ -686,7 +686,7 @@ OfficePuraErp::Application.routes.draw do
     match "incomeexpenseestimation_vehicle" => 'reports#incomeexpenseestimation_vehicle'
     match "drivervehicles" => 'reports#drivervehicles', :as => :report_drivervehicles
   end
-  
+
   match 'payrolls/getdrivers/:type' => 'payrolls#getdrivers'
   match 'payrolls/getdriverdata/:type/:id' => 'payrolls#getdriverdata'
 
@@ -696,10 +696,10 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
-  match 'payrollreturns/index_confirmed' => 'payrollreturns#index_confirmed'  
+  match 'payrollreturns/index_confirmed' => 'payrollreturns#index_confirmed'
   match 'payrollreturns/new/:payroll_id' => 'payrollreturns#new'
   resources :payrollreturns
-  
+
   match 'receiptpayrolls/new/:payroll_id' => 'receiptpayrolls#new'
   resources :receiptpayrolls
 
@@ -708,7 +708,7 @@ OfficePuraErp::Application.routes.draw do
 
   match 'docs(/:gkey/:sheetname)' => 'googledocs#index'
 
-  match '/media/:dragonfly/:file_name', :to => Dragonfly[:images]  
+  match '/media/:dragonfly/:file_name', :to => Dragonfly[:images]
   post 'attachments/upload' => 'attachments#upload', :as => :attachments_upload
 	post 'attachments/uploadTaxInv' => 'attachments#uploadTaxInv', :as => :attachments_uploadTaxInv
   post 'attachments/uploadQuot' => 'attachments#uploadQuot', :as => :attachments_uploadQuot
@@ -718,14 +718,14 @@ OfficePuraErp::Application.routes.draw do
 	get 'attachments/removeQuot/:id' => 'attachments#removeQuot', :as => :attachments_removeQuot
 
 
-  
+
 
   match 'deletes/action' => 'deletes#action'
   match 'deletes/money' => 'deletes#money'
   match 'deletes/bankexpense' => 'deletes#bankexpense'
   match 'deletes/receiptreturn' => 'deletes#receiptreturn'
-  match 'deletes/trainexpense' => 'deletes#trainexpense' 
-  match 'deletes/insuranceexpense' => 'deletes#insuranceexpense' 
+  match 'deletes/trainexpense' => 'deletes#trainexpense'
+  match 'deletes/insuranceexpense' => 'deletes#insuranceexpense'
 
   resources :containermemos do
     member do
@@ -733,14 +733,14 @@ OfficePuraErp::Application.routes.draw do
       get 'disable'
     end
   end
-	
+
 	match "helpdesks" => "helpdesks#index"
 	match "helpdesks/edit/:id" => "helpdesks#edit"
 	match "helpdesks/show/:id" => "helpdesks#show"
 	match "helpdesks/new" => "helpdesks#new"
 	post "helpdesks/create" => "helpdesks#create"
  	post 'helpdesks/updateticket'=> 'helpdesks#updateticket'
-	
+
 	get 'api/vehiclesapi' => 'vehiclesapi#index'
 	get 'api/vehiclesapi/detail/:id' => 'vehiclesapi#detail'
 	get 'api/vehiclesapi/search' => 'vehiclesapi#search'
@@ -752,7 +752,7 @@ OfficePuraErp::Application.routes.draw do
 
   get 'api/get_container_pura' => 'containers#get_container_pura'
   get 'api/containersapi/get_container_pura' => 'containersapi#get_container_pura'
-    
+
     get 'api/driversapi' => 'driversapi#index'
     get 'api/driversapi/detail/:id' => 'driversapi#detail'
     get 'api/driversapi/search' => 'driversapi#search'
@@ -764,18 +764,18 @@ OfficePuraErp::Application.routes.draw do
     get 'api/driversapi/invoicehistory/:id' => 'driversapi#history'
     get 'api/driversapi/list' => 'driversapi#driverFormList'
     get 'api/driversapi/getdriver_by_idcard' => 'driversapi#getdriver_by_idcard'
-    
+
     get 'api/dashboard' => 'dashboards#widget'
-      
+
     get 'api/report/annualvehicle' => 'reportsapi#annualvehicle'
     get 'api/report/get_today_invoice' => 'reportsapi#get_today_invoice'
     get 'api/report/vehicledetails' => 'reportsapi#vehicle_details'
-    
+
     get 'api/customer/customerroutes' => 'reportsapi#customer_routes'
 
     get 'taxinvoiceitems/downloadexcel/:id', to: 'taxinvoiceitems#downloadexcel'
 
-    get 'report-events' => 'events#report_events' 
+    get 'report-events' => 'events#report_events'
     get 'report-dp-events' => 'events#report_dpevents'
     get 'report-events-summary' => 'events#event_summary'
 
@@ -787,14 +787,14 @@ OfficePuraErp::Application.routes.draw do
     get 'api/invoices/getapi_invoices' => 'invoicesapi#getapi_invoices'
     get 'api/invoices/detail/:id' => 'invoicesapi#detail'
     get 'api/taxinvoices/duedate' => 'taxinvoicesapi#index'
-  
+
     post 'api/attachments/uploadtaxinvoice' => 'attachmentapi#uploadTaxInv'
     post 'api/attachments/remove/:id' => 'attachmentapi#remove'
-    
+
     post 'taxinvoiceitemvs/api/post-taxinvoiceitemv' => 'taxinvoiceitemv#postapi_taxinvoiceitemv'
-    post 'api/taxinvoiceitems/create' => 'taxinvoiceitemapi#updateitems' 
+    post 'api/taxinvoiceitems/create' => 'taxinvoiceitemapi#updateitems'
     get 'api/taxinvoiceitems/detail/:id' => 'taxinvoiceitemapi#detail'
-    
+
     match 'trainexpenses-paid' => 'trainexpenses#paid'
     match 'trainexpenses/new/:invoice_id' => 'trainexpenses#new'
     match 'trainexpenses/delete/:invoice_id' => 'trainexpenses#delete'
@@ -813,7 +813,7 @@ OfficePuraErp::Application.routes.draw do
     scope "monitoring" do
       match "operational" => 'monitorings#operational'
     end
-    
+
     scope "api" do
       scope "invoices", controller: "invoicesapi" do
         post 'create_invoice' => 'invoicesapi#createInvoice'
@@ -833,6 +833,12 @@ OfficePuraErp::Application.routes.draw do
       member do
         get 'enable'
         get 'disable'
+      end
+    end
+
+    resources :recapinvoicebyroutes do
+      collection do
+        get 'excelbyroutes'
       end
     end
 
