@@ -400,6 +400,7 @@
       </td>
       <td>
         <input type="text" id ="sku_<%=taxinvoiceitem.id%>" name="sku_<%=taxinvoiceitem.id%>" class="half" value="<%=taxinvoiceitem.sku_id%>" />
+        <span><%= link_to '&#xf044;'.html_safe, "/taxinvoiceitems/new/#{taxinvoiceitem.invoice_id}", :class => "edit tipsy", :title => 'Detail SJ' %></span>
       </td>
       <td><%=taxinvoiceitem.invoice.event_id rescue nil%></td>
       <td>
