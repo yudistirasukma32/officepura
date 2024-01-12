@@ -495,7 +495,7 @@
 		<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 		<% if (ext != 'pdf') %>
 			<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
-				<a href="<%= img.file.url() %>" target="_blank">
+				<a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
 					<%= image_tag img.file.url(:suffix => "/#{img.name}") if img.file_uid %>
 				</a>
 			<% else %>
