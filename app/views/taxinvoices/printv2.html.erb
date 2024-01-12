@@ -498,7 +498,7 @@
 	<% Attachment.where("imageable_id IN (?)", @invoice_images).each do |img| %>
 	<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 		<% if (ext == 'pdf') %>
-			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800"></iframe>
+			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" class="print-pdf"></iframe>
 			<object data="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800"></object>
 			<embed src="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800">
 		<% else %>
@@ -535,5 +535,11 @@
 
 			}
 		});
+
+		let print = () => {
+        let objFra = document.getElementByClass('print-pdf');
+        objFra.contentWindow.focus();
+        objFra.contentWindow.print();
+    }
 	</script>
 <% end %>
