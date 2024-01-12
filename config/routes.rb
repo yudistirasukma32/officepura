@@ -481,6 +481,7 @@ OfficePuraErp::Application.routes.draw do
   resources :taxinvoices do
     member do
       get 'print'
+      get 'printv2'
       get 'cancelpayment'
       get 'printreceipt'
       get 'clone'

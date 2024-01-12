@@ -446,6 +446,32 @@ class TaxinvoicesController < ApplicationController
 
   def print
     @taxinvoice = Taxinvoice.find(params[:id])
+    @invoice_images = Taxinvoiceitem.active.where("taxinvoice_id = ?", params[:id]).reorder(:id).pluck(:invoice_id)
+    @sj_images = Attachment.where("imageable_id IN (?)", @invoice_images)
+    # render json: @sj_images
+    # return false
+    
+    grandtotal = @taxinvoice.total - @taxinvoice.total.to_i 
+    @is_pembulatan = (grandtotal == 0)
+    # @decimal_place = is_pembulatan ? 0 : 2
+    # render json: {
+    #   totalitem: total == 0,
+    #   gst_tax: gst_tax == 0,
+    #   price_tax: price_tax == 0,
+    #   grandtotal: grandtotal == 0,
+    #   is_pembulatan: @is_pembulatan
+    # }
+    # return false
+    respond_to :html
+  end
+
+  def printv2
+    @taxinvoice = Taxinvoice.find(params[:id])
+    @invoice_images = Taxinvoiceitem.active.where("taxinvoice_id = ?", params[:id]).reorder(:id).pluck(:invoice_id)
+    @sj_images = Attachment.where("imageable_id IN (?)", @invoice_images)
+    # render json: @sj_images
+    # return false
+    
     grandtotal = @taxinvoice.total - @taxinvoice.total.to_i 
     @is_pembulatan = (grandtotal == 0)
     # @decimal_place = is_pembulatan ? 0 : 2
