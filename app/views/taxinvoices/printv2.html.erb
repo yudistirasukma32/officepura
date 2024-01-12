@@ -497,7 +497,7 @@
 			<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
 				<a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
 				<div style="width: 100% !important; margin: 0 auto !important;">
-					<%= image_tag img.file.thumb('480x320').url(:suffix => "/#{img.name}") if img.file_uid %>
+					<%= image_tag img.file.url(:suffix => "/#{img.name}") if img.file_uid %>
 				</div>
 				</a>
 			<% else %>
