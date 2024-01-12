@@ -492,7 +492,7 @@
 
 <div class="d-show-print">
 	<% Attachment.where("imageable_id IN (?)", @invoice_images).each do |img| %>
-	<div style="width: 100%; margin: 0 auto;">
+	<div style="width: 500px; margin: 0 auto;">
 		<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 			<% if (ext != 'pdf') %>
 				<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
