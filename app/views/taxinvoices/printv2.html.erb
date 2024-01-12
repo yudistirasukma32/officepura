@@ -30,8 +30,9 @@
 			background-repeat: no-repeat;
 			background-size: auto;
 			display: revert !important;  
-			/* visibility: visible; */
-			-webkit-print-color-adjust: exact;
+			-webkit-print-color-adjust: exact !important;   /* Chrome, Safari Edge */
+			color-adjust: exact !important;                 /* Firefox */
+			print-color-adjust: exact !important;           /* Firefox 97+, Safari 15.4+ */
 		}
 	}
 	
