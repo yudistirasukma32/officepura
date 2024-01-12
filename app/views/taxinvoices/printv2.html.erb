@@ -492,17 +492,19 @@
 
 <div class="d-show-print">
 	<% Attachment.where("imageable_id IN (?)", @invoice_images).each do |img| %>
+	<div style="width: 100%; margin: 0 auto;">
 		<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
-		<% if (ext != 'pdf') %>
-			<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
-				<a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
-					<%= image_tag img.file.url(:suffix => "/#{img.name}") if img.file_uid %>
-				</a>
-			<% else %>
-				<a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
+			<% if (ext != 'pdf') %>
+				<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
+					<a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
+						<%= image_tag img.file.url(:suffix => "/#{img.name}") if img.file_uid %>
+					</a>
+				<% else %>
+					<a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
+				<% end %>
 			<% end %>
 		<% end %>
-	<% end %>
+	</div>
 </div>
 
 
