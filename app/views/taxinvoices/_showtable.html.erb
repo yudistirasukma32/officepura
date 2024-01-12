@@ -146,6 +146,7 @@
 			<%= link_to '&#xf044;'.html_safe, edit_url, :class => "edit tipsy", :title => 'Edit Data / Masuk Detail' %> 
 			<% end %>
 			<a href="<%=print_taxinvoice_path(taxinvoice)%>" class="delete tipsy" title="Print Invoice"><i class="icon-print"></i></a>
+			<a href="<%=printv2_taxinvoice_path(taxinvoice)%>" class="delete tipsy" title="Print Invoice + TTD"><i class="icon-file-alt"></i></a>
 			<% if (!taxinvoice.paiddate.nil? and session[:adminrole]) or (taxinvoice.paiddate.nil?) %>
 			<%= link_to '&#xf00d;'.html_safe, taxinvoice, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
 			<% end %>
