@@ -496,8 +496,8 @@
 		<% if (ext != 'pdf') %>
 			<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
 				<a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
-				<div style="width: 800px !important; margin: 0 auto !important;">
-					<%= image_tag img.file.thumb('1024x720').url(:suffix => "/#{img.name}") if img.file_uid %>
+				<div style="width: 800px !important; margin: 0 auto !important; padding: 2rem;">
+					<%= image_tag img.file.thumb('1280x800').url(:suffix => "/#{img.name}") if img.file_uid %>
 				</div>
 				</a>
 			<% else %>
