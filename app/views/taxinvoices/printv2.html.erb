@@ -518,7 +518,7 @@
 			<!-- 
 			<a href="https://docs.google.com/gview?url=<%= img.file.url() if img.file_uid%>&embedded=true"></a> 
 			-->
-			<embed src="https://drive.google.com/viewerng/viewer?embedded=true&url=<%= img.file.url() if img.file.uid %>" width="500" height="375">
+			<embed src="https://drive.google.com/viewerng/viewer?embedded=true&url=<%= img.file.url() if img.file_uid %>" width="500" height="375">
 
 		<% else %>
 			<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
