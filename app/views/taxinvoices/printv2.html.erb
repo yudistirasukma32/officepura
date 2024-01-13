@@ -13,9 +13,19 @@
 			display: none;
 		}
 
-		iframe{display:block}
-		object{display:block}
-		embed{display:block}
+		iframe{
+			display:block;
+			width: 100% !important;
+		}
+		object{
+			display:block;
+			width: 100% !important;
+		}
+
+		embed{
+			display:block;
+			width: 100% !important;
+		}
 
 		.d-show-print {
 			display: revert !important;
@@ -498,12 +508,17 @@
 	<% Attachment.where("imageable_id IN (?)", @invoice_images).each do |img| %>
 	<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 		<% if (ext == 'pdf') %>
-		
-			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" class="print-pdf"></iframe>
-			<iframe src=<%= img.file.url() if img.file_uid %> width="600" height="780" style="border: none;"> </iframe>
+		<div class="print-pdf">
+			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" type='application/pdf'></iframe>
+		</div>
+			
+			
 			<object data="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800"></object>
 			<embed src="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800">
+			<!-- 
 			<a href="https://docs.google.com/gview?url=<%= img.file.url() if img.file_uid%>&embedded=true"></a> 
+			-->
+			<embed src="https://drive.google.com/viewerng/viewer?embedded=true&url=<%= img.file.url() if img.file.uid %>" width="500" height="375">
 
 		<% else %>
 			<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
