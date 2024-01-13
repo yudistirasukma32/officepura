@@ -13,6 +13,15 @@
 			display: none;
 		}
 
+		.print-pdf {
+			body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+		}
+
 		iframe{
 			display:block;
 			width: 100% !important;
@@ -528,11 +537,13 @@
 			<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="100%" height="auto" allowfullscreen="true">
 			-->
 
-		<object data="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="750px" height="750px">
-			<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf">
-				<p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true">Download PDF</a>.</p>
-			</embed>
-		</object>
+		<div class="print-pdf">
+			<object data="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="750px" height="750px">
+				<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf">
+					<p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true">Download PDF</a>.</p>
+				</embed>
+			</object>
+		</div>
 
 
 		<% else %>
