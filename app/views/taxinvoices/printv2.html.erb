@@ -529,25 +529,27 @@
 			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" type='application/pdf'></iframe>
 		</div>
 			-->
-			
 			<!-- 
 			<object data="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800"></object>
 			<embed src="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800">
-			<a href="https://docs.google.com/gview?url=<%= img.file.url() if img.file_uid%>&embedded=true"></a> 
+			<a href="https://docs.google.com/gview?url=<%= img.file.url() if img.file_uid%>&embedded=true"></a>
 			<embed src="https://drive.google.com/viewerng/viewer?embedded=true&url=<%= img.file.url() if img.file_uid %>" width="500" height="375">
-			<%# <iframe src="https://docs.google.com/gview?url=http://example.com/mypdf.pdf&embedded=true" style="width:718px; height:700px;" frameborder="0"></iframe> %>
+			-->
 			<iframe src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" style="width:718px; height:700px;" frameborder="0" type='application/pdf' allowfullscreen="true"></iframe>
+			<!-- 
 			<object data="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="100%" height="auto" allowfullscreen="true"></object>
 			<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="100%" height="auto" allowfullscreen="true">
 			-->
 
-		<div class="print-pdf">
-			<object data="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="750px" height="750px">
-				<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf">
-					<p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true">Download PDF</a>.</p>
-				</embed>
-			</object>
-		</div>
+		<!-- 
+			<div class="print-pdf">
+				<object data="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="750px" height="750px">
+					<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf">
+						<p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true">Download PDF</a>.</p>
+					</embed>
+				</object>
+			</div>
+		-->
 
 
 		<% else %>
