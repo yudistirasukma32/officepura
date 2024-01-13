@@ -498,11 +498,14 @@
 	<% Attachment.where("imageable_id IN (?)", @invoice_images).each do |img| %>
 	<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 		<% if (ext == 'pdf') %>
-		<!-- 
+		
+			<!-- 
 			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" class="print-pdf"></iframe>
+			-->
 			<object data="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800"></object>
 			<embed src="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800">
-		-->
+			<a href="https://docs.google.com/gview?url=<%= img.file.url() if img.file_uid%>&embedded=true"></a> 
+
 		<% else %>
 			<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
 				<a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
