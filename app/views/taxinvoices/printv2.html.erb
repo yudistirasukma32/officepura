@@ -522,6 +522,8 @@
 			<%# <iframe src="https://docs.google.com/gview?url=http://example.com/mypdf.pdf&embedded=true" style="width:718px; height:700px;" frameborder="0"></iframe> %>
 			-->
 			<iframe src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" style="width:718px; height:700px;" frameborder="0" type='application/pdf'></iframe>
+			<object data="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="auto" height="auto"></object>
+			<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="auto" height="auto">
 
 
 		<% else %>
