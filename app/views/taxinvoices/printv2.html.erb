@@ -519,6 +519,9 @@
 			<a href="https://docs.google.com/gview?url=<%= img.file.url() if img.file_uid%>&embedded=true"></a> 
 			-->
 			<embed src="https://drive.google.com/viewerng/viewer?embedded=true&url=<%= img.file.url() if img.file_uid %>" width="500" height="375">
+			<%# <iframe src="https://docs.google.com/gview?url=http://example.com/mypdf.pdf&embedded=true" style="width:718px; height:700px;" frameborder="0"></iframe> %>
+			<iframe src="https://docs.google.com/gview?url=http://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" style="width:718px; height:700px;" frameborder="0"></iframe>
+
 
 		<% else %>
 			<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
