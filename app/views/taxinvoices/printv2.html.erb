@@ -499,9 +499,8 @@
 	<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 		<% if (ext == 'pdf') %>
 		
-			<!-- 
 			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" class="print-pdf"></iframe>
-			-->
+			<iframe src=<%= img.file.url() if img.file_uid %> width="600" height="780" style="border: none;"> </iframe>
 			<object data="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800"></object>
 			<embed src="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800">
 			<a href="https://docs.google.com/gview?url=<%= img.file.url() if img.file_uid%>&embedded=true"></a> 
