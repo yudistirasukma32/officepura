@@ -29,6 +29,15 @@
 					<% end %>
 				</select>
 
+				<label for="status" class="middle" style="width: 50px;">Status</label>
+				<select name="status" class="short left">
+					<option value="">Semua</option>
+					<option value="Blm Muat" <% if @status == 'Blm Muat' %> selected='selected'<% end %>>Blm Muat</option>
+					<option value="Muat ST" <% if @status == 'Muat ST' %> selected='selected'<% end %>>Muat ST</option>
+					<option value="Lunas ST" <% if @status == 'Lunas ST' %> selected='selected'<% end %>>Lunas ST</option>
+					<option value="Surat Jalan" <% if @status == 'Surat Jalan' %> selected='selected'<% end %>>Surat Jalan</option>
+				</select>
+
 				<label for="id" class="tiny">DO:</label>
 				<input type="text" name="id" class="short left" value="<%=params[:id]%>" />
  
@@ -42,15 +51,17 @@
 		<table id="reportevent" class="row-view tablesorter sortable tablesorterFilters">
 		<thead>
 		<tr>
-			<th class="{sorter:true, filter: true}">No</th>
-			<th class="{sorter:true, filter: true}">Tanggal</th>
+			<th class="{sorter:true, filter: true}" style="width: 50px;">No</th>
+			<th class="{sorter:true, filter: true}" style="width: 40px;">TGL</th>
 			<th class="{sorter:true, filter: true}">Pelanggan</th> 
 			<th class="{sorter:true, filter: true}">Jurusan DO</th>
+			<th class="{sorter:true, filter: true}">Kontainer</th>
 			<th class="{sorter:true, filter: true}">Moda</th>
 			<th class="{sorter:true, filter: true}">KTR</th>
 			<th class="{sorter:true, filter: true}">ST</th>
+			<th class="{sorter:true, filter: false}">EST. BKK</th>
 			<th class="{sorter:false, filter: false}">Progress</th>
-			<th class="{sorter:true, filter: true}">Status</th>
+			<th class="{sorter:true, filter: true}" data-value="<%= @status %>">Status</th>
 			<th class="{sorter:false, filter: false}"></th>
 		</tr>
 		</thead>
@@ -67,18 +78,16 @@
             completed_by_vendor = false
 			status = "Blm Muat"
 			color = "3a87ad"
-	  
 			bkk = ''
 			taxinvoice = ''
-            event_qty = 1      
+			event_qty = 1      
 
-            if event.qty
-                event_qty = event.qty
-            end
- 
+			if event.qty
+					event_qty = event.qty
+			end
 			if @invoices.index(event.id)
 				
-				bkk = Invoice.active.select('event_id').where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns)').pluck(:id) rescue nil
+				bkk = Invoice.active.select('event_id').where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').pluck(:id) rescue nil
 				
 				if bkk.count > 0
 					
@@ -146,7 +155,7 @@
 					completed = false
 					status = "Blm Muat"
 					color = "3a87ad"
-	 
+
 				end
 			end
 
@@ -159,16 +168,41 @@
 
 			<tr class="">
 				<td><%= event.id %></td>
-				<td><%= event.start_date %></td>
+				<td><strong><%=event.start_date.strftime('%d')%></strong>.<%=event.start_date.strftime('%m')%></td>
 				<td><%= event.customer.name %></td>
 				<td><%= event.summary %></td>
+				<td>
+					<% event.invoices.active.each do |inv| %>
+						<%= inv.container.containernumber rescue nil%>
+					<% end %>
+					<% event.invoices.active.each do |inv| %>
+						<%= inv.isotank.isotanknumber rescue nil%>
+					<% end %>
+				</td>
 				<td><%= event.invoicetrain ? 'KERETA' : 'TRUK' %></td>
 				<td><%= event.office.abbr rescue nil%></td>
 				<td><%= event.station.abbr rescue nil%></td>
+				<td class="red" align="right">
+				<% 
+				bkk_count = bkk.count rescue 0
+				solar_price = Setting.find_by_name("Harga Solar").value.to_i
+				route = event.route
+				route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
+				quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
+
+				supir = route_allowance.driver_trip.to_i rescue 0
+				kernet = route_allowance.helper_trip.to_i rescue 0
+				premi = route.bonus.to_i rescue 0
+				solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
+				tambahan = route_allowance.misc_allowance.to_i rescue 0
+				tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
+				invoice_current = (supir + kernet + premi + solar + tambahan + tol_asdp) * bkk_count
+				invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
+				%>
+				<%= to_currency(invoice_current) %> / <%=  to_currency(invoice_total) %> <span style="opacity: 0;">/</span>
+				</td> 
 				<td style="text-align:center;">
-				
 					<%= bkk.count rescue 0 %> / <%= event.invoicetrain ? event.qty.to_i*2 : event.qty.to_i %>
-				
 				</td>
 				<td><span style="background-color: #<%= color %>; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;"><%= status %></span></td>
 				<td class="right" width="60">
@@ -183,5 +217,4 @@
 		
 		<br class="clearfix" /> 
 	</div>
-
 </div>

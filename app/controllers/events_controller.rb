@@ -491,6 +491,8 @@ class EventsController < ApplicationController
 
     @customer = Customer.find(params[:customer_id]) rescue nil
     @customer_id = @customer.id if @customer
+
+    @status = params[:status]
   
     @id = params[:id]
     
