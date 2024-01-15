@@ -469,8 +469,10 @@ class TaxinvoicesController < ApplicationController
     @taxinvoice = Taxinvoice.find(params[:id])
     @invoice_images = Taxinvoiceitem.active.where("taxinvoice_id = ?", params[:id]).reorder(:id).pluck(:invoice_id)
     @sj_images = Attachment.where("imageable_id IN (?)", @invoice_images)
-    # render json: @sj_images
+    # render json: @invoice_images
     # return false
+
+
     
     grandtotal = @taxinvoice.total - @taxinvoice.total.to_i 
     @is_pembulatan = (grandtotal == 0)

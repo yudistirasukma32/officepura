@@ -236,6 +236,7 @@
 						<th width="40" style="padding-left:10px; text-align:center">Tarif</th>
 						<th colspan="2" style="text-align:center">Jurusan</th>
 						<th width="70" style="text-align:center">Total</th>
+						<th class="d-none-print"></th>
 					</tr>
 					<% subtotal = 0 %>
 					<% weight_gross = 0 %>
@@ -282,6 +283,11 @@
 								<% end %>
 								</td>
 								<td align="right"><%= to_currency(taxinvoiceitem.total)%>  </td>
+								<td class="d-none-print">
+									<a href="/taxinvoiceitems/new/<%=taxinvoiceitem.invoice_id%>" class="delete tipsy" title="Detail SJ">
+										<i class="icon-print"></i>
+									</a>
+								</td>
 							</tr>
 						<% end %>
 						<% @taxinvoice.taxinvoiceitemvs.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
@@ -326,6 +332,7 @@
 									<td align="left" style="padding-left:10px;"><%=to_currency_bank(taxgenericitem.price_per)%></td>
 									<td colspan="2" style="text-align:left"><%=taxgenericitem.description%></td>
 									<td align="right"><%= to_currency(taxgenericitem.total)%></td>
+									
 								</tr>
 							<% end %>
 						<% end %>
@@ -524,10 +531,11 @@
 	<% Attachment.where("imageable_id IN (?)", @invoice_images).each do |img| %>
 	<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 		<% if (ext == 'pdf') %>
+		<%# removed print pdf %>
+		<!-- 
 		<div class="print-pdf">
 			<iframe src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" style="width:718px; height:700px;" frameborder="0" type='application/pdf' allowfullscreen="true"></iframe>
 		</div>
-		<!-- 
 			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" type='application/pdf'></iframe>
 			-->
 			<!-- 
