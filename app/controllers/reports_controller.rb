@@ -3036,6 +3036,7 @@ end
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
       
       @customer_id = params[:customer_id]
+      @routetrain_id = params[:routetrain_id]
 
       @customers = Customer.where('id in (select customer_id from events where deleted = false and start_date between ? and ?)', @startdate.to_date, @enddate.to_date).order(:name)
       
@@ -3065,10 +3066,17 @@ end
       if @tanktype.present? and @tanktype != 'all'
         @eventsa = @eventsa.where('tanktype = ?', @tanktype)
       end
- 
+
       if params[:office_id].present? && params[:office_id] != 'all'
-       @eventsa = @eventsa.where(office_id: params[:office_id])
+        @eventsa = @eventsa.where(office_id: params[:office_id])
       end
+
+      if params[:routetrain_id].present? && params[:routetrain_id] != 'all'
+        @eventsa = @eventsa.where(routetrain_id: params[:routetrain_id])
+      end
+
+      # render json: params
+      # return false
       
       global_supir = 0
       global_kernet = 0
@@ -3146,7 +3154,10 @@ end
           invoice_total: invoice_total,
           total_estimation: estimation,
           description: description,
-          start_date: event.start_date
+          start_date: event.start_date,
+          route_train: (event.routetrain.name rescue "Kosong"),
+          route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
+          route_train_id: event.routetrain_id
         }
       end
       @summary = {
@@ -3162,6 +3173,7 @@ end
       @section = "estimationreport"
       @where = "estimation_event_invoice"
       # render json: @events
+      # return false
       # render "estimation"
     else
       redirect_to root_path()

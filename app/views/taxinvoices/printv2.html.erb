@@ -104,7 +104,7 @@
 		
 
 			<% if !@taxinvoice.nil? %>
-				<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+				<a class="print btn" href="javascript:print();" id="btnPrint"><i class="icon-print"></i> Print</a>
 				<a class="print btn btn-yellow" href="/taxinvoices/<%=@taxinvoice.id%>/printreceipt"><i class="icon-print"></i> Kwitansi</a>
 				<a class="print btn-txt btn-green" href="/taxinvoices/downloadexcel/<%=@taxinvoice.id%>"><i class="icon-file"></i> Excel</a>
 
@@ -524,10 +524,11 @@
 	<% Attachment.where("imageable_id IN (?)", @invoice_images).each do |img| %>
 	<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 		<% if (ext == 'pdf') %>
-		<!-- 
 		<div class="print-pdf">
-			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" type='application/pdf'></iframe>
+			<iframe src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" style="width:718px; height:700px;" frameborder="0" type='application/pdf' allowfullscreen="true"></iframe>
 		</div>
+		<!-- 
+			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" type='application/pdf'></iframe>
 			-->
 			<!-- 
 			<object data="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800"></object>
@@ -535,7 +536,7 @@
 			<a href="https://docs.google.com/gview?url=<%= img.file.url() if img.file_uid%>&embedded=true"></a>
 			<embed src="https://drive.google.com/viewerng/viewer?embedded=true&url=<%= img.file.url() if img.file_uid %>" width="500" height="375">
 			-->
-			<iframe src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" style="width:718px; height:700px;" frameborder="0" type='application/pdf' allowfullscreen="true"></iframe>
+			
 			<!-- 
 			<object data="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="100%" height="auto" allowfullscreen="true"></object>
 			<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="100%" height="auto" allowfullscreen="true">
@@ -586,6 +587,17 @@
 
 			}
 		});
+
+		$("#btnPrint").live("click", function () {
+			var divContents = $(".print-pdf").html();
+			var printWindow = window.open('', '', 'height=400,width=800');
+			printWindow.document.write('<html><head><title>DIV Contents</title>');
+			printWindow.document.write('</head><body >');
+			printWindow.document.write(divContents);
+			printWindow.document.write('</body></html>');
+			printWindow.document.close();
+			printWindow.print();
+			});
 
 		// let print = () => {
     //     let objFra = document.getElementsByClassName('print-pdf');

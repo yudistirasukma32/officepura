@@ -1,5 +1,13 @@
 <%= render "shared/header" %>
 
+<%= content_for :css do %>	 
+	<style>
+		#main #filter {
+			height: 96px;
+		}
+	</style>
+<% end %>
+
 <div id="nav">
 	<%= render "shared/nav" %>
 </div>
@@ -15,44 +23,57 @@
 
 	<div id="filter">
 		<form id="filterform" name="filterform" action="" method="get">
-		<div class="field-row continue">
-			<div style="position: relative; width: fit-content; float: left;">
-			<label for="customer_id"  style="width: 50px;"/>Pelanggan</label>
-			<select name="customer_id" class="half left chzn-select" style="width: 120px;"/>
-				<option value="">Semua Pelanggan</option>
-				<% @customers.each do |customer| %>
-				<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
-				<% end %>
-			</select>
+			<div class="field-row continue">
+				<div style="position: relative; width: fit-content; float: left;">
+				<label for="customer_id"  style="width: 50px;"/>Pelanggan</label>
+				<select name="customer_id" class="half left chzn-select" style="width: 120px;"/>
+					<option value="">Semua Pelanggan</option>
+					<% @customers.each do |customer| %>
+					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
+					<% end %>
+				</select>
+				</div>
+				<label for="office_id" class="middle" style="width: 50px;"/>Kantor</label>
+				<select name="office_id" class="short left office_id" style="margin-right: 5px;">	
+					<option value="all">All</option>
+					<% Office.active.each do |office| %>
+					<option value="<%=office.id%>" <%= params[:office_id].to_i == office.id ? "selected" : "" %>><%=office.name%></option>
+					<% end %>
+				</select>
+				<label for="transporttype"  class="middle" style="width: 50px; padding: 0 10px 0 5px;">Tipe DO</label>
+				<select name="transporttype" class="short left combo_route "  style="margin-right: 15px;">	
+				<option value="all">Semua Tipe</option>
+					<% ["STANDART","KERETA","RORO","LOSING"].each do |type| %>
+					<option <%= type == params[:transporttype] ? 'selected' : '' %>><%=type%></option>
+					<% end %>
+				</select>
+				<label for="tanktype" class="middle" style="width: 40px;padding: 0 10px 0 5px;">Group</label>
+				<select name="tanktype" class="short left combo_route" style="margin-right: 15px;">	
+				<option value="all">Semua Group</option>
+					<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
+					<% ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER', 'TRUK BOX', 'MULTIFUNGSI'].each do |type| %>
+					<option <%= type == params[:tanktype] ? 'selected' : '' %>><%=type%></option>
+					<% end %>
+				</select>
+				<label for="startdate" style="width: 50px;"/>Tgl Awal</label>
+				<input type="text" name="startdate" class="left half date-picker" value="<%=@startdate%>" style="width: 80px;"/>
+				<label for="enddate" class="middle" style="width: 40px;"/>Akhir</label>
+				<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" style="width: 80px;"/>
 			</div>
-			<label for="office_id" class="middle" style="width: 50px;"/>Kantor</label>
-			<select name="office_id" class="short left office_id" style="margin-right: 5px;">	
-				<option value="all">All</option>
-				<% Office.active.each do |office| %>
-				<option value="<%=office.id%>" <%= params[:office_id].to_i == office.id ? "selected" : "" %>><%=office.name%></option>
-				<% end %>
-			</select>
-			<label for="transporttype"  class="middle" style="width: 50px; padding: 0 10px 0 5px;">Tipe DO</label>
-			<select name="transporttype" class="short left combo_route "  style="margin-right: 15px;">	
-			<option value="all">Semua Tipe</option>
-				<% ["STANDART","KERETA","RORO","LOSING"].each do |type| %>
-				<option <%= type == params[:transporttype] ? 'selected' : '' %>><%=type%></option>
-				<% end %>
-			</select>
-			<label for="tanktype" class="middle" style="width: 40px;padding: 0 10px 0 5px;">Group</label>
-			<select name="tanktype" class="short left combo_route" style="margin-right: 15px;">	
-			<option value="all">Semua Group</option>
-				<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
-				<% ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER', 'TRUK BOX', 'MULTIFUNGSI'].each do |type| %>
-				<option <%= type == params[:tanktype] ? 'selected' : '' %>><%=type%></option>
-				<% end %>
-			</select>
-			<label for="startdate" style="width: 50px;"/>Tgl Awal</label>
-			<input type="text" name="startdate" class="left half date-picker" value="<%=@startdate%>" style="width: 80px;"/>
-			<label for="enddate" class="middle" style="width: 40px;"/>Akhir</label>
-			<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" style="width: 80px;"/>
-			<input class="submit" type="submit" value="Filter" style="margin-top: -3px; margin-left: 16px;"/>
-		</div>
+			
+			<div class="field-row continue">
+				<div style="position: relative; width: fit-content; float: left;">
+					<label for="routetrain_id"  style="width: 90px;"/>Jurusan Kereta</label>
+					<select name="routetrain_id" class="half left chzn-select" style="width: 400px;"/>
+						<option value="all">Semua Jurusan</option>
+						<% routetrains = Routetrain.active %>
+						<% routetrains.each do |route| %>
+						<option value="<%=route.id%>" <%= route.id == params[:routetrain_id].to_i ? "selected" : '' %>><%=route.name%> - <%= route.container_type %></option>
+						<% end %>
+					</select>
+				</div>
+				<input class="submit" type="submit" value="Filter" style="margin-top: -3px; margin-left: 16px;"/>
+			</div>
 		</form>
 	</div>
 
@@ -85,7 +106,12 @@
 		<tr<% if i % 2 == 0 %> class="even"<% end %>>
 			<td><%=i+1%>.</td>
 			<td><%=event[:start_date].strftime('%d.%m.%y')%></td>
-			<td><%=event[:description] %></td>
+			<td><%=event[:description] %>
+			<% if event[:route_train].present? && event[:route_train] != "Kosong" %>
+				<br>
+				<%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
+			<% end %>
+			</td>
 			<td><%=event[:tanktype] %></td>
 			<td><%=event[:office] %></td>
 			<td class="" align="right"><%=to_currency(event[:supir])%></td>
