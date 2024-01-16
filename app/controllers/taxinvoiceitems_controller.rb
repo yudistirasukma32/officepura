@@ -277,7 +277,8 @@ class TaxinvoiceitemsController < ApplicationController
     sheet.add_row ['No','Tanggal','Surat Jalan','Tgl Muat','Muat','Tgl Bongkar','Bongkar','Susut'], :height => 20, :widths => [:auto]
   
     invoice.taxinvoiceitems.each_with_index do |item, i|
-      sheet.add_row [i+1,item.date.strftime("%d-%m-%Y"),item.sku_id,item.load_date.strftime("%d-%m-%Y"),'Muat',item.unload_date.strftime("%d-%m-%Y"),item.weight_gross,item.weight_net],:height => 20, :widths => [:auto]
+      # sheet.add_row [i+1,item.date.strftime("%d-%m-%Y"),item.sku_id,item.load_date.strftime("%d-%m-%Y"),'Muat',item.unload_date.strftime("%d-%m-%Y"),item.weight_gross,item.weight_net],:height => 20, :widths => [:auto]
+      sheet.add_row [i+1,(item.date.strftime("%d-%m-%Y") rescue nil),item.sku_id,(item.load_date.strftime("%d-%m-%Y") rescue nil),'Muat',(item.unload_date.strftime("%d-%m-%Y") rescue nil),item.weight_gross,item.weight_net],:height => 20, :widths => [:auto]
     end
   
   
