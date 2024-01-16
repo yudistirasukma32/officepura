@@ -26,7 +26,7 @@
 			<div class="field-row continue">
 				<div style="position: relative; width: fit-content; float: left;">
 				<label for="customer_id"  style="width: 50px;"/>Pelanggan</label>
-				<select name="customer_id" class="half left chzn-select" style="width: 120px;"/>
+				<select name="customer_id" class="half left chzn-select" style="width: 150px;"/>
 					<option value="">Semua Pelanggan</option>
 					<% @customers.each do |customer| %>
 					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
@@ -63,14 +63,26 @@
 			
 			<div class="field-row continue" style="margin-top: 10px; display: flex; column-gap: 10px;">
 				<div style="position: relative; width: fit-content; float: left;">
-					<label for="routetrain_id"  style="width: 90px;"/>Jurusan Kereta</label>
-					<select name="routetrain_id" class="half left chzn-select" style="width: 400px;"/>
-						<option value="all">Semua Jurusan</option>
-						<% routetrains = Routetrain.active %>
-						<% routetrains.each do |route| %>
-						<option value="<%=route.id%>" <%= route.id == params[:routetrain_id].to_i ? "selected" : '' %>><%=route.name%> - <%= route.container_type %></option>
+					<label for="operator_id"  style="width: 120px;"/>Operator Kereta</label>
+					<select name="operator_id" class="half left chzn-select" style="width: 140px;" onchange="javascript:getRouteTrains(this.value);"/>
+						<option value="all">Semua Operator</option>
+						<% operators = Operator.active %>
+						<% operators.each do |operator| %>
+						<option value="<%=operator.id%>" <%= operator.id == params[:operator_id].to_i ? "selected" : '' %>><%=operator.abbr%></option>
 						<% end %>
 					</select>
+				</div>
+				<div id="route-trains">
+					<div style="position: relative; width: fit-content; float: left;">
+						<label for="routetrain_id"  style="width: 90px;">Jurusan Kereta</label>
+						<select name="routetrain_id" class="half left chzn-select" style="width: 450px;">
+							<option value="all">Semua Jurusan</option>
+							<% routetrains = Routetrain.active %>
+							<% routetrains.each do |route| %>
+								<option value="<%=route.id%>" <%= route.id == params[:routetrain_id].to_i ? "selected" : '' %>><%=route.name%> - <%= route.container_type %></option>
+							<% end %>
+						</select>
+					</div>
 				</div>
 				<input class="submit" type="submit" value="Filter" style="margin-top: -3px; margin-left: 16px;"/>
 			</div>

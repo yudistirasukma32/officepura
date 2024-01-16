@@ -417,6 +417,7 @@ OfficePuraErp::Application.routes.draw do
   get 'invoices/getroutesonly/:customer_id' => 'invoices#get_routesonly'
 
   get 'invoices/getroutes/:customer_id' => 'invoices#get_routes'
+  get 'reports/getroutetrains/:operator_id' => 'reports#get_routetrains'
   get 'invoices/getroutesbyoffice/:office_id' => 'invoices#get_routesbyoffice'
 
   get 'invoices/getrouteswithtype/:customer_id/:transporttype' => 'invoices#get_routeswithtype'

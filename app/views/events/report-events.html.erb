@@ -41,7 +41,7 @@
 
 				<label for="id" class="tiny">DO:</label>
 				<input type="text" name="id" class="short left" value="<%=params[:id]%>" />
- 
+
 				<input class="submit left" type="submit" value="Filter" />
 			</div>
 			</form>
@@ -69,7 +69,13 @@
 		
 		<tbody>
 
-		<% @events.each do |event| %>
+		<% 
+		progressbkk = 0
+		alltotalbkk = 0
+		qtybkk = 0
+		allbkk = 0
+		@events.each do |event| 
+		%>
 
 		<%
 			half_completed = false
@@ -79,13 +85,15 @@
             completed_by_vendor = false
 			status = "Blm Muat"
 			color = "3a87ad"
+	  
 			bkk = ''
 			taxinvoice = ''
-			event_qty = 1      
+            event_qty = 1      
 
-			if event.qty
-					event_qty = event.qty
-			end
+            if event.qty
+                event_qty = event.qty
+            end
+ 
 			if @invoices.index(event.id)
 				
 				bkk = Invoice.active.select('event_id').where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').pluck(:id) rescue nil
@@ -156,7 +164,7 @@
 					completed = false
 					status = "Blm Muat"
 					color = "3a87ad"
-
+	 
 				end
 			end
 
@@ -186,6 +194,7 @@
 				<td class="red" align="right">
 				<% 
 				bkk_count = bkk.count rescue 0
+				qtybkk += bkk_count
 				solar_price = Setting.find_by_name("Harga Solar").value.to_i
 				route = event.route
 				route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
@@ -199,11 +208,14 @@
 				tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
 				invoice_current = (supir + kernet + premi + solar + tambahan + tol_asdp) * bkk_count
 				invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
+				progressbkk += invoice_current
+				alltotalbkk += invoice_total
 				%>
 				<%= to_currency(invoice_current) %> / <%=  to_currency(invoice_total) %> <span style="opacity: 0;">/</span>
 				</td> 
 				<td style="text-align:center;">
 					<%= bkk.count rescue 0 %> / <%= event.invoicetrain ? event.qty.to_i*2 : event.qty.to_i %>
+					<% event.invoicetrain ? allbkk += event.qty.to_i*2 :  allbkk += event.qty.to_i %>
 				</td>
 				<td><span style="background-color: #<%= color %>; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;"><%= status %></span></td>
 				<td class="right" width="60">
@@ -212,6 +224,15 @@
 				</td>
 			</tr>
 		<% end %>
+
+		<tr class="footer">
+			<td class="total" colspan="7">TOTAL</td>
+			<td class="red right">(<%= to_currency(alltotalbkk - progressbkk)%>)</td>
+			<td class="red right"><%= to_currency(progressbkk) %> / <%= to_currency(alltotalbkk) %> <span style="opacity: 0;">/</span></td>
+			<td style="text-align:center;"><%= qtybkk %> / <%= allbkk %></td>
+			<td></td>
+			<td></td>
+		</tr>
 
 		</tbody>
 		</table>

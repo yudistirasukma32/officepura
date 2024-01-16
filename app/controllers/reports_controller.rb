@@ -3071,6 +3071,10 @@ end
         @eventsa = @eventsa.where(office_id: params[:office_id])
       end
 
+      if params[:operator_id].present? && params[:operator_id] != 'all'
+        @eventsa = @eventsa.where(operator_id: params[:operator_id])
+      end
+
       if params[:routetrain_id].present? && params[:routetrain_id] != 'all'
         @eventsa = @eventsa.where(routetrain_id: params[:routetrain_id])
       end
@@ -3179,6 +3183,11 @@ end
       redirect_to root_path()
     end
     
+  end
+
+  def get_routetrains
+    @routes = Routetrain.where("deleted = ? and enabled = ? and operator_id = ?", false, true, params[:operator_id])
+    render :json => { :success => true, :html => render_to_string(:partial => "reports/routetrains", :layout => false) }.to_json;
   end
 
   def memocleanings

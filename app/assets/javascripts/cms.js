@@ -622,6 +622,23 @@ function getRoutes(customer_id) {
 		
 }
 
+function getRouteTrains(operator_id) {
+
+	$.ajax({
+		type: "GET",
+		url: "/reports/getroutetrains/" + operator_id,
+		success: function(data) {
+			console.log("/reports/getroutetrains/" + operator_id);
+			$('#route-trains').html(data.html);
+			$(".chzn-select").chosen();
+		},
+		request: function() {
+			$('#route-trains').html('<em>Mengunduh Data</em>');			
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+}
+
 function getRoutesWithTransportType(customer_id) {
 
 	var transporttype = $("#invoice_transporttype").val();

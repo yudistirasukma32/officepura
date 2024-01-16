@@ -1,0 +1,9 @@
+<div style="position: relative; width: fit-content; float: left;">
+  <label for="routetrain_id"  style="width: 90px;">Jurusan Kereta</label>
+  <select name="routetrain_id" class="half left chzn-select" style="width: 450px;">
+    <option value="all">Semua Jurusan</option>
+    <% @routes.each do |route| %>
+      <option value="<%= route.id %>"><%= route.name %> - <%= route.container_type %></option>
+    <% end %>
+  </select>
+</div>
