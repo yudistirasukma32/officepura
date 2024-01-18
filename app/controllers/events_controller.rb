@@ -23,15 +23,15 @@ class EventsController < ApplicationController
   def getestimatedtonage
     if params[:price_per_type] == 'M3'
       @estimated_tonage = @estimated_tonage_m3
-      render :json => { :success => true, :html => render_to_string(:partial => "events/estimatedtonage", :layout => false) }.to_json; 
+      render :json => { :success => true, :html => render_to_string(:partial => "events/estimatedtonage", :layout => false) }.to_json;
     elsif params[:price_per_type] == 'KG'
       @estimated_tonage = @estimated_tonage_kg
-      render :json => { :success => true, :html => render_to_string(:partial => "events/estimatedtonage", :layout => false) }.to_json; 
+      render :json => { :success => true, :html => render_to_string(:partial => "events/estimatedtonage", :layout => false) }.to_json;
     elsif params[:price_per_type] == 'LITER'
       @estimated_tonage = @estimated_tonage_lt
-      render :json => { :success => true, :html => render_to_string(:partial => "events/estimatedtonage", :layout => false) }.to_json; 
+      render :json => { :success => true, :html => render_to_string(:partial => "events/estimatedtonage", :layout => false) }.to_json;
     end
-    
+
   end
 
   def index
@@ -46,19 +46,19 @@ class EventsController < ApplicationController
   end
 
   def edit
-    @process = 'edit' 
+    @process = 'edit'
     @event = Event.find(params[:id])
     @event.start_date = @event.start_date.strftime('%d-%m-%Y') if !@event.start_date.blank?
     @event.end_date = @event.end_date.strftime('%d-%m-%Y') if !@event.end_date.blank?
     @isdelete = true
-      
+
 
     @eventmemos = Eventmemo.active.where('event_id = ?', @event.id)
     @eventcleaningmemos = Eventcleaningmemo.active.where('event_id = ?', @event.id)
 
     @taxinvoiceitemvs = Taxinvoiceitemv.active.where(event_id: params[:id]).where("total > money(0)")
     @invoices = Invoice.active.where('event_id = ?', @event.id)
- 
+
     if @invoices.present?
         inv = @invoices.select('id').pluck('id')
         @taxinvoiceitems = Taxinvoiceitem.active.where('invoice_id IN (?)', inv)
@@ -78,7 +78,7 @@ class EventsController < ApplicationController
     #       iso_cont_number: params[:iso_cont_number][i],
     #       quantity: params[:quantity][i],
     #     })
-        
+
     #   end
     # end
 
@@ -87,7 +87,7 @@ class EventsController < ApplicationController
     inputs = params[:event]
 
     if inputs[:invoicetrain] == false || inputs[:invoicetrain] == "false"
-    
+
       inputs[:operator_id] = 0
       inputs[:routetrain_id] = 0
       inputs[:station_id] = 0
@@ -95,7 +95,7 @@ class EventsController < ApplicationController
     end
 
     if inputs[:invoicetrain] == false && inputs[:losing] == true
-      
+
       inputs[:invoicetrain] = false
       inputs[:losing] = true
       inputs[:invoiceship] = false
@@ -107,8 +107,8 @@ class EventsController < ApplicationController
       inputs[:invoicetrain] = false
       inputs[:losing] = false
       inputs[:invoiceship] = false
-    
-    end 
+
+    end
 
     if inputs[:invoicetrain] == 'roro'
 
@@ -121,7 +121,7 @@ class EventsController < ApplicationController
 
     query = @event.cancelled ? "?type=cancelled" : ""
     @event.user_id = current_user.id
-   
+
     if @event.save
 
       if params[:so_number].present?
@@ -131,10 +131,10 @@ class EventsController < ApplicationController
             long_id: so_number
           }
         end
-          
+
         @event.eventsalesorders.create(eventso)
       end
-      
+
       if params[:vendor_name].present? && params[:event][:need_vendor].to_i == 1
         eventvendors = []
         params[:vendor_name].each_with_index do |vendor,i|
@@ -144,33 +144,33 @@ class EventsController < ApplicationController
             iso_cont_number: params[:iso_cont_number][i],
             quantity: params[:quantity][i],
           })
-          
+
         end
         @event.eventvendors.create(eventvendors)
       end
 #      redirect_to(events_path + query, :notice => 'Data Event telah ditambah')
-    
+
       redirect_to(edit_event_url(@event), :notice => 'Data Event / DO berhasil ditambah.')
-        
+
     else
       render :action => 'new'
-        
+
     end
   end
 
   def update
-    
+
     # render json: params
     # return false
     @event = Event.find(params[:id])
     inputs = params[:event]
-      
+
     if inputs[:need_vendor] == '0'
         inputs[:vendor_name] = ''
     end
 
     if inputs[:invoicetrain] == false || inputs[:invoicetrain] == "false"
-    
+
       inputs[:operator_id] = 0
       inputs[:routetrain_id] = 0
       inputs[:station_id] = 0
@@ -208,14 +208,14 @@ class EventsController < ApplicationController
                 quantity: params[:quantity][i],
               })
             end
-            
+
           end
           @event.eventvendors.create(eventvendors)
         end
-        
+
       end
       query = @event.cancelled ? "?type=cancelled" : ""
-      
+
       # if @event.invoicetrain
       #   @event.office_id = nil
       # else
@@ -231,14 +231,14 @@ class EventsController < ApplicationController
             long_id: so_number
           }
         end
-          
+
         @event.eventsalesorders.create(eventso)
       end
-        
+
 #      redirect_to(events_path + query, :notice => 'Data Event telah disimpan')
-        
+
       redirect_to(edit_event_url(@event), :notice => 'Data Event / DO berhasil di-edit.')
-        
+
     else
       render :action => 'edit'
     end
@@ -248,7 +248,7 @@ class EventsController < ApplicationController
   def destroy
     @event = Event.find(params[:id])
     @event.deleted = true
-    @event.save 
+    @event.save
     redirect_to(events_path)
   end
 
@@ -267,10 +267,10 @@ class EventsController < ApplicationController
         @events = @events.where("office_id = ?", current_user.office_id)
       end
 
-      render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json; 
+      render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json;
 
     else
-        
+
         if is_train == "0"
 
           @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval ? day AND current_date + interval ? day AND invoicetrain = false", params[:customer_id], @intervalago, @intervalnext).order(:start_date)
@@ -278,7 +278,7 @@ class EventsController < ApplicationController
             @events = @events.where("office_id = ?", current_user.office_id)
           end
 
-          render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json; 
+          render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json;
 
         else
 
@@ -287,13 +287,13 @@ class EventsController < ApplicationController
             @events = @events.where("office_id = ?", current_user.office_id)
           end
 
-          render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json; 
-            
+          render :json => { :success => true, :html => render_to_string(:partial => "invoices/events", :layout => false) }.to_json;
+
         end
 
     end
 
-  end    
+  end
 
   def getevents
 
@@ -320,11 +320,11 @@ class EventsController < ApplicationController
       end
 
     elsif params[:type] == 'cancelled'
-      
+
       @events = Event.where("deleted = false AND cancelled = true and start_date >= ?", 3.months.ago).order(:id)
-        
+
       @events = @events.map do |e|
-            
+
         if e.company.nil?
           company = ' [RDPI]'
           summary = e.summary + company + ' / ' + e.user.username rescue nil
@@ -350,22 +350,22 @@ class EventsController < ApplicationController
       if current_user.office_id.present? && !current_user.owner
         @events = @events.where("office_id = ?", current_user.office_id)
       end
-      
-      invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)    
-        
+
+      invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)
+
       @events = @events.map do |e|
         vendor = Taxinvoiceitemv.active.select('event_id, total').where("event_id IN (?) AND taxinvoiceitemvs.total > '0'", e.id)
-          
+
         half_completed = false
         completed = false
         invoiced = false
         train = false
         completed_by_vendor = false
-  
+
         bkk = ''
         taxinvoice = ''
-        event_qty = 1      
-  
+        event_qty = 1
+
         if e.qty
             event_qty = e.qty
         end
@@ -377,24 +377,24 @@ class EventsController < ApplicationController
         elsif e.need_vendor
           completed_by_vendor = true
         end
-        
+
         if invoices.index(e.id)
-          bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').pluck(:id) 
-          # bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where().pluck(:id) 
-          
+          bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').where('id in (select invoice_id from receipts where deleted = false)').pluck(:id)
+          # bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where().pluck(:id)
+
           if bkk.count > 0 || vendor.count > 0
             this_bkk = Invoice.active.select('id, invoicetrain, quantity').find(bkk[0])
-            
+
             #Check BKK train/not
             if this_bkk.invoicetrain
-                
+
               train = true
-              
+
               #Check QTY of BKK match / not with QTY on event
               if bkk.count >= event_qty.to_i*2
-                  
+
                 completed = true
-                
+
                 taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
 
                 if taxinvoices.count + vendor.count >= bkk.count / 2
@@ -404,10 +404,10 @@ class EventsController < ApplicationController
                 end
 
               else
-                  
+
                 half_completed = true
                 completed = false
-                
+
                 if e.need_vendor && vendor.count > 0
                   if vendor.count >= event_qty / 2
                     invoiced = true
@@ -416,17 +416,17 @@ class EventsController < ApplicationController
                   completed_by_vendor = true
                 end
               end
-              
+
             else
-                
+
               train = false
               half_completed = true
-              
+
               #Check QTY of BKK match / not with QTY on event
               if bkk.count >= event_qty.to_i
-                  
+
                 completed = true
-                
+
                 taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
 
                 if taxinvoices.count + vendor.count >= bkk.count
@@ -436,7 +436,7 @@ class EventsController < ApplicationController
                 end
               end
             end
-            
+
           else
               completed = false
           end
@@ -473,10 +473,10 @@ class EventsController < ApplicationController
           :invoiced => invoiced,
           :sj => taxinvoices
         }
-  
+
       end
     end
-    
+
     respond_to do |format|
        format.json { render :json => @events }
      end
@@ -493,9 +493,9 @@ class EventsController < ApplicationController
     @customer_id = @customer.id if @customer
 
     @status = params[:status]
-  
+
     @id = params[:id]
-    
+
     if @customer.present?
       @events = @customer.events.active
     else
@@ -505,13 +505,13 @@ class EventsController < ApplicationController
     @events = @events.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
 
     if @id.present?
-    
+
       @events = Event.where('id = ?', @id)
 
     end
-     
+
     @events = @events.order(:start_date)
- 
+
     @invoices = Invoice.active.select('event_id').where("date >= ?", 12.months.ago).pluck(:event_id)
 
     render "report-events"
@@ -525,9 +525,9 @@ class EventsController < ApplicationController
 
     @customer = Customer.find(params[:customer_id]) rescue nil
     @customer_id = @customer.id if @customer
-  
+
     @id = params[:id]
-    
+
     if @customer.present?
       @events = @customer.events.active
     else
@@ -537,14 +537,14 @@ class EventsController < ApplicationController
     @events = @events.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
 
     if @id.present?
-    
+
       @events = Event.where('id = ?', @id)
 
     end
 
     @events = @events.where("downpayment_amount > money(0)")
     @events = @events.order(:start_date)
- 
+
     @invoices = Invoice.active.select('event_id').where("date >= ?", 3.months.ago).pluck(:event_id)
 
     render "report-dpevents"
@@ -559,12 +559,12 @@ class EventsController < ApplicationController
 
     @customer = Customer.find(params[:customer_id]) rescue nil
     @customer_id = @customer.id if @customer
-  
+
     @id = params[:id]
 
     # render json: @customer.events.where(a: "a")
     # return false
-    
+
     if @customer.present?
       @events = @customer.events.active
     else
@@ -574,14 +574,14 @@ class EventsController < ApplicationController
     @events = @events.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
 
     if @id.present?
-    
+
       @events = Event.where('id = ?', @id)
 
     end
-     
+
     # @events = @customer.events.active if @customer
     @events = @events.order(:start_date)
- 
+
     @invoices = Invoice.active.select('event_id').where("date >= ?", 12.months.ago).pluck(:event_id)
 
     render "report-events-summary"
@@ -625,7 +625,7 @@ class EventsController < ApplicationController
 
     @events = @events.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
     # fetch_excel()
-      
+
     @invoice_id = params[:invoice_id]
 
     if @invoice_id.present?
@@ -633,14 +633,14 @@ class EventsController < ApplicationController
     end
 
     @office_id = params[:office_id]
-      
+
     if @office_id.present? and @office_id != "all"
         @events = @events.where("office_id = ?", @office_id)
     end
-      
-    @offices = Office.active.order('id asc')  
+
+    @offices = Office.active.order('id asc')
     @office_role = []
-      
+
     if checkrole 'BKK Kantor Sidoarjo'
         @office_role.push(1)
     end
@@ -649,7 +649,7 @@ class EventsController < ApplicationController
     end
     if checkrole 'BKK Kantor Probolinggo'
         @office_role.push(3)
-    end    
+    end
     if checkrole 'BKK Kantor Semarang'
         @office_role.push(4)
     end
@@ -662,14 +662,14 @@ class EventsController < ApplicationController
     # if checkrole 'BKK Cargo Padat'
     #   @office_role.push(7)
     # end
-    
+
     if checkrole 'Operasional BKK'
         @offices = @offices.where('id != 7').order('id asc')
     else
         @offices = @offices.where('id IN (?)', @office_role).order('id asc')
     end
-        
-  
+
+
     respond_to :html
   end
 
@@ -724,7 +724,7 @@ class EventsController < ApplicationController
 		end
 
     @multimoda = ['Truk', 'Truk + Kereta', 'Truk + Kapal']
-    render :json => { :success => true, :html => render_to_string(:partial => "events/dovendor", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "events/dovendor", :layout => false) }.to_json;
   end
 
   def getdovvendors
@@ -755,7 +755,7 @@ class EventsController < ApplicationController
       @vendors.push(new_vendorhash)
 		end
 
-    render :json => { :success => true, :html => render_to_string(:partial => "events/dovvendors", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "events/dovvendors", :layout => false) }.to_json;
   end
 
   def getdovroutes
@@ -785,7 +785,7 @@ class EventsController < ApplicationController
       @routes.push(new_routehash)
 		end
 
-    render :json => { :success => true, :html => render_to_string(:partial => "events/dovroutes", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "events/dovroutes", :layout => false) }.to_json;
   end
 
   def getdovvendorroutes
@@ -815,7 +815,7 @@ class EventsController < ApplicationController
       @vendorroutes.push(new_routehash)
 		end
 
-    render :json => { :success => true, :html => render_to_string(:partial => "events/dovvendorroutes", :layout => false) }.to_json; 
+    render :json => { :success => true, :html => render_to_string(:partial => "events/dovvendorroutes", :layout => false) }.to_json;
   end
 
   def transferdov

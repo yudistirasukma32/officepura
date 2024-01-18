@@ -36,13 +36,14 @@ class Invoice < ActiveRecord::Base
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :enabled, :date, :ship_name, :driver_id, :customer_id, :vehicle_id, :trip_type, :price_per, :gas_start,
-  				:gas_litre, :gas_voucher, :gas_leftover, :ferry_fee, :tol_fee, :gas_cost, :insurance, :insurance_rate, :bonus, :incentive,
-  				:quantity, :driver_allowance, :gas_allowance, :total, :description, :route_id, :vehiclegroup_id, :office_id, :deleted,
-  				:invoice_id, :misc_allowance, :user_id, :helper_allowance, :need_helper, :deleteuser_id, :spk_number, :invoicetrain, :isotank_id,
-				:driver_phone, :transporttype, :port_id, :ship_id, :train_fee, :container_id, :tanktype, :isotank_number, :container_number, :event_id,
-				:premi, :premi_allowance, :routetrain_id, :operator_id, :shipoperator_id, :routeship_id, :invoicemultimode, :cargo_type, :losing,
-				:vehicle_duplicate, :vehicle_duplicate_id, :weight_gross, :load_date, :is_insurance, :tsi_total, :by_vendor, :truckvendor_id,
-				:kosongan, :kosongan_type, :kosongan_confirmed, :kosongan_confirmed_by, :kosongan_previous_invoice_id, :payment_ship, :payment_train
+		:gas_litre, :gas_voucher, :gas_leftover, :ferry_fee, :tol_fee, :gas_cost, :insurance, :insurance_rate, :bonus, :incentive,
+		:quantity, :driver_allowance, :gas_allowance, :total, :description, :route_id, :vehiclegroup_id, :office_id, :deleted,
+		:invoice_id, :misc_allowance, :user_id, :helper_allowance, :need_helper, :deleteuser_id, :spk_number, :invoicetrain, :isotank_id,
+		:driver_phone, :transporttype, :port_id, :ship_id, :train_fee, :container_id, :tanktype, :isotank_number, :container_number, :event_id,
+		:premi, :premi_allowance, :routetrain_id, :operator_id, :shipoperator_id, :routeship_id, :invoicemultimode, :cargo_type, :losing,
+		:vehicle_duplicate, :vehicle_duplicate_id, :weight_gross, :load_date, :is_insurance, :tsi_total, :by_vendor, :truckvendor_id,
+		:kosongan, :kosongan_type, :kosongan_confirmed, :kosongan_confirmed_by, :kosongan_previous_invoice_id, :payment_ship, :payment_train,
+		:payment_ship
 
   	def sum_gasleftover
   		self.gas_leftover * self.gas_cost
