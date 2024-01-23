@@ -33,6 +33,7 @@
 				<select name="status" class="short left">
 					<option value="">Semua</option>
 					<option value="Blm Muat" <% if @status == 'Blm Muat' %> selected='selected'<% end %>>Blm Muat</option>
+					<option value="BKK dibuat" <% if @status == 'BKK dibuat' %> selected='selected'<% end %>>BKK dibuat</option>
 					<option value="Muat ST" <% if @status == 'Muat ST' %> selected='selected'<% end %>>Muat ST</option>
 					<option value="Loading" <% if @status == 'Loading' %> selected='selected'<% end %>>Loading</option>
 					<option value="Lunas ST" <% if @status == 'Lunas ST' %> selected='selected'<% end %>>Lunas ST</option>
@@ -41,7 +42,7 @@
 
 				<label for="id" class="tiny">DO:</label>
 				<input type="text" name="id" class="short left" value="<%=params[:id]%>" />
-
+ 
 				<input class="submit left" type="submit" value="Filter" />
 			</div>
 			</form>
@@ -78,6 +79,7 @@
 		%>
 
 		<%
+			handled = false
 			half_completed = false
 			completed = false
 			invoiced = false
@@ -96,75 +98,83 @@
  
 			if @invoices.index(event.id)
 				
-			bkk = Invoice.active.select('event_id').where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').where('id in (select invoice_id from receipts where deleted = false)').pluck(:id) rescue nil
-				
-				if bkk.count > 0
-					
-					this_bkk = Invoice.active.select('id, invoicetrain, quantity').find(bkk[0])
-					
-					if this_bkk.invoicetrain
+				bkk_unconfirmed = Invoice.active.select('event_id').where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').pluck(:id) rescue nil
+				bkk = Invoice.active.select('event_id').where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').where('id in (select invoice_id from receipts where deleted = false)').pluck(:id) rescue nil
+
+				if bkk_unconfirmed.count > 0 && bkk.count == 0
+					handled = true
+					status = "BKK dibuat"
+					color = "062b87"
+				else
+
+					if bkk.count > 0
 						
-						train = true
+						this_bkk = Invoice.active.select('id, invoicetrain, quantity').find(bkk[0])
 						
-						if bkk.count >= event_qty.to_i*2
+						if this_bkk.invoicetrain
 							
-							completed = true
-							status = "Lunas ST"
-							color = "008000"
-                            
-                            taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
+							train = true
+							
+							if bkk.count >= event_qty.to_i*2
+								
+								completed = true
+								status = "Lunas ST"
+								color = "008000"
+								
+								taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
 
-                            if taxinvoices.count >= bkk.count / 2
+								if taxinvoices.count >= bkk.count / 2
 
-                                invoiced = true
-                                status = "Surat Jalan"
-                                color = "b38e1d"
+									invoiced = true
+									status = "Surat Jalan"
+									color = "b38e1d"
 
-                            end
+								end
+								
+							else
+								
+								half_completed = true
+								completed = false
+								status = "Muat ST"
+								color = "8bc34a"
+								
+							end
 							
 						else
 							
-							half_completed = true
+							train = false
 							completed = false
+							half_completed = true
 							status = "Muat ST"
 							color = "8bc34a"
+							
+							if bkk.count >= event_qty.to_i
+							
+								completed = true
+								status = "Loading"
+								color = "008000"
+								
+								taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
+
+								if taxinvoices.count >= bkk.count
+
+									invoiced = true
+									status = "Surat Jalan"
+									color = "b38e1d"
+
+								end
+								
+							end
 							
 						end
 						
 					else
 						
-                        train = false
-                        completed = false
-                        half_completed = true
-                        status = "Muat ST"
-                        color = "8bc34a"
-                        
-                        if bkk.count >= event_qty.to_i
-                        
-                            completed = true
-                            status = "Loading"
-                            color = "008000"
-                            
-                            taxinvoices = Taxinvoiceitem.active.select('invoice_id, total').where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", bkk).pluck(:id)
-
-                            if taxinvoices.count >= bkk.count
-
-                                invoiced = true
-                                status = "Surat Jalan"
-                                color = "b38e1d"
-
-                            end
-                            
-                        end
-						
+						completed = false
+						status = "Blm Muat"
+						color = "3a87ad"
+		
 					end
-					
-				else
-					
-					completed = false
-					status = "Blm Muat"
-					color = "3a87ad"
-	 
 				end
 			end
 
@@ -198,7 +208,9 @@
 				solar_price = Setting.find_by_name("Harga Solar").value.to_i
 				route = event.route
 				route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
+				
 				quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
+				quantity = completed_by_vendor ? quantity * 0.5 : quantity rescue 0
 
 				supir = route_allowance.driver_trip.to_i rescue 0
 				kernet = route_allowance.helper_trip.to_i rescue 0

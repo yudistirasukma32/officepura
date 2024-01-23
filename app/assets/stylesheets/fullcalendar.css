@@ -280,6 +280,11 @@ html .fc,
 	background-color: #2196f3; /* default BACKGROUND color */	
 }
 
+.fc-event.handled {
+	border: 1px solid #062b87; /* default BORDER color */
+	background-color: #062b87; /* default BACKGROUND color */	
+}
+
 .fc-event.half_completed {
 	border: 1px solid #8bc34a; /* default BORDER color */
 	background-color: #8bc34a; /* default BACKGROUND color */	

@@ -356,6 +356,7 @@ class EventsController < ApplicationController
       @events = @events.map do |e|
         vendor = Taxinvoiceitemv.active.select('event_id, total').where("event_id IN (?) AND taxinvoiceitemvs.total > '0'", e.id)
 
+        handled = false
         half_completed = false
         completed = false
         invoiced = false
@@ -379,7 +380,13 @@ class EventsController < ApplicationController
         end
 
         if invoices.index(e.id)
+          bkk_unconfirmed = Invoice.active.select('event_id').where('event_id = ?', e.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').pluck(:id) 
           bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').where('id in (select invoice_id from receipts where deleted = false)').pluck(:id)
+
+          if bkk_unconfirmed.count > 0 && bkk.count == 0
+            handled = true
+          end
+
           # bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where().pluck(:id)
 
           if bkk.count > 0 || vendor.count > 0
@@ -459,6 +466,7 @@ class EventsController < ApplicationController
 
         {
           :id => e.id,
+          :handled => handled,
           :authorised => e.authorised,
           :summary => summary,
           :cancelled => e.cancelled,
