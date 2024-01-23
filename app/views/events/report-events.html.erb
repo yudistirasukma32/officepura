@@ -33,7 +33,7 @@
 				<select name="status" class="short left">
 					<option value="">Semua</option>
 					<option value="Blm Muat" <% if @status == 'Blm Muat' %> selected='selected'<% end %>>Blm Muat</option>
-					<option value="BKK dibuat" <% if @status == 'BKK dibuat' %> selected='selected'<% end %>>BKK dibuat</option>
+					<option value="Blm Confirm" <% if @status == 'Blm Confirm' %> selected='selected'<% end %>>Blm Confirm</option>
 					<option value="Muat ST" <% if @status == 'Muat ST' %> selected='selected'<% end %>>Muat ST</option>
 					<option value="Loading" <% if @status == 'Loading' %> selected='selected'<% end %>>Loading</option>
 					<option value="Lunas ST" <% if @status == 'Lunas ST' %> selected='selected'<% end %>>Lunas ST</option>
@@ -103,7 +103,7 @@
 
 				if bkk_unconfirmed.count > 0 && bkk.count == 0
 					handled = true
-					status = "BKK dibuat"
+					status = "Blm Confirm"
 					color = "062b87"
 				else
 
