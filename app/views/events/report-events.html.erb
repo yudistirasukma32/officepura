@@ -63,7 +63,8 @@
 			<th class="{sorter:true, filter: true}">ST</th>
 			<th class="{sorter:true, filter: false}">EST. BKK</th>
 			<th class="{sorter:false, filter: false}">Progress</th>
-			<th class="{sorter:true, filter: true}" data-value="<%= @status %>">Status</th>
+			<th class="{sorter:true, filter: true}">Status</th>
+			<!-- <th class="{sorter:true, filter: true}" data-value="<%= @status %>">Status</th> -->
 			<th class="{sorter:false, filter: false}"></th>
 		</tr>
 		</thead>
@@ -105,6 +106,10 @@
 					handled = true
 					status = "Blm Confirm"
 					color = "062b87"
+					
+					if @status.present? && @status != 'Blm Confirm'
+						next
+					end
 				else
 
 					if bkk.count > 0
@@ -129,6 +134,11 @@
 									status = "Surat Jalan"
 									color = "b38e1d"
 
+									if @status.present? && @status != 'Surat Jalan'
+										next
+									end
+								elsif @status.present? && @status != 'Lunas ST'
+									next
 								end
 								
 							else
@@ -137,7 +147,10 @@
 								completed = false
 								status = "Muat ST"
 								color = "8bc34a"
-								
+
+								if @status.present? && @status != 'Muat ST'
+									next
+								end
 							end
 							
 						else
@@ -162,8 +175,16 @@
 									status = "Surat Jalan"
 									color = "b38e1d"
 
+									if @status.present? && @status != 'Surat Jalan'
+										next
+									end
+
+								elsif @status.present? && @status != 'Loading'
+									next
 								end
-								
+
+							elsif @status.present? && @status != 'Muat ST'
+								next
 							end
 							
 						end
@@ -173,6 +194,10 @@
 						completed = false
 						status = "Blm Muat"
 						color = "3a87ad"
+
+						if @status.present? && @status != 'Blm Muat'
+							next
+						end
 		
 					end
 				end
@@ -182,6 +207,10 @@
 				completed_by_vendor = true
 				status = "Vendor"
 				color = "009688"
+			end
+
+			if @status.present? && @status != 'Blm Muat' && status == 'Blm Muat'
+				next
 			end
         %>
 
