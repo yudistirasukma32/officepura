@@ -54,6 +54,10 @@
 			total = total.to_i - @taxinvoice.downpayment.to_i
 		end
 
+		if @taxinvoice.secondpayment.present?
+			total = total.to_i - @taxinvoice.secondpayment.to_i
+		end
+
 		total_in_words = moneytowordsrupiah(total)
 		
 		%>
