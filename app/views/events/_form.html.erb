@@ -273,14 +273,14 @@
   </div>
 
   <div class="field-row">
-    <% @quant = Array(0..50) %>
+    <% @quant = Array(0..100) %>
     <%= f.label :qty, "Jumlah" %>   
     <%= f.select :qty, options_for_select(@quant.collect {|w| [w, w]}, (params[:qty].present? ? params[:qty] : @event.qty)), {}, { :class => 'half' } %>
     <span style="position: absolute; margin-top: 0.5rem;"><strong>RIT</strong></span>
   </div>
 
   <div class="field-row">
-    <% @quant = Array(0..50) %>
+    <% @quant = Array(0..100) %>
     <%= f.label :truck_quantity, "Jumlah Truk" %>   
     <%= f.select :truck_quantity, options_for_select(@quant.collect {|w| [w, w]}, (params[:qty].present? ? params[:qty] : @event.truck_quantity)), {}, { :class => 'half' } %>
     <span style="position: absolute; margin-top: 0.5rem;"><strong>Truk</strong></span>
