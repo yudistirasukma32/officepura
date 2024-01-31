@@ -114,7 +114,7 @@
                         <td align="right"><%= to_currency(taxinvoice.downpayment) %></td>
                         <td align="right"><%= to_currency(taxinvoice.gst_tax) %></td>
                         <td align="right"><%= to_currency(taxinvoice.price_tax) %></td>
-                        <td align="right"><%= to_currency(taxinvoice.total-taxinvoice.downpayment) %></td>
+                        <td align="right"><%= to_currency(taxinvoice.total-taxinvoice.downpayment-taxinvoice.secondpayment) %></td>
                         <td align="right"><a href="<%= print_taxinvoice_url(taxinvoice.id) %>" class="delete tipsy" original-title="Print Invoice Tagihan"><i class="icon-print"></i></a>
                         </td>
     
