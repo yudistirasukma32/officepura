@@ -54,7 +54,7 @@
 			total = total.to_i - @taxinvoice.downpayment.to_i
 		end
 
-		if @taxinvoice.secondpayment.present?
+		if @taxinvoice.secondpayment.to_i > 0
 			total = total.to_i - @taxinvoice.secondpayment.to_i
 		end
 
