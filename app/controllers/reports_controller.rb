@@ -14,7 +14,7 @@ class ReportsController < ApplicationController
   end
 
   def estimation
-    role = cek_roles 'Admin Keuangan'
+    role = cek_roles 'Admin Keuangan, Estimasi'
     if role
       offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
 
@@ -2608,7 +2608,7 @@ end
   end
 
   def estimationincomeexpense
-    role = cek_roles 'Admin Keuangan'
+    role = cek_roles 'Admin Keuangan, Estimasi'
 
       # @is_superior = []
       # @is_kosongan = []
