@@ -6,7 +6,7 @@ class ReportsController < ApplicationController
   protect_from_forgery :except => [:ledger]
 
   def set_section
-   
+
   end
 
   def index
@@ -26,7 +26,7 @@ class ReportsController < ApplicationController
       @vehicles = Vehicle.order(:current_id).all
 
       @invoices = Invoice.where('date BETWEEN :startdate AND :enddate and deleted = false and id in (select invoice_id from receipts where deleted = false)', {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
-      
+
       @tanktype = params[:tanktype]
       if params[:tanktype].present? && params[:tanktype] != 'Semua'
         @vehicles = Vehicle.where('platform_type = ?', @tanktype)
@@ -56,7 +56,7 @@ class ReportsController < ApplicationController
       # @receipts = Receipt.where("(created_at >= ? and created_at < ?) AND deleted = false", @startdate.to_date, @enddate.to_date + 1.day)
       # @countbkm = Receiptreturn.where("(created_at >= ? and created_at < ?) AND deleted = false", @startdate.to_date, @enddate.to_date + 1.day).count(:id)
 
-      #update price 
+      #update price
       @invoices.each do |invoice|
         invoice.price_per = invoice.route.price_per if !invoice.route_id.blank?
         invoice.save
@@ -72,7 +72,7 @@ class ReportsController < ApplicationController
       redirect_to root_path()
     end
 
-    
+
   end
 
   def productstocks
@@ -86,23 +86,23 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def downloadexcelproductstocks
 
-    @date = Date.today.strftime('%d-%m-%Y') 
+    @date = Date.today.strftime('%d-%m-%Y')
 
     filename = "productstocks_" + @date.to_date.strftime('%d%m%Y') + ".xls"
 
     @productgroups = Productgroup.active.order(:name)
-  
+
     green = Axlsx::Color.new :rgb => "FF00FF00"
     red = Axlsx::Color.new :rgb => "FFCC0033"
 
     p = Axlsx::Package.new
     p.workbook.add_worksheet(:name => "Kas Harian") do |sheet|
-      
+
       bold = sheet.styles.add_style(:b => true)
       right = sheet.styles.add_style(:alignment => {:horizontal => :right})
       right_bold = sheet.styles.add_style(:alignment => {:horizontal => :right}, :b => true)
@@ -112,7 +112,7 @@ class ReportsController < ApplicationController
       h3_red = sheet.styles.add_style :color => red, :b => true
       number = sheet.styles.add_style :format_code => "#,##0.00"
       number_bold = sheet.styles.add_style :format_code => "#,##0.00", :b => true
-      
+
       sheet.add_row [''], :height => 20
       sheet.add_row ['', "Dibuat pada Tanggal: #{Date.today.strftime('%d %B %Y')} (#{Time.now.strftime('%H:%M')})"] , :height => 20, :widths => [:auto, :ignore], :style => [nil, bold]
 
@@ -136,14 +136,14 @@ class ReportsController < ApplicationController
         end
         sheet.add_row ['','','TOTAL', '', '', running] , :height => 20, :style => [nil, nil, bold,  nil, nil, number_bold]
 
-      end 
+      end
 
       p.use_autowidth = false
       p.use_shared_strings = true
-    
-      send_data(p.to_stream.read, :filename => filename, :type => :xls, :x_sendfile => true)  
-    end 
-  end 
+
+      send_data(p.to_stream.read, :filename => filename, :type => :xls, :x_sendfile => true)
+    end
+  end
 
   def paymentchecks
     role = cek_roles 'Admin Keuangan'
@@ -161,7 +161,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def assets
@@ -171,25 +171,25 @@ class ReportsController < ApplicationController
       @month = "%02d" % Date.today.month.to_s if @month.nil?
       @year = params[:year]
       @year = Date.today.year if @year.nil?
-      
+
       @balance = 0
       @assetlancars = Asset.where(:asset_type => 'Lancar')
       @assettaklancars = Asset.where(:asset_type => 'Tidak Lancar')
       @vehicles = Vehicle.where("date_purchase IS NOT NULL AND amount IS NOT NULL").order(:current_id)
-      
+
       amountlancars = Asset.where(:asset_type => 'Lancar').sum(:amount)
       amounttaklancars = Asset.where(:asset_type => 'Tidak Lancar').sum(:amount)
       amountvehicle = Vehicle.sum(:amount)
 
       @balance = amountlancars + amounttaklancars + amountvehicle
-      
+
       @section = "reports1"
       @where = "reports-assets"
       render "assets"
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def suppliers
@@ -207,14 +207,14 @@ class ReportsController < ApplicationController
       end
 
       @balance = 0
-      
+
       @section = "reports2"
       @where = "suppliers"
       render "suppliers"
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def customers
@@ -231,7 +231,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def customercredits
@@ -248,7 +248,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def suppliercredits
@@ -265,7 +265,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def tiretargets
@@ -287,7 +287,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def getcustomerdata
@@ -308,12 +308,12 @@ class ReportsController < ApplicationController
       taxinvoices = Taxinvoice.where("extract(year from date) = #{@year} and paiddate is null and deleted = false and customer_id = #{customer.id}").sum(:total)
       objReturn[i] = [taxinvoices.to_i, cus_name]
     end
-    
+
     objReturn2[0] = objReturn
     respond_to do |format|
       format.json {render :json => objReturn2 }
     end
-  end 
+  end
 
   def product_orders
     role = cek_roles 'Admin HRD, Admin Gudang'
@@ -324,21 +324,21 @@ class ReportsController < ApplicationController
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
 
-      if @productgroup_id 
+      if @productgroup_id
         if @productgroup_id.to_i > 0
           @productgroups = Productgroup.where(:id => @productgroup_id)
         else
           @productgroups = Productgroup.order(:name)
         end
       end
-      
+
       @section = "reports2"
       @where = "product-orders"
       render "product-orders"
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def bonus_receipts
@@ -363,14 +363,14 @@ class ReportsController < ApplicationController
                                                   .where("invoices.driver_id = #{params[:driver_id]}")
                                                   .where("money(premi_allowance) > money(0)").order(:id)
       end
- 
+
       @driver = Driver.find(params[:driver_id]) rescue nil
       @driver_id = @driver.id if @driver
-      
+
     else
       redirect_to root_path
     end
-    
+
     @section = "reports1"
     @where = "bonus-receipts"
     render "bonus-receipts"
@@ -389,7 +389,7 @@ class ReportsController < ApplicationController
       if @vehicle
 
         @invoices = Invoice.active.where('date BETWEEN :startdate AND :enddate', {:startdate => @startdate.to_date, :enddate => @enddate.to_date}).where(:vehicle_id => @vehicle.id)
-        
+
         @inv_ids = @invoices.any? ? @invoices.collect(&:id).join(",") : 0
 
         @taxinvoiceitems = Taxinvoiceitem.active.joins(:taxinvoice)
@@ -397,7 +397,7 @@ class ReportsController < ApplicationController
                               .where("money(taxinvoiceitems.total) > money(0) and taxinvoiceitems.invoice_id IN (#{@inv_ids})")
 
                               # .find_by_sql("SELECT * FROM taxinvoiceitems WHERE money(total) > money(0) and invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = #{@vehicle.id} AND (date >= '#{@startdate.to_date}'::date and date < '#{@enddate.to_date + 1.day}'::date))")
-        
+
         @invoicechilds = Invoice.active.find_by_sql("SELECT id FROM invoices WHERE id IN (SELECT invoice_id FROM invoices where invoice_id IS NOT NULL and invoicetrain IS TRUE and vehicle_id = #{@vehicle.id} AND (date >= '#{@startdate.to_date}'::date and date < '#{@enddate.to_date + 1.day}'::date))")
 
         @ids = @invoicechilds.any? ? @invoicechilds.collect(&:id).join(",") : 0
@@ -407,7 +407,7 @@ class ReportsController < ApplicationController
                               .where("money(taxinvoiceitems.total) > money(0) and taxinvoiceitems.invoice_id IN (#{@ids})")
 
         # @taxgenericitems = Taxgenericitem.active.find_by_sql("SELECT * FROM taxgenericitems WHERE money(total) > money(0) AND vehicle_id = #{@vehicle.id} AND (date >= '#{@startdate.to_date}'::date AND date < '#{@enddate.to_date + 1.day}'::date)")
-        
+
         @taxgenericitems = Taxgenericitem.active.joins(:taxinvoice)
                             .where(:taxinvoices => {:deleted => false})
                             .where(:taxgenericitems => {:vehicle_id => @vehicle.id})
@@ -432,7 +432,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def expenses_vehicle
@@ -461,7 +461,7 @@ class ReportsController < ApplicationController
 
         @solar_pomps = Receipt.joins(:invoice).where("(receipts.created_at > ? and receipts.created_at < ?) AND receipts.deleted = false AND invoices.gas_voucher > 0 AND receipts.invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:created_at) rescue nil
 
-        @outcome = @receipts.sum(:total).to_i - @receiptreturns.sum(:total).to_i  + @receiptpremis.sum(:total).to_i + @receiptincentives.sum(:total).to_i + @receiptexpenses.where(:expensetype => 'Kredit').sum(:total).to_i - @receiptexpenses.where(:expensetype => 'Debit').sum(:total).to_i + @productrequestitems.sum(:total).to_i 
+        @outcome = @receipts.sum(:total).to_i - @receiptreturns.sum(:total).to_i  + @receiptpremis.sum(:total).to_i + @receiptincentives.sum(:total).to_i + @receiptexpenses.where(:expensetype => 'Kredit').sum(:total).to_i - @receiptexpenses.where(:expensetype => 'Debit').sum(:total).to_i + @productrequestitems.sum(:total).to_i
       end
 
       @section = "reports2"
@@ -469,8 +469,8 @@ class ReportsController < ApplicationController
       render "expenses-vehicle"
     else
       redirect_to root_path()
-    end    
-    
+    end
+
   end
 
   def taxinvoices_report
@@ -489,7 +489,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def taxinvoiceitems_report
@@ -500,35 +500,35 @@ class ReportsController < ApplicationController
           @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
           @enddate = params[:enddate]
           @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
-    
+
           @customer_id = Customer.find(params[:customer_id]).id rescue nil
-    
+
           if @customer_id
             @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ? AND taxinvoiceitems.customer_id = ?)", @startdate.to_date, @enddate.to_date + 1, @customer_id).order("date, taxinvoice_id")
           else
             @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ?)", @startdate.to_date, @enddate.to_date + 1).order("date ASC, taxinvoice_id ASC")
           end
-    
+
           if checkroleonly 'Vendor Supir'
-    
+
             @vendor = Vendor.where('user_id = ?', current_user.id)
-            
+
             if @vendor.present?
               @drivers = Driver.order('name')
               @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
-    
+
               @taxinvoiceitems = @taxinvoiceitems.joins(:invoice).where("invoices.driver_id in (select id from drivers where vendor_id = ?)", @vendor[0].id)
             end
-    
+
           end
-    
+
           @section = "reports1"
           @where = "taxinvoiceitems-report"
           render "taxinvoiceitems-report"
         else
           redirect_to root_path()
         end
-        
+
       end
 
   def isotanks_report
@@ -538,7 +538,7 @@ class ReportsController < ApplicationController
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
-      
+
       if params[:transporttype].present?
 
         if params[:transporttype] == 'KERETA'
@@ -561,7 +561,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def isotankutilization
@@ -581,7 +581,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def containers_report
@@ -591,7 +591,7 @@ class ReportsController < ApplicationController
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
-      
+
       @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND invoicetrain = false AND tanktype = 'KONTAINER' AND (container_id is not null AND container_id != 0))", @startdate.to_date, @enddate.to_date + 1).order(:date)
 
       if params[:transporttype].present?
@@ -616,10 +616,10 @@ class ReportsController < ApplicationController
         end
 
       end
-  
+
         # @invoices = @invoices.where(container_id: params[:container_id]) if params[:container_id].present?
 
-       
+
 
       @section = "reports1"
       @where = "containers-report"
@@ -627,7 +627,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def containerutilization
@@ -646,7 +646,7 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def invoices
@@ -669,7 +669,7 @@ class ReportsController < ApplicationController
         @invoices = @invoices.where("invoicetrain = false")
 
       end
-      
+
       @section = "reports1"
       @where = "report_invoices"
       render "invoices"
@@ -677,11 +677,11 @@ class ReportsController < ApplicationController
       redirect_to root_path()
     end
   end
-    
+
 def confirmed_invoices
     role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
     if role
-      @offices = Office.active        
+      @offices = Office.active
       @startdate = params[:startdate]
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
@@ -696,7 +696,7 @@ def confirmed_invoices
       if checkroleonly 'Vendor Supir'
 
         @vendor = Vendor.where('user_id = ?', current_user.id)
-        
+
         if @vendor.present?
           @drivers = Driver.order('name')
           @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
@@ -710,7 +710,7 @@ def confirmed_invoices
 
       @office_id = params[:office_id]
       @is_premi = params[:is_premi]
-        
+
       if @office_id.present? and @office_id != "all"
         @invoices = @invoices.where("office_id = ?", @office_id)
       end
@@ -726,9 +726,9 @@ def confirmed_invoices
       if @transporttype == 'KERETA'
 
         @invoices = @invoices.where("invoicetrain = true")
-          
+
       elsif @transporttype == 'KOSONGAN'
-          
+
         cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
         @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
 
@@ -742,7 +742,7 @@ def confirmed_invoices
       @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
 
       if @is_premi.present?
-        
+
         if @is_premi == '1'
 
           @invoices = @invoices.where("premi_allowance > money(0)")
@@ -750,7 +750,7 @@ def confirmed_invoices
         elsif @is_premi == '0'
 
           @invoices = @invoices.where("premi = false")
-        
+
         end
 
       end
@@ -761,13 +761,13 @@ def confirmed_invoices
     else
       redirect_to root_path()
     end
-end  
+end
 
 def collectible_invoices
   role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
   if role
 
-    @offices = Office.active        
+    @offices = Office.active
     @startdate = params[:startdate]
     @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
     @enddate = params[:enddate]
@@ -782,7 +782,7 @@ def collectible_invoices
     if checkroleonly 'Vendor Supir'
 
       @vendor = Vendor.where('user_id = ?', current_user.id)
-      
+
       if @vendor.present?
         @drivers = Driver.order('name')
         @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
@@ -796,7 +796,7 @@ def collectible_invoices
 
     @office_id = params[:office_id]
     @is_premi = params[:is_premi]
-      
+
     if @office_id.present? and @office_id != "all"
       @invoices = @invoices.where("office_id = ?", @office_id)
     end
@@ -812,9 +812,9 @@ def collectible_invoices
     if @transporttype == 'KERETA'
 
       @invoices = @invoices.where("invoicetrain = true")
-        
+
     elsif @transporttype == 'KOSONGAN'
-        
+
       cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
       @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
 
@@ -829,7 +829,7 @@ def collectible_invoices
     @invoices = @invoices.where("id in (select taxinvoiceitems.invoice_id from taxinvoiceitems where taxinvoiceitems.deleted = false AND taxinvoiceitems.taxinvoice_id IS NOT NULL)")
 
     if @is_premi.present?
-      
+
       if @is_premi == '1'
 
         @invoices = @invoices.where("premi_allowance > money(0)")
@@ -837,7 +837,7 @@ def collectible_invoices
       elsif @is_premi == '0'
 
         @invoices = @invoices.where("premi = false")
-      
+
       end
 
     end
@@ -848,8 +848,8 @@ def collectible_invoices
   else
     redirect_to root_path()
   end
-end  
-    
+end
+
 
 def drivervehicles
   role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
@@ -865,7 +865,7 @@ def drivervehicles
     if checkroleonly 'Vendor Supir'
 
       @vendor = Vendor.where('user_id = ?', current_user.id)
-      
+
       if @vendor.present?
         @drivers = Driver.order('name')
         @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
@@ -894,7 +894,7 @@ def drivervehicles
   else
     redirect_to root_path()
   end
-end 
+end
 
   def indexannualreport_vehicle
     role = cek_roles 'Admin Operasional, Admin HRD, Admin Keuangan'
@@ -919,7 +919,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def annualreport_vehicle
@@ -959,7 +959,7 @@ end
     #   @groupumum = Officeexpensegroup.where("officeexpensegroup_id=1 AND deleted=false").order(:id)
     #   @groupkantor = Officeexpensegroup.where("officeexpensegroup_id=5 AND deleted=false").order(:id)
 
-      
+
 
 
     # #Perhitungan SAlDO AWAL
@@ -968,27 +968,27 @@ end
     #   #administrasi kantor
     #   administrasi = 0
     #   @groupkantor.each do |group|
-    #     outcomegroupcredit = group.receiptexpenses.where("expensetype = 'Kredit' and deleted = false and to_char(created_at, 'MM-YYYY') < ?", "#{@month}-#{@year}").sum(:total) 
+    #     outcomegroupcredit = group.receiptexpenses.where("expensetype = 'Kredit' and deleted = false and to_char(created_at, 'MM-YYYY') < ?", "#{@month}-#{@year}").sum(:total)
     #        outcomegroupdebit = group.receiptexpenses.where("expensetype = 'Debit' and deleted = false and to_char(created_at, 'MM-YYYY') < ?", "#{@month}-#{@year}").sum(:total)
     #        outcomegrouptotal = outcomegroupcredit - outcomegroupdebit
-    #        administrasi += outcomegrouptotal 
+    #        administrasi += outcomegrouptotal
     #     end
 
     #   #administrasi operasional
     #   operasional = 0
     #   @groupumum.each do |group|
     #     outcomegroupcredit = group.receiptexpenses.where("expensetype = 'Kredit' and deleted = false and to_char(created_at, 'MM-YYYY') < ?", "#{@month}-#{@year}").sum(:total)
-    #       if group.id == 8 
+    #       if group.id == 8
     #         premi = Receiptpremi.where("deleted = false and to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}").sum(:total)
     #         outcomegroupcredit += premi
-    #       end 
+    #       end
     #       outcomegroupdebet = group.receiptexpenses.where("expensetype = 'Debit' and deleted = false and to_char(created_at, 'MM-YYYY') < ?", "#{@month}-#{@year}").sum(:total)
     #         outcomegrouptotal = outcomegroupcredit - outcomegroupdebet
     #         operasional +=  outcomegrouptotal
     #   end
 
 
-    #   @incomeexpensebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+    #   @incomeexpensebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
     #                                           FROM bankexpensegroups a
     #                                           LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY') ='#{@month}-#{@year}'
     #                                           WHERE a.ID IN (6,21) AND a.deleted = false
@@ -998,7 +998,7 @@ end
     #     @incomes += incomeexpense.total
     #   end
 
-    #   @debtincomebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+    #   @debtincomebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
     #                                           FROM bankexpensegroups a
     #                                           LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')<'#{@month}-#{@year}'
     #                                           WHERE a.name like 'Hutang Direksi%' AND a.deleted = false
@@ -1008,7 +1008,7 @@ end
     #     @incomes += incomeexpense.total
     #   end
 
-    #   @creditincomebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+    #   @creditincomebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
     #                                     FROM bankexpensegroups a
     #                                     LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')<'#{@month}-#{@year}'
     #                                     WHERE a.ID IN (112) AND a.deleted = false
@@ -1018,7 +1018,7 @@ end
     #     @incomes += incomeexpense.total
     #   end
 
-    #   @assetsalebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+    #   @assetsalebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
     #                                     FROM bankexpensegroups a
     #                                     LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')<'#{@month}-#{@year}'
     #                                     WHERE a.ID IN (89) AND a.deleted = false
@@ -1028,7 +1028,7 @@ end
     #     @incomes += incomeexpense.total
     #   end
 
-    #   @kmkfacilitiebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+    #   @kmkfacilitiebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
     #                                     FROM bankexpensegroups a
     #                                     LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')<'#{@month}-#{@year}'
     #                                     WHERE a.name like 'Fasilitas KMK%' AND a.deleted = false AND b.description like 'Pindah%'
@@ -1038,7 +1038,7 @@ end
     #     @incomes += incomeexpense.total
     #   end
 
-    #   @bankexpensebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+    #   @bankexpensebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
     #                                           FROM bankexpensegroups a
     #                                           LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')<'#{@month}-#{@year}'
     #                                           WHERE a.name like 'Biaya%' AND a.deleted = false
@@ -1048,7 +1048,7 @@ end
     #     @outcomes -= outcome.total
     #   end
 
-    #   @capitalexpensebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+    #   @capitalexpensebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
     #                                           FROM bankexpensegroups a
     #                                           LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')<'#{@month}-#{@year}'
     #                                           WHERE a.name like 'Modal%' AND a.deleted = false
@@ -1058,7 +1058,7 @@ end
     #     @outcomes -= outcome.total
     #   end
 
-    #   @debtexpensebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+    #   @debtexpensebefore = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
     #                                           FROM bankexpensegroups a
     #                                           LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')<'#{@month}-#{@year}'
     #                                           WHERE a.name like 'Hutang%' AND a.deleted = false
@@ -1067,7 +1067,7 @@ end
     #   @debtexpensebefore.each do |outcome|
     #     @outcomes -= outcome.total
     #   end
-      
+
     #   @receiptpayrollsupirbefore = Receiptpayroll.joins(:payroll)
     #   .where("to_char(receiptpayrolls.created_at, 'MM-YYYY')<'#{@month}-#{@year}' AND receiptpayrolls.deleted = false")
     #   .where("payrolls.driver_id IS NOT NULL")
@@ -1083,15 +1083,15 @@ end
     #       @operasionalbefore = @receiptbefore.sum("driver_allowance + helper_allowance + gas_allowance + misc_allowance + tol_fee + ferry_fee").to_i - @receiptbefore.sum("driver_allowance + helper_allowance + gas_allowance + misc_allowance + tol_fee").to_i
 
     #       #office
-    #   officeumumcredit = Receiptexpense.where("expensetype = 'Kredit' and officeexpensegroup_id = 1 and deleted = false and to_char(created_at, 'MM-YYYY') < ?", "#{@month}-#{@year}").sum(:total) 
+    #   officeumumcredit = Receiptexpense.where("expensetype = 'Kredit' and officeexpensegroup_id = 1 and deleted = false and to_char(created_at, 'MM-YYYY') < ?", "#{@month}-#{@year}").sum(:total)
     #   officeumumdebit = Receiptexpense.where("expensetype = 'Debit' and officeexpensegroup_id = 1 and deleted = false and to_char(created_at, 'MM-YYYY') < ?", "#{@month}-#{@year}").sum(:total)
     #       @officetotalbefore = officeumumcredit - officeumumdebit
     #   #=================
 
     #   #BEBAN OPERASIONAL DAN LAIN-LAIN
     #   @productrequestitembefore = Productrequestitem.where("productrequest_id in (select id from productrequests where vehicle_id is NULL AND deleted = false and to_char(date, 'MM-YYYY') < ?)", "#{@month}-#{@year}").sum(:total)
-      
-      
+
+
     #   @balance = @incomes - @outcomes - @operasionalbefore.to_i - @officetotalbefore.to_i - @receiptpayrollsupir.sum(:total) - @receiptpayrollkernet.sum(:total) - @productrequestitembefore - administrasi - operasional
 
       @section = "reports1"
@@ -1100,7 +1100,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def incomes_cashinout
@@ -1117,69 +1117,69 @@ end
 
 
       if @month == "0"
-        @incomeexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @incomeexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                                 WHERE a.ID IN (6) AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @debtincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @debtincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                                 WHERE (a.name like 'Hutang Direksi%' OR a.ID IN (21)) AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @creditincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @creditincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                           FROM bankexpensegroups a
                                           LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                           WHERE a.ID IN (112) AND a.deleted = false AND b.deleted = false
                                           GROUP BY a.id, a.name
                                           ORDER BY a.id")
 
-        @creditPura = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @creditPura = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                                 WHERE a.ID IN (101) AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
-        @creditInti = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @creditInti = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                                 WHERE (a.name like 'Piutang Rajawali Inti%' OR a.ID IN (153)) AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @assetsales = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @assetsales = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                           FROM bankexpensegroups a
                                           LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                           WHERE a.ID IN (89) AND a.deleted = false AND b.deleted = false
                                           GROUP BY a.id, a.name
                                           ORDER BY a.id")
 
-        @kmkfacilities = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @kmkfacilities = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                           FROM bankexpensegroups a
                                           LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                           WHERE a.name like 'Fasilitas KMK%' AND a.deleted = false AND b.deleted = false AND b.description like 'Pindah%'
                                           GROUP BY a.id, a.name
                                           ORDER BY a.id")
 
-        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                                 WHERE a.name like 'Biaya%' AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @capitalexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @capitalexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                                 WHERE a.name like 'Modal%' AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @debtexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @debtexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                                 WHERE a.name like 'Hutang%' AND a.deleted = false AND b.deleted = false
@@ -1201,70 +1201,70 @@ end
 
         @invoice_incomes = Taxinvoice.active.where("date BETWEEN :startdate AND :enddate", {:startdate => @three_month_before.to_date.at_beginning_of_month, :enddate => @three_month_before})
 
-        
-        @incomeexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+
+        @incomeexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                                 WHERE a.ID IN (6) AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @debtincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @debtincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                                 WHERE (a.name like 'Hutang Direksi%' OR a.ID IN (21)) AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @creditincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @creditincomes = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                           FROM bankexpensegroups a
                                           LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                           WHERE a.ID IN (112) AND a.deleted = false AND b.deleted = false
                                           GROUP BY a.id, a.name
                                           ORDER BY a.id")
 
-        @creditPura = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @creditPura = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                                 WHERE a.ID IN (101) AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
-        @creditInti = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @creditInti = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                                 WHERE (a.name like 'Piutang Rajawali Inti%' OR a.ID IN (153)) AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @assetsales = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @assetsales = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                           FROM bankexpensegroups a
                                           LEFT OUTER JOIN bankexpenses b on b.creditgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                           WHERE a.ID IN (89) AND a.deleted = false AND b.deleted = false
                                           GROUP BY a.id, a.name
                                           ORDER BY a.id")
 
-        @kmkfacilities = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @kmkfacilities = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                           FROM bankexpensegroups a
                                           LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                           WHERE a.name like 'Fasilitas KMK%' AND a.deleted = false AND b.deleted = false AND b.description like 'Pindah%'
                                           GROUP BY a.id, a.name
                                           ORDER BY a.id")
 
-        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                                 WHERE a.name like 'Biaya%' AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @capitalexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @capitalexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                                 WHERE a.name like 'Modal%' AND a.deleted = false AND b.deleted = false
                                                 GROUP BY a.id, a.name
                                                 ORDER BY a.id")
 
-        @debtexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @debtexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                                 FROM bankexpensegroups a
                                                 LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                                 WHERE a.name like 'Hutang%' AND a.deleted = false AND b.deleted = false
@@ -1287,7 +1287,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def incomes_statement
@@ -1303,13 +1303,13 @@ end
       @groupkantor = Officeexpensegroup.where("officeexpensegroup_id=5 AND deleted=false").order(:id)
 
       if @month == "0"
-        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                               FROM bankexpensegroups a
                                               LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                               WHERE a.name like 'Biaya%' AND a.deleted = false
                                               GROUP BY a.id, a.name
                                               ORDER BY a.id")
-      
+
         @receiptpayrollsupir = Receiptpayroll.joins(:payroll)
         .where("to_char(receiptpayrolls.created_at, 'YYYY')='#{@year}' AND receiptpayrolls.deleted = false")
         .where("payrolls.driver_id IS NOT NULL")
@@ -1319,13 +1319,13 @@ end
         .where("payrolls.driver_id IS NULL")
 
       else
-        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                               FROM bankexpensegroups a
                                               LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                               WHERE a.name like 'Biaya%' AND a.deleted = false
                                               GROUP BY a.id, a.name
                                               ORDER BY a.id")
-      
+
         @receiptpayrollsupir = Receiptpayroll.joins(:payroll)
         .where("to_char(receiptpayrolls.created_at, 'MM-YYYY')='#{@month}-#{@year}' AND receiptpayrolls.deleted = false")
         .where("payrolls.driver_id IS NOT NULL")
@@ -1342,7 +1342,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def incomes_statement_nocharge
@@ -1358,14 +1358,14 @@ end
       @groupkantor = Officeexpensegroup.where("officeexpensegroup_id=5 AND name NOT LIKE 'Biaya%'")
 
       if @month == "0"
-        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                         FROM bankexpensegroups a
                                         LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'YYYY')='#{@year}'
                                         WHERE a.name not like 'Biaya%'
                                         GROUP BY a.id, a.name
                                         ORDER BY a.id")
       else
-        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total 
+        @bankexpense = Bankexpense.find_by_sql("SELECT a.id, a.name, coalesce(sum(money(b.total)), money(0)) as total
                                         FROM bankexpensegroups a
                                         LEFT OUTER JOIN bankexpenses b on b.debitgroup_id=a.id and to_char(b.date, 'MM-YYYY')='#{@month}-#{@year}'
                                         WHERE a.name not like 'Biaya%'
@@ -1379,7 +1379,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def expenses_daily
@@ -1390,7 +1390,7 @@ end
 
       @date = params[:date]
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
-      
+
       kas = Bankexpensegroup.where("UPPER(name) = 'KAS' ").first
 
       @bankexpensecredit = Bankexpense.where("to_char(date, 'DD-MM-YYYY') = ? AND creditgroup_id = ? AND deleted = false", @date, kas.id)
@@ -1418,23 +1418,23 @@ end
       officepexpenses_credit = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false", @date)
       @receipttrains = Receipttrain.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date).order(:office_id)
       @receiptships = Receiptship.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date).order(:office_id)
-      
+
       if @date.to_date.year == 2013
         firstdate = Date.new(2013,7,1)
       else
         firstdate = @date.to_date.at_beginning_of_year
       end
-      
+
       @bankexpensecreditold = Bankexpense.where("(date >= ? and date < ?) AND creditgroup_id = ? AND deleted = false", firstdate, @date.to_date, kas.id)
       @bankexpensedebitold = Bankexpense.where("(date >= ? and date < ?) AND debitgroup_id = ? AND deleted = false", firstdate, @date.to_date, kas.id)
       @receiptsold = Receipt.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date).order(:office_id)
       @receiptreturnsold = Receiptreturn.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date).order(:office_id)
-      
+
       officepexpenses_debitold = Receiptexpense.where("(created_at >= ? and created_at < ?) and expensetype = 'Debit' AND deleted = false", firstdate, @date.to_date)
       officepexpenses_creditold = Receiptexpense.where("(created_at >= ? and created_at < ?) and expensetype = 'Kredit' AND deleted = false", firstdate, @date.to_date)
       officepexpenses_debitold = Receiptexpense.where("(created_at >= ? and created_at < ?) and expensetype = 'Debit' AND deleted = false", firstdate, @date.to_date)
       officepexpenses_creditold = Receiptexpense.where("(created_at >= ? and created_at < ?) and expensetype = 'Kredit' AND deleted = false", firstdate, @date.to_date)
-      
+
       @receiptsalesold = Receiptsale.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date)
       @receiptpremisold = Receiptpremi.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date)
       @receiptordersold = Receiptorder.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date)
@@ -1444,32 +1444,32 @@ end
       @receiptpayrollreturnsold = Receiptpayrollreturn.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date)
 
       @balance =  0
-      @balance = @balance + @receiptreturnsold.sum(:total) + officepexpenses_debitold.sum(:total) + @receiptsalesold.sum(:total) + @bankexpensedebitold.sum(:total) + @receiptpayrollreturnsold.sum(:total) 
+      @balance = @balance + @receiptreturnsold.sum(:total) + officepexpenses_debitold.sum(:total) + @receiptsalesold.sum(:total) + @bankexpensedebitold.sum(:total) + @receiptpayrollreturnsold.sum(:total)
       @balance = @balance - @receiptsold.sum(:total) - officepexpenses_creditold.sum(:total) - @receiptpremisold.sum(:total) - @receiptordersold.sum(:total) - @bankexpensecreditold.sum(:total) - @receiptdriversold.sum(:total) - @receiptpayrollsold.sum(:total) - @receipttrainsold.sum(:total) - @receiptshipsold.sum(:total)
 
       render "expenses-daily"
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def expenses_daily_new
     role = cek_roles 'Admin Keuangan, Admin Operasional'
-    if role 
+    if role
     @where = "expenses-daily-new"
       @section = "reports1"
-      
+
       @date = params[:date]
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
-      
+
       kas = Bankexpensegroup.where("UPPER(name) = 'KAS' ").first
 
       # Hidden Kas
       @hiddenexpensedebit = Officeexpense.where("date = ? AND expensetype = 'Debit' AND deleted = false", @date.to_date).where(:officeexpensegroup_id => 60).order(:id)
       @hiddenexpensecredit = Officeexpense.where("date = ? AND expensetype = 'Kredit' AND deleted = false", @date.to_date).where(:officeexpensegroup_id => 60).order(:id)
       #######
-      
+
       @bankexpensecredit = Bankexpense.where("to_char(date, 'DD-MM-YYYY') = ? AND creditgroup_id = ? AND deleted = false AND pettycashledger = false", @date, kas.id)
       @bankexpensedebit = Bankexpense.where("to_char(date, 'DD-MM-YYYY') = ? AND debitgroup_id = ? AND deleted = false AND pettycashledger = false", @date, kas.id)
       # render json: @bankexpensecredit
@@ -1496,12 +1496,12 @@ end
 
       officepexpenses_debit = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Debit' AND deleted = false", @date)
       officepexpenses_credit = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false", @date)
-      
+
       @premis = Invoice.joins(:receipts).where("invoices.premi_allowance > money(0) and to_char(receipts.created_at, 'DD-MM-YYYY') = ? AND invoices.deleted = false and receipts.deleted = false", @date).order(:office_id)
       @receipttrains = Receipttrain.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date).order(:office_id)
       @receiptships = Receiptship.active.where("to_char(created_at, 'DD-MM-YYYY') = ?", @date).order(:office_id)
       # @premis = Receipt.where("premi_allowance > money(0) and to_char(created_at, 'DD-MM-YYYY') = ? AND receipts.deleted = false", @date).order(:office_id)
-      
+
       # render json: @premis
       # return false
       if @date.to_date.year == 2013
@@ -1509,7 +1509,7 @@ end
       else
         firstdate = @date.to_date.at_beginning_of_year
       end
-      
+
       @bankexpensecreditold = Bankexpense.where("(date >= ? and date < ?) AND creditgroup_id = ? AND deleted = false AND pettycashledger = false", firstdate, @date.to_date, kas.id)
       @bankexpensedebitold = Bankexpense.where("(date >= ? and date < ?) AND debitgroup_id = ? AND deleted = false AND pettycashledger = false", firstdate, @date.to_date, kas.id)
       @receiptsold = Receipt.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date).order(:office_id)
@@ -1524,7 +1524,7 @@ end
       officepexpenses_creditold = Receiptexpense.where("(created_at >= ? and created_at < ?) and expensetype = 'Kredit' AND deleted = false", firstdate, @date.to_date)
       officepexpenses_debitold = Receiptexpense.where("(created_at >= ? and created_at < ?) and expensetype = 'Debit' AND deleted = false", firstdate, @date.to_date)
       officepexpenses_creditold = Receiptexpense.where("(created_at >= ? and created_at < ?) and expensetype = 'Kredit' AND deleted = false", firstdate, @date.to_date)
-      
+
       @receiptsalesold = Receiptsale.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date)
       @receiptordersold = Receiptorder.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date)
       @receiptpremisold = Receiptpremi.where("(created_at >= ? and created_at < ?) AND deleted = false", firstdate, @date.to_date)
@@ -1537,18 +1537,18 @@ end
 
 
       @balance =  0
-      @balance = @balance + @hiddenexpensedebitold.sum(:total) + @receiptreturnsold.sum(:total) + officepexpenses_debitold.sum(:total) + @receiptsalesold.sum(:total) + @bankexpensedebitold.sum(:total) + @receiptpayrollreturnsold.sum(:total) 
-      @balance = @balance - @hiddenexpensecreditold.sum(:total) - @receiptsold.sum(:total) - officepexpenses_creditold.sum(:total) - @receiptpremisold.sum(:total) - @receiptincentivesold.sum(:total) - @receiptordersold.sum(:total) - @bankexpensecreditold.sum(:total) - @receiptdriversold.sum(:total) - @receiptpayrollsold.sum(:total) - @receipttrainsold.sum(:total) - @receiptshipsold.sum(:total) 
-    
-    
+      @balance = @balance + @hiddenexpensedebitold.sum(:total) + @receiptreturnsold.sum(:total) + officepexpenses_debitold.sum(:total) + @receiptsalesold.sum(:total) + @bankexpensedebitold.sum(:total) + @receiptpayrollreturnsold.sum(:total)
+      @balance = @balance - @hiddenexpensecreditold.sum(:total) - @receiptsold.sum(:total) - officepexpenses_creditold.sum(:total) - @receiptpremisold.sum(:total) - @receiptincentivesold.sum(:total) - @receiptordersold.sum(:total) - @bankexpensecreditold.sum(:total) - @receiptdriversold.sum(:total) - @receiptpayrollsold.sum(:total) - @receipttrainsold.sum(:total) - @receiptshipsold.sum(:total)
+
+
       @support = Setting.find_by_name("Penyesuaian Saldo Setelah 1 November 2022").value.to_i
-      @balance = @balance + @support 
-      
+      @balance = @balance + @support
+
 
       offsetRunning = Setting.find_by_name("Offset Saldo Akhir 1 Nov").value.to_i
 
       @sdate = Date.new(2022, 11, 1)
-      
+
       if @date.to_i > @sdate.strftime('%d-%m-%Y').to_i
         @balance = @balance - offsetRunning
       end
@@ -1557,7 +1557,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def expenses_bank
@@ -1576,7 +1576,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
     def expenses_office
@@ -1595,7 +1595,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def filterledger
@@ -1603,11 +1603,11 @@ end
     if role
         @where = "ledger"
       @section = "reports1"
-      id_group_sangu = 999 
+      id_group_sangu = 999
       id_group_premi = 999
       id_groupbank_sangu = 25
       id_groupbank_premi = 32
-      id_groupbank_solar = 27 
+      id_groupbank_solar = 27
       @startdate = params[:startdate]
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
@@ -1636,18 +1636,18 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def ledger
     @where = "ledger"
     @section = "reports1"
     @inputs = params[:filterform]
-    id_group_sangu = 0 
-    id_group_premi = 8 
+    id_group_sangu = 0
+    id_group_premi = 8
     id_groupbank_sangu = 25
     id_groupbank_premi = 32
-    id_groupbank_solar = 27 
+    id_groupbank_solar = 27
     # @bankexpensegroups = Bankexpensegroup.active.where("id not in (?,?,?)", id_groupbank_solar, id_groupbank_sangu, id_groupbank_premi).order(:name)
     # @officeexpensegroups = Officeexpensegroup.active.where("officeexpensegroup_id is not null and id not in (?,?)", id_group_sangu, id_group_premi).order(:name)
     @bankexpensegroups = Bankexpensegroup.active.where("id not in (?,?,?)", id_groupbank_solar, id_groupbank_sangu, id_groupbank_premi).order(:name)
@@ -1665,11 +1665,11 @@ end
       @year = params[:year]
       @year = Date.today.year if @year.nil?
 
-      id_group_sangu = 54 
-      id_group_premi = 8 
+      id_group_sangu = 54
+      id_group_premi = 8
       id_groupbank_sangu = 25
       id_groupbank_premi = 32
-      id_groupbank_solar = 27 
+      id_groupbank_solar = 27
       @bankexpensegroups = Bankexpensegroup.active.where("id not in (?,?,?)", id_groupbank_solar, id_groupbank_sangu, id_groupbank_premi).order(:name)
       @officeexpensegroups = Officeexpensegroup.active.where("officeexpensegroup_id is not null and id not in (?,?)", id_group_sangu, id_group_premi).order(:name)
 
@@ -1679,7 +1679,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def expenses_gas
@@ -1693,12 +1693,12 @@ end
       @enddate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @enddate.nil?
 
       @office = params[:office_id]
-      
+
       if @office.present?
 
-        @office = Office.find(params[:office_id])        
+        @office = Office.find(params[:office_id])
         @receipts = Receipt.where("created_at BETWEEN ? AND ? AND office_id = ? AND deleted = false", @startdate, @enddate, @office.id)
-      
+
       else
         @office = Office.all.first
         @receipts = Receipt.where("created_at BETWEEN ? AND ? AND deleted = false", @startdate, @enddate)
@@ -1711,7 +1711,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def expenses_drivers
@@ -1723,14 +1723,14 @@ end
       @office = Office.all.first if @office.nil?
       @receipts = Receipt.where("to_char(created_at, 'DD-MM-YYYY') = ? and office_id = ? AND deleted = false", @date, @office.id)
       @receiptreturns = Receiptreturn.where("to_char(created_at, 'DD-MM-YYYY') = ? and office_id = ? AND deleted = false", @date, @office.id)
-      
+
       @section = "reports2"
       @where = "expenses-drivers"
       render "expenses-drivers"
     else
       redirect_to root_path()
     end
-    
+
   end
 
 
@@ -1749,7 +1749,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def gas_leftovers
@@ -1760,10 +1760,10 @@ end
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
       @vehicles = Invoice.find_by_sql(["
-        select DISTINCT v.id, v.current_id 
+        select DISTINCT v.id, v.current_id
         from invoices i
         inner join vehicles v on i.vehicle_id = v.id
-        where i.gas_leftover > 0 and (i.date > ? and i.date < ?) 
+        where i.gas_leftover > 0 and (i.date > ? and i.date < ?)
         AND i.deleted = false
         group by v.id", @startdate.to_date, @enddate.to_date])
       @section = "reports2"
@@ -1772,7 +1772,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def downloadexcelexpensedaily
@@ -1816,7 +1816,7 @@ end
 
     p = Axlsx::Package.new
     p.workbook.add_worksheet(:name => "Kas Harian") do |sheet|
-      
+
       bold = sheet.styles.add_style(:b => true)
       right = sheet.styles.add_style(:alignment => {:horizontal => :right})
       right_bold = sheet.styles.add_style(:alignment => {:horizontal => :right}, :b => true)
@@ -1892,7 +1892,7 @@ end
         sheet.add_row ['','KAS UMUM'] , :height => 20, :style => [nil, h3_green], :widths => [:auto, :ignore]
 
         umum.each_with_index do |expense, i|
-          running += expense.total 
+          running += expense.total
           current_id = expense.officeexpense.vehicle.current_id unless expense.officeexpense.vehicle.nil?
           sheet.add_row ['',i + 1, expense.officeexpense.description.gsub('<br />', '\n'), expense.officeexpense.office.abbr, current_id, expense.total, 0, running], :style => [nil, nil, wrap_txt, nil, nil, number, number, number ]
         end
@@ -1906,7 +1906,7 @@ end
         sheet.add_row ['','KAS KANTOR'] , :height => 20, :style => [nil, h3_green], :widths => [:auto, :ignore]
 
         kantor.each_with_index do |expense, i|
-          running += expense.total 
+          running += expense.total
           current_id = expense.officeexpense.vehicle.current_id unless expense.officeexpense.vehicle.nil?
           sheet.add_row ['',i + 1, expense.officeexpense.description.gsub('<br />', '\n'), expense.officeexpense.office.abbr, current_id, expense.total, 0, running], :style => [nil, nil, wrap_txt, nil, nil, number, number, number ]
         end
@@ -1919,11 +1919,11 @@ end
         @receiptsales.where("money(total) > money(0)").each_with_index do |receiptsale, i|
           running += receiptsale.total
 
-          productname = "" 
-          receiptsale.sale.saleitems.each do |item|  
-            productname += item.productsale.name + ", " 
-          end  
-          productname = productname[0...-2]  
+          productname = ""
+          receiptsale.sale.saleitems.each do |item|
+            productname += item.productsale.name + ", "
+          end
+          productname = productname[0...-2]
           sheet.add_row ['',i + 1, getwords(productname, 35), '', '', receiptsale.total, 0, running], :style => [nil, nil, nil, nil, nil, number, number, number ]
         end
         sheet.add_row ['','', "TOTAL",'', '', @receiptsales.where("money(total) > money(0)"), '', ''] , :height => 20, :style => [nil, nil, bold, nil, nil, number_green, nil, nil ]
@@ -2007,11 +2007,11 @@ end
         @receiptorders.where("money(total) > money(0)").each_with_index do |receiptorder, i|
           running -= receiptorder.total
 
-          productname = "" 
-          receiptorder.productorder.productorderitems.each do |item|  
-            productname += item.product.name + ", " 
-          end  
-          productname = productname[0...-2]  
+          productname = ""
+          receiptorder.productorder.productorderitems.each do |item|
+            productname += item.product.name + ", "
+          end
+          productname = productname[0...-2]
 
           sheet.add_row ['',i + 1, getwords(productname, 35) , '', '', 0,  receiptorder.total, running], :style => [nil, nil, nil, nil, nil, number, number, number ]
         end
@@ -2019,14 +2019,14 @@ end
         sheet.add_row ['','', "TOTAL",'', '', '', @receiptorders.sum(:total), ''] , :height => 20, :style => [nil, nil, bold, nil, nil,  nil, number_red, nil ]
       end
 
-      umum = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND (officeexpensegroup_id = 1 OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = 1))", @date).order(:id) 
+      umum = Receiptexpense.where("to_char(created_at, 'DD-MM-YYYY') = ? and expensetype = 'Kredit' AND deleted = false AND (officeexpensegroup_id = 1 OR officeexpensegroup_id in (SELECT id from officeexpensegroups where officeexpensegroup_id = 1))", @date).order(:id)
 
       if umum.any?
         sheet.add_row [''], :height => 20, :widths => [:auto, :ignore]
         sheet.add_row ['','KAS UMUM'] , :height => 20, :style => [nil, h3_red], :widths => [:auto, :ignore]
 
         umum.each_with_index do |expense, i|
-          running -= expense.total 
+          running -= expense.total
           current_id = expense.officeexpense.vehicle.current_id unless expense.officeexpense.vehicle.nil?
           sheet.add_row ['',i + 1, expense.officeexpense.description.gsub('<br />', '\n'), expense.officeexpense.office.abbr, current_id, 0, expense.total, running], :style => [nil, nil, wrap_txt, nil, nil, number, number, number ]
         end
@@ -2040,7 +2040,7 @@ end
         sheet.add_row ['','KAS KANTOR'] , :height => 20, :style => [nil, h3_red], :widths => [:auto, :ignore]
 
         kantor.each_with_index do |expense, i|
-          running -= expense.total 
+          running -= expense.total
           current_id = expense.officeexpense.vehicle.current_id unless expense.officeexpense.vehicle.nil?
           sheet.add_row ['',i + 1, expense.officeexpense.description.gsub('<br />', '\n'), expense.officeexpense.office.abbr, current_id, 0, expense.total, running] , :style => [nil, nil, wrap_txt, nil, nil, number, number, number ]
         end
@@ -2076,7 +2076,7 @@ end
         sheet.add_row [''], :height => 20
         sheet.add_row ['','NO', 'KETERANGAN', 'KTR', 'NO.POL', 'LITER', 'SOLAR', 'TOTAL' ] , :height => 20, :style => [nil, bold, bold, bold, bold, right_bold, right_bold, right_bold]
 
-        total = 0 
+        total = 0
         @gas_vouchers.each_with_index do |invoice, i|
           total += invoice.gas_voucher.to_i * invoice.gas_cost.to_i
           sheet.add_row ['',i + 1, "#{zeropad(invoice.id)}: #{invoice.date.strftime("%d/%m/%y")}, #{invoice.quantity} Rit, #{invoice.route.name} (#{invoice.driver.name})", invoice.office.abbr, invoice.vehicle.current_id, invoice.gas_voucher, invoice.gas_cost, invoice.gas_voucher.to_i * invoice.gas_cost.to_i] , :style => [nil, nil, nil, nil, nil, number, number, number ]
@@ -2110,7 +2110,7 @@ end
         bold = sheet.styles.add_style :b => true
         right = sheet.styles.add_style :alignment => {:horizontal => :right}
         right_bold = sheet.styles.add_style :alignment => {:horizontal => :right}, :b => true
-       
+
         sheet.add_row [''], :height => 20
         sheet.add_row ['', "Dibuat pada Tanggal: #{Date.today.strftime('%d %B %Y')} (#{Time.now.strftime('%H:%M')})"] , :height => 20, :widths => [:auto, :ignore], :style => [nil, bold]
 
@@ -2123,7 +2123,7 @@ end
         sheet.add_row [''], :height => 20
         sheet.add_row ['','NO', 'KETERANGAN', 'KTR', 'NO.POL', 'UP', 'RATE', 'TOTAL' ] , :height => 20, :style => [nil, bold, bold, bold, bold, right_bold, right_bold, right_bold]
 
-        total_insurances = 0 
+        total_insurances = 0
         @insurances.each_with_index do |invoice, i|
           total_insurances += invoice.insurance * invoice.insurance_rate.to_f
           sheet.add_row ['',i + 1, "#{zeropad(invoice.id)}: #{invoice.quantity} Rit, #{invoice.route.name} (#{invoice.driver.name})", invoice.office.abbr, invoice.vehicle.current_id, invoice.insurance, invoice.insurance_rate, invoice.insurance * invoice.insurance_rate.to_f] , :style => [nil, nil, nil, nil, nil, number, nil, number ]
@@ -2141,7 +2141,7 @@ end
         right = sheet.styles.add_style :alignment => {:horizontal => :right}
         right_bold = sheet.styles.add_style :alignment => {:horizontal => :right}, :b => true
         number_right_bold = sheet.styles.add_style :alignment => {:horizontal => :right}, :b => true, :format_code => "#,##0.00"
-       
+
         sheet.add_row [''], :height => 20
         sheet.add_row ['', "Dibuat pada Tanggal: #{Date.today.strftime('%d %B %Y')} (#{Time.now.strftime('%H:%M')})"] , :height => 20, :widths => [:auto, :ignore], :style => [nil, bold]
 
@@ -2155,8 +2155,8 @@ end
         total_estimation = estimation =  i = qty = 0
         @receipts.each_with_index do |receipt, i|
           qty = receipt.invoice.quantity
-          qty -= receipt.invoice.receiptreturns.where(:deleted => false).first.quantity if !receipt.invoice.receiptreturns.where(:deleted => false).first.nil? 
-          if receipt.invoice.price_per >= 300000 
+          qty -= receipt.invoice.receiptreturns.where(:deleted => false).first.quantity if !receipt.invoice.receiptreturns.where(:deleted => false).first.nil?
+          if receipt.invoice.price_per >= 300000
             estimation = qty * receipt.invoice.price_per.to_i
             tipe = 'BORONGAN'
           else
@@ -2179,7 +2179,7 @@ end
           right = sheet.styles.add_style :alignment => {:horizontal => :right}
           right_bold = sheet.styles.add_style :alignment => {:horizontal => :right}, :b => true
           number_right_bold = sheet.styles.add_style :alignment => {:horizontal => :right}, :b => true, :format_code => "#,##0.00"
-         
+
           sheet.add_row [''], :height => 20
           sheet.add_row ['', "Dibuat pada Tanggal: #{Date.today.strftime('%d %B %Y')} (#{Time.now.strftime('%H:%M')})"] , :height => 20, :widths => [:auto, :ignore], :style => [nil, bold]
 
@@ -2189,7 +2189,7 @@ end
           sheet.add_row [''], :height => 20
           sheet.add_row ['','NO', 'KETERANGAN', 'SUPPLIER', 'TOTAL' ] , :height => 20, :style => [nil, bold, bold, bold, right_bold]
 
-          total_bon = 0 
+          total_bon = 0
           i = 1
           @productorders.each do |productorder|
             productorder.productorderitems.where(:bon => true).each do |productorderitem|
@@ -2206,7 +2206,7 @@ end
 
     p.use_autowidth = false
     p.use_shared_strings = true
-    
+
     send_data(p.to_stream.read, :filename => filename, :type => :xls, :x_sendfile => true)
   end
 
@@ -2222,12 +2222,12 @@ end
 
       income.push((taxinvoices.to_i + inc_others.to_i)/1000)
 
-      receipts = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total) 
+      receipts = Receipt.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total)
       receiptreturns = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where extract(month from r.created_at) = #{i} and extract(year from r.created_at) = #{@year} and r.deleted = false and i.vehicle_id = #{@vehicle_id})").sum(:total)
       receiptpremis = Receiptpremi.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total)
       receiptincentives = Receiptincentive.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and deleted = false and invoice_id in (SELECT id from invoices where vehicle_id = #{@vehicle_id})").sum(:total)
       receiptexpenses = Receiptexpense.where("extract(month from created_at) = #{i} and extract(year from created_at) = #{@year} and expensetype = 'Kredit' and deleted = false and officeexpense_id in (select id from officeexpenses where vehicle_id = #{@vehicle_id})").sum(:total)
-      productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and vehicle_id = #{@vehicle_id})").sum(:total) 
+      productrequests = Productrequestitem.where("productrequest_id in (select id from productrequests where extract(month from date) = #{i} and extract(year from date) = #{@year} and deleted = false and vehicle_id = #{@vehicle_id})").sum(:total)
 
       outcome.push((receipts.to_i + receiptpremis.to_i + receiptincentives.to_i + receiptexpenses.to_i + productrequests.to_i - receiptreturns.to_i)/1000)
     end
@@ -2256,7 +2256,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def expensesdriverdaily
@@ -2275,7 +2275,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def payroll
@@ -2294,7 +2294,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def invoicereturns
@@ -2313,10 +2313,10 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
-  
+
   def downloadexcelpayroll
     @date = params[:date].to_date
     @date_period = (@date - 1.month).to_date
@@ -2331,7 +2331,7 @@ end
       p.workbook.add_worksheet(:name => "Supir") do |sheet|
         bold = sheet.styles.add_style(:b => true)
         bold_top_left_right = sheet.styles.add_style(:b => true, :border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :center, :vertical => :center} )
-        
+
         top_left_right = sheet.styles.add_style(:border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :left} )
         center_top_left_right = sheet.styles.add_style(:border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :center} )
         number_top_left_right = sheet.styles.add_style(:format_code => "#,##0.00", :border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :right} )
@@ -2370,10 +2370,10 @@ end
         sheet.merge_cells "Z8:AC8"
 
         @maindrivers.order(:id).each_with_index do |driver, i|
-          sheet.add_row ['',i+1, (driver.vehicle.current_id rescue ''), (driver.driver.name rescue ''), driver.non_holidays, driver.holidays, driver.holidays + driver.non_holidays, driver.master_weight_loss, driver.weight_loss, driver.master_weight_loss-driver.weight_loss, driver.master_accident, driver.accident, driver.master_accident.to_f - driver.accident.to_f, driver.master_sparepart, driver.sparepart, driver.master_sparepart.to_f - driver.sparepart.to_f, driver.master_bon, driver.bon, driver.master_bon.to_f - driver.bon.to_f, driver.allowance, driver.master_saving, driver.saving_reduction, driver.saving, driver.master_saving.to_f - driver.saving_reduction.to_f + driver.saving.to_f, driver.weight_loss.to_f + driver.sparepart.to_f + driver.accident.to_f + driver.bon.to_f + driver.saving.to_f + driver.allowance.to_f, driver.non_holidays_payment, driver.holidays_payment, driver.bonus, driver.non_holidays_payment.to_f + driver.holidays_payment.to_f + driver.bonus.to_f, driver.total ] , :height => 20, :style => [nil, center_top_left_right, top_left_right, top_left_right, center_top_left_right, center_top_left_right, center_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right] 
+          sheet.add_row ['',i+1, (driver.vehicle.current_id rescue ''), (driver.driver.name rescue ''), driver.non_holidays, driver.holidays, driver.holidays + driver.non_holidays, driver.master_weight_loss, driver.weight_loss, driver.master_weight_loss-driver.weight_loss, driver.master_accident, driver.accident, driver.master_accident.to_f - driver.accident.to_f, driver.master_sparepart, driver.sparepart, driver.master_sparepart.to_f - driver.sparepart.to_f, driver.master_bon, driver.bon, driver.master_bon.to_f - driver.bon.to_f, driver.allowance, driver.master_saving, driver.saving_reduction, driver.saving, driver.master_saving.to_f - driver.saving_reduction.to_f + driver.saving.to_f, driver.weight_loss.to_f + driver.sparepart.to_f + driver.accident.to_f + driver.bon.to_f + driver.saving.to_f + driver.allowance.to_f, driver.non_holidays_payment, driver.holidays_payment, driver.bonus, driver.non_holidays_payment.to_f + driver.holidays_payment.to_f + driver.bonus.to_f, driver.total ] , :height => 20, :style => [nil, center_top_left_right, top_left_right, top_left_right, center_top_left_right, center_top_left_right, center_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right]
         end
 
-        sheet.add_row ['','','', 'TOTAL', @maindrivers.sum(:non_holidays), @maindrivers.sum(:holidays), @maindrivers.sum('holidays + non_holidays'), @maindrivers.sum(:master_weight_loss), @maindrivers.sum(:weight_loss), @maindrivers.sum("master_weight_loss-weight_loss"), @maindrivers.sum(:master_accident), @maindrivers.sum(:accident),@maindrivers.sum("master_accident-accident"), @maindrivers.sum(:master_sparepart), @maindrivers.sum(:sparepart), @maindrivers.sum("master_sparepart-sparepart"), @maindrivers.sum(:master_bon), @maindrivers.sum(:bon), @maindrivers.sum("master_bon-bon"), @maindrivers.sum(:allowance), @maindrivers.sum(:master_saving), @maindrivers.sum(:saving_reduction), @maindrivers.sum(:saving), @maindrivers.sum("master_saving-saving_reduction+saving"), @maindrivers.sum("weight_loss+sparepart+accident+bon+saving+allowance"), @maindrivers.sum(:non_holidays_payment), @maindrivers.sum(:holidays_payment), @maindrivers.sum(:bonus), @maindrivers.sum("non_holidays_payment+holidays_payment+bonus"), @maindrivers.sum(:total) ] , :height => 20, :style => [nil, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom] 
+        sheet.add_row ['','','', 'TOTAL', @maindrivers.sum(:non_holidays), @maindrivers.sum(:holidays), @maindrivers.sum('holidays + non_holidays'), @maindrivers.sum(:master_weight_loss), @maindrivers.sum(:weight_loss), @maindrivers.sum("master_weight_loss-weight_loss"), @maindrivers.sum(:master_accident), @maindrivers.sum(:accident),@maindrivers.sum("master_accident-accident"), @maindrivers.sum(:master_sparepart), @maindrivers.sum(:sparepart), @maindrivers.sum("master_sparepart-sparepart"), @maindrivers.sum(:master_bon), @maindrivers.sum(:bon), @maindrivers.sum("master_bon-bon"), @maindrivers.sum(:allowance), @maindrivers.sum(:master_saving), @maindrivers.sum(:saving_reduction), @maindrivers.sum(:saving), @maindrivers.sum("master_saving-saving_reduction+saving"), @maindrivers.sum("weight_loss+sparepart+accident+bon+saving+allowance"), @maindrivers.sum(:non_holidays_payment), @maindrivers.sum(:holidays_payment), @maindrivers.sum(:bonus), @maindrivers.sum("non_holidays_payment+holidays_payment+bonus"), @maindrivers.sum(:total) ] , :height => 20, :style => [nil, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom]
       end
     end
 
@@ -2381,7 +2381,7 @@ end
       p.workbook.add_worksheet(:name => "Warnen") do |sheet|
         bold = sheet.styles.add_style(:b => true)
         bold_top_left_right = sheet.styles.add_style(:b => true, :border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :center, :vertical => :center} )
-        
+
         top_left_right = sheet.styles.add_style(:border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :left} )
         center_top_left_right = sheet.styles.add_style(:border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :center} )
         number_top_left_right = sheet.styles.add_style(:format_code => "#,##0.00", :border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :right} )
@@ -2420,10 +2420,10 @@ end
         sheet.merge_cells "Z8:AC8"
 
         @warnens.order(:id).each_with_index do |driver, i|
-          sheet.add_row ['',i+1, (driver.vehicle.current_id rescue ''), (driver.driver.name rescue '-'), driver.non_holidays, driver.holidays, driver.holidays + driver.non_holidays, driver.master_weight_loss, driver.weight_loss, driver.master_weight_loss.to_f - driver.weight_loss.to_f, driver.master_accident, driver.accident, driver.master_accident.to_f - driver.accident.to_f, driver.master_sparepart, driver.sparepart, driver.master_sparepart.to_f - driver.sparepart.to_f, driver.master_bon, driver.bon, driver.master_bon.to_f - driver.bon.to_f, driver.allowance, driver.master_saving, driver.saving_reduction, driver.saving, driver.master_saving.to_f - driver.saving_reduction.to_f + driver.saving.to_f, driver.weight_loss.to_f + driver.sparepart.to_f + driver.accident.to_f + driver.bon.to_f + driver.saving.to_f + driver.allowance.to_f, driver.non_holidays_payment, driver.holidays_payment, driver.bonus, driver.non_holidays_payment.to_f + driver.holidays_payment.to_f + driver.bonus.to_f, driver.total ] , :height => 20, :style => [nil, center_top_left_right, top_left_right, top_left_right, center_top_left_right, center_top_left_right, center_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right] 
+          sheet.add_row ['',i+1, (driver.vehicle.current_id rescue ''), (driver.driver.name rescue '-'), driver.non_holidays, driver.holidays, driver.holidays + driver.non_holidays, driver.master_weight_loss, driver.weight_loss, driver.master_weight_loss.to_f - driver.weight_loss.to_f, driver.master_accident, driver.accident, driver.master_accident.to_f - driver.accident.to_f, driver.master_sparepart, driver.sparepart, driver.master_sparepart.to_f - driver.sparepart.to_f, driver.master_bon, driver.bon, driver.master_bon.to_f - driver.bon.to_f, driver.allowance, driver.master_saving, driver.saving_reduction, driver.saving, driver.master_saving.to_f - driver.saving_reduction.to_f + driver.saving.to_f, driver.weight_loss.to_f + driver.sparepart.to_f + driver.accident.to_f + driver.bon.to_f + driver.saving.to_f + driver.allowance.to_f, driver.non_holidays_payment, driver.holidays_payment, driver.bonus, driver.non_holidays_payment.to_f + driver.holidays_payment.to_f + driver.bonus.to_f, driver.total ] , :height => 20, :style => [nil, center_top_left_right, top_left_right, top_left_right, center_top_left_right, center_top_left_right, center_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right]
         end
 
-        sheet.add_row ['','','', 'TOTAL', @warnens.sum(:non_holidays), @warnens.sum(:holidays), @warnens.sum('holidays + non_holidays'), @warnens.sum(:master_weight_loss), @warnens.sum(:weight_loss), @warnens.sum("master_weight_loss-weight_loss"), @warnens.sum(:master_accident), @warnens.sum(:accident),@warnens.sum("master_accident-accident"), @warnens.sum(:master_sparepart), @warnens.sum(:sparepart), @warnens.sum("master_sparepart-sparepart"), @warnens.sum(:master_bon), @warnens.sum(:bon), @warnens.sum("master_bon-bon"), @warnens.sum(:allowance), @warnens.sum(:master_saving), @warnens.sum(:saving_reduction), @warnens.sum(:saving), @warnens.sum("master_saving-saving_reduction+saving"), @warnens.sum("weight_loss+sparepart+accident+bon+saving+allowance"), @warnens.sum(:non_holidays_payment), @warnens.sum(:holidays_payment), @warnens.sum(:bonus), @warnens.sum("non_holidays_payment+holidays_payment+bonus"), @warnens.sum(:total) ] , :height => 20, :style => [nil, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom] 
+        sheet.add_row ['','','', 'TOTAL', @warnens.sum(:non_holidays), @warnens.sum(:holidays), @warnens.sum('holidays + non_holidays'), @warnens.sum(:master_weight_loss), @warnens.sum(:weight_loss), @warnens.sum("master_weight_loss-weight_loss"), @warnens.sum(:master_accident), @warnens.sum(:accident),@warnens.sum("master_accident-accident"), @warnens.sum(:master_sparepart), @warnens.sum(:sparepart), @warnens.sum("master_sparepart-sparepart"), @warnens.sum(:master_bon), @warnens.sum(:bon), @warnens.sum("master_bon-bon"), @warnens.sum(:allowance), @warnens.sum(:master_saving), @warnens.sum(:saving_reduction), @warnens.sum(:saving), @warnens.sum("master_saving-saving_reduction+saving"), @warnens.sum("weight_loss+sparepart+accident+bon+saving+allowance"), @warnens.sum(:non_holidays_payment), @warnens.sum(:holidays_payment), @warnens.sum(:bonus), @warnens.sum("non_holidays_payment+holidays_payment+bonus"), @warnens.sum(:total) ] , :height => 20, :style => [nil, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom]
       end
     end
 
@@ -2431,7 +2431,7 @@ end
       p.workbook.add_worksheet(:name => "Kernet") do |sheet|
          bold = sheet.styles.add_style(:b => true)
         bold_top_left_right = sheet.styles.add_style(:b => true, :border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :center, :vertical => :center} )
-        
+
         top_left_right = sheet.styles.add_style(:border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :left} )
         center_top_left_right = sheet.styles.add_style(:border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :center} )
         number_top_left_right = sheet.styles.add_style(:format_code => "#,##0.00", :border => { :style => :thin, :color =>"00000000", :edges => [:top, :left, :right] }, :alignment => { :horizontal => :right} )
@@ -2470,10 +2470,10 @@ end
         sheet.merge_cells "Z8:AC8"
 
         @helpers.order(:id).each_with_index do |driver, i|
-         sheet.add_row ['',i+1, (driver.vehicle.current_id rescue ''), (driver.helper.name rescue ''), driver.non_holidays, driver.holidays, driver.holidays + driver.non_holidays, driver.master_weight_loss, driver.weight_loss, driver.master_weight_loss.to_f - driver.weight_loss.to_f, driver.master_accident, driver.accident, driver.master_accident.to_f - driver.accident.to_f, driver.master_sparepart, driver.sparepart, driver.master_sparepart.to_f - driver.sparepart.to_f, driver.master_bon, driver.bon, driver.master_bon.to_f - driver.bon.to_f, driver.allowance, driver.master_saving, driver.saving_reduction, driver.saving, driver.master_saving.to_f - driver.saving_reduction.to_f + driver.saving.to_f, driver.weight_loss.to_f + driver.sparepart.to_f + driver.accident.to_f + driver.bon.to_f + driver.saving.to_f + driver.allowance.to_f, driver.non_holidays_payment, driver.holidays_payment, driver.bonus, driver.non_holidays_payment.to_f + driver.holidays_payment.to_f + driver.bonus.to_f, driver.total ] , :height => 20, :style => [nil, center_top_left_right, top_left_right, top_left_right, center_top_left_right, center_top_left_right, center_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right] 
+         sheet.add_row ['',i+1, (driver.vehicle.current_id rescue ''), (driver.helper.name rescue ''), driver.non_holidays, driver.holidays, driver.holidays + driver.non_holidays, driver.master_weight_loss, driver.weight_loss, driver.master_weight_loss.to_f - driver.weight_loss.to_f, driver.master_accident, driver.accident, driver.master_accident.to_f - driver.accident.to_f, driver.master_sparepart, driver.sparepart, driver.master_sparepart.to_f - driver.sparepart.to_f, driver.master_bon, driver.bon, driver.master_bon.to_f - driver.bon.to_f, driver.allowance, driver.master_saving, driver.saving_reduction, driver.saving, driver.master_saving.to_f - driver.saving_reduction.to_f + driver.saving.to_f, driver.weight_loss.to_f + driver.sparepart.to_f + driver.accident.to_f + driver.bon.to_f + driver.saving.to_f + driver.allowance.to_f, driver.non_holidays_payment, driver.holidays_payment, driver.bonus, driver.non_holidays_payment.to_f + driver.holidays_payment.to_f + driver.bonus.to_f, driver.total ] , :height => 20, :style => [nil, center_top_left_right, top_left_right, top_left_right, center_top_left_right, center_top_left_right, center_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right, number_top_left_right,number_top_left_right, number_top_left_right]
         end
 
-        sheet.add_row ['','','', 'TOTAL', @helpers.sum(:non_holidays), @helpers.sum(:holidays), @helpers.sum('holidays + non_holidays'), @helpers.sum(:master_weight_loss), @helpers.sum(:weight_loss), @helpers.sum("master_weight_loss-weight_loss"), @helpers.sum(:master_accident), @helpers.sum(:accident),@helpers.sum("master_accident-accident"), @helpers.sum(:master_sparepart), @helpers.sum(:sparepart), @helpers.sum("master_sparepart-sparepart"), @helpers.sum(:master_bon), @helpers.sum(:bon), @helpers.sum("master_bon-bon"), @helpers.sum(:allowance), @helpers.sum(:master_saving), @helpers.sum(:saving_reduction), @helpers.sum(:saving), @helpers.sum("master_saving-saving_reduction+saving"), @helpers.sum("weight_loss+sparepart+accident+bon+saving+allowance"), @helpers.sum(:non_holidays_payment), @helpers.sum(:holidays_payment), @helpers.sum(:bonus), @helpers.sum("non_holidays_payment+holidays_payment+bonus"), @helpers.sum(:total) ] , :height => 20, :style => [nil, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom] 
+        sheet.add_row ['','','', 'TOTAL', @helpers.sum(:non_holidays), @helpers.sum(:holidays), @helpers.sum('holidays + non_holidays'), @helpers.sum(:master_weight_loss), @helpers.sum(:weight_loss), @helpers.sum("master_weight_loss-weight_loss"), @helpers.sum(:master_accident), @helpers.sum(:accident),@helpers.sum("master_accident-accident"), @helpers.sum(:master_sparepart), @helpers.sum(:sparepart), @helpers.sum("master_sparepart-sparepart"), @helpers.sum(:master_bon), @helpers.sum(:bon), @helpers.sum("master_bon-bon"), @helpers.sum(:allowance), @helpers.sum(:master_saving), @helpers.sum(:saving_reduction), @helpers.sum(:saving), @helpers.sum("master_saving-saving_reduction+saving"), @helpers.sum("weight_loss+sparepart+accident+bon+saving+allowance"), @helpers.sum(:non_holidays_payment), @helpers.sum(:holidays_payment), @helpers.sum(:bonus), @helpers.sum("non_holidays_payment+holidays_payment+bonus"), @helpers.sum(:total) ] , :height => 20, :style => [nil, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_center_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom, bold_number_top_left_right_bottom,bold_number_top_left_right_bottom, bold_number_top_left_right_bottom]
       end
     end
     p.use_autowidth = false
@@ -2490,14 +2490,14 @@ end
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
       @invoices = Invoice.where("(date > ? and date < ?) AND deleted = false", @startdate.to_date, @enddate.to_date).order(:customer_id)
-      
+
       @section = "reports1"
       @where = "reports-taxinvoiceitems"
       render "taxinvoiceitems"
     else
       redirect_to root_path()
     end
-      
+
   end
 
   def downloadexcelproductorder
@@ -2510,13 +2510,13 @@ end
     filename = "productorder_" + @date.to_date.strftime('%d%m%Y') + ".xls"
 
     @productgroups = Productgroup.active.order(:name)
-  
+
     green = Axlsx::Color.new :rgb => "FF00FF00"
     red = Axlsx::Color.new :rgb => "FFCC0033"
 
     p = Axlsx::Package.new
     p.workbook.add_worksheet(:name => "Productorder") do |sheet|
-      
+
       bold = sheet.styles.add_style(:b => true)
       right = sheet.styles.add_style(:alignment => {:horizontal => :right})
       right_bold = sheet.styles.add_style(:alignment => {:horizontal => :right}, :b => true)
@@ -2526,7 +2526,7 @@ end
       h3_red = sheet.styles.add_style :color => red, :b => true
       number = sheet.styles.add_style :format_code => "#,##0.00"
       number_bold = sheet.styles.add_style :format_code => "#,##0.00", :b => true
-      
+
       sheet.add_row [''], :height => 20
       sheet.add_row ['', "Dibuat pada Tanggal: #{Date.today.strftime('%d %B %Y')} (#{Time.now.strftime('%H:%M')})"] , :height => 20, :widths => [:auto, :ignore], :style => [nil, bold]
 
@@ -2542,7 +2542,7 @@ end
       @productgroups.each do |group|
 
         @request = Productrequestitem.find_by_sql(["SELECT i.*, r.date from productrequestitems i inner join productrequests r on i.productrequest_id = r.id "+
-                         "where i.product_id in (SELECT id FROM products WHERE productgroup_id = #{group.id}) " + 
+                         "where i.product_id in (SELECT id FROM products WHERE productgroup_id = #{group.id}) " +
                          "AND r.date >= ? and r.date < ? AND r.deleted = false order by r.date", @startdate.to_date, @enddate.to_date + 1.day])
 
         @order = Productorderitem.find_by_sql(["SELECT i.*, r.date from productorderitems i inner join productorders r on i.productorder_id = r.id "+
@@ -2565,11 +2565,11 @@ end
               total_item = item.stockgiven * (item.total/item.quantity)
               total_req += total_item
               grand_total_req += total_item
-              sheet.add_row ['', 
-                            i+1, 
-                            item.productrequest.date.strftime('%d-%m-%Y'), 
-                            item.product.name, 
-                            (item.productrequest.vehicle.current_id if !item.productrequest.vehicle_id.blank?), 
+              sheet.add_row ['',
+                            i+1,
+                            item.productrequest.date.strftime('%d-%m-%Y'),
+                            item.product.name,
+                            (item.productrequest.vehicle.current_id if !item.productrequest.vehicle_id.blank?),
                             to_currency_bank(item.stockgiven),
                             to_currency(item.total / item.quantity),
                             to_currency(total_item) ] , :height => 20, :style => [nil, nil, nil, nil, nil, number, number, number]
@@ -2582,31 +2582,31 @@ end
           @order.each_with_index do |item, i|
             total_order += item.total
             grand_total_order += item.total
-            sheet.add_row ['', 
-                          i+1, 
-                          item.productorder.date.strftime('%d-%m-%Y'), 
-                          item.product.name, 
-                          (item.productorder.productrequest.vehicle.current_id if  !item.productorder.productrequest.blank? and !item.productorder.productrequest.vehicle_id.blank?), 
+            sheet.add_row ['',
+                          i+1,
+                          item.productorder.date.strftime('%d-%m-%Y'),
+                          item.product.name,
+                          (item.productorder.productrequest.vehicle.current_id if  !item.productorder.productrequest.blank? and !item.productorder.productrequest.vehicle_id.blank?),
                           item.quantity,
                           to_currency(item.price_per),
                           to_currency(item.total) ] , :height => 20, :style => [nil, nil, nil, nil, nil, number, number, number]
           end
           sheet.add_row ['', '','','', '', '', '', to_currency(total_order)] , :height => 20, :style => [nil, nil, nil, nil, nil, nil, nil, number_bold]
-    
+
           sheet.add_row ['', '','TOTAL','', '', '', '', to_currency(total_req + total_order)] , :height => 20, :style => [nil, nil, bold, nil, nil, nil, nil, number_bold]
         end
       end
       sheet.add_row [''], :height => 20
       sheet.add_row ['', '','','', '', '', 'Total Permintaan', to_currency(grand_total_req, 'Rp. ')] , :height => 20, :style => [nil, nil, nil, nil, nil, nil, bold, h3_red]
-      sheet.add_row ['', '','','', '', '', 'Total Pembelian', to_currency(grand_total_order, 'Rp. ')] , :height => 20, :style => [nil, nil, nil, nil, nil, nil, bold, h3_red]  
+      sheet.add_row ['', '','','', '', '', 'Total Pembelian', to_currency(grand_total_order, 'Rp. ')] , :height => 20, :style => [nil, nil, nil, nil, nil, nil, bold, h3_red]
 
       p.use_autowidth = false
       p.use_shared_strings = true
-    
-      send_data(p.to_stream.read, :filename => filename, :type => :xls, :x_sendfile => true)  
+
+      send_data(p.to_stream.read, :filename => filename, :type => :xls, :x_sendfile => true)
     end
   end
-  
+
   def estimationincomeexpense
     role = cek_roles 'Admin Keuangan'
 
@@ -2617,11 +2617,11 @@ end
       # superiors = Customer.where("name ~* '.*superior.*' or name ~* '.*indogreen.*' or name ~* '.*PRIORITY ONE.*' or name ~* '.*CORRIN.*' or name ~* '.*FOCCON INTERLITE.*' or name ~* '.*PRIMAVOST.*' or name ~* '.*corin.*' or name ~* '.*focon interlite.*'")
       # foccon = Customer.where("name ~* '.*focon interlite.*'")
       # kosongans = Customer.where("name ~* '.*kosongan.*'")
-      
+
       # superiors.map do |superior|
       #   @is_superior.push(superior.id)
       # end
-  
+
       # kosongans.map do |kosongan|
       #   @is_kosongan.push(kosongan.id)
       # end
@@ -2660,7 +2660,7 @@ end
     formatted_enddate = @enddate.to_date.strftime("%Y-%m-%d")
 		# Saldo Kas
 		@saldoKas = to_currency(Setting.find_by_name("Saldo Kas Kantor").value.to_i) || 0
-    
+
 		# BKK
 		@invoices = Invoice.active.where("(date between ? and ?) AND id in (SELECT invoice_id FROM receipts where deleted = false)",formatted_startdate,formatted_enddate)
 
@@ -2669,13 +2669,13 @@ end
     @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
 	    @invoices.each do |invoice|
 	      # qty = invoice.quantity
-	      # qty -= invoice.receiptreturns.where(:deleted => false).sum(:quantity) if invoice.receiptreturns.where(:deleted => false).any? 
-	      #   if (invoice.route.price_per || 0) >= offset 
+	      # qty -= invoice.receiptreturns.where(:deleted => false).sum(:quantity) if invoice.receiptreturns.where(:deleted => false).any?
+	      #   if (invoice.route.price_per || 0) >= offset
 	      #     estimation = qty * (invoice.route.price_per.to_i || 0)
 	      #   else
 	      #     estimation = qty * 25000 * (invoice.route.price_per.to_i || 0)
 	      #   end
-          
+
 	      @total += invoice.get_estimation(offset,@customer_35)
 	    end
 
@@ -2691,9 +2691,9 @@ end
 			@persentaseBkk = receipt * 100
 			@persentaseBkk /= @totalBkk
 		end
-		
+
 		#BKM
-		@invoicereturns = Invoicereturn.active.where("(date between ? and ?) AND id not in (SELECT id from invoicereturns where id in (SELECT invoicereturn_id FROM receiptreturns where deleted = false))",formatted_startdate,formatted_enddate) 
+		@invoicereturns = Invoicereturn.active.where("(date between ? and ?) AND id not in (SELECT id from invoicereturns where id in (SELECT invoicereturn_id FROM receiptreturns where deleted = false))",formatted_startdate,formatted_enddate)
 		@receiptreturns = Receiptreturn.active.where("created_at between ? and ?",formatted_startdate,formatted_enddate)
 
 		@totalBkm = (@invoicereturns.sum(:quantity)+@receiptreturns.sum(:quantity)).to_f
@@ -2704,12 +2704,12 @@ end
 			@persentaseBkm = receiptreturn * 100
 			@persentaseBkm /= @totalBkm
 		end
- 
+
 		# Surat Jalan
 		taxinvoiceitems = Taxinvoiceitem.active.where("date between ? and ?",formatted_startdate,formatted_enddate).count(:all)
 		# taxgenericitems = Taxgenericitem.active.where("(date ? and ?)").count(:all)
 		@totalDitagihkan = Taxinvoiceitem.active.where("(date between ? and ?) AND invoice_id IS NOT NULL",formatted_startdate, formatted_enddate).count(:all)
-		
+
 		@totalSuratjalan = taxinvoiceitems #+ taxgenericitems
 		if @totalSuratjalan == 0
 			@persentaseSuratJalan = 0
@@ -2730,7 +2730,7 @@ end
 		else
 			@persentaseInvoice = (totalRupiahPaidInvoice.to_f / totalRupiahInvoice.to_f)*100
 		end
- 
+
 		@invoicenotpaids = Taxinvoice.active.where("paiddate IS NULL").limit(100).order('period_end asc')
 
     @section = "estimationreport"
@@ -2740,19 +2740,19 @@ end
 
   def shrinkreport
     role = cek_roles 'Admin Keuangan'
-		
+
     @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
     @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
 
 #    @taxinvoiceitems = Taxinvoiceitem.where('date BETWEEN :startdate AND :enddate and deleted = false', {:startdate => @startdate.to_date, :enddate => @enddate.to_date}).order(:invoice_id)
-		
+
 		@taxinvoiceitems = Taxinvoiceitem.where('invoice_id in (SELECT id FROM invoices where date BETWEEN :startdate AND :enddate and deleted = false)', {:startdate => @startdate.to_date, :enddate => @enddate.to_date}).order(:invoice_id)
 
     respond_to :html
-		
+
 		@section = "reports2"
 		@where = 'shrinkreport'
-  end  
+  end
 
   def driver_rit
     role = cek_roles 'Admin HRD, Admin Keuangan, Admin Operasional'
@@ -2793,14 +2793,14 @@ end
       # if @tanktype.present? and @tanktype != 'all'
       #   @vehicles = @vehicles.where('platform_type = ?', @tanktype)
       # end
-    
+
       @section = "reports2"
       @where = "annualreport-vehicle"
       # render "indexannualreport-vehicle"
 
       # render json: @vehiclegroups
       # return false
-      
+
     else
       redirect_to root_path()
     end
@@ -2819,25 +2819,25 @@ end
 
       @vehiclegroups= Vehiclegroup.where(:deleted => false).order(:name)
       @vehicles = Vehicle.active.all(:order=>:current_id)
-    
+
       @section = "reports2"
       @where = "incomeexpenseestimation_vehicle"
       # render "indexannualreport-vehicle"
 
       # render json: @vehiclegroups
       # return false
-    
+
     else
       redirect_to root_path()
     end
   end
-    
+
   def unpaid_invoice
-    
+
     role = cek_roles 'Admin Keuangan, Auditor'
-      
+
     if role
-      
+
       @month = params[:month]
       @month = "%02d" % Date.today.month.to_s if @month.nil?
       @day = "01"
@@ -2859,8 +2859,8 @@ end
 
       if @customer.present?
         @taxinvoices = @taxinvoices.where("customer_id = ?", @customer.id)
-      end  
-      
+      end
+
       if params[:due_date_order].present?
         if params[:due_date_order] == "asc"
           @taxinvoices = @taxinvoices.order("((case when sentdate is not null then sentdate else date end) + (interval '1' day * COALESCE(customers.terms_of_payment_in_days,0))) asc")
@@ -2873,18 +2873,18 @@ end
       # render json: @taxinvoices
       @section = "reports2"
       @where = "reports-unpaidinvoice"
-        
+
     else
       redirect_to root_path()
     end
-  end    
-  
+  end
+
   def paid_invoice
-    
+
     role = cek_roles 'Admin Keuangan, Auditor'
-      
+
     if role
-      
+
       @month = params[:month]
       @month = "%02d" % Date.today.month.to_s if @month.nil?
       @day = "01"
@@ -2906,8 +2906,8 @@ end
 
       if @customer.present?
         @taxinvoices = @taxinvoices.where("customer_id = ?", @customer.id)
-      end  
-      
+      end
+
       if params[:due_date_order].present?
         if params[:due_date_order] == "asc"
           @taxinvoices = @taxinvoices.order("((case when sentdate is not null then sentdate else date end) + (interval '1' day * COALESCE(customers.terms_of_payment_in_days,0))) asc")
@@ -2920,11 +2920,11 @@ end
       # render json: @taxinvoices
       @section = "reports2"
       @where = "reports-paidinvoice"
-        
+
     else
       redirect_to root_path()
     end
-  end    
+  end
 
   def estimation_event_expense_backup
     role = cek_roles 'Admin Keuangan'
@@ -2959,11 +2959,11 @@ end
         customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
         invoice_summary = event.invoices.active.map do |invoice|
           quantity = invoice.quantity - (invoice.receiptreturns.where(:deleted => false).sum(:quantity).to_i)
-          if price_per >= offset 
+          if price_per >= offset
             estimation = quantity * price_per
           elsif customer_35.include? invoice.customer_id
             estimation = quantity * 20000 * price_per
-          elsif(invoice.invoicetrain && invoice.isotank_id.to_i != 0 && price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg 
+          elsif(invoice.invoicetrain && invoice.isotank_id.to_i != 0 && price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg
             estimation = quantity * 20000 * price_per
           else
             estimation = quantity * 25000 * price_per
@@ -2975,7 +2975,7 @@ end
           tol_asdp += invoice.tol_fee.to_i + invoice.ferry_fee.to_i
           invoice_total += invoice.total.to_i
           total_estimation += estimation
-          
+
           total_quantity += quantity
 
           {
@@ -3022,11 +3022,11 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def estimation_event_expense
-    role = cek_roles 'Admin Keuangan'
+    role = cek_roles 'Admin Keuangan, Estimasi'
     if role
       offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
 
@@ -3034,12 +3034,12 @@ end
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
-      
+
       @customer_id = params[:customer_id]
       @routetrain_id = params[:routetrain_id]
 
       @customers = Customer.where('id in (select customer_id from events where deleted = false and start_date between ? and ?)', @startdate.to_date, @enddate.to_date).order(:name)
-      
+
       @eventsa = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date).order(:start_date)
 
       @transporttype = params[:transporttype]
@@ -3081,7 +3081,7 @@ end
 
       # render json: params
       # return false
-      
+
       global_supir = 0
       global_kernet = 0
       global_solar = 0
@@ -3114,24 +3114,24 @@ end
         event_price_per_type = event.price_per_type rescue 'KG'
         event_tonage = event.estimated_tonage.to_i rescue 0
 
-        # if price_per >= offset 
+        # if price_per >= offset
         #   estimation = quantity * price_per
         # elsif customer_35.include? event.customer_id
         #   estimation = quantity * 20000 * price_per
-        # elsif(price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg 
+        # elsif(price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg
         #   estimation = quantity * event_tonage * price_per
         # else
         #   estimation = quantity * event_tonage * price_per
         # end
 
-        if price_per >= offset 
+        if price_per >= offset
           estimation = quantity * price_per
         elsif customer_35.include? event.customer_id
-          estimation = quantity * 20000 * price_per  
+          estimation = quantity * 20000 * price_per
         else
           estimation = quantity * event_tonage *  price_per
         end
-        
+
         global_supir += supir
         global_kernet += kernet
         global_solar += solar
@@ -3182,7 +3182,7 @@ end
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def get_routetrains
@@ -3218,4 +3218,3 @@ end
     end
   end
 end
-

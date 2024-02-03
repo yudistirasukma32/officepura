@@ -237,13 +237,13 @@
 			</li>
 			
 			<li class="<%= @section == 'estimationreport' ? 'on' : '' %>">
-			<%= link_to_if (checkrole 'Admin Keuangan'), "Estimasi", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('estimationreport');".html_safe %>
+			<%= link_to_if (checkrole 'Admin Keuangan, Estimasi'), "Estimasi", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('estimationreport');".html_safe %>
 			
 				<ul id="sub-estimationreport" class="submenu" style="width:220px;">
-					<li><%= link_to_if (checkrole 'Admin Keuangan'), "Dashboard Estimasi", "/reports/estimationdashboard" %></li>
-					<li><%= link_to_if (checkrole 'Admin Keuangan'), "Estimasi Pendapatan BKK", "/reports/estimation" %></li>
-					<li><%= link_to_if (checkrole 'Admin Keuangan'), "Perbandingan BKK & Estimasi", "/reports/estimation-income-expense" %></li>
-					<li><%= link_to_if (checkrole 'Admin Keuangan'), "Perbandingan BKK & DO", "/reports/estimation-event-expense" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi'), "Dashboard Estimasi", "/reports/estimationdashboard" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi'), "Estimasi Pendapatan BKK", "/reports/estimation" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi'), "Perbandingan BKK & Estimasi", "/reports/estimation-income-expense" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi'), "Perbandingan BKK & DO", "/reports/estimation-event-expense" %></li>
 				</ul>
 			</li>
 
