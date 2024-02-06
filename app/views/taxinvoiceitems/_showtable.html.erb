@@ -33,10 +33,10 @@
         
             <% else %>
         
-                <% if invoice.invoices.any? %>
+                <% if invoice.invoices.active.any? %>
                     <% run = true %>
-                    <% second_driver = invoice.invoices.first.driver.name %>
-                    <% second_nopol = invoice.invoices.first.vehicle.current_id %>
+                    <% second_driver = invoice.invoices.active.first.driver.name %>
+                    <% second_nopol = invoice.invoices.active.first.vehicle.current_id %>
 
                 <% else %>
                     <% run = false %>
@@ -135,7 +135,7 @@
                 <% end %>    
             </td>
         </tr>
-        <% inv_bongkar = Invoice.where("invoice_id = ?", invoice.id) %>
+        <% inv_bongkar = Invoice.where("invoice_id = ? AND deleted=FALSE", invoice.id) %>
         <% if inv_bongkar.present? %>
         <tr>
             <td></td>
