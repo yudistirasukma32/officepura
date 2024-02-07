@@ -87,7 +87,7 @@
                 <% total = 0 %>
                 <tbody>
                 <% @taxinvoices.each_with_index do |taxinvoice| %>
-                <% total = total + taxinvoice.total - taxinvoice.downpayment %>
+                <% total = total + taxinvoice.total - taxinvoice.downpayment - taxinvoice.secondpayment %>
                     <tr>
                         <td><%= taxinvoice.customer.name%>&nbsp;<% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
                         <td align=""><%= taxinvoice.long_id %></td>
