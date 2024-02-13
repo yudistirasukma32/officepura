@@ -4,11 +4,16 @@
     <%= f.text_field :name %>
 	</div>
 
-  <div class="field-row first">
+	<div class="field-row first">
+    <%= f.label :industry, "Industri" %>
+    <%= f.select :industry, options_for_select(@industries, @commodity.industry), {}, {:class => 'half chzn-select'} %>
+	</div>
+
+	<div class="field-row first">
     <%= f.label :insurance_amount, "Besaran Asuransi" %>
     <%= f.text_field :insurance_amount, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => @commodity.insurance_amount.to_i %>
 	</div>
-  
+
   <div class="actions">
     <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Marketing' %>
     <a class="back left" href="<%=commodities_path%>">Kembali ke Index</a>

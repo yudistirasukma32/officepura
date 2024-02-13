@@ -13,6 +13,27 @@ class ReportsController < ApplicationController
     redirect_to '/reports/expenses-daily'
   end
 
+  def revenuebreakdown
+    @customer_id = params[:customer_id].present? ? params[:customer_id] : nil
+    @commodity_id = params[:commodity_id].present? ? params[:commodity_id] : nil
+
+    @month = params[:month]
+    @month = "%02d" % Date.today.month.to_s if @month.nil?
+    @year = params[:year]
+    @year = Date.today.year if @year.nil?
+
+    @monthEnd = params[:monthEnd]
+    @monthEnd = "%02d" % Date.today.month.to_s if @monthEnd.nil?
+    @dayEnd = getlastday (@monthEnd.to_s)
+    @yearEnd = params[:yearEnd]
+    @yearEnd = Date.today.year if @yearEnd.nil?
+
+    @events = Event.active.where("start_date BETWEEN ? AND ?", "#{@year}-#{@month}-01","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
+    @events = @events.where("customer_id=?", @customer_id) if @customer_id.present?
+    @events = @events.where("commodity_id=?", @commodity_id) if @commodity_id.present?
+
+  end
+
   def estimation
     role = cek_roles 'Admin Keuangan, Estimasi'
     if role

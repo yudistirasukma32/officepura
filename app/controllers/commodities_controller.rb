@@ -7,6 +7,14 @@ class CommoditiesController < ApplicationController
   def set_section
     @section = "masters"
     @where = "commodities"
+
+    @industries = [
+      ["Pilih Industri", nil],
+      ["Industri Kimia", "Industri Kimia"],
+      ["Industri Agri", "Industri Agri"],
+      ["Industri Konsumer", "Industri Konsumer"],
+      ["Lainnya", "Lainnya"]
+    ]
   end
 
   def set_role
@@ -65,14 +73,14 @@ class CommoditiesController < ApplicationController
     @commodity.deleted = true
     @commodity.save
     redirect_to(commodities_url)
-  end  
-  
+  end
+
   def enable
     @commodity = Commodity.find(params[:id])
     @commodity.update_attributes(:enabled => true)
     redirect_to(commodities_url)
   end
-  
+
   def disable
     @commodity = Commodity.find(params[:id])
     @commodity.update_attributes(:enabled => false)

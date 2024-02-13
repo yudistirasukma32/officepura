@@ -1,0 +1,119 @@
+<%= content_for :css do %>
+  <style>
+    #main #filter {
+      height: 80px;
+    }
+  </style>
+<% end %>
+  <%= render "shared/header" %>
+    
+  <div id="nav">
+    <%= render "shared/nav" %>
+  </div>
+
+  <div id="main">
+
+    <div id="content-full">
+      <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+      <h1><%=Setting.find_by_name("Client Name").value%> / Revenue Breakdown: <span class="red"><%=@year%></span></h1>
+
+      <br class="clearfix" />
+      
+      <div id="filter">
+        <form id="filterform" name="filterform" action="" method="get">
+          <div class="field-row continue">
+            <label for="customer_id" style="width: 72px;">Pelanggan</label>
+              <select name="customer_id" class="third left">
+                <option value="">Semua Pelanggan</option>
+                <% Customer.active.order(:name).each do |customer| %>
+                  <option value="<%=customer.id%>"<% if customer.id == @customer_id.to_i %> selected='selected'<% end %>><%=customer.name%></option>
+                <% end %>
+              </select>
+            <label for="date" class="middle" style="width: 64px;">Periode</label>
+              <select name="month" class="half left" style="margin-right:10px;">
+                <% (1.upto(12)).each do |m| %>
+                <option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+                <% end %>
+              </select>
+              <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+                <select name="year" class="short left">
+                  <% (Date.today.year.downto(year_to)).each do |y| %>
+                    <option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+                  <% end %>
+                </select>
+              <label for="date" class="middle" style="width: 64px;">Sampai</label>
+                <select name="monthEnd" class="half left" style="margin-right:10px;">
+                  <% (1.upto(12)).each do |m| %>
+                    <option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @monthEnd %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+                  <% end %>
+                </select>
+              <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+                <select name="yearEnd" class="short left">
+                  <% (Date.today.year.downto(year_to)).each do |y| %>
+                    <option value="<%=y%>"<% if y.to_s == @yearEnd %> selected='selected'<% end %>><%=y%></option>
+                  <% end %>
+                </select>
+            </div>
+          <div class="field-row continue">
+            <label for="commodity_id" style="width: 80px;">Komoditas</label>
+              <select name="commodity_id" class="third left">
+                <option value="">Semua Komoditas</option>
+                <% Commodity.active.order(:name).each do |comodity| %>
+                  <option value="<%= comodity.id %>"<% if comodity.id == @commodity_id.to_i %> selected='selected'<% end %>><%= comodity.name %></option>
+                <% end %>
+              </select>
+            <input class="submit left" type="submit" value="Filter" />
+          </div>
+        </form>
+      </div>
+
+      <br class="clearfix" />
+      <%#= Taxinvoiceitem.active.joins(:taxinvoice).where("taxinvoices.paiddate IS NOT NULL").pluck(:id) %>
+      
+      <table class="row-view tablesorter">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th class="{sorter:true, filter: false}" >Tanggal</th>
+            <th class="center {sorter:true, filter: false}" >Pelanggan</th>
+            <th class="{sorter:true, filter: false}">Bahan Ditransport</th>
+            <th width="80" class="center {sorter:true, filter: false}">Industri</th>
+            <th width=150 class="{sorter:true, filter: false} center">Total Revenue (dalam Rupiah)</th>
+            <th class="{sorter:false, filter: false} center">Total Volume</th>
+          </tr>
+        </thead>
+        <% total_revenue, total_volume = 0,0 %>
+        <tbody>
+          <% @events.each_with_index do |event, i| %>
+            <%
+              invoice_ids = event.invoices.pluck(:id)
+              taxinvoiceitem_ids = Taxinvoiceitem.active.joins(:taxinvoice).where("taxinvoices.paiddate IS NOT NULL AND taxinvoiceitems.invoice_id IN (?)", invoice_ids).pluck(:id)
+              volume = Taxinvoiceitem.where(id: taxinvoiceitem_ids).sum(:weight_net)
+            %>
+            <% if taxinvoiceitem_ids.size > 0 %>
+              <%
+                total_revenue += event.invoices.sum(:total)
+                total_volume += volume
+              %>
+              <tr>
+                <td><%= i+1 %>.</td>
+                <td><%= event.start_date.strftime("%d-%m-%Y") rescue nil %></td>
+                <td><%= event.customer.name rescue nil %></td>
+                <td><%= event.commodity.name rescue nil %></td>
+                <td><%= event.commodity.industry rescue nil %></td>
+                <td class="right"><%= to_currency(event.invoices.sum(:total)) %></td>
+                <td class="right"><%= to_currency(volume) %> <%= event.price_per_type == 'BORONGAN' ? ('(' + event.price_per_type + ')') : event.price_per_type %></td>
+              </tr>
+            <% end %>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5"><strong>Total</strong></td>
+            <td align="right"><strong><%= to_currency(total_revenue) %></strong></td>
+            <!-- <td align="right"><strong><%= to_currency(total_volume) %></strong></td> -->
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>

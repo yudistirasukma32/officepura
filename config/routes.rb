@@ -1,6 +1,10 @@
 OfficePuraErp::Application.routes.draw do
 
   get "debug", to: "dashboards#debug"
+
+
+
+
   resources :legalities do
     member do
       get 'enable'
@@ -113,6 +117,7 @@ OfficePuraErp::Application.routes.draw do
     member do
       get 'enable'
       get 'disable'
+
       get "copy"
     end
     collection do
@@ -667,6 +672,7 @@ OfficePuraErp::Application.routes.draw do
 
     match 'estimation-income-expense' => 'reports#estimationincomeexpense'
     match 'estimationdashboard' => 'reports#estimationdashboard'
+    match 'revenue-breakdown' => 'reports#revenuebreakdown'
     match 'estimation-event-expense' => 'reports#estimation_event_expense'
 
     match 'shrinkreport' => 'reports#shrinkreport'

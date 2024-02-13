@@ -232,6 +232,7 @@
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Operasional BKK'), "Solar Gantungan", "/reports/gas-leftovers" %></li>
 					<li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin HRD, Admin Operasional' || current_user.owner), "Laporan Rit Sopir", "/reports/driver-rit" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin HRD, Admin Operasional' || current_user.owner), "Revenue Breakdown", "/reports/revenue-breakdown" %></li>
 					
 				</ul>
 			</li>

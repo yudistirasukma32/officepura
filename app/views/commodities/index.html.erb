@@ -21,6 +21,7 @@
 			<thead>
 			<tr>
 				<th>Nama</th>
+				<th>Industri</th>
 				<th width="60" data-sorter="false" class="sorter-false">Aktif</th>
 				<th width="60" class="{sorter: false}"></th>
 			</tr>
@@ -32,6 +33,7 @@
 				<% if current_user.adminrole %>
 				<tr class="deleted">
 					<td><%= commodity.name %></td>
+					<td><%= commodity.industry rescue nil %></td>
 					<% if commodity.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
 					<% else %>
@@ -44,6 +46,7 @@
 				<% if checkrole 'Admin Kendaraan' %>
 				<tr>
 					<td><%= commodity.name %></td>
+					<td><%= commodity.industry rescue nil %></td>
 					<% if commodity.enabled %>
 					<td><%= link_to '&#xf058;'.html_safe, disable_commodity_path(commodity), :class => 'enabled tipsy', :title => 'Non Aktifkan' %></td>
 					<% else %>
