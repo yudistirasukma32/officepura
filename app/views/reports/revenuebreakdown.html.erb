@@ -78,30 +78,32 @@
             <th class="center {sorter:true, filter: false}" >Pelanggan</th>
             <th class="{sorter:true, filter: false}">Bahan Ditransport</th>
             <th width="80" class="center {sorter:true, filter: false}">Industri</th>
-            <th width=150 class="{sorter:true, filter: false} center">Total Revenue (dalam Rupiah)</th>
-            <th class="{sorter:false, filter: false} center">Total Volume</th>
+            <th width=150 class="{sorter:true, filter: false} right">Total Revenue (dalam Rupiah)</th>
+            <th class="{sorter:false, filter: false} right">Total Volume</th>
           </tr>
         </thead>
-        <% total_revenue, total_volume = 0,0 %>
+        <% total_revenue, total_volume, j = 0,0,0 %>
         <tbody>
           <% @events.each_with_index do |event, i| %>
             <%
-              invoice_ids = event.invoices.pluck(:id)
+              invoice_ids = event.invoices.active.pluck(:id)
               taxinvoiceitem_ids = Taxinvoiceitem.active.joins(:taxinvoice).where("taxinvoices.paiddate IS NOT NULL AND taxinvoiceitems.invoice_id IN (?)", invoice_ids).pluck(:id)
               volume = Taxinvoiceitem.where(id: taxinvoiceitem_ids).sum(:weight_net)
+              revenue = Taxinvoiceitem.where(id: taxinvoiceitem_ids).sum(:total)
             %>
             <% if taxinvoiceitem_ids.size > 0 %>
               <%
-                total_revenue += event.invoices.sum(:total)
+                total_revenue += revenue
                 total_volume += volume
+                j += 1
               %>
               <tr>
-                <td><%= i+1 %>.</td>
+                <td><%= j %>.</td>
                 <td><%= event.start_date.strftime("%d-%m-%Y") rescue nil %></td>
                 <td><%= event.customer.name rescue nil %></td>
                 <td><%= event.commodity.name rescue nil %></td>
                 <td><%= event.commodity.industry rescue nil %></td>
-                <td class="right"><%= to_currency(event.invoices.sum(:total)) %></td>
+                <td class="right"><%= to_currency(revenue) %></td>
                 <td class="right"><%= to_currency(volume) %> <%= event.price_per_type == 'BORONGAN' ? ('(' + event.price_per_type + ')') : event.price_per_type %></td>
               </tr>
             <% end %>
