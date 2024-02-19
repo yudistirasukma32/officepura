@@ -159,6 +159,7 @@
 		    <th width="40" style="padding-left:10px; text-align:center">Tarif</th>
 		    <th colspan="2" style="text-align:center">Jurusan</th>
 		    <th width="70" style="text-align:center">Total</th>
+			<th width="20" class="d-none-print"></th>
 		  </tr>
 		  <% subtotal = 0 %>
 		  <% weight_gross = 0 %>
@@ -205,6 +206,11 @@
 					<% end %>
 					</td>
 					<td align="right"><%= to_currency(taxinvoiceitem.total)%>  </td>
+					<td class="d-none-print">
+						<a href="/taxinvoiceitems/new/<%=taxinvoiceitem.invoice_id%>" class="delete tipsy" title="Detail SJ">
+							<i class="icon-print"></i>
+						</a>
+					</td>
 				</tr>
 			 <% end %>
 			 <% @taxinvoice.taxinvoiceitemvs.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
