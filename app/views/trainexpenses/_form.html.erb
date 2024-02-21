@@ -99,9 +99,17 @@
         <th width="160" class="right" style="padding-right:5px;">Total</th>
       </tr>
 
+      <%
+        routetrain_price = @invoice.routetrain.price_per.to_i
+        containerex_ids = Container.active.where("containernumber ILIKE 'A%'").pluck(:id)
+        containerex_ids.push(0)
+        if @invoice.routetrain.operator_id == 2 && @invoice.container_id.present? && containerex_ids.exclude?(@invoice.container_id)
+          routetrain_price = Setting.find_by_name("Harga Jurusan BKE").value.to_i
+        end
+      %>
       <tr>
         <td><%= f.label :price_per, "Tarif" %></td>
-        <td><%= f.text_field :price_per, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per.to_i), :readOnly => 'true' %></td>
+        <td><%= f.text_field :price_per, :class => 'half disabled allowance-field', :value => to_currency(routetrain_price), :readOnly => 'true' %></td>
       </tr>
       <tr>
         <td><%= f.label :misc_total, "Lain-lain" %></td>
@@ -114,7 +122,7 @@
 
       <tr class="total-row">
         <td><%= f.label :total, "Total" %></td>
-        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per.to_i), :readOnly => 'true' %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(routetrain_price), :readOnly => 'true' %></td>
       </tr>
     </table>
 
