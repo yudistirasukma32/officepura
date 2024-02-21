@@ -327,6 +327,16 @@
 </div>
 
 <div class="field-row continue" style="padding-bottom:10px;">
+  <label style="color:#000; font-weight:700;">Qty Muat</label>
+  <input type="checkbox" id="is_showqty_loaded" name="is_showqty_loaded" value="Yes" <% if @taxinvoice.is_showqty_loaded %> checked="checked"<% end %> /> &nbsp; Tampilkan quantity muat saat print invoice &nbsp; 
+</div>
+
+<div class="field-row continue" style="padding-bottom:10px;">
+  <label style="color:#000; font-weight:700;">Qty Bongkar</label>
+  <input type="checkbox" id="is_showqty_unloaded" name="is_showqty_unloaded" value="Yes" <% if @taxinvoice.is_showqty_unloaded %> checked="checked"<% end %> /> &nbsp; Tampilkan quantity bongkar saat print invoice &nbsp; 
+</div>
+
+<div class="field-row continue" style="padding-bottom:10px;">
   <label style="color:#000; font-weight:700;">Pembulatan Nominal</label>
   <input type="checkbox" id="is_rounded" name="pembulatan" onclick="bulatkan()" /> &nbsp; Bulatkan angka - angka yang bernilai Decimal &nbsp; 
 </div>

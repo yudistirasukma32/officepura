@@ -43,7 +43,7 @@ class TaxinvoicesController < ApplicationController
     @taxinvoices = Taxinvoice.active
     @taxinvoices = @customer.taxinvoices.active if @customer
     @taxinvoices = @taxinvoices.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}").order(:long_id)
-     
+
     if params[:process] == 'payment'
       @taxinvoices.each do |taxinvoice|
         if params["cb_" + taxinvoice.id.to_s] == 'on'
@@ -83,12 +83,12 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.period_start = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).minimum(:date) || Date.today.strftime('%d-%m-%Y')
       @taxinvoice.period_end = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).maximum(:date) || Date.today.strftime('%d-%m-%Y')
       @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
-      @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / ' + Date.today.year.to_s 
+      @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / ' + Date.today.year.to_s
 
       if params[:update] == 'true'
         @taxinvoiceitems.each do |item|
           item.price_per = item.invoice.route.price_per.to_f
-          if item.is_gross 
+          if item.is_gross
             item.total = item.weight_gross.to_i * item.price_per.to_f
           elsif item.is_wholesale
             item.total = item.wholesale_price.to_f
@@ -139,7 +139,7 @@ class TaxinvoicesController < ApplicationController
     if params[:update] == 'true'
       @taxinvoiceitems.each do |item|
         item.price_per = item.invoice.route.price_per.to_f
-        if item.is_gross 
+        if item.is_gross
           item.total = item.weight_gross.to_i * item.price_per.to_f
         elsif item.is_wholesale
           item.total = item.wholesale_price.to_f
@@ -155,14 +155,14 @@ class TaxinvoicesController < ApplicationController
       insurance_cost = 0
       insurance_cost += @taxinvoice.insurance_cost.to_i
       subtotal -=insurance_cost
-        
+
         #ppn_new
         ppn = Setting.where(name: 'ppn')
         ppn = ppn.blank? ? 10 : ppn[0].value
-      
+
       @taxinvoice.gst_tax = @taxinvoice.gst_tax.to_f > 0 ? subtotal.to_f * (ppn.to_f / 100) : 0
       @taxinvoice.price_tax = @taxinvoice.price_tax.to_f > 0 ? subtotal.to_f * 0.02 : 0
-      
+
       @taxinvoice.total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f
 
       @taxinvoice.user_id = current_user.id
@@ -186,7 +186,7 @@ class TaxinvoicesController < ApplicationController
       end
     end
 
-    
+
   end
 
   def updateitems
@@ -196,7 +196,7 @@ class TaxinvoicesController < ApplicationController
     @customer = Customer.find(params[:customer_id]) rescue nil
 
     customer_wholesaleprice = @customer.wholesale_price if !@customer.nil?
-    
+
     if @customer
       if params[:process] == "edit"
         @taxinvoice = Taxinvoice.find(params[:id])
@@ -209,7 +209,7 @@ class TaxinvoicesController < ApplicationController
         @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date)
         @taxinvoiceitemvs = @customer.taxinvoiceitemvs.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date)
         @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
-        @long_id = ("%04d" % @long_id.to_s) + ' / TGH / RDPI / ' + romenumber + ' / ' + Date.today.year.to_s 
+        @long_id = ("%04d" % @long_id.to_s) + ' / TGH / RDPI / ' + romenumber + ' / ' + Date.today.year.to_s
         @taxinvoice = Taxinvoice.new
         @taxinvoice.long_id = params[:long_id]
       end
@@ -239,6 +239,8 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.description = params[:description]
       @taxinvoice.price_by = params[:price_by]
       @taxinvoice.is_weightlost = params[:is_weightlost] == "Yes" ? true : false
+      @taxinvoice.is_showqty_loaded = params[:is_showqty_loaded] == "Yes" ? true : false
+      @taxinvoice.is_showqty_unloaded = params[:is_showqty_unloaded] == "Yes" ? true : false
       @taxinvoice.sentdate = params[:sentdate]
       @taxinvoice.insurance_cost = params[:insurance_cost]
       @taxinvoice.remarks = params[:remarks]
@@ -247,7 +249,7 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.bank_id = params[:bank_id]
       @taxinvoice.booking_code = params[:booking_code]
       @taxinvoice.save
-      
+
       if @taxinvoiceitems && @taxinvoiceitems.any?
         @taxinvoiceitems.each do |taxinvoiceitem|
           if params["cb_" + taxinvoiceitem.id.to_s] == 'on'
@@ -256,7 +258,7 @@ class TaxinvoicesController < ApplicationController
             taxinvoiceitem.save
           else
             taxinvoiceitem.taxinvoice_id = nil
-            taxinvoiceitem.save 
+            taxinvoiceitem.save
           end
         end
       end
@@ -299,11 +301,11 @@ class TaxinvoicesController < ApplicationController
             taxinvoiceitem.total = total
 
           end
-          
+
           taxinvoiceitem.save
         else
           taxinvoiceitem.taxinvoice_id = nil
-          taxinvoiceitem.save 
+          taxinvoiceitem.save
         end
       end
 
@@ -315,7 +317,7 @@ class TaxinvoicesController < ApplicationController
             taxinvoiceitemv.save
           else
             taxinvoiceitemv.taxinvoice_id = nil
-            taxinvoiceitemv.save 
+            taxinvoiceitemv.save
           end
         end
       end
@@ -358,13 +360,13 @@ class TaxinvoicesController < ApplicationController
             taxinvoiceitemv.total = total
 
           end
-          
+
           taxinvoiceitemv.save
         else
           taxinvoiceitemv.taxinvoice_id = nil
-          taxinvoiceitemv.save 
+          taxinvoiceitemv.save
         end
-      end    
+      end
 
       #update total and tax
       if @taxinvoice.taxinvoiceitems.minimum("date").present? && @taxinvoice.taxinvoiceitemvs.minimum("date").present?
@@ -378,7 +380,7 @@ class TaxinvoicesController < ApplicationController
       end
 
       if @taxinvoice.taxinvoiceitems.maximum("date").present? && @taxinvoice.taxinvoiceitemvs.maximum("date").present?
-        if @taxinvoice.taxinvoiceitems.maximum("date").to_date > @taxinvoice.taxinvoiceitemvs.maximum("date").to_date 
+        if @taxinvoice.taxinvoiceitems.maximum("date").to_date > @taxinvoice.taxinvoiceitemvs.maximum("date").to_date
           period_end =  @taxinvoice.taxinvoiceitems.maximum("date")
         else
           period_end =  @taxinvoice.taxinvoiceitemvs.maximum("date")
@@ -392,14 +394,14 @@ class TaxinvoicesController < ApplicationController
 
       # subtotal = subtotal.to_i
       extra_cost = @taxinvoice.extra_cost.to_f
-      
+
       @taxinvoice.period_start = period_start
       @taxinvoice.period_end = period_end
 
         #ppn_new
         ppn = Setting.where(name: 'ppn')
-        ppn = ppn.blank? ? 10 : ppn[0].value    
-        
+        ppn = ppn.blank? ? 10 : ppn[0].value
+
       subtotal += extra_cost
       ppn_percentage = params[:gst_tax].to_f
       if ppn_percentage > 0
@@ -407,25 +409,25 @@ class TaxinvoicesController < ApplicationController
       else
         @taxinvoice.gst_tax = 0
       end
-      
+
       @taxinvoice.gst_percentage = ppn_percentage
       if params[:price_tax] == "Yes"
-            @taxinvoice.price_tax = subtotal.to_f * 0.02 
+            @taxinvoice.price_tax = subtotal.to_f * 0.02
       else
         @taxinvoice.price_tax = 0
       end
-      
+
       total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f
 
       total = total - @taxinvoice.insurance_cost - @taxinvoice.claim_cost
-      
+
       if params[:pembulatan].present?
         total = total.round()
       end
 
       @taxinvoice.total = total
       @taxinvoice.total_in_words = moneytowordsrupiah(@taxinvoice.total)
- 
+
       @taxinvoice.save
 
       createbankexpenserecord @taxinvoice.id, true
@@ -438,7 +440,7 @@ class TaxinvoicesController < ApplicationController
       #   }
       #   return false
       # end
-      # render json: 
+      # render json:
       # return false
       redirect_to(taxinvoices_url, :notice => "Data Invoice untuk pelanggan<br /><strong class='yellow'>#{@customer.name}</strong><br />sukses disimpan.".html_safe)
     end
@@ -450,8 +452,8 @@ class TaxinvoicesController < ApplicationController
     @sj_images = Attachment.where("imageable_id IN (?)", @invoice_images)
     # render json: @sj_images
     # return false
-    
-    grandtotal = @taxinvoice.total - @taxinvoice.total.to_i 
+
+    grandtotal = @taxinvoice.total - @taxinvoice.total.to_i
     @is_pembulatan = (grandtotal == 0)
     # @decimal_place = is_pembulatan ? 0 : 2
     # render json: {
@@ -473,8 +475,8 @@ class TaxinvoicesController < ApplicationController
     # return false
 
 
-    
-    grandtotal = @taxinvoice.total - @taxinvoice.total.to_i 
+
+    grandtotal = @taxinvoice.total - @taxinvoice.total.to_i
     @is_pembulatan = (grandtotal == 0)
     # @decimal_place = is_pembulatan ? 0 : 2
     # render json: {
@@ -490,7 +492,7 @@ class TaxinvoicesController < ApplicationController
 
   def printreceipt
     @taxinvoice = Taxinvoice.find(params[:id])
-    grandtotal = @taxinvoice.total - @taxinvoice.total.to_i 
+    grandtotal = @taxinvoice.total - @taxinvoice.total.to_i
     @is_pembulatan = (grandtotal == 0)
     # @decimal_place = is_pembulatan ? 0 : 2
     # render json: {
@@ -502,7 +504,7 @@ class TaxinvoicesController < ApplicationController
     # }
     # return false
     respond_to :html
-  end  
+  end
 
   def gettaxinvoiceitems
     @customer = Customer.find(params[:customer_id]) rescue nil
@@ -521,7 +523,7 @@ class TaxinvoicesController < ApplicationController
         itemv.is_wholesale = true
       end
     end
-    render :json => {:success => true, :html => render_to_string(:partial => "taxinvoices/additionalitem"), :layout => false}.to_json; 
+    render :json => {:success => true, :html => render_to_string(:partial => "taxinvoices/additionalitem"), :layout => false}.to_json;
   end
 
   def payment
@@ -539,7 +541,7 @@ class TaxinvoicesController < ApplicationController
     inputs = params[:taxinvoice]
 
     @taxinvoice = Taxinvoice.find(inputs[:taxinvoice_id]) rescue nil
-    @taxinvoice.paiddate = inputs[:paiddate]    
+    @taxinvoice.paiddate = inputs[:paiddate]
 
     createbankexpenserecord @taxinvoice.id, false if @taxinvoice.save
 
@@ -554,8 +556,8 @@ class TaxinvoicesController < ApplicationController
     old_amount = @taxinvoice.downpayment
 
     @taxinvoice.downpayment_date = inputs[:downpayment_date]
-    @taxinvoice.downpayment = clean_currency(inputs[:downpayment])    
-    
+    @taxinvoice.downpayment = clean_currency(inputs[:downpayment])
+
     bankexpensedownpayment @taxinvoice, old_amount if @taxinvoice.save
 
     redirect_to(request.referer, :notice => "Deposit Invoice untuk pelanggan<br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses disimpan.".html_safe)
@@ -573,11 +575,11 @@ class TaxinvoicesController < ApplicationController
 
     @taxinvoice.secondpayment_date = nil
     @taxinvoice.secondpayment = '$0.00'
-    
+
     bankexpensecanceldownpayment @taxinvoice, old_amount if @taxinvoice.save
 
     redirect_to(request.referer, :notice => "Down Payment untuk Pelanggan <br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses dihapus.".html_safe)
-  end  
+  end
 
   def secondpayment
     inputs = params[:taxinvoice]
@@ -587,8 +589,8 @@ class TaxinvoicesController < ApplicationController
     old_amount = @taxinvoice.secondpayment
 
     @taxinvoice.secondpayment_date = inputs[:secondpayment_date]
-    @taxinvoice.secondpayment = clean_currency(inputs[:secondpayment])    
-    
+    @taxinvoice.secondpayment = clean_currency(inputs[:secondpayment])
+
     bankexpensesecondpayment @taxinvoice, old_amount if @taxinvoice.save
 
     redirect_to(request.referer, :notice => "Angsuran untuk pelanggan<br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses disimpan.".html_safe)
@@ -603,11 +605,11 @@ class TaxinvoicesController < ApplicationController
 
     @taxinvoice.secondpayment_date = nil
     @taxinvoice.secondpayment = '$0.00'
-    
+
     bankexpensecancelsecondpayment @taxinvoice, old_amount if @taxinvoice.save
 
     redirect_to(request.referer, :notice => "Angsuran untuk Pelanggan <br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses dihapus.".html_safe)
-  end   
+  end
 
   def destroy
     @taxinvoice = Taxinvoice.find(params[:id])
@@ -631,10 +633,10 @@ class TaxinvoicesController < ApplicationController
 
   def cancelpayment
     @taxinvoice = Taxinvoice.find(params[:id])
-    
-    if !@taxinvoice.paiddate.nil?      
+
+    if !@taxinvoice.paiddate.nil?
       Bankexpense.where("debitgroup_id IS NOT NULL AND creditgroup_id IS NOT NULL AND taxinvoice_id IN (#{@taxinvoice.id}) AND deleted IS FALSE").update_all(:deleted => true) rescue nil
-      
+
       # kill old records
       Bankexpense.where("debitgroup_id = 96 AND taxinvoice_id IN (#{@taxinvoice.id}) AND deleted IS FALSE").update_all(:deleted => true) rescue nil
 
@@ -646,18 +648,18 @@ class TaxinvoicesController < ApplicationController
     end
 
     redirect_to(request.referer, :notice => "Pembayaran untuk Pelanggan <br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses dibatalkan.".html_safe)
-  end   
+  end
 
   def bankexpensedownpayment taxinvoice, old_amount
     inputBank = params[:bank_id]
-    inputBank = 5 if inputBank.nil? 
-    
+    inputBank = 5 if inputBank.nil?
+
     inputPiutang = params[:piutang_id]
     inputPiutang = 6 if inputPiutang.nil?
 
     bankexpense = Bankexpense.where(:taxinvoice_id => taxinvoice.id, :creditgroup_id => inputPiutang, :debitgroup_id => inputBank, :deleted => false).where("description LIKE 'Down Payment Invoice %'").first rescue nil
     bankexpense = Bankexpense.new if bankexpense.nil?
-    
+
     bankexpense.debitgroup_id = inputBank
     bankexpense.creditgroup_id = inputPiutang
     bankexpense.taxinvoice_id = taxinvoice.id
@@ -665,9 +667,9 @@ class TaxinvoicesController < ApplicationController
     bankexpense.description = "Down Payment Invoice " + taxinvoice.long_id + ", " + taxinvoice.customer.name
     bankexpense.date = taxinvoice.downpayment_date
 
-    bank = Bankexpense.where(:taxinvoice_id => bankexpense.taxinvoice_id, :debitgroup_id => inputPiutang, :deleted => false).first rescue nil    
+    bank = Bankexpense.where(:taxinvoice_id => bankexpense.taxinvoice_id, :debitgroup_id => inputPiutang, :deleted => false).first rescue nil
     if bank
-      bankexpense.bankexpense_id = bank.id 
+      bankexpense.bankexpense_id = bank.id
     end
 
     if bankexpense.save
@@ -696,31 +698,31 @@ class TaxinvoicesController < ApplicationController
       bankexpense.deleted = true
 
       if bankexpense.save
-        debit_to = Bankexpensegroup.find(bankexpense.debitgroup_id) 
+        debit_to = Bankexpensegroup.find(bankexpense.debitgroup_id)
         if !debit_to.nil?
           debit_to.total -= old_amount
           debit_to.save
         end
 
-        credit_to = Bankexpensegroup.find(bankexpense.creditgroup_id) 
+        credit_to = Bankexpensegroup.find(bankexpense.creditgroup_id)
         if !credit_to.nil?
           credit_to.total += old_amount
           credit_to.save
         end
       end
     end
-  end 
+  end
 
   def bankexpensesecondpayment taxinvoice, old_amount
     inputBank = params[:bank_id]
-    inputBank = 5 if inputBank.nil? 
-    
+    inputBank = 5 if inputBank.nil?
+
     inputPiutang = params[:piutang_id]
     inputPiutang = 6 if inputPiutang.nil?
 
     bankexpense = Bankexpense.where(:taxinvoice_id => taxinvoice.id, :creditgroup_id => inputPiutang, :debitgroup_id => inputBank, :deleted => false).where("description LIKE 'Angsuran Invoice %'").first rescue nil
     bankexpense = Bankexpense.new if bankexpense.nil?
-    
+
     bankexpense.debitgroup_id = inputBank
     bankexpense.creditgroup_id = inputPiutang
     bankexpense.taxinvoice_id = taxinvoice.id
@@ -728,9 +730,9 @@ class TaxinvoicesController < ApplicationController
     bankexpense.description = "Angsuran Invoice " + taxinvoice.long_id + ", " + taxinvoice.customer.name
     bankexpense.date = taxinvoice.secondpayment_date
 
-    bank = Bankexpense.where(:taxinvoice_id => bankexpense.taxinvoice_id, :debitgroup_id => inputPiutang, :deleted => false).first rescue nil    
+    bank = Bankexpense.where(:taxinvoice_id => bankexpense.taxinvoice_id, :debitgroup_id => inputPiutang, :deleted => false).first rescue nil
     if bank
-      bankexpense.bankexpense_id = bank.id 
+      bankexpense.bankexpense_id = bank.id
     end
 
     if bankexpense.save
@@ -759,28 +761,28 @@ class TaxinvoicesController < ApplicationController
       bankexpense.deleted = true
 
       if bankexpense.save
-        debit_to = Bankexpensegroup.find(bankexpense.debitgroup_id) 
+        debit_to = Bankexpensegroup.find(bankexpense.debitgroup_id)
         if !debit_to.nil?
           debit_to.total -= old_amount
           debit_to.save
         end
 
-        credit_to = Bankexpensegroup.find(bankexpense.creditgroup_id) 
+        credit_to = Bankexpensegroup.find(bankexpense.creditgroup_id)
         if !credit_to.nil?
           credit_to.total += old_amount
           credit_to.save
         end
       end
     end
-  end 
+  end
 
   def createbankexpenserecord taxinvoice_id, create = true
      @taxinvoice = Taxinvoice.find(taxinvoice_id) rescue nil
      if @taxinvoice
         if create
           description = "Invoice " + @taxinvoice.long_id
-          
-          #record bank pendapatan 
+
+          #record bank pendapatan
           @bankexpensependapatan = Bankexpense.where(:taxinvoice_id => taxinvoice_id,  :creditgroup_id => ID_GROUP_PENDAPATAN, :deleted => false).first rescue nil
           needupdate = @bankexpensependapatan.nil? ? false : true
           @bankexpensependapatan = Bankexpense.new if @bankexpensependapatan.nil?
@@ -789,15 +791,15 @@ class TaxinvoicesController < ApplicationController
           @bankexpensependapatan.description = description
           @bankexpensependapatan.date = @taxinvoice.date
 
-          credit_to = Bankexpensegroup.find(ID_GROUP_PENDAPATAN) rescue nil          
+          credit_to = Bankexpensegroup.find(ID_GROUP_PENDAPATAN) rescue nil
           credit_to.total += @bankexpensependapatan.total if needupdate && !credit_to.nil?
 
           @bankexpensependapatan.total = @taxinvoice.total.to_f - @taxinvoice.gst_tax.to_f + @taxinvoice.price_tax.to_f + @taxinvoice.insurance_cost.to_f
-          
+
           credit_to.total -= @bankexpensependapatan.total if !credit_to.nil?
           credit_to.save if @bankexpensependapatan.save
 
-          #record bank ppn 
+          #record bank ppn
           if @taxinvoice.gst_tax.to_i > 0
             @bankexpenseppn = Bankexpense.where(:taxinvoice_id => taxinvoice_id,  :creditgroup_id => ID_GROUP_PPN, :deleted => false).first rescue nil
             needupdate = @bankexpenseppn.nil? ? false : true
@@ -811,7 +813,7 @@ class TaxinvoicesController < ApplicationController
             credit_to.total += @bankexpenseppn.total if needupdate && !credit_to.nil?
 
             @bankexpenseppn.total = @taxinvoice.gst_tax.to_i
-            
+
             credit_to.total -= @bankexpenseppn.total if !credit_to.nil?
             credit_to.save if @bankexpenseppn.save
           end
@@ -830,7 +832,7 @@ class TaxinvoicesController < ApplicationController
             debit_to.total -= @bankexpensepph.total if needupdate && !debit_to.nil?
 
             @bankexpensepph.total = @taxinvoice.price_tax.to_i
-            
+
             debit_to.total += @bankexpensepph.total if !debit_to.nil?
             debit_to.save if @bankexpensepph.save
           end
@@ -848,15 +850,15 @@ class TaxinvoicesController < ApplicationController
           debit_to.total -= @bankexpensepiutang.total if needupdate && !debit_to.nil?
 
           @bankexpensepiutang.total = @taxinvoice.total
-          
+
           debit_to.total += @bankexpensepiutang.total if !debit_to.nil?
           debit_to.save if @bankexpensepiutang.save
 
         else
           #record bank pembayaran
           inputBank = params[:bank_id]
-          inputBank = 5 if inputBank.nil? 
-          
+          inputBank = 5 if inputBank.nil?
+
           inputPiutang = params[:piutang_id]
           inputPiutang = 6 if inputPiutang.nil?
 
@@ -876,13 +878,13 @@ class TaxinvoicesController < ApplicationController
           end
 
           if @bankexpensebayar.save
-            debit_to = Bankexpensegroup.find(@bankexpensebayar.debitgroup_id) 
+            debit_to = Bankexpensegroup.find(@bankexpensebayar.debitgroup_id)
             if !debit_to.nil?
               debit_to.total += @bankexpensebayar.total
               debit_to.save
             end
 
-            credit_to = Bankexpensegroup.find(@bankexpensebayar.creditgroup_id) 
+            credit_to = Bankexpensegroup.find(@bankexpensebayar.creditgroup_id)
             if !credit_to.nil?
               credit_to.total -= @bankexpensebayar.total
               credit_to.save
@@ -919,7 +921,7 @@ class TaxinvoicesController < ApplicationController
     taxinvoice = Taxinvoice.find(params[:taxinvoice_id]) rescue nil
     filename = "invoices_" + Date.today.strftime('%d%m%Y') + ".xls"
 
-    grandtotal = taxinvoice.total - taxinvoice.total.to_i 
+    grandtotal = taxinvoice.total - taxinvoice.total.to_i
     @is_pembulatan = ((grandtotal == 0))
 
 
@@ -931,7 +933,7 @@ class TaxinvoicesController < ApplicationController
       bold = sheet.styles.add_style(:b => true)
       right = sheet.styles.add_style(:alignment => {:horizontal => :right})
       right_bold = sheet.styles.add_style(:alignment => {:horizontal => :right}, :b => true)
-      
+
       sheet.add_row [''], :height => 20
       index_col +=1
       sheet.add_row ['','No. Invoice', taxinvoice.long_id], :height => 20, :widths => [:auto, :auto, :ignore]
@@ -952,7 +954,7 @@ class TaxinvoicesController < ApplicationController
       if !taxinvoice.customer.npwp.blank?
         sheet.add_row ['','NPWP', taxinvoice.customer.npwp], :height => 20, :widths => [:auto, :auto, :ignore]
         index_col +=1
-      end 
+      end
       if !taxinvoice.product_name.blank?
         sheet.add_row ['','Barang', taxinvoice.product_name], :height => 20, :widths => [:auto, :auto, :ignore]
         index_col +=1
@@ -1024,7 +1026,7 @@ class TaxinvoicesController < ApplicationController
       sheet.add_row ['',"PPN 10%",'','','','','','','', to_currency_bank(taxinvoice.gst_tax)], :height => 20, :style => right
       index_col +=1
 
-      #PPh 
+      #PPh
       sheet.merge_cells 'B' + index_col.to_s + ':I'+ index_col.to_s
       sheet.add_row ['',"PPh Pasal 23 2%",'','','','','','','', to_currency_bank(0 - taxinvoice.price_tax)], :height => 20, :style => right
       index_col +=1
@@ -1041,11 +1043,11 @@ class TaxinvoicesController < ApplicationController
       if !taxinvoice.description.blank?
         sheet.add_row ['',taxinvoice.description], :height => 20, :style => bold, :widths => [:auto, :ignore]
       end
- 
+
     end
     p.use_autowidth = false
     p.use_shared_strings = true
-    
+
     #if p.serialize("/tmp/#{filename}")
       #send_data("#{Rails.root}/tmp/#{filename}", :filename => filename, :type => :xls, :x_sendfile => true)
     #end
@@ -1053,30 +1055,30 @@ class TaxinvoicesController < ApplicationController
     send_data(p.to_stream.read, :filename => filename, :type => :xls, :x_sendfile => true)
 
   end
-    
+
     def send_email
 
         # @name = 'Test'
         # @email = 'yudistira@mydevteam.com.au'
         # @finance_mail = 'finance@rdpitrans.com'
-        
+
         # @taxinvoice = Taxinvoice.find(params[:taxinvoice_id])
-        
-        # if @taxinvoice.present? 
-            
+
+        # if @taxinvoice.present?
+
         # @long_id =  @taxinvoice.long_id
-         
+
         # @total = to_currency(@taxinvoice.total)
         # @customer = @taxinvoice.customer.name
         # @sent_date = @taxinvoice.sentdate
         # inv_subject = "Invoice Tagihan "+@long_id+" "+@customer
-            
+
         # if @sent_date.nil?
         #     @sent_date = Date.today.strftime('%d-%m-%Y')
         # end
-            
+
         # html = render_to_string partial: 'email_template/taxinvoice_sent'
- 
+
         # require 'uri'
         # require 'json'
         # require 'net/http'
@@ -1103,15 +1105,15 @@ class TaxinvoicesController < ApplicationController
         #     },
         #     'subject': inv_subject,
         #     'htmlContent': html,
-        #     'headers': { 
+        #     'headers': {
         #         'charset': 'iso-8859-1'
         #     }
         # })
 
         # response = https.request(request)
-            
+
         # render json: { status: 200, message: "Success", response: response }
-            
+
         #end
 
     end
@@ -1136,7 +1138,7 @@ class TaxinvoicesController < ApplicationController
 
   def fetch_excel(s, taxinvoice_id)
     s.default_sheet = s.sheets.first
-     
+
      taxinvoice = Taxinvoice.find(taxinvoice_id)
      customer_id = taxinvoice.customer_id
 
@@ -1155,7 +1157,7 @@ class TaxinvoicesController < ApplicationController
         vehicle_id = vehicle.id
       end
 
-      if !taxinvoice.nil?     
+      if !taxinvoice.nil?
         if !date.nil?
           Taxgenericitem.create(:taxinvoice_id => taxinvoice.id , :customer_id => customer_id, :vehicle_id => vehicle_id, :date => date, :description => route, :weight_gross => weight_gross, :weight_net => weight_net )
         end
@@ -1175,8 +1177,8 @@ class TaxinvoicesController < ApplicationController
     @taxinvoice.sentdate = (params[:sentdate] rescue nil)
     @taxinvoice.confirmeddate = (params[:confirmeddate] rescue nil)
     ppn = Setting.where(name: 'ppn')
-    ppn = ppn.blank? ? 10 : ppn[0].value    
-        
+    ppn = ppn.blank? ? 10 : ppn[0].value
+
     ppn_percentage = params[:gst_tax].to_f
     if ppn_percentage > 0
       @taxinvoice.gst_tax = subtotal.to_f * (ppn_percentage.to_f / 100)
@@ -1185,9 +1187,9 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.gst_tax = 0
       @taxinvoice.gst_percentage = 0
     end
-      
+
     if params[:price_tax] == "Yes"
-      @taxinvoice.price_tax = subtotal.to_f * 0.02 
+      @taxinvoice.price_tax = subtotal.to_f * 0.02
     else
       @taxinvoice.price_tax = 0
     end
@@ -1203,8 +1205,8 @@ class TaxinvoicesController < ApplicationController
     else
       render json: { status: 400, message: "Data Invoice gagal diupdate" }, status: 400
     end
-      
-    # render json: @taxinvoice 
+
+    # render json: @taxinvoice
   end
 
   def clone
@@ -1225,15 +1227,15 @@ class TaxinvoicesController < ApplicationController
 
 		response = http.request(request)
 		@response = response.read_body
-		
+
 		if JSON(@response)['status'] == 404
-			
+
 		@customerlist = ''
 
-		else	
-			
+		else
+
 		@customerlist = JSON(@response)['data']
-			
+
 		end
 
   end
@@ -1275,13 +1277,13 @@ class TaxinvoicesController < ApplicationController
 
 		# response = http.request(request)
 		# @response = response.read_body
-		
+
 		# if JSON(@response)['status'] == 404
-			
+
 		# render json: { status: 400, message: "Customers not found" }, status: 400
 
-		# else	
-			
+		# else
+
     #   @taxinvoice_id_destination = JSON(@response)['data']['id']
 
     #   if is_generic
@@ -1291,7 +1293,7 @@ class TaxinvoicesController < ApplicationController
     #   end
 
     #   if taxinvoiceitems.present?
-            
+
     #     taxinvoiceitems = taxinvoiceitems.map do |t|
 
     #       url = URI("https://office.puratrans.com/api_taxinvoices/create_taxinvoice_taxgenericitem")
