@@ -200,8 +200,10 @@
 					<% end %>
 					<td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
 					<td colspan="2" style="text-align:left">
-					<% if taxinvoiceitem.invoice.event %>
-						<%=taxinvoiceitem.invoice.event.summary%> 
+					<% if taxinvoiceitem.event_name.present? %>
+						<%= taxinvoiceitem.event_name %>
+					<% elsif taxinvoiceitem.invoice.event %>
+						<%= taxinvoiceitem.invoice.event.summary%> 
 					<% else %>
 				
 						<%=taxinvoiceitem.invoice.route.name%><br>

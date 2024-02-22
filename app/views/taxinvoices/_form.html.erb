@@ -371,6 +371,7 @@
       <th width="110">Surat Jalan</th>
       <th width="40">No.DO</th>
       <th>Jurusan</th>
+      <th class="right">Berita Acara</th>
       <th width="30" class="right">Muat (Kg)</th>
       <th width="30" class="right">Bkr (Kg)</th>
       <th width="70" class="right">Total</th>
@@ -430,6 +431,9 @@
         <% end %>
         <% end %>
   
+      </td>
+      <td align="right">
+        <input type="text" id="event_name_<%= taxinvoiceitem.id %>" name="event_name_<%= taxinvoiceitem.id %>" class="half right" value="<%= taxinvoiceitem.event_name.present? ? taxinvoiceitem.event_name : taxinvoiceitem.invoice.event.summary rescue nil %>">
       </td>
       <td align="right">
         <input type="text" id="gross_<%=taxinvoiceitem.id%>" name="gross_<%=taxinvoiceitem.id%>" class="short right" value="<%=taxinvoiceitem.weight_gross%>" onchange="javascript: countTotalInvoiceQty(<%=taxinvoiceitem.id%>);" onkeypress="javascript:return isNumberKey(this);"/>
@@ -509,7 +513,7 @@
   <% end %>
 
   <tr id="-1">
-    <td colspan="6"></td>
+    <td colspan="7"></td>
     <td align="right">SUBTOTAL</td>
     <td align="right"><span id="lbl_grosstotal"><%=@taxinvoiceitems.where("taxinvoice_id IS NOT NULL").sum(:weight_gross)%></span></td>
     <td align="right"><span id="lbl_qtytotal"><%=@taxinvoiceitems.where("taxinvoice_id IS NOT NULL").sum(:weight_net)%></span></td>
@@ -518,15 +522,15 @@
   </tr>
 
   <tr id="-2">
-    <td colspan="6"></td>
+    <td colspan="7"></td>
     <td align="right">Biaya Tambahan</td>
     <td align="right">&nbsp;</td>
-     <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
     <td align="right"><span id="txt_extra_cost"><%=to_currency_bank(@taxinvoice.extra_cost)%></span></td>
   </tr>
 
   <tr id="-3">
-    <td colspan="6"></td>
+    <td colspan="7"></td>
     <td align="right">Potongan Asuransi</td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
@@ -534,7 +538,7 @@
   </tr>
 
   <tr id="-3">
-    <td colspan="6"></td>
+    <td colspan="7"></td>
     <td align="right">Potongan Klem Susut</td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
@@ -542,7 +546,7 @@
   </tr>
   
   <tr id="ppn-row" style="<%= taxinvoice_ppn == 0 ? "display: none;".html_safe : "" %>">
-    <td colspan="6"></td>
+    <td colspan="7"></td>
     <td align="right">PPN <span id="ppn_amount"><%= taxinvoice_ppn - taxinvoice_ppn.to_i > 0 ? taxinvoice_ppn.to_f : taxinvoice_ppn.to_i %></span>%</td>
     <td align="right">&nbsp;</td>
      <td align="right">&nbsp;</td>
@@ -550,7 +554,7 @@
   </tr>
 
   <tr id="-4">
-    <td colspan="6"></td>
+    <td colspan="7"></td>
     <td align="right">PPH 2%</td>
     <td align="right">&nbsp;</td>
      <td align="right">&nbsp;</td>
@@ -558,7 +562,7 @@
   </tr>
 
   <tr id="-5" class="footer">
-    <td colspan="6"></td>
+    <td colspan="7"></td>
     <td align="right" class="total">TOTAL</td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
