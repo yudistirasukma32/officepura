@@ -5,8 +5,8 @@
   <div class="field-row first">
     <%= f.label :office_id, "Kantor" %>
     <% if @iseditable %>
- 
-    <select id="invoice_office_id" name="invoice[office_id]" class="half chzn-select" require onchange="javascript:getVehiclesByOffice(this.value);">
+
+    <select id="invoice_office_id" name="invoice[office_id]" class="half chzn-select" require onchange="javascript:getVehiclesByOffice(this.value, <%= params[:train].present? %>);">
       <option value="0">- Kantor -</option>
       <% @offices.each do |office| %>
         <option value="<%=office.id%>"
@@ -460,7 +460,7 @@
         <a class="back left" href="<%=invoices_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
       <% end %>
     <% end %>
-    
+
   </div>
 
 <% end %>

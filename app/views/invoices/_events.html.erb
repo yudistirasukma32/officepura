@@ -1,7 +1,7 @@
 <% if !@events.first.nil? %>
 <div class="field-row">
   <label for="event_id">DO Kal. Event</label>
-  <select id="invoice_event_id" name="invoice[event_id]" class="chzn-select double combo_route" onchange="javascript:getdodetail(this.value)">
+  <select id="invoice_event_id" name="invoice[event_id]" class="chzn-select double combo_route" onchange="javascript:getdodetail(this.value, <%= @is_train == '1' %>)">
     <option value="0">- Pilih DO -</option>
     <% @events.each do |event| %>
     <% event_qty = event.qty.to_i rescue 0 %>
@@ -36,15 +36,49 @@
 <% end %>
 
 <script>
-		function getdodetail(event_id){
+		function getdodetail(event_id, train){
 			$.ajax({
 				type: "GET",
-				url: "/events/getdodetail?event_id=" + event_id,
-				success: function(operator_id) {
-					$("#invoice_operator_id").val(operator_id.operator_id).trigger("chosen:updated");
+				url: "/events/getdodetail?event_id=" + event_id + "&train=" + train,
+				success: function(data) {
+					$("#invoice_operator_id").val(data.operator_id).trigger("chosen:updated");
           $("#invoice_operator_id").trigger("liszt:updated");
-					console.log(operator_id.operator_id);
-          getRouteTrain(operator_id.operator_id);
+					$("#invoice_office_id").val(data.office_id).trigger("chosen:updated");
+          $("#invoice_office_id").trigger("liszt:updated");
+          
+          if (data.cargo_type == "padat"){
+            $('#invoice_cargo_type_padat').prop('checked', true);
+          } else if (data.cargo_type == "cair"){
+            $('#invoice_cargo_type_cair').prop('checked', true);
+          }
+
+          $.ajax({
+            type: "GET",
+            url: "/invoices/gettanktype/" + data.cargo_type,
+            success: function(data1) {
+              $('#div_tanktype').html(data1.html);
+              $(".chzn-select").chosen();
+
+              $("#invoice_tanktype").val(data.tanktype).trigger("chosen:updated");
+              $("#invoice_tanktype").trigger("liszt:updated");
+              $("#invoice_route_id").val(data.route_id).trigger("chosen:updated");
+              $("#invoice_route_id").trigger("liszt:updated");
+
+              getRouteTrain(data.operator_id);
+              getVehiclesByOffice(data.office_id, train);
+              checkTank(data.tanktype);
+              getAllowances();
+            },
+            failure: function() {alert("Error. Mohon refresh browser Anda.");}
+          });
+
+					
+
+          setTimeout(function(){
+            $("#invoice_routetrain_id").val(data.routetrain_id).trigger("chosen:updated");
+            $("#invoice_routetrain_id").trigger("liszt:updated");
+          }, 2000);
+          
           // console.log(data['operator_id']);
           // alert(operator_id.operator_id);
 				},

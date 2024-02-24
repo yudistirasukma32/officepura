@@ -255,14 +255,15 @@ class EventsController < ApplicationController
   def get_event_by_customer
 
     customer_id = params[:customer_id]
-    is_train = params[:train]
+    @is_train = params[:train]
 
-    @intervalago = Setting.find_by_name("DO Days Interval Ago").value rescue nil || 10
+    @intervalago = Setting.find_by_name("DO Days Interval Ago").value rescue nil || 20
     @intervalnext = Setting.find_by_name("DO Days Interval Next").value rescue nil || 5
 
     if customer_id == "50" || customer_id == "51" || customer_id == "144"
 
       @events = Event.active.where("end_date BETWEEN current_date - interval ? day AND current_date + interval ? day", @intervalago, @intervalnext).order(:start_date)
+
       if current_user.office_id.present? && !current_user.owner
         @events = @events.where("office_id = ?", current_user.office_id)
       end
@@ -271,9 +272,10 @@ class EventsController < ApplicationController
 
     else
 
-        if is_train == "0"
+        if @is_train == "0"
 
           @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval ? day AND current_date + interval ? day AND invoicetrain = false", params[:customer_id], @intervalago, @intervalnext).order(:start_date)
+
           if current_user.office_id.present? && !current_user.owner
             @events = @events.where("office_id = ?", current_user.office_id)
           end
@@ -283,6 +285,7 @@ class EventsController < ApplicationController
         else
 
           @events = Event.active.where("customer_id = ? AND end_date BETWEEN current_date - interval ? day AND current_date + interval ? day AND invoicetrain = true", params[:customer_id], @intervalago, @intervalnext).order(:start_date)
+
           if current_user.office_id.present? && !current_user.owner
             @events = @events.where("office_id = ?", current_user.office_id)
           end
@@ -380,7 +383,8 @@ class EventsController < ApplicationController
         end
 
         if invoices.index(e.id)
-          bkk_unconfirmed = Invoice.active.select('event_id').where('event_id = ?', e.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').pluck(:id) 
+
+          bkk_unconfirmed = Invoice.active.select('event_id').where('event_id = ?', e.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').pluck(:id)
           bkk = Invoice.active.select('event_id').where('event_id = ?', e.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').where('id in (select invoice_id from receipts where deleted = false)').pluck(:id)
 
           if bkk_unconfirmed.count > 0 && bkk.count == 0
@@ -447,6 +451,7 @@ class EventsController < ApplicationController
           else
               completed = false
           end
+
         end
 
         if e.company.nil?
@@ -603,7 +608,7 @@ class EventsController < ApplicationController
 
   def getdodetail
     @event = Event.find(params[:event_id])
-    render json: { operator_id: @event.operator_id }, status: 200
+    render json: { operator_id: @event.operator_id, office_id: @event.office_id, cargo_type: @event.cargo_type, tanktype: @event.tanktype, route_id: @event.route_id, routetrain_id: @event.routetrain_id }, status: 200
   end
 
   def add_dovendor

@@ -685,13 +685,13 @@ function getDriverPhone(driver_id) {
 	});	
 }
 
-function getVehiclesByOffice(office_id){
+function getVehiclesByOffice(office_id, train){
 	
 	if(office_id != 0) {
 
 		$.ajax({
 			type: "GET",
-			url: "/invoices/getvehiclesbyofficeid/" + office_id,
+			url: "/invoices/getvehiclesbyofficeid/" + office_id + "?train=" + train,
 			success: function(data) {
 				$('#div_vehicles').html(data.html);
 				$(".chzn-select").chosen();
@@ -2379,7 +2379,7 @@ $(document).ready(function() {
 				url: "/invoices/gettanktype/" + cargotype,
 				success: function(data) {
 					$('#div_tanktype').html(data.html);
-					// $(".chzn-select").chosen();
+					$(".chzn-select").chosen();
 				},
 				failure: function() {alert("Error. Mohon refresh browser Anda.");}
 			});		
@@ -2392,7 +2392,7 @@ $(document).ready(function() {
 				url: "/invoices/gettanktype/" + cargotype,
 				success: function(data) {
 					$('#div_tanktype').html(data.html);
-					// $(".chzn-select").chosen();
+					$(".chzn-select").chosen();
 				},
 				failure: function() {alert("Error. Mohon refresh browser Anda.");}
 			});
@@ -2839,7 +2839,7 @@ if ($('#invoice_cargo_type_padat').length > 0) {
 		url: "/invoices/gettanktype/" + cargotype,
 		success: function(data) {
 			$('#div_tanktype').html(data.html);
-			// $(".chzn-select").chosen();
+			$(".chzn-select").chosen();
 		},
 		failure: function() {alert("Error. Mohon refresh browser Anda.");}
 	});
