@@ -528,48 +528,22 @@
 </div>
 
 <div class="d-show-print">
-	<% Attachment.where("imageable_id IN (?)", @invoice_images).each do |img| %>
-	<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
-		<% if (ext == 'pdf') %>
-		<%# removed print pdf %>
-		<!-- 
-		<div class="print-pdf">
-			<iframe src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" style="width:718px; height:700px;" frameborder="0" type='application/pdf' allowfullscreen="true"></iframe>
-		</div>
-			<iframe src="<%= img.file.url() if img.file_uid %>" frameborder="0" width="800" height="800" type='application/pdf'></iframe>
-			-->
-			<!-- 
-			<object data="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800"></object>
-			<embed src="<%= img.file.url() if img.file_uid %>" type="application/pdf" width="800" height="800">
-			<a href="https://docs.google.com/gview?url=<%= img.file.url() if img.file_uid%>&embedded=true"></a>
-			<embed src="https://drive.google.com/viewerng/viewer?embedded=true&url=<%= img.file.url() if img.file_uid %>" width="500" height="375">
-			-->
-			
-			<!-- 
-			<object data="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="100%" height="auto" allowfullscreen="true"></object>
-			<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="100%" height="auto" allowfullscreen="true">
-			-->
+	<% attachments = Attachment.where("imageable_id IN (?)", @invoice_images) %>
+	<% attachments.each do |img| %>
+		<% if (img.file_uid.present?) %>
+			<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+			<% if (ext == 'pdf') %>
 
-		<!-- 
-			<div class="print-pdf">
-				<object data="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf" width="750px" height="750px">
-					<embed src="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true" type="application/pdf">
-						<p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://docs.google.com/gview?url=https://office.puratrans.com/<%= img.file.url() if img.file_uid %>&embedded=true">Download PDF</a>.</p>
-					</embed>
-				</object>
-			</div>
-		-->
-
-
-		<% else %>
-			<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
-				<a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
-				<div style="width: 800px !important; margin: 0 auto !important; padding: 2rem;">
-					<%= image_tag img.file.thumb('1280x800').url(:suffix => "/#{img.name}") if img.file_uid %>
-				</div>
-				</a>
 			<% else %>
-				<a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
+				<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
+					<a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
+					<div style="width: 800px !important; margin: 0 auto !important; padding: 2rem;">
+						<%= image_tag img.file.thumb('1280x800').url(:suffix => "/#{img.name}") if img.file_uid %>
+					</div>
+					</a>
+				<% else %>
+					<a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
+				<% end %>
 			<% end %>
 		<% end %>
 	<% end %>
