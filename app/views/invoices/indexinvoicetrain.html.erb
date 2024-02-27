@@ -248,7 +248,7 @@
                     <% end %>
 					<td width="70">
 						<% if !invoice.invoices.active.any? %>
-							<% if invoice.invoicereturns.any? %>
+							<% if invoice.invoicereturns.active.any? %>
 								BKM
 							<% else %>
 								<% if !checkroleonly 'Vendor Supir' %>	
