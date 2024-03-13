@@ -63,10 +63,10 @@
 				<% @grandTotal = 0%>
 				<% @trainexpenses.each do |invoice| %>
 					<%
-						routetrain_price = @invoice.routetrain.price_per.to_i
+						routetrain_price = invoice.routetrain.price_per.to_i
 						containerex_ids = Container.active.where("containernumber ILIKE 'A%'").pluck(:id)
 						containerex_ids.push(0)
-						if @invoice.routetrain.operator_id == 2 && @invoice.container_id.present? && containerex_ids.exclude?(@invoice.container_id)
+						if invoice.routetrain.operator_id == 2 && invoice.container_id.present? && containerex_ids.exclude?(invoice.container_id)
 						routetrain_price = Setting.find_by_name("Harga Jurusan BKE").value.to_i
 						end
 					%>
