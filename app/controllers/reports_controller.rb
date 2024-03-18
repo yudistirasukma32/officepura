@@ -2874,7 +2874,7 @@ end
       @taxinvoices = Taxinvoice.active.joins(:customer)
 
       # @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'DD-MM-YYYY') BETWEEN ? AND ?", "#{@day}-#{@month}-#{@year}","#{@dayEnd}-#{@monthEnd}-#{@yearEnd}")
-      @taxinvoices = @taxinvoices.where("senddate is null AND date BETWEEN ? AND ?", "#{@year}-#{@month}-#{@day}-","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
+      @taxinvoices = @taxinvoices.where("sentdate is null AND date BETWEEN ? AND ?", "#{@year}-#{@month}-#{@day}-","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
 
       @customer = Customer.find(params[:customer_id]) rescue nil
 
