@@ -100,11 +100,35 @@
       </tr>
 
       <%
+        # Special price change for BKE. Make sure to change the price in _form.html.erb  too
         routetrain_price = @invoice.routetrain.price_per.to_i
-        containerex_ids = Container.active.where("containernumber ILIKE 'A%'").pluck(:id)
-        containerex_ids.push(0)
-        if @invoice.routetrain.operator_id == 2 && @invoice.container_id.present? && containerex_ids.exclude?(@invoice.container_id)
-          routetrain_price = Setting.find_by_name("Harga Jurusan BKE").value.to_i
+        containera_ids = Container.active.where("containernumber ILIKE 'A%'").pluck(:id)
+        containerdh_ids = Container.active.where("containernumber ILIKE 'DH%'").pluck(:id)
+        routetrainused_ids = 24, 25, 30, 32
+
+        if @invoice.routetrain.operator_id == 2 # BKE
+          if routetrainused_ids.include? @invoice.routetrain_id
+            # DRY CONTAINER
+            if @invoice.container_id.present? && @invoice.container_id.to_i != 0
+              if @invoice.routetrain_id == 30 && (containera_ids.include? @invoice.container_id) # DRY 20 FEET
+                routetrain_price = 2750000
+              elsif @invoice.routetrain_id == 30 && (containerdh_ids.include? @invoice.container_id) # DRY 20 FEET
+                routetrain_price = 2350000
+              elsif @invoice.routetrain_id == 32 # DRY 20 FEET EMPTY
+                routetrain_price = 2800000
+              end
+
+            # ISOTANK
+            elsif @invoice.isotank_id.present? && @invoice.isotank_id.to_i != 0
+              if @invoice.routetrain_id == 24 # ISOTANK 20 FEET
+                routetrain_price = 3050000
+              elsif @invoice.routetrain_id == 25 # ISOTANK 20 FEET EMPTY
+                routetrain_price = 2800000
+              end
+            end
+          elsif containera_ids.exclude? @invoice.container_id
+            routetrain_price = 2250000
+          end
         end
       %>
       <tr>
