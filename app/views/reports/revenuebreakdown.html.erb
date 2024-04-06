@@ -22,13 +22,7 @@
       <div id="filter">
         <form id="filterform" name="filterform" action="" method="get">
           <div class="field-row continue">
-            <label for="customer_id" style="width: 72px;">Pelanggan</label>
-              <select name="customer_id" class="third left">
-                <option value="">Semua Pelanggan</option>
-                <% Customer.active.order(:name).each do |customer| %>
-                  <option value="<%=customer.id%>"<% if customer.id == @customer_id.to_i %> selected='selected'<% end %>><%=customer.name%></option>
-                <% end %>
-              </select>
+
             <label for="date" class="middle" style="width: 64px;">Periode</label>
               <select name="month" class="half left" style="margin-right:10px;">
                 <% (1.upto(12)).each do |m| %>
@@ -55,13 +49,31 @@
                 </select>
             </div>
           <div class="field-row continue">
-            <label for="commodity_id" style="width: 80px;">Komoditas</label>
-              <select name="commodity_id" class="third left">
-                <option value="">Semua Komoditas</option>
-                <% Commodity.active.order(:name).each do |comodity| %>
-                  <option value="<%= comodity.id %>"<% if comodity.id == @commodity_id.to_i %> selected='selected'<% end %>><%= comodity.name %></option>
+
+            <label for="transporttype"  class="middle" style="width: 64px; ">Tipe DO</label>
+            <select name="transporttype" class="left combo_route" style="width: 90px; margin-right: 15px;">	
+            <option value="all">Semua Tipe</option>
+              <% ["STANDART","KERETA","RORO","LOSING"].each do |type| %>
+              <option <%= type == params[:transporttype] ? 'selected' : '' %>><%=type%></option>
+              <% end %>
+            </select>
+
+            <label for="commodity_id" style="width: 64px;">Komoditas</label>
+            <select name="commodity_id" class="third left" style="margin-right: 15px;">	
+              <option value="">Semua Komoditas</option>
+              <% Commodity.active.order(:name).each do |comodity| %>
+                <option value="<%= comodity.id %>"<% if comodity.id == @commodity_id.to_i %> selected='selected'<% end %>><%= comodity.name %></option>
+              <% end %>
+            </select>
+
+              <label for="customer_id" style="width: 64px;">Pelanggan</label>
+              <select name="customer_id" class="third left">
+                <option value="">Semua Pelanggan</option>
+                <% Customer.active.order(:name).each do |customer| %>
+                  <option value="<%=customer.id%>"<% if customer.id == @customer_id.to_i %> selected='selected'<% end %>><%=customer.name%></option>
                 <% end %>
               </select>
+
             <input class="submit left" type="submit" value="Filter" />
           </div>
         </form>
@@ -74,17 +86,17 @@
         <thead>
           <tr>
             <th>No.</th>
-            <th class="{sorter:true, filter: false}" >Tanggal</th>
+            <th width='90' class="{sorter:true, filter: false}" >Tanggal&nbsp;&nbsp;</th>
             <th class="center {sorter:true, filter: false}" >Pelanggan</th>
-            <th class="{sorter:true, filter: false}">Bahan Ditransport</th>
-            <th width="80" class="center {sorter:true, filter: false}">Industri</th>
-            <th width=150 class="{sorter:true, filter: false} right">Total Revenue (dalam Rupiah)</th>
+            <th width='70' class="center {sorter:true, filter: false}" >Moda &nbsp;&nbsp;</th>
+            <th class="{sorter:true, filter: false}">Komoditas</th>
+            <th width='150' class="{sorter:true, filter: false} right">Total Revenue (Rp)&nbsp;&nbsp;</th>
             <th class="{sorter:false, filter: false} right">Total Volume</th>
           </tr>
         </thead>
         <% total_revenue, total_volume, j = 0,0,0 %>
         <tbody>
-          <% @events.each_with_index do |event, i| %>
+          <% @events.includes(:customer, :commodity).each_with_index do |event, i| %>
             <%
               invoice_ids = event.invoices.active.pluck(:id)
               taxinvoiceitem_ids = Taxinvoiceitem.active.joins(:taxinvoice).where("taxinvoices.paiddate IS NOT NULL AND taxinvoiceitems.invoice_id IN (?)", invoice_ids).pluck(:id)
@@ -101,10 +113,22 @@
                 <td><%= j %>.</td>
                 <td><%= event.start_date.strftime("%d-%m-%Y") rescue nil %></td>
                 <td><%= event.customer.name rescue nil %></td>
-                <td><%= event.commodity.name rescue nil %></td>
-                <td><%= event.commodity.industry rescue nil %></td>
+                <td>
+                  <% if event.invoicetrain %>
+                    Kereta
+                  <% elsif event.invoiceship %>
+                    Kapal
+                  <% else %>
+                    Truk
+                  <% end %>
+                </td>
+                <td><%= event.commodity.name rescue nil %></td> 
                 <td class="right"><%= to_currency(revenue) %></td>
-                <td class="right"><%= to_currency(volume) %> <%= event.price_per_type == 'BORONGAN' ? ('(' + event.price_per_type + ')') : event.price_per_type %></td>
+                <td class="right">
+                  <%= to_currency(volume) %> 
+                  <!-- <%= event.price_per_type == 'BORONGAN' ? ('(' + event.price_per_type + ')') : 'KG' %> -->
+                  <%= event.price_per_type == 'BORONGAN' ? ('KG (b)') : 'KG' %>
+                </td>
               </tr>
             <% end %>
           <% end %>
@@ -113,7 +137,7 @@
           <tr>
             <td colspan="5"><strong>Total</strong></td>
             <td align="right"><strong><%= to_currency(total_revenue) %></strong></td>
-            <!-- <td align="right"><strong><%= to_currency(total_volume) %></strong></td> -->
+            <td align="right"><strong><%= to_currency(total_volume) %> KG</strong></td>
           </tr>
         </tfoot>
       </table>

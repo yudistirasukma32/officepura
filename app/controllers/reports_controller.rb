@@ -16,6 +16,7 @@ class ReportsController < ApplicationController
   def revenuebreakdown
     @customer_id = params[:customer_id].present? ? params[:customer_id] : nil
     @commodity_id = params[:commodity_id].present? ? params[:commodity_id] : nil
+    @transporttype = params[:transporttype].present? ? params[:transporttype] : 'all'
 
     @month = params[:month]
     @month = "%02d" % Date.today.month.to_s if @month.nil?
@@ -31,6 +32,20 @@ class ReportsController < ApplicationController
     @events = Event.active.where("start_date BETWEEN ? AND ?", "#{@year}-#{@month}-01","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
     @events = @events.where("customer_id=?", @customer_id) if @customer_id.present?
     @events = @events.where("commodity_id=?", @commodity_id) if @commodity_id.present?
+
+    if @transporttype.present? and @transporttype != 'all'
+      if @transporttype == 'RORO'
+        @events = @events.where('invoiceship = true')
+      elsif @transporttype == 'LOSING'
+        @events = @events.where('losing = true')
+      else
+        if @transporttype == 'KERETA'
+          @events = @events.where('invoicetrain = true')
+        else
+          @events = @events.where('invoicetrain = false')
+        end
+      end
+    end
 
   end
 
@@ -65,9 +80,6 @@ class ReportsController < ApplicationController
       end
       if params[:customer_id].present?
         @invoices = @invoices.where(customer_id: params[:customer_id])
-      end
-      if params[:driver_id].present?
-        @invoices = @invoices.where(driver_id: params[:driver_id])
       end
       @invoices = @invoices.order(:id)
       @ids = @invoices.any? ? @invoices.collect(&:id).join(",") : 0
