@@ -705,7 +705,45 @@
 				<td colspan="3">&nbsp;</td>
 			</tr>
 		</tbody>
-	<% end %>	
+	<% end %>
+	
+	<% if @officeexpenses_docs.any? %>
+	<% total = 0 %>
+
+		<tbody class="tablesorter-no-sort">
+			<tr class="subheading">
+				<th colspan="6" style="color:#000;">Bukti Kas Dokumen (<%=@officeexpenses_docs.count%>)</th>
+			</tr>
+		</tbody>
+
+		<tbody>
+		<% @officeexpenses_docs.each do |expense| %>
+			<% total += expense.total %>
+
+			<tr>
+				<td><%=zeropad(expense.id)%></td>
+				<td><%=nl2br(expense.description).html_safe%>
+                <%= (expense.isotank_id.present? && expense.isotank_id.to_i != 0) ? ("Isotank = " + expense.isotank.isotanknumber) : '' %>
+                <%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+                </td>
+				<td><%=expense.office.abbr if !expense.office_id.nil?%></td>
+				<td><%=expense.vehicle.current_id if !expense.vehicle_id.blank? %></td>
+				<td align="right" class="<% if expense.expensetype == 'Kredit' %>red<% else %>green<% end %>"><%= to_currency(expense.total) %></td>
+				<td class="right">
+					<a class="cta" href="<%=new_receiptexpense_path%>/<%=expense.id%>">Konfirm</a>
+				</td>
+			</tr>
+		<% end %>
+		</tbody>
+		<tbody class="tablesorter-no-sort">
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="red"><strong><%=to_currency(total.abs)%></strong></td>
+				<td colspan="3">&nbsp;</td>
+			</tr>
+		</tbody>
+	<% end %>
 
 	<% if @sales.any? %>
 	<% total = 0 %>
