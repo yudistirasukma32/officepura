@@ -380,7 +380,7 @@
 			<tr><td colspan="3">&nbsp;</td></tr>
 			<tr><td colspan="3">&nbsp;</td></tr>
 			<tr>
-				<td style="text-align:center"><%= current_user.staff_id.nil? ? current_user.username : current_user.staff.name %></td>
+				<td style="text-align:center"><%= @taxinvoice.user.staff_id.present? ? @taxinvoice.user.staff.name : @taxinvoice.user.username %></td>
 				<td>&nbsp;</td>
 			</tr>
   		</table>
