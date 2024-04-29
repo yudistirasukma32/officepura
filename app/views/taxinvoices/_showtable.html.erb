@@ -54,7 +54,7 @@
 		</td>
 		<td align="right">
 			<strong><%=to_currency_bank(taxinvoice.total)%></strong>
-			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment + taxinvoice.secondpayment)%>)<% end %>
+			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment + taxinvoice.secondpayment + taxinvoice.thirdpayment + taxinvoice.fourthpayment)%>)<% end %>
 		</td>
 		<td><% if !taxinvoice.paiddate.nil? %><%=taxinvoice.paiddate.strftime('%d-%m')%> (<%=(taxinvoice.paiddate - taxinvoice.date).to_i%>) <% end %></td>
 		<td class="right" width="60">&nbsp;</td>
@@ -113,7 +113,7 @@
 		</td>
 		<td align="right">
 			<strong><%=to_currency_bank(taxinvoice.total)%></strong>
-			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment + taxinvoice.secondpayment)%>)<% end %>
+			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment + taxinvoice.secondpayment + taxinvoice.thirdpayment + taxinvoice.fourthpayment)%>)<% end %>
 		</td>
 
 		<% if taxinvoice.paiddate.nil? %>

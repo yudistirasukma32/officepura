@@ -1,4 +1,5 @@
 <% if !@taxinvoice.nil? %>
+	<% total_angsuran = @taxinvoice.secondpayment + @taxinvoice.thirdpayment + @taxinvoice.fourthpayment %>
 	<div class="info-box" style="float:right; width:420px; margin-left:20px;">
 	    <h3>Invoice Tagihan #<%=zeropad(@taxinvoice_id)%></h3>
 
@@ -142,16 +143,16 @@
 			<tr>
 	          <td>Angsuran</td>
 	          <td>&nbsp;</td>
-	          <td align="right" class="green"><%=to_currency(@taxinvoice.secondpayment)%></td>
+	          <td align="right" class="green"><%=to_currency(total_angsuran)%></td>
 	        </tr>
 	        <tr class="total-row">
 	          <td>Total</td>
 	          <td>&nbsp;</td>
-	          <td><input type="text" id="invoice_total" class="half disabled allowance-field" value="<%=to_currency(@taxinvoice.total - @taxinvoice.downpayment - @taxinvoice.secondpayment)%>" readOnly="true" /></td>
+	          <td><input type="text" id="invoice_total" class="half disabled allowance-field" value="<%=to_currency(@taxinvoice.total - @taxinvoice.downpayment - total_angsuran)%>" readOnly="true" /></td>
 	        </tr>
 	     </table>
 	  	</div>
-	  </div>
+	</div>
 
 <form id="taxinvoice" name="taxinvoice" action="/taxinvoices/updatepayment" method="post" style="float:left; width:300px; clear:left; margin-bottom:30px;">
 	<input type="hidden" id="invoice_id" name="taxinvoice[taxinvoice_id]" value="<%=@taxinvoice_id%>"/>
@@ -187,7 +188,7 @@
 	</div>
 	<div class="field-row continue">
 		<label for="total">Total</label>
-		<input type="text" name="taxinvoice[total]" class="red" value="<%=to_currency(@taxinvoice.total - @taxinvoice.downpayment - @taxinvoice.secondpayment, 'Rp. ')%> (<%=to_currency(@taxinvoice.downpayment + @taxinvoice.secondpayment, 'Rp. ')%>)" readonly="readonly" />
+		<input type="text" name="taxinvoice[total]" class="red" value="<%=to_currency(@taxinvoice.total - @taxinvoice.downpayment - total_angsuran, 'Rp. ')%> (<%=to_currency(@taxinvoice.downpayment + total_angsuran, 'Rp. ')%>)" readonly="readonly" />
 	</div>
   <div class="actions" style="float: left; margin-top: 5px;">
   	<input type="submit" value="Pelunasan Tagihan" class="left"/>
@@ -300,7 +301,7 @@
 	<input type="hidden" id="invoice_id" name="taxinvoice[taxinvoice_id]" value="<%=@taxinvoice_id%>"/>
 
 	<div class="field-row">
-	<h3 style="margin-top:0;"><strong>Pembayaran Angsuran</strong></h3><br />
+	<h3 style="margin-top:0;"><strong>Pembayaran Angsuran 1</strong></h3><br />
 
     <label for="bank_id">Bank</label>
 		<select name="bank_id" class="third left">
@@ -333,6 +334,154 @@
 	<div class="field-row continue">
 		<label for="secondpayment">Nominal</label>
 		<input type="text" name="taxinvoice[secondpayment]" class="half" value="<%=to_currency(@taxinvoice.secondpayment)%>" placeholder="0" onkeypress="javascript:return isMoneyKey(this);" />
+	</div>
+
+	<div class="actions" style="float: left; margin-top: 5px;">
+		<input type="submit" value="Simpan Angsuran" class="left" />
+	</div>
+
+</form>
+
+<% end %>
+
+<% if @taxinvoice.thirdpayment > 0 %>
+
+<form id="taxinvoice" name="taxinvoice" action="/taxinvoices/cancelthirdpayment" method="post" style="float:left; width:300px; clear:left;">
+
+	<input type="hidden" id="invoice_id" name="taxinvoice[taxinvoice_id]" value="<%=@taxinvoice_id%>"/>
+
+	<div class="field-row">
+		<h3 style="margin-top:0;"><strong>Pembatalan Angsuran</strong></h3><br />
+
+		<label for="paiddate">Tanggal</label>
+		<input type="text" name="taxinvoice[thirdpayment_date]" class="half date-picker" value="<%=@taxinvoice.thirdpayment_date.strftime('%d-%m-%Y')%>" readonly="readonly" />
+	</div>
+
+	<div class="field-row continue">
+		<label for="thirdpayment">Nominal</label>
+		<input type="text" name="taxinvoice[thirdpayment]" class="half" value="<%=to_currency(@taxinvoice.thirdpayment, 'Rp. ')%>" readonly="readonly" />
+	</div>
+
+	<div class="actions" style="float: left; margin-top: 5px;">
+		<input type="submit" value="Batal Angsuran" class="left" />
+	</div>
+
+</form>
+
+<% else %>
+
+<form id="taxinvoice" name="taxinvoice" action="/taxinvoices/thirdpayment" method="post" style="float:left; width:300px; clear:left;">
+
+	<input type="hidden" id="invoice_id" name="taxinvoice[taxinvoice_id]" value="<%=@taxinvoice_id%>"/>
+
+	<div class="field-row">
+	<h3 style="margin-top:0;"><strong>Pembayaran Angsuran 2</strong></h3><br />
+
+    <label for="bank_id">Bank</label>
+		<select name="bank_id" class="third left">
+			<% Bankexpensegroup.where("UPPER(name) like 'BANK%' ").active.order(:name).each do |bankexpensegroup| %>
+			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultBankValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
+			<% end %>
+			<% Bankexpensegroup.where("UPPER(name) like 'UANG TITIPAN%' ").active.order(:name).each do |bankexpensegroup| %>
+			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultBankValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
+			<% end %>
+			<% Bankexpensegroup.where("UPPER(name) like 'HUTANG KLAIM%' ").active.order(:name).each do |bankexpensegroup| %>
+			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultBankValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
+			<% end %>
+		</select>
+	</div>
+	
+	<div class="field-row continue">
+    <label for="piutang_id">Piutang</label>
+		<select name="piutang_id" class="third left">
+			<% Bankexpensegroup.where("UPPER(name) like 'PIUTANG%' ").active.order(:name).each do |bankexpensegroup| %>
+			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultPiutangValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
+			<% end %>
+		</select>
+	</div>
+
+	<div class="field-row continue" style="margin-top: 10px;">
+		<label for="paiddate">Tanggal</label>
+		<input type="text" name="taxinvoice[thirdpayment_date]" class="half date-picker" value="<%=@taxinvoice.thirdpayment_date.strftime('%d-%m-%Y')%>"/>
+	</div>
+
+	<div class="field-row continue">
+		<label for="thirdpayment">Nominal</label>
+		<input type="text" name="taxinvoice[thirdpayment]" class="half" value="<%=to_currency(@taxinvoice.thirdpayment)%>" placeholder="0" onkeypress="javascript:return isMoneyKey(this);" />
+	</div>
+
+	<div class="actions" style="float: left; margin-top: 5px;">
+		<input type="submit" value="Simpan Angsuran" class="left" />
+	</div>
+
+</form>
+
+<% end %>
+
+<% if @taxinvoice.fourthpayment > 0 %>
+
+<form id="taxinvoice" name="taxinvoice" action="/taxinvoices/cancelfourthpayment" method="post" style="float:left; width:300px; clear:left;">
+
+	<input type="hidden" id="invoice_id" name="taxinvoice[taxinvoice_id]" value="<%=@taxinvoice_id%>"/>
+
+	<div class="field-row">
+		<h3 style="margin-top:0;"><strong>Pembatalan Angsuran</strong></h3><br />
+
+		<label for="paiddate">Tanggal</label>
+		<input type="text" name="taxinvoice[fourthpayment_date]" class="half date-picker" value="<%=@taxinvoice.fourthpayment_date.strftime('%d-%m-%Y')%>" readonly="readonly" />
+	</div>
+
+	<div class="field-row continue">
+		<label for="fourthpayment">Nominal</label>
+		<input type="text" name="taxinvoice[fourthpayment]" class="half" value="<%=to_currency(@taxinvoice.fourthpayment, 'Rp. ')%>" readonly="readonly" />
+	</div>
+
+	<div class="actions" style="float: left; margin-top: 5px;">
+		<input type="submit" value="Batal Angsuran" class="left" />
+	</div>
+
+</form>
+
+<% else %>
+
+<form id="taxinvoice" name="taxinvoice" action="/taxinvoices/fourthpayment" method="post" style="float:left; width:300px; clear:left;">
+
+	<input type="hidden" id="invoice_id" name="taxinvoice[taxinvoice_id]" value="<%=@taxinvoice_id%>"/>
+
+	<div class="field-row">
+	<h3 style="margin-top:0;"><strong>Pembayaran Angsuran 3</strong></h3><br />
+
+    <label for="bank_id">Bank</label>
+		<select name="bank_id" class="third left">
+			<% Bankexpensegroup.where("UPPER(name) like 'BANK%' ").active.order(:name).each do |bankexpensegroup| %>
+			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultBankValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
+			<% end %>
+			<% Bankexpensegroup.where("UPPER(name) like 'UANG TITIPAN%' ").active.order(:name).each do |bankexpensegroup| %>
+			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultBankValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
+			<% end %>
+			<% Bankexpensegroup.where("UPPER(name) like 'HUTANG KLAIM%' ").active.order(:name).each do |bankexpensegroup| %>
+			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultBankValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
+			<% end %>
+		</select>
+	</div>
+	
+	<div class="field-row continue">
+    <label for="piutang_id">Piutang</label>
+		<select name="piutang_id" class="third left">
+			<% Bankexpensegroup.where("UPPER(name) like 'PIUTANG%' ").active.order(:name).each do |bankexpensegroup| %>
+			  <option value="<%=bankexpensegroup.id%>" <% if bankexpensegroup.id == @defaultPiutangValue %> selected='selected'<% end %> ><%=bankexpensegroup.name%></option>
+			<% end %>
+		</select>
+	</div>
+
+	<div class="field-row continue" style="margin-top: 10px;">
+		<label for="paiddate">Tanggal</label>
+		<input type="text" name="taxinvoice[fourthpayment_date]" class="half date-picker" value="<%=@taxinvoice.fourthpayment_date.strftime('%d-%m-%Y')%>"/>
+	</div>
+
+	<div class="field-row continue">
+		<label for="fourthpayment">Nominal</label>
+		<input type="text" name="taxinvoice[fourthpayment]" class="half" value="<%=to_currency(@taxinvoice.fourthpayment)%>" placeholder="0" onkeypress="javascript:return isMoneyKey(this);" />
 	</div>
 
 	<div class="actions" style="float: left; margin-top: 5px;">

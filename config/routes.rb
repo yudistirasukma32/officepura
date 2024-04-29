@@ -505,6 +505,12 @@ OfficePuraErp::Application.routes.draw do
       post 'secondpayment' => 'taxinvoices#secondpayment'
       post 'cancelsecondpayment' => 'taxinvoices#cancelsecondpayment'
 
+      post 'thirdpayment' => 'taxinvoices#thirdpayment'
+      post 'cancelthirdpayment' => 'taxinvoices#cancelthirdpayment'
+
+      post 'fourthpayment' => 'taxinvoices#fourthpayment'
+      post 'cancelfourthpayment' => 'taxinvoices#cancelfourthpayment'
+
       post 'import_excel'
     end
   end

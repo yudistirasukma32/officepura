@@ -61,7 +61,7 @@
                     <th class="center {sorter:true, filter: false}" width="200">No Invoice</th>
                     <th class="{sorter:true, filter: false}" width="90">Kirim</th>
                     <th class="{sorter:true, filter: false}" width="90">Konfirm</th>
-                    <th class="{sorter:false, filter: false}" width="110">Jatuh Tempo</th>
+                    <th class="{sorter:false, filter: false}" width="90">J. Tempo</th>
                     <th width="80" class="center {sorter:true, filter: false}">DPP</th>
                     <th width="80" class="center {sorter:true, filter: false}">PPN</th>
                     <th width="80" class="center {sorter:true, filter: false}">PPH</th>
@@ -73,7 +73,7 @@
                 <% total = 0 %>
                 <tbody>
                 <% @taxinvoices.each_with_index do |taxinvoice| %>
-                <% total = total + taxinvoice.total - taxinvoice.downpayment - taxinvoice.secondpayment %>
+                <% total = total + taxinvoice.total - taxinvoice.downpayment - taxinvoice.secondpayment - taxinvoice.thirdpayment - taxinvoice.fourthpayment %>
                     <tr>
                         <td><%= taxinvoice.customer.name%>&nbsp;<% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
                         <td align=""><%= taxinvoice.long_id %></td>
@@ -100,7 +100,7 @@
                         <td align="right"><%= to_currency(taxinvoice.downpayment) %></td>
                         <td align="right"><%= to_currency(taxinvoice.gst_tax) %></td>
                         <td align="right"><%= to_currency(taxinvoice.price_tax) %></td>
-                        <td align="right"><%= to_currency(taxinvoice.total-taxinvoice.downpayment-taxinvoice.secondpayment) %></td>
+                        <td align="right"><%= to_currency(taxinvoice.total-taxinvoice.downpayment-taxinvoice.secondpayment-taxinvoice.thirdpayment-taxinvoice.fourthpayment) %></td>
                         <td align="right"><a href="<%= print_taxinvoice_url(taxinvoice.id) %>" class="delete tipsy" original-title="Print Invoice Tagihan"><i class="icon-print"></i></a>
                         </td>
     
@@ -110,12 +110,12 @@
     
                 </tbody>
                 <tfoot>
-                <tr>
-                    <td colspan="2"><strong>Total</strong></td>
-                    <td colspan="7" align="right"><strong><%= to_currency(total) %></strong></td>
-    
-                </tr>
-              </tfoot>
+                    <tr>
+                        <td colspan="2"><strong>Total</strong></td>
+                        <td colspan="7" align="right"><strong><%= to_currency(total) %></strong></td>
+        
+                    </tr>
+                </tfoot>
             </table>
         
         </div>

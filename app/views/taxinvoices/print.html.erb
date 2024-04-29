@@ -48,12 +48,12 @@
 
 		<div class="field-row continue">
 			<label class="left">Tanggal</label>
-  			<input type="text" class="disabled left" value=":  <%=@taxinvoice.date.strftime('%d-%m-%Y')%>" />
+  			<input type="text" class="disabled left" value=":  <%=@taxinvoice.date.strftime('%d/%m/%Y')%>" />
 		</div>
 
 		<div class="field-row continue">
 			<label class="left">Periode</label>
-  			<input type="text" class="disabled left" value=":  <%=@taxinvoice.period_start.strftime('%d-%m-%Y')%> <% if @taxinvoice.period_start != @taxinvoice.period_end %>  s/d <%=@taxinvoice.period_end.strftime('%d-%m-%Y')%> <% end %>" />
+  			<input type="text" class="disabled left" value=":  <%=@taxinvoice.period_start.strftime('%d/%m/%Y')%> <% if @taxinvoice.period_start != @taxinvoice.period_end %>  s/d <%=@taxinvoice.period_end.strftime('%d-%m-%Y')%> <% end %>" />
 		</div>
 
 		<div class="field-row continue">
@@ -186,7 +186,8 @@
 						<span style="display: none;"><% if taxinvoiceitem.invoice.invoicetrain %>,<% if taxinvoiceitem.invoice.invoices.first %> <%= taxinvoiceitem.invoice.invoices.first.vehicle.current_id %> <% end %> <% end %></span>
 					</td>
 					<td>
-						<% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
+						<% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> 
+					</td>
 					<% if @taxinvoice.is_showqty_loaded %>
 						<td align="right">
 							<% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxinvoiceitem.weight_gross)%> <% end %> 
@@ -280,7 +281,7 @@
 		  <tr>
 		  	<td></td>
 		    <td colspan="3">SUBTOTAL</td>
-		    <% if @taxinvoice.is_showqty_loaded %>
+				<% if @taxinvoice.is_showqty_loaded %>
 					<td align="right" style="border-top: 3px double"><strong><%= to_currency(weight_gross) %></strong></td>
 				<% end %>
 				<% if @taxinvoice.is_showqty_unloaded %>
@@ -307,15 +308,29 @@
 
 			<% if @taxinvoice.downpayment.to_i > 0 %>
 				<tr id="pph-row">
-					<td colspan="<%= colspan%>" class="footer1" align="right">DP</td>
+					<td colspan="<%= colspan%>" class="footer1" align="right">DP (<%= @taxinvoice.downpayment_date.strftime('%d/%m/%Y') %>)</td>
 					<td align="right"><span id="txt_price_dp" <% if @taxinvoice.downpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.downpayment.to_i)%></strong></span></td>
 				</tr>
 			<% end %>
 
 			<% if @taxinvoice.secondpayment.to_i > 0 %>
 				<tr id="pph-row">
-					<td colspan="<%= colspan%>" class="footer1" align="right">DP (<%= @taxinvoice.secondpayment_date.strftime('%d/%m/%Y') %>)</td>
+					<td colspan="<%= colspan%>" class="footer1" align="right">Angsuran (<%= @taxinvoice.secondpayment_date.strftime('%d/%m/%Y') %>)</td>
 					<td align="right"><span id="txt_price_dp" <% if @taxinvoice.secondpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.secondpayment.to_i)%></strong></span></td>
+				</tr>
+			<% end %>
+
+			<% if @taxinvoice.thirdpayment.to_i > 0 %>
+				<tr id="pph-row">
+					<td colspan="<%= colspan%>" class="footer1" align="right">Angsuran (<%= @taxinvoice.thirdpayment_date.strftime('%d/%m/%Y') %>)</td>
+					<td align="right"><span id="txt_price_dp" <% if @taxinvoice.thirdpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.thirdpayment.to_i)%></strong></span></td>
+				</tr>
+			<% end %>
+
+			<% if @taxinvoice.fourthpayment.to_i > 0 %>
+				<tr id="pph-row">
+					<td colspan="<%= colspan%>" class="footer1" align="right">Angsuran (<%= @taxinvoice.fourthpayment_date.strftime('%d/%m/%Y') %>)</td>
+					<td align="right"><span id="txt_price_dp" <% if @taxinvoice.fourthpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.fourthpayment.to_i)%></strong></span></td>
 				</tr>
 			<% end %>
 
@@ -357,7 +372,7 @@
 		  <tr class="footer">
 		    <td colspan="<%= colspan - 1%>" class="footer2"><span style="display: none;">&nbsp;<% if !@taxinvoice.total_in_words.blank? %> Terbilang: <%= @taxinvoice.total_in_words%><% end %></span></td>
 		    <td align="right" width="40"><strong>TOTAL</strong></td>
-		    <td align="right" style="border-top: 3px double"><strong><span id="txt_total"><%= @is_pembulatan ? to_currency(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i - @taxinvoice.secondpayment.to_i) : to_currency_bank(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i - @taxinvoice.secondpayment.to_i)%></span></strong></td>
+		    <td align="right" style="border-top: 3px double"><strong><span id="txt_total"><%= @is_pembulatan ? to_currency(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i - @taxinvoice.secondpayment.to_i - @taxinvoice.thirdpayment.to_i - @taxinvoice.fourthpayment.to_i) : to_currency_bank(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i - @taxinvoice.secondpayment.to_i - @taxinvoice.thirdpayment.to_i - @taxinvoice.fourthpayment.to_i)%></span></strong></td>
 		  </tr>
 
 		  <tr>
