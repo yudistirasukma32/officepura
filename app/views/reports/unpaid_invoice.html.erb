@@ -1,7 +1,7 @@
 <%= content_for :css do %>
     <style>
         #main #filter {
-            height: 80px;
+            /* height: 80px; */
         }
     </style>
     <% end %>
@@ -36,25 +36,11 @@
                         <% end %>
                     </select>
                     <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
-                    <select name="year" class="short left">
+                    <select name="year" class="short left" style="margin-right: 10px;">
                         <% (Date.today.year.downto(year_to)).each do |y| %>
                         <option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
                         <% end %>
                     </select>
-                    <label for="date" class="middle" style="width: 64px;">Sampai</label>
-                    <select name="monthEnd" class="half left" style="margin-right:10px;">
-                        <% (1.upto(12)).each do |m| %>
-                        <option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @monthEnd %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
-                        <% end %>
-                    </select>
-                    <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
-                    <select name="yearEnd" class="short left">
-                        <% (Date.today.year.downto(year_to)).each do |y| %>
-                        <option value="<%=y%>"<% if y.to_s == @yearEnd %> selected='selected'<% end %>><%=y%></option>
-                        <% end %>
-                    </select>
-                </div>
-                <div class="field-row continue">
                     <label for="due_date_order" style="width: 80px;">Jatuh Tempo</label>
                     <select name="due_date_order" class="third left">
                         <option value="">Tanpa Urutan</option>
