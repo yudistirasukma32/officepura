@@ -1,4 +1,13 @@
 <style type="text/css">
+	#transfer-div {
+		position: absolute;
+		width: 50%;
+		bottom: 3%;
+		left: 1%;
+		padding: 5px;
+		border: solid 2px #000;
+	}
+
 	.headsignature {margin-top:0px;margin-left: 250px;}
 
 	@media print{
@@ -386,7 +395,7 @@
 		  <% end %>
 		</table>
 
-		<table class="row-view no-border showprint" style="border:0; width:100%;">
+		<table class="row-view no-border showprint" style="border:0; width:100%; position: relative; left: 60%;">
 		 	<tr>
 				<th width="150" style="text-align:center">Dibuat :</th>
 				<th width="300">&nbsp;</th>
@@ -400,11 +409,47 @@
 			</tr>
   		</table>
   		<% end %>
+	
+		<% 
+			if @taxinvoice.bank_id.present? && @taxinvoice.bank_id != 0
+							
+				bank_name = @taxinvoice.bank.name
+				bank_account_name = @taxinvoice.bank.bank_account_name
+				bank_account_number = @taxinvoice.bank.bank_account_number
+			
+			else
+		
+				bank = Bank.find(1)
+				
+				bank_name = bank.name
+				bank_account_name = bank.bank_account_name
+				bank_account_number = bank.bank_account_number
+		
+			end
+		%>
+	  
+		<div id="transfer-div" class="showprint">
+			<p style="margin-bottom: 0; padding-bottom: 5px">Pembayaran ditransfer ke</p>
+			<table>
+				<tr style="font-weight: bold;">
+					<td>No. Rek</td>
+					<td style="padding: 5px 10px"> : <%= bank_account_number %></td>
+				</tr>
+				<tr style="font-weight: bold;">
+					<td>Bank</td>
+					<td style="padding: 5px 10px"> : <%= bank_name %></td>
+				</tr>
+				<tr style="font-weight: bold;">
+					<td>Atas Nama</td>
+					<td style="padding: 5px 10px"> : <%= bank_account_name %></td>
+				</tr>
+			</table>
+			<p style="margin: 5px; padding-bottom: 5px">Pembayaran dianggap lunas setelah kami uangkan</p>
+		</div>
+	
 	</div>
 
 </div>
-
-
 
 <%= content_for :js do %>
 	<script>
