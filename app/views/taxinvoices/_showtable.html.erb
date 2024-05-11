@@ -22,8 +22,11 @@
 	</thead>
 
 	<tbody>
-	<% total = 0 %>
-	<% totalGeneric = 0 %>
+	<%
+		total = 0
+		totalGeneric = 0
+		total_dpp, total_ppn, total_pph, grandtotal = 0, 0, 0, 0
+	%>
 	<% @taxinvoices.each do |taxinvoice| %>
 		<% customer = taxinvoice.customer %>
 
@@ -66,11 +69,19 @@
 	
 	<% else %>
 	
-		<% if !taxinvoice.generic %>
-			<% total += taxinvoice.total %>
-		<% else %>
-			<% totalGeneric += taxinvoice.total %>
-		<% end %>
+		<%
+			if !taxinvoice.generic
+				total += taxinvoice.total
+				total_dpp += taxinvoice.taxinvoiceitems.sum(:total)
+			else 
+				totalGeneric += taxinvoice.total
+				total_dpp += taxinvoice.taxgenericitems.sum(:total)
+			end
+
+			total_ppn += taxinvoice.gst_tax
+			total_pph += taxinvoice.price_tax
+			grandtotal += taxinvoice.total
+		%>
 
 	<tr id="<%=taxinvoice.id%>">
 		<td width="20"> <% if taxinvoice.paiddate.nil? %> <input type="checkbox" id="cb_<%=taxinvoice.id%>" name="cb_<%=taxinvoice.id%>" /><% end %></td>
@@ -162,6 +173,13 @@
 
 	<% if @taxinvoices.any? %>
 	<tbody class="tablesorter-no-sort">
+	<tr class="footer">
+		<td colspan="7" class="total" align="right">TOTAL</td>
+		<td class="total" align="right"><%=to_currency_bank(total_dpp)%></td>
+		<td class="total" align="right"><%=to_currency_bank(total_ppn)%></td>
+		<td class="total" align="right"><%=to_currency_bank(total_pph)%></td>
+		<td class="total" align="right"><%=to_currency_bank(grandtotal)%></td>
+	</tr>
 	<!-- <tr class="footer">
 		<td colspan="5" class="total" style="padding-left:5px;">TOTAL INVOICE&nbsp; <span class="red"><%=@customer.name + ', ' if @customer%><%=Date::MONTHNAMES[@month.to_i] + ' ' + @year.to_s%></span></td>
 		<td class="total" align="right"><%=to_currency_bank(total)%></td>
