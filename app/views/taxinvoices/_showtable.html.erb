@@ -124,7 +124,7 @@
 		</td>
 		<td align="right">
 			<strong><%=to_currency_bank(taxinvoice.total)%></strong>
-			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(taxinvoice.downpayment + taxinvoice.secondpayment + taxinvoice.thirdpayment + taxinvoice.fourthpayment)%>)<% end %>
+			<% if taxinvoice.downpayment > 0 %><br />(<%=to_currency_bank(( taxinvoice.downpayment rescue 0 ) + ( taxinvoice.secondpayment rescue 0 ) + ( taxinvoice.thirdpayment rescue 0 ) +( taxinvoice.fourthpayment rescue 0 ))%>)<% end %>
 		</td>
 
 		<% if taxinvoice.paiddate.nil? %>

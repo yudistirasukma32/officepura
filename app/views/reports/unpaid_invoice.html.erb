@@ -73,10 +73,16 @@
                 <% total = 0 %>
                 <tbody>
                 <% @taxinvoices.each_with_index do |taxinvoice| %>
-                <% total = total + taxinvoice.total - taxinvoice.downpayment - taxinvoice.secondpayment - taxinvoice.thirdpayment - taxinvoice.fourthpayment %>
+                <% total = total + taxinvoice.total - (taxinvoice.downpayment rescue 0) - (taxinvoice.secondpayment rescue 0) - (taxinvoice.thirdpayment rescue 0) - (taxinvoice.fourthpayment rescue 0) %>
                     <tr>
                         <td><%= taxinvoice.customer.name%>&nbsp;<% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
-                        <td align=""><%= taxinvoice.long_id %></td>
+                        <td align="">
+                            <%= taxinvoice.long_id %>
+                            <% if taxinvoice.remarks.present? %>
+                                <br>
+                                <small><%= taxinvoice.remarks %></small>
+                            <% end %>
+                        </td>
                         <td><%=taxinvoice.sentdate.strftime('%d-%m-%y') rescue nil%></td>
                         <td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td> 
                         
@@ -100,7 +106,7 @@
                         <td align="right"><%= to_currency(taxinvoice.downpayment) %></td>
                         <td align="right"><%= to_currency(taxinvoice.gst_tax) %></td>
                         <td align="right"><%= to_currency(taxinvoice.price_tax) %></td>
-                        <td align="right"><%= to_currency(taxinvoice.total-taxinvoice.downpayment-taxinvoice.secondpayment-taxinvoice.thirdpayment-taxinvoice.fourthpayment) %></td>
+                        <td align="right"><%= to_currency(taxinvoice.total - ( taxinvoice.downpayment rescue 0 ) - (taxinvoice.secondpayment rescue 0 ) - ( taxinvoice.thirdpayment rescue 0 ) - (taxinvoice.fourthpayment rescue 0 )) %></td>
                         <td align="right"><a href="<%= print_taxinvoice_url(taxinvoice.id) %>" class="delete tipsy" original-title="Print Invoice Tagihan"><i class="icon-print"></i></a>
                         </td>
     
