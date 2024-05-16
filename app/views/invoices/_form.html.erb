@@ -2,11 +2,16 @@
   
   <%= render "info-box", :f => f %>
 
+  <%
+    if params[:kosongan].present?
+      @offices = Office.active.order(:id)
+    end
+  %>
   <div class="field-row first">
     <%= f.label :office_id, "Kantor" %>
     <% if @iseditable %>
 
-    <select id="invoice_office_id" name="invoice[office_id]" class="half chzn-select" require onchange="javascript:getVehiclesByOffice(this.value, <%= params[:train].present? %>);">
+    <select id="invoice_office_id" name="invoice[office_id]" class="half chzn-select" require onchange="javascript:getVehiclesByOffice(this.value, <%= params[:train].present? %>, <%= params[:kosongan].present? %>);">
       <option value="0">- Kantor -</option>
       <% @offices.each do |office| %>
         <option value="<%=office.id%>"
@@ -207,7 +212,7 @@
 
   if params[:kosongan] || params[:kosongan] == true
 
-      @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%RDPI%' OR name LIKE '%PURA%' OR name LIKE '%INTI'").order(:name) 
+      # @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%RDPI%' OR name LIKE '%PURA%' OR name LIKE '%INTI'").order(:name) 
 
   else
 
@@ -224,7 +229,7 @@
 
   <% end %>
   
-  <% if !@customers.first.nil? %>
+  <% if @customers.present? %>
 
   <div class="field-row">
     <%= f.label :customer_id, "Pelanggan" %>
@@ -242,7 +247,17 @@
       <%= f.hidden_field :customer_id, :value => @invoice.customer_id %>
     <% end %>
     <small>*Pelanggan yang ditampilkan adalah yang memiliki DO.</small>
-  </div> 
+  </div>
+
+  <% else %>
+
+  <div id="div_customer">
+    <div class="field-row">
+      <%= f.label :customer_id, "Pelanggan" %>
+      <input type="text" class="double disabled" value="<%= !@invoice.customer.nil? ? @invoice.customer.name : 'Harap memilih kantor terlebih dahulu.' %>" />
+      <%= f.hidden_field :customer_id, :value => @invoice.customer_id %>
+    </div>
+  </div>
 
   <% end %>
 
@@ -254,6 +269,7 @@
     </div>
   </div>
   
+  <% if params[:kosongan].blank? %>
   <div id="div_routes">
     <div class="field-row">
       <%= f.label :route_id, "Jurusan Truk" %>
@@ -261,6 +277,18 @@
       <%= f.hidden_field :route_id, :value => @invoice.route_id %>
     </div>
   </div>
+  <% else %>
+  <div class="field-row">
+    <%= f.label :route_id, "Jurusan Truk" %>
+    <select id="invoice_route_id" name="invoice[route_id]" class="double combo_route chzn-select">
+      <option value="0">- Pilih Jurusan -</option>
+      <% Route.active.order(:name).each do |route| %>
+      <option value="<%=route.id%>"
+        <% if route.id == @invoice.route_id %> selected="selected"<% end %>><%=route.name%></option>
+      <% end %>
+    </select>
+  </div>
+  <% end %>
 
   <% if params[:train] || params[:train] == true %>
   <div class="field-row">

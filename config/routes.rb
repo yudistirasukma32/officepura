@@ -406,7 +406,7 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
-  get 'invoices/getcustomer/:route_id' => 'invoices#get_customer'
+  get 'invoices/getcustomer/:office_id' => 'invoices#get_customer'
   get 'invoices/getvehiclegroup/:vehicle_id' => 'invoices#get_vehiclegroup'
   get 'invoices/getvehicles/:vehiclegroup_id' => 'invoices#get_vehicles'
   get 'invoices/getvehicle/:vehicle_id' => 'invoices#get_vehicle'

@@ -506,7 +506,7 @@ class InvoicesController < ApplicationController
     @isotanks = Isotank.active.order(:isotanknumber)
     # @isotanks = @isotanks.where("isotanknumber IN ('NLLU 2902068','NLLU 2902073','NLLU 2902089','NLLU 2902094','NLLU 2902108','NLLU 2902113','NLLU 2902129','NLLU 2902134','NLLU 2902140','NLLU 2902155','NLLU 2902284','NLLU 2902290','NLLU 2902303','NLLU 2902319','NLLU 2902324','NLLU 2902330','NLLU 2902345','NLLU 2902350','NLLU 2902366','NLLU 2902371','NLLU 2900764','NLLU 2900770','NLLU 2900785','NLLU 2900790','NLLU 2900804','NLLU 2900810','NLLU 2900825','NLLU 2900830','NLLU 2900846','NLLU 2900851','NLLU 2901380','NLLU 2901415','NLLU 2901800','NLLU 2901816','NLLU 2901842','NLLU 2901159','NLLU 2901190','NLLU 2901210','NLLU 2901225','NLLU 9700027','NLLU 2800277','NLLU 2800282','NLLU 2800298','SAXU 2705112','SAXU 2705468','NLLU 2900907','NLLU 2900912','NLLU 2900928','NLLU 2900949','NLLU 2901077','NLLU 2901082','NLLU 2901117','NLLU 2901122','NLLU 2901138','NLLU 2901164','NLLU 2902746','NLLU 2902751','NLLU 2902767','NLLU 2902772','NLLU 2902788','NLLU 2902793','NLLU 2902807','NLLU 2902812','NLLU 2902828','NLLU 2902833','NLLU 2902849','NLLU 2902854','NLLU 2902860','NLLU 2902875','NLLU 2900070','NLLU 2900105','NLLU 2900173','NLLU 2900189','NLLU 2900424','NLLU 2900430')")
 
-    @offices = Office.active
+    @offices = Office.active.order(:id)
     @office_role = []
 
     if checkrole 'BKK Kantor Sidoarjo'
@@ -531,10 +531,11 @@ class InvoicesController < ApplicationController
     #     @office_role.push(7)
     # end
 
-    if checkrole 'Operasional BKK'
-        @offices = @offices.where('id != 7').order('id asc')
-    else
-        @offices = @offices.where('id IN (?)', @office_role).order('id asc')
+    # if checkrole 'Operasional BKK'
+    #     @offices = @offices.where('id != 7').order('id asc')
+    # else
+    if @office_role.count > 0
+        @offices = @offices.where('id IN (?)', @office_role)
     end
 
   end
@@ -1221,8 +1222,8 @@ class InvoicesController < ApplicationController
   end
 
   def get_customer
-    @route = Route.find(params[:route_id]) rescue nil
-    @customer = Customer.find(@route.customer_id) rescue nil if @route
+    office = Office.find(params[:office_id])
+    @customers = Customer.active.where("city ILIKE ? AND (name LIKE '%RDPI%' OR name LIKE '%PURA%' OR name LIKE '%INTI')", office.name.upcase).order(:name)
     render :json => { :success => true, :html => render_to_string(:partial => "invoices/customer"), :layout => false }.to_json;
   end
 
@@ -1240,13 +1241,13 @@ class InvoicesController < ApplicationController
   def get_vehicles_by_office_id
     # Sby, Prb, Smt, CP
     if params[:office_id] == '3' || params[:office_id] == '5' || params[:office_id] == '6' || params[:office_id] == '7'
-        @vehicles = Vehicle.where(:office_id => params[:office_id], :enabled => true, :deleted => false).order('current_id ASC') rescue nil
-        @vehicles = @vehicles.where("platform_type = 'Platform' OR platform_type = 'Trailer Platform' OR platform_type = 'Engkel'") if params[:train] == 'true'
-        render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles_new"), :layout => false }.to_json;
+      @vehicles = Vehicle.where(:office_id => params[:office_id], :enabled => true, :deleted => false).order('current_id ASC') rescue nil
+      @vehicles = @vehicles.where("platform_type = 'Platform' OR platform_type = 'Trailer Platform' OR platform_type = 'Engkel'") if params[:train] == 'true'
+      render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles_new"), :layout => false }.to_json;
     else
-        @vehicles = Vehicle.where('enabled = true AND deleted = false AND office_id NOT IN (3,5,6,7)').order('current_id ASC') rescue nil
-        @vehicles = @vehicles.where("platform_type = 'Platform' OR platform_type = 'Trailer Platform' OR platform_type = 'Engkel'") if params[:train] == 'true'
-        render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles_new"), :layout => false }.to_json;
+      @vehicles = Vehicle.where('enabled = true AND deleted = false AND office_id NOT IN (3,5,6,7)').order('current_id ASC') rescue nil
+      @vehicles = @vehicles.where("platform_type = 'Platform' OR platform_type = 'Trailer Platform' OR platform_type = 'Engkel'") if params[:train] == 'true'
+      render :json => { :success => true, :html => render_to_string(:partial => "invoices/vehicles_new"), :layout => false }.to_json;
     end
   end
 

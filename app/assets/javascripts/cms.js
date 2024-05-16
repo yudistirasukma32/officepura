@@ -685,7 +685,7 @@ function getDriverPhone(driver_id) {
 	});	
 }
 
-function getVehiclesByOffice(office_id, train){
+function getVehiclesByOffice(office_id, train, kosongan){
 	
 	if(office_id != 0) {
 
@@ -699,6 +699,16 @@ function getVehiclesByOffice(office_id, train){
 			failure: function() {alert("Error. Mohon refresh browser Anda.");}
 		});
 
+	} else {
+		if ($('#invoice_total').val() == '0') {
+			$('#invoice_submit').hide();
+		} else {
+			$('#invoice_submit').show();		
+		}
+	}
+
+	if (kosongan == true && office_id != 0) {
+		getCustomer(office_id);
 	} else {
 		if ($('#invoice_total').val() == '0') {
 			$('#invoice_submit').hide();
@@ -783,11 +793,11 @@ function getAllowances() {
 	});
 }
 
-function getCustomer(route_id)
+function getCustomer(office_id)
 {
 	$.ajax({
 		type: "GET",
-		url: "/invoices/getcustomer/" + route_id,
+		url: "/invoices/getcustomer/" + office_id,
 		success: function(data) {
 			$('#div_customer').html(data.html);
 			$(".chzn-select").chosen();
