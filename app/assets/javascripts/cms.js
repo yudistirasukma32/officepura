@@ -693,6 +693,16 @@ function getVehiclesByOffice(office_id, train, kosongan){
 	if (kosongan == true && office_id != 0) {
 		getCustomer(office_id);
 
+		$.ajax({
+			type: "GET",
+			url: "/invoices/getvehiclesbyofficeid/" + office_id + "?train=" + train,
+			success: function(data) {
+				$('#div_vehicles').html(data.html);
+				$(".chzn-select").chosen();
+			},
+			failure: function() {alert("Error. Mohon refresh browser Anda.");}
+		});
+
 	} else if(office_id != 0) {
 		$.ajax({
 			type: "GET",
