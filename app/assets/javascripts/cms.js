@@ -2470,6 +2470,10 @@ $(document).ready(function() {
 			}
 		}
 
+		if ($('#invoice_office_id').val() == 0) {
+			errors = addComma(errors, "<strong>Kantor</strong>");
+		}
+
 		if ($('#invoice_customer_id').val() == 0) {			
 			errors = addComma(errors, "<strong>Pelanggan</strong>");
 		}
