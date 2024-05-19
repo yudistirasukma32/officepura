@@ -586,6 +586,8 @@ function getRouteTrain2(operator_id) {
 }
 
 function getRoutes(customer_id) {
+
+	$("#route-loader").show();
     
     if (document.getElementById('invoice_invoicetrain_true').checked) {
         var transporttype = "1";
@@ -600,6 +602,7 @@ function getRoutes(customer_id) {
             console.log("/invoices/getroutes/" + customer_id + "?train=" + transporttype);
 			$('#div_routes').html(data.html);
 			$(".chzn-select").chosen();
+			$("#route-loader").hide();
 		},
 		request: function() {
 			$('#div_routes').html('<em>Mengunduh Data</em>');			
@@ -686,9 +689,11 @@ function getDriverPhone(driver_id) {
 }
 
 function getVehiclesByOffice(office_id, train, kosongan){
-	
-	if(office_id != 0) {
 
+	if (kosongan == true && office_id != 0) {
+		getCustomer(office_id);
+
+	} else if(office_id != 0) {
 		$.ajax({
 			type: "GET",
 			url: "/invoices/getvehiclesbyofficeid/" + office_id + "?train=" + train,
@@ -706,17 +711,6 @@ function getVehiclesByOffice(office_id, train, kosongan){
 			$('#invoice_submit').show();		
 		}
 	}
-
-	if (kosongan == true && office_id != 0) {
-		getCustomer(office_id);
-	} else {
-		if ($('#invoice_total').val() == '0') {
-			$('#invoice_submit').hide();
-		} else {
-			$('#invoice_submit').show();		
-		}
-	}
-
 }
 
 function getTonage(price_per_type) {

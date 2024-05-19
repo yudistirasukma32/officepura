@@ -1,3 +1,13 @@
+<style>
+  #route-loader {
+    position: absolute;
+    left: 50%;
+    top: 36.5%;
+    width: 20px;
+    height: 20px;
+  }
+</style>
+
 <%= form_for(@invoice) do |f| %>
   
   <%= render "info-box", :f => f %>
@@ -269,7 +279,6 @@
     </div>
   </div>
   
-  <% if params[:kosongan].blank? %>
   <div id="div_routes">
     <div class="field-row">
       <%= f.label :route_id, "Jurusan Truk" %>
@@ -277,18 +286,7 @@
       <%= f.hidden_field :route_id, :value => @invoice.route_id %>
     </div>
   </div>
-  <% else %>
-  <div class="field-row">
-    <%= f.label :route_id, "Jurusan Truk" %>
-    <select id="invoice_route_id" name="invoice[route_id]" class="double combo_route chzn-select">
-      <option value="0">- Pilih Jurusan -</option>
-      <% Route.active.order(:name).each do |route| %>
-      <option value="<%=route.id%>"
-        <% if route.id == @invoice.route_id %> selected="selected"<% end %>><%=route.name%></option>
-      <% end %>
-    </select>
-  </div>
-  <% end %>
+  <div id="route-loader" class="loader main-dashboard d-block" style="display: none;"></div>
 
   <% if params[:train] || params[:train] == true %>
   <div class="field-row">

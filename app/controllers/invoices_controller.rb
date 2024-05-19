@@ -1268,12 +1268,18 @@ class InvoicesController < ApplicationController
 
     if is_train == "0"
 
-        #customer kosongan pura / rdpi
+        # Customer kosongan pura / rdpi
         cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
-        if cust_kosongan.include? params[:customer_id].to_i
+        # Customer kosongan perlu filter
+        filter_kosongan = Customer.active.where("name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
+        if cust_kosongan.include? params[:customer_id].to_i
+          @routes = Route.active.where(customer_id: cust_kosongan).order(:name)
+
+          if filter_kosongan.include? params[:customer_id].to_i
             @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
+          end
 
         else
 
