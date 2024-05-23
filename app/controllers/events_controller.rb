@@ -688,7 +688,7 @@ class EventsController < ApplicationController
 
   def getdovendor
     url = URI("https://office.8cemerlang.com/events/api/setdovendor?target=pura")
-    # url = URI("http://localhost:3000/events/api/setdovendor?target=pura")
+    # url = URI("http://localhost:3001/events/api/setdovendor?target=pura")
 		https = Net::HTTP.new(url.host, url.port)
 		https.read_timeout = 3600
 		https.use_ssl = true
@@ -742,7 +742,7 @@ class EventsController < ApplicationController
 
   def getdovvendors
     url = URI("https://office.8cemerlang.com/events/api/setdovvendors?multimoda=#{params[:multimoda]}")
-    # url = URI("http://localhost:3000/events/api/setdovvendors?multimoda=#{params[:multimoda]}")
+    # url = URI("http://localhost:3001/events/api/setdovvendors?multimoda=#{params[:multimoda]}")
 		https = Net::HTTP.new(url.host, url.port)
 		https.read_timeout = 3600
 		https.use_ssl = true
@@ -773,7 +773,7 @@ class EventsController < ApplicationController
 
   def getdovroutes
     url = URI("https://office.8cemerlang.com/events/api/setdovroutes?customer_id=#{params[:customer_id]}")
-    # url = URI("http://localhost:3000/events/api/setdovroutes?customer_id=#{params[:customer_id]}")
+    # url = URI("http://localhost:3001/events/api/setdovroutes?customer_id=#{params[:customer_id]}")
 		https = Net::HTTP.new(url.host, url.port)
 		https.read_timeout = 3600
 		https.use_ssl = true
@@ -803,7 +803,7 @@ class EventsController < ApplicationController
 
   def getdovvendorroutes
     url = URI("https://office.8cemerlang.com/events/api/setdovvendorroutes?vendor_id=#{params[:vendor_id]}")
-    # url = URI("http://localhost:3000/events/api/setdovvendorroutes?vendor_id=#{params[:vendor_id]}")
+    # url = URI("http://localhost:3001/events/api/setdovvendorroutes?vendor_id=#{params[:vendor_id]}")
 		https = Net::HTTP.new(url.host, url.port)
 		https.read_timeout = 3600
 		https.use_ssl = true
@@ -835,7 +835,7 @@ class EventsController < ApplicationController
     orievent = Event.find(params[:event_id])
 
     url = URI("https://office.8cemerlang.com/events/api/post-dovendor")
-    # url = URI("http://localhost:3000/events/api/post-dovendor")
+    # url = URI("http://localhost:3001/events/api/post-dovendor")
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -871,13 +871,20 @@ class EventsController < ApplicationController
 
     response = http.request(request)
     @response = response.read_body
+    data = JSON.parse(@response)
 
-    orievent.need_vendor = true
-    orievent.save
+    if data["status"] == 200
+      orievent.need_vendor = true
+      orievent.save
 
-    render json: {
-      status: 200,
-      message: 'Permintaan DO Vendor ke Indolintas 8 Cemerlang berhasil',
-    }, status: 200
+      flash[:success] = "Permintaan DO Vendor ke Indolintas 8 Cemerlang berhasil dibuat"
+      flash.keep
+    else
+      flash[:error] = "Permintaan gagal dibuat"
+      flash.keep
+    end
+
+    redirect_to events_add_dovendor_url
+    # render json: data["status"] == 200
   end
 end
