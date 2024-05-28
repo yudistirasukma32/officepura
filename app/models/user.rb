@@ -36,4 +36,8 @@ class User < ActiveRecord::Base
 
   	scope :active, lambda {where(:enabled => true, :deleted => false)}
 
+	def active_for_authentication?
+		super && !deleted
+	end
+
 end

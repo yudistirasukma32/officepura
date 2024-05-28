@@ -26,8 +26,8 @@ class UsersController < ApplicationController
 
 	def index
 		if current_user.owner
-			@users = User.where(:deleted => false).order(:username)
-	      # @users = User.where.not(:username => 'admin').order(:username)
+			@users = User.where("deleted = false AND username != 'admin'").order(:username)
+	    #   @users = User.where.not(:username => 'admin').order(:username)
 	    else
 	      redirect_to edit_user_path(current_user.id)
 	    end
