@@ -64,21 +64,22 @@
       </td>
   </tr>
 
-<% if @invoice.invoices.first %>
+<% bongkar = @invoice.invoices.active.first %>
+<% if bongkar %>
   <tr>
       <td>Jurusan Bkr</td>
       <td>
-      <%=@invoice.invoices.first.quantity%> Rit: <%=@invoice.invoices.first.route.name%>, 
+      <%=bongkar.quantity%> Rit: <%=bongkar.route.name%>, 
  
-      <% if @invoice.invoices.first.vehicle_duplicate.present? && @invoice.invoices.first.vehicle_duplicate_id != 0%>
-        <strong><%=@invoice.invoices.first.vehicle_duplicate.current_id rescue nil%></strong>
+      <% if bongkar.vehicle_duplicate.present? && bongkar.vehicle_duplicate_id != 0%>
+        <strong><%=bongkar.vehicle_duplicate.current_id rescue nil%></strong>
       <% else %>
-          <%=@invoice.invoices.first.vehicle.current_id rescue nil%>
+          <%=bongkar.vehicle.current_id rescue nil%>
       <% end %>
 
       <span style="display: none;">
-        <% if !@invoice.invoices.first.vehicle.plat_type.nil? %>
-          (<%= @invoice.invoices.first.vehicle.plat_type %>)
+        <% if !bongkar.vehicle.plat_type.nil? %>
+          (<%= bongkar.vehicle.plat_type %>)
         <%end%>
       </span>
 
@@ -123,7 +124,7 @@
     
   <tr>
     <td>Supir</td>
-    <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %><% if @invoice.invoices.any? %>, <%=@invoice.invoices.first.driver.name%><%end%></td>
+    <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %><% if @invoice.invoices.any? %>, <%=bongkar.driver.name%><%end%></td>
   </tr>
 
   <% if current_user.adminrole || current_user.owner %>
