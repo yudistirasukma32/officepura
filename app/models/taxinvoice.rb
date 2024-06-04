@@ -1,4 +1,10 @@
 class Taxinvoice < ActiveRecord::Base
+	include PublicActivity::Model
+	tracked owner: Proc.new { |controller, model| controller.current_user }
+	tracked :params => {
+		:sentdate => proc {|controller, model_instance| model_instance.sentdate},
+		:confirmeddate => proc {|controller, model_instance| model_instance.confirmeddate}
+	}
 
 	belongs_to :customer
 	belongs_to :office
@@ -18,7 +24,7 @@ class Taxinvoice < ActiveRecord::Base
 					:generic, :gst_tax, :gst_percentage, :price_tax, :bank_id, :booking_code,
 					:secondpayment, :secondpayment_date, :is_showqty_loaded, :is_showqty_unloaded
 
-  	scope :active, lambda {where(:deleted => false)}
+	scope :active, lambda {where(:deleted => false)}
 
 	has_many :attachments, :as => :imageable
 

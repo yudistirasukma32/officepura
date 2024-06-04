@@ -1,0 +1,31 @@
+<% if @activities.present? %>
+<hr>
+<h3>History Tgl Kirim & Tgl Konfirmasi</h3>
+<table class="row-view more-pad" id="tbItem" style="width: 100%; margin-top: 30px;">
+    <thead>
+        <tr id="0">
+            <th>No.</th>
+            <th>Tgl Perubahan</th>
+            <th>Tgl Kirim</th>
+            <th>Tgl Konfirmasi</th>
+            <th>User</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <% @activities.each_with_index do |activity, i| %>
+        <%
+            user = User.find(activity.owner_id)
+        %>
+        <tr id="activity_<%= activity.id %>">
+            <td><%= i + 1 %></td>
+            <td><%= activity.created_at.strftime('%d-%m-%Y %H:%M') %></td>
+            <td><%= activity.parameters[:sentdate].to_date.strftime('%d-%m-%Y') rescue nil %></td>
+            <td><%= activity.parameters[:confirmeddate].to_date.strftime('%d-%m-%Y') rescue nil %></td>
+            <td><%= user.username rescue nil %></td>
+            <td><button type="button" onclick="javascript:deleteSentDateLog(<%= activity.id %>);"><i class="icon-remove"></i></button></td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+<% end %>

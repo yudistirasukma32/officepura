@@ -861,12 +861,40 @@ function changeBonus(qty) {
 	$('#bonusreceipt_total_bonus').val(Number($('#bonus_route').val()) * parseInt(qty));
 }
 
+function deleteSentDateLog(id) {
+	$.ajax({
+		type: "POST",
+		url: "/taxinvoices/deletesentdatelog/" + id,
+		beforeSend: function() {
+			confirm('Apakah Anda yakin ingin menghapus aktivitas ini?');
+		},
+		success: function(data) {
+			$('#activity_' + id).remove();
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
+}
+
 function getVehicles(vehiclegroup_id) {
 	$.ajax({
 		type: "GET",
 		url: "/invoices/getvehicles/" + vehiclegroup_id,
 		success: function(data) {
 			$('#div_vehicle').html(data.html);
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
+}
+
+function getSentDateLog()
+{
+	var taxinvoice_id = $("#taxinvoice_id").val();
+
+	$.ajax({
+		type: "GET",
+		url: "/taxinvoices/getsentdatelog/" + taxinvoice_id,
+		success: function(data) {
+			$('#sentdate_log').html(data.html);
 		},
 		failure: function() {alert("Error. Mohon refresh browser Anda.");}
 	});
@@ -1209,6 +1237,14 @@ function countTotalInvoiceQty(taxinvoice_id)
 	$('#total_'+taxinvoice_id).html(totalitem.formatMoney(2,',','.'));
 
 	countTotalTaxInvoiceItems();
+}
+
+function taxinvoiceitemsReject(){
+	if($('#rejected').prop('checked')){
+		$('#rejectbox').show();
+	} else {
+		$('#rejectbox').hide();
+	}
 }
 
 function checkAllTaxinvoiceitems(){
@@ -2863,14 +2899,6 @@ if ($('#invoice_cargo_type_padat').length > 0) {
 	});
 }
 
-function taxinvoiceitemsReject(){
-	if($('#rejected').prop('checked')){
-		$('#rejectbox').show();
-	} else {
-		$('#rejectbox').hide();
-	}
-}
-
 function checkTank(name) {
 	if (name == 'ISOTANK') {
         $(".isotank_id").show();
@@ -3011,6 +3039,8 @@ $(document).ready(function(e){
 	$('#sentdate').datepicker({"dateFormat" : "dd-mm-yy", changeMonth : true, changeYear : true});
 	$('#confirmeddate').val($(this).data("confirmeddate"));
 	$('#confirmeddate').datepicker({"dateFormat" : "dd-mm-yy", changeMonth : true, changeYear : true});
+	$('#sentdate_log').empty();
+	getSentDateLog();
 	$("#myModal").show();
 })
 .on("submit","#update_tax",function(e){

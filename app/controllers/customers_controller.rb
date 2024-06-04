@@ -10,7 +10,7 @@ class CustomersController < ApplicationController
   end
 
   def set_role
-    @user_role = 'Admin Marketing, Marketing, Admin Keuangan, Master Jurusan, User Jurusan, Admin Jurusan'
+    @user_role = 'Admin Marketing, Marketing, Admin Keuangan, Master Jurusan, User Jurusan, Admin Jurusan, Lihat Pelanggan'
   end
 
   def index
@@ -21,7 +21,7 @@ class CustomersController < ApplicationController
     else
       redirect_to root_path()
     end
-    
+
   end
 
   def new
@@ -63,7 +63,7 @@ class CustomersController < ApplicationController
     end
   end
 
-  def addroute    
+  def addroute
     redirect_to new_route_path(params[:id])
   end
 
@@ -72,14 +72,14 @@ class CustomersController < ApplicationController
     @customer.deleted = true
     @customer.save
     redirect_to(customers_url)
-  end  
-  
+  end
+
   def enable
     @customer = Customer.find(params[:id])
     @customer.update_attributes(:enabled => true)
     redirect_to(customers_url)
   end
-  
+
   def disable
     @customer = Customer.find(params[:id])
     @customer.update_attributes(:enabled => false)
@@ -105,15 +105,15 @@ class CustomersController < ApplicationController
 
 		response = http.request(request)
 		@response = response.read_body
-		
+
 		if JSON(@response)['status'] == 404
-			
+
 		@customerlist = ''
 
-		else	
-			
-		  @customerlist = JSON(@response)['data']
-			
+		else
+
+		@customerlist = JSON(@response)['data']
+
 		end
 
   end
@@ -133,7 +133,7 @@ class CustomersController < ApplicationController
     # @checkAllowance = []
 
     # if customerRoutes.present?
-            
+
     #   customerRoutes = customerRoutes.map do |r|
 
     #     url = URI("https://office.puratrans.com/api_routes/create_route")
@@ -159,17 +159,17 @@ class CustomersController < ApplicationController
 
     #     response = http.request(request)
     #     @response = response.read_body
-        
+
     #     if JSON(@response)['status'] == 404
-          
+
     #       render json: { status: 400, message: "Customers not found" }, status: 400
-    
-    #     else	
-          
+
+    #     else
+
     #       @allowances = Allowance.where('route_id = ? AND vehiclegroup_id in (1,2,3)', r.id)
-    
+
     #       if @allowances.present?
- 
+
     #         allowances_all = @allowances.map do |al|
 
     #           url = URI("https://office.puratrans.com/api_routes/create_allowance")
@@ -179,7 +179,7 @@ class CustomersController < ApplicationController
     #           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     #           request = Net::HTTP::Post.new(url.request_uri)
     #           request["Content-Type"] = "application/json"
-    
+
     #           request.body = JSON.dump({
     #             "allowance": {
     #               "vehiclegroup_id": al.vehiclegroup_id,
@@ -196,9 +196,9 @@ class CustomersController < ApplicationController
     #           response2 = response.read_body
 
     #         end
-    
+
     #       end
-    
+
     #     end
 
     #   end

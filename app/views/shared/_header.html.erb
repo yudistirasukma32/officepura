@@ -14,7 +14,7 @@
 				<a class="finger" onclick="javascript:toggleSub('masters');">Master</a>
 
 				<ul id="sub-masters" class="submenu">
-					<li><%= link_to_if (checkrole 'Admin Keuangan, Marketing, Admin Marketing, Admin Pelanggan'), "Pelanggan", "/customers" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Marketing, Admin Marketing, Admin Pelanggan, Lihat Pelanggan'), "Pelanggan", "/customers" %></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Master Jurusan, User Jurusan'), "Jurusan", "/routes" %></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Operasional BKK, Vendor Supir, Admin Supir'), "Supir", "/drivers" %></li>
                     <li><%= link_to_if (checkrole 'Admin HRD'), "Staf", "/staffs" %></li>

@@ -218,10 +218,13 @@ class TaxinvoicesController < ApplicationController
         @customer.save
       end
 
+      if @taxinvoice.duedate.nil?
+        @taxinvoice.duedate = @customer.terms_of_payment_in_days.nil? ? Date.today + 2.months : Date.today + @customer.terms_of_payment_in_days.to_i.days
+      end
+
       @taxinvoice.customer_id = @customer.id
       @taxinvoice.ship_name = params[:ship_name]
       @taxinvoice.date = params[:date]
-      @taxinvoice.duedate = @customer.terms_of_payment_in_days.nil? ? Date.today + 2.months : Date.today + @customer.terms_of_payment_in_days.to_i.days
       @taxinvoice.product_name = params[:product_name]
       @taxinvoice.spk_no = params[:spk_no]
       @taxinvoice.po_no = params[:po_no]
@@ -504,6 +507,19 @@ class TaxinvoicesController < ApplicationController
     # }
     # return false
     respond_to :html
+  end
+
+  def delete_sentdatelog
+    activity = PublicActivity::Activity.find(params[:id])
+    activity.destroy
+    render json: { success: true }
+  end
+
+  def get_sentdatelog
+    # puts "ACTIVITY: #{PublicActivity::Activity.limit(10).to_sql}"
+    @activities = PublicActivity::Activity.where("trackable_type = 'Taxinvoice' AND trackable_id = ? AND owner_id IS NOT NULL", params[:taxinvoice_id]).order("created_at desc").limit(10)
+
+    render :json => {:success => true, :html => render_to_string(:partial => "taxinvoices/sentdatelog"), :layout => false}.to_json;
   end
 
   def gettaxinvoiceitems

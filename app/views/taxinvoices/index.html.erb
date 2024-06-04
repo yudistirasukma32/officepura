@@ -34,7 +34,7 @@
 					<% (Date.today.year.downto(year_to)).each do |y| %>
 					<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
 					<% end %>
-				</select>
+				</select> 
 				<input class="submit left" type="submit" value="Filter" />
 				<a class="print btn d-none" href="javascript:print();"><i class="icon-print"></i> Print</a>
 			</div>
@@ -250,6 +250,8 @@
 		<div class="" style="padding-bottom:0px; text-align: right; width: 100%; margin-top: 1rem;">
 			<input type="submit" value="Simpan" class="btn btn-styled"/>
 		</div>
+
+		<div id="sentdate_log"></div>
 	</form>
   </div>
 

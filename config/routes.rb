@@ -274,7 +274,6 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
-
   get 'invoices/printspk/:id' => 'invoices#printspk'
 
   match 'invoices/add_ship' => 'invoices#indexaddship'
@@ -477,6 +476,8 @@ OfficePuraErp::Application.routes.draw do
   match 'assetpayments/index_confirmed' => 'assetpayments#index_confirmed'
   resources :assetpayments
 
+  post 'taxinvoices/deletesentdatelog/:id' => 'taxinvoices#delete_sentdatelog'
+  get 'taxinvoices/getsentdatelog/:taxinvoice_id' => 'taxinvoices#get_sentdatelog'
   get 'taxinvoices/gettaxinvoiceitems/:taxinvoice_id/:customer_id/:is_wholesale' => 'taxinvoices#gettaxinvoiceitems'
   match 'taxinvoices/downloadexcel/:taxinvoice_id' => 'taxinvoices#downloadexcel'
   post 'taxinvoices/updatepayment' => 'taxinvoices#updatepayment'
