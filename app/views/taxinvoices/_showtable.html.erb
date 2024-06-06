@@ -161,8 +161,10 @@
 			<% if (!taxinvoice.paiddate.nil? and session[:adminrole]) or (taxinvoice.paiddate.nil?) %>
 			<%= link_to '&#xf00d;'.html_safe, taxinvoice, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
 			<% end %>
-			<% if !taxinvoice.paiddate.nil? && current_user.owner %>
-				<a class="tipsy delete" title="Batal Pembayaran" href="<%=cancelpayment_taxinvoice_url(taxinvoice.id)%>"><i class="icon-ban"></i></a>
+			<% if !taxinvoice.paiddate.nil? %>
+				<% if checkrole 'Admin Invoice Tagihan' || current_user.owner %>
+					<a class="tipsy delete" title="Batal Pembayaran" href="<%=cancelpayment_taxinvoice_url(taxinvoice.id)%>"><i class="icon-ban"></i></a>
+				<% end %>
 			<% end %>
 		</td>
 	</tr>
