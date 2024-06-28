@@ -74,7 +74,7 @@
 				</tr>
 				<% end %>
 			<% else %>
-				<% if checkrole 'Admin Operasional, Admin Kendaraan, Operasional BKK' %>
+				<% if checkrole 'Admin Kendaraan' %>
 				<tr>
 					<td><%=i+=1%>.</td>
 					<td><%= image_tag img.file.thumb('30x30').url(:suffix => "/#{img.name}") if !img.nil? and img.file_uid %></td>
