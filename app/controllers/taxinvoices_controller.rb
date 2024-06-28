@@ -517,7 +517,7 @@ class TaxinvoicesController < ApplicationController
 
   def get_sentdatelog
     # puts "ACTIVITY: #{PublicActivity::Activity.limit(10).to_sql}"
-    @activities = PublicActivity::Activity.where("trackable_type = 'Taxinvoice' AND trackable_id = ? AND owner_id IS NOT NULL", params[:taxinvoice_id]).order("created_at desc").limit(10)
+    @activities = PublicActivity::Activity.where("trackable_type = 'Taxinvoice' AND trackable_id = ? AND owner_id IS NOT NULL AND (parameters NOT LIKE E'%:sentdate: \n%' OR parameters NOT LIKE E'%:confirmeddate: \n%')", params[:taxinvoice_id]).order("created_at desc").limit(10)
 
     render :json => {:success => true, :html => render_to_string(:partial => "taxinvoices/sentdatelog"), :layout => false}.to_json;
   end

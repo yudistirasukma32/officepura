@@ -40,6 +40,7 @@
 				</select>
 
 				<input class="submit" type="submit" value="Filter" />
+				<a class="print btn-txt btn-green" href="<%= download_excel_trainexpenses_url(:startdate => @startdate, :enddate => @enddate, :operator_id => params[:operator_id], :containertype => params[:containertype]) %>"><i class="icon-file"></i> Excel</a>
 			</div>
 			</form>
 		</div>
@@ -63,7 +64,7 @@
 				<% @grandTotal = 0%>
 				<% @trainexpenses.each do |invoice| %>
 					<%
-						# Special price change for BKE. Make sure to change the price in _form.html.erb  too
+						# Special price change for BKE. Make sure to change the price in _form.html.erb && download_excel
 						routetrain_price = invoice.routetrain.price_per.to_i
 						containera_ids = Container.active.where("containernumber ILIKE 'A%'").pluck(:id)
 						containerdh_ids = Container.active.where("containernumber ILIKE 'DH%'").pluck(:id)

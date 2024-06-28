@@ -367,6 +367,9 @@ OfficePuraErp::Application.routes.draw do
   end
 
   resources :trainexpenses do
+    collection do
+      get 'download_excel'
+    end
     member do
       get 'enable'
       get 'disable'

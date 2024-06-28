@@ -7,7 +7,7 @@
 		<th class="{sorter:true, filter: false}" width="80">Tgl Dibuat</th>
 		<th class="{sorter:true, filter: true}" width="50">INV</th>
 		<th class="{sorter:true, filter: true}" >Pelanggan</th>
-		<th class="{sorter:true, filter: false}" width="90">Kirim</th>
+		<th class="{sorter:true, filter: false}" width="300">Kirim</th>
 		<th class="{sorter:true, filter: false}" width="90">Konfirm</th>
 		<th class="{sorter:true, filter: false}" width="120">Jatuh Tempo</th>
 		<th class="right {sorter:false, filter: false}" width="80">DPP</th>
@@ -28,7 +28,10 @@
 		total_dpp, total_ppn, total_pph, grandtotal = 0, 0, 0, 0
 	%>
 	<% @taxinvoices.each do |taxinvoice| %>
-		<% customer = taxinvoice.customer %>
+	<%
+		customer = taxinvoice.customer
+		activities = PublicActivity::Activity.where("trackable_type = 'Taxinvoice' AND trackable_id = ? AND owner_id IS NOT NULL AND parameters NOT LIKE E'%:sentdate: \n%'", taxinvoice.id).order("created_at desc").limit(2)
+	%>
 
 	<% if taxinvoice.deleted %>
 	
@@ -37,8 +40,16 @@
 		<td width="20"> <input type="checkbox" id="cb_<%=taxinvoice.id%>" name="cb_<%=taxinvoice.id%>" <% if !taxinvoice.paiddate.nil? %> checked="checked" disabled="disabled" <% end %> /></td>
 		<td><%=taxinvoice.created_at.strftime('%d-%m')%></td>
 		<td><%=taxinvoice.long_id[0,4].gsub(' /', '')%> </td>
-		<td><%=taxinvoice.customer.name%> <% if !taxinvoice.ship_name.blank? %> (<%=taxinvoice.ship_name%>) <% end %> <% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
-		<td><%=taxinvoice.sentdate.strftime('%d-%m') rescue nil%></td>
+		<td>
+			<%=taxinvoice.customer.name%> <% if !taxinvoice.ship_name.blank? %> (<%=taxinvoice.ship_name%>) <% end %> <% if !taxinvoice.waybill.blank? %>(<%= taxinvoice.waybill %>)<% end %> <% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %>
+			<% if taxinvoice.bank_id.to_i > 0 %><br/>(<%= taxinvoice.bank.bank_account_number %>)<% end %>
+		</td>
+		<td>
+			<%=taxinvoice.sentdate.strftime('%d-%m') rescue nil%>
+			<% if activities.count > 1 %>
+				<br/>(<%= activities[1].parameters[:sentdate].to_date.strftime('%d-%m') rescue nil %>)
+			<% end %>
+		</td>
 		<td><%=taxinvoice.confirmeddate.strftime('%d-%m') rescue nil%></td>
 		<% different = (taxinvoice.duedate - Date.today).to_i %> 
 		<td<% if different < 0 %> class="red"<% end %>><%=taxinvoice.duedate.strftime('%d-%m')%> (<%=different%>)</td>
@@ -87,10 +98,16 @@
 		<td width="20"> <% if taxinvoice.paiddate.nil? %> <input type="checkbox" id="cb_<%=taxinvoice.id%>" name="cb_<%=taxinvoice.id%>" /><% end %></td>
 		<td><%=taxinvoice.created_at.strftime('%d-%m')%></td>
 		<td><%=taxinvoice.long_id[0,4].gsub(' /', '')%> </td>
-		<td><%=taxinvoice.customer.name rescue nil%> <% if !taxinvoice.ship_name.blank? %>(<%=taxinvoice.ship_name%>) <% end %><% if taxinvoice.generic %>&nbsp;<i class="icon-star grey"></i><% end %> 
+		<td><%=taxinvoice.customer.name rescue nil%> <% if !taxinvoice.ship_name.blank? %>(<%=taxinvoice.ship_name%>) <% end %> <% if !taxinvoice.waybill.blank? %>(<%= taxinvoice.waybill %>)<% end %> <% if taxinvoice.generic %>&nbsp;<i class="icon-star grey"></i><% end %>
+			<% if taxinvoice.bank_id.to_i > 0 %><br/>(<%= taxinvoice.bank.bank_account_number %>)<% end %>
 			<% if taxinvoice.downpayment > 0 %><br />Deposit <%=to_currency_bank(taxinvoice.downpayment_date.strftime('%d-%m'))%><% end %>
 		</td>
-		<td><%=taxinvoice.sentdate.strftime('%d-%m') rescue nil%></td>
+		<td>
+			<%=taxinvoice.sentdate.strftime('%d-%m') rescue nil%>
+			<% if activities.count > 1 %>
+				<br/>(<%=activities[1].parameters[:sentdate].to_date.strftime('%d-%m') rescue nil %>)
+			<% end %>
+		</td>
 		<td><%=taxinvoice.confirmeddate.strftime('%d-%m') rescue nil%></td>
         
         <%
