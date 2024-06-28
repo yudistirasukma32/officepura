@@ -1290,6 +1290,7 @@ class TaxinvoicesController < ApplicationController
     subtotal = subtotal + @taxinvoice.extra_cost.to_i
     @taxinvoice.sentdate = (params[:sentdate] rescue nil)
     @taxinvoice.confirmeddate = (params[:confirmeddate] rescue nil)
+    @taxinvoice.waybill = (params[:waybill] rescue nil)
     ppn = Setting.where(name: 'ppn')
     ppn = ppn.blank? ? 10 : ppn[0].value
 

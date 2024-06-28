@@ -3039,6 +3039,14 @@ $(document).ready(function(e){
 	$('#sentdate').datepicker({"dateFormat" : "dd-mm-yy", changeMonth : true, changeYear : true});
 	$('#confirmeddate').val($(this).data("confirmeddate"));
 	$('#confirmeddate').datepicker({"dateFormat" : "dd-mm-yy", changeMonth : true, changeYear : true});
+	
+	if ($(this).data("generic") == true) {
+		$('#waybill_edit').hide();
+	} else {
+		$('#waybill_edit').show();
+		$('#waybill').val($(this).data("waybill"));
+	}
+
 	$('#sentdate_log').empty();
 	getSentDateLog();
 	$("#myModal").show();
