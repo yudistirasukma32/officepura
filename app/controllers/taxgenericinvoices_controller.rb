@@ -103,6 +103,7 @@ class TaxgenericinvoicesController < ApplicationController
     @taxinvoice.sto_no = params[:sto_no]
     @taxinvoice.so_no = params[:so_no]
     @taxinvoice.do_no = params[:do_no]
+    @taxinvoice.waybill = params[:waybill]
 
     @taxinvoice.bank_id = params[:bank_id]
 
