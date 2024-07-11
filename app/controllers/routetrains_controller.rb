@@ -7,9 +7,9 @@ class RoutetrainsController < ApplicationController
   def set_section
     @section = "masters"
     @where = "routetrains"
-    
-    @contype = ["ISOTANK 20FT", "ISOTANK EMPTY 20FT", "DRY CONTAINER EMPTY 20FT", "DRY CONTAINER 20FT", "DRY CONTAINER EMPTY 40FT", "DRY CONTAINER 40FT"]
-    
+
+    @contype = ["ISOTANK 20FT", "ISOTANK 40FT", "ISOTANK EMPTY 20FT", "ISOTANK EMPTY 40FT", "DRY CONTAINER EMPTY 20FT", "DRY CONTAINER 20FT", "DRY CONTAINER EMPTY 40FT", "DRY CONTAINER 40FT"]
+
     @consize = ["20FT", "40FT"]
   end
 
@@ -64,14 +64,14 @@ class RoutetrainsController < ApplicationController
     @routetrain.deleted = true
     @routetrain.save
     redirect_to(routetrains_url)
-  end  
-  
+  end
+
   def enable
     @routetrain = Routetrain.find(params[:id])
     @routetrain.update_attributes(:enabled => true)
     redirect_to(routetrains_url)
   end
-  
+
   def disable
     @routetrain = Routetrain.find(params[:id])
     @routetrain.update_attributes(:enabled => false)
