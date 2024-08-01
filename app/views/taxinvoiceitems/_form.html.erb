@@ -28,7 +28,7 @@
   </tr>
   <tr>
     <td width="100">Kantor</td>
-    <td><%=@invoice.office.name%></td>
+    <td><%= @invoice.office.name rescue nil %></td>
   </tr>
   <tr>
     <td width="100">Tgl. Bikin</td>
@@ -42,13 +42,13 @@
   <% end %>
   <tr>
     <td>Pelanggan</td>
-    <td><%=@invoice.customer.name%></td>
+    <td><%= @invoice.customer.name rescue nil %></td>
   </tr>
 <% if @invoice.invoicetrain %>
   <tr>
       <td>Jurusan Muat</td>
       <td>
-      <%=@invoice.quantity%> Rit: <%=@invoice.route.name%>,
+      <%=@invoice.quantity%> Rit: <%= @invoice.route.name rescue nil %>,
       <% if @invoice.vehicle_duplicate.present? && @invoice.vehicle_duplicate_id != 0%>
         <strong><%=@invoice.vehicle_duplicate.current_id rescue nil%></strong>
       <% else %>
@@ -69,7 +69,7 @@
   <tr>
       <td>Jurusan Bkr</td>
       <td>
-      <%=bongkar.quantity%> Rit: <%=bongkar.route.name%>, 
+      <%=bongkar.quantity%> Rit: <%= bongkar.route.name rescue nil %>, 
  
       <% if bongkar.vehicle_duplicate.present? && bongkar.vehicle_duplicate_id != 0%>
         <strong><%=bongkar.vehicle_duplicate.current_id rescue nil%></strong>
@@ -91,7 +91,7 @@
   <tr>
       <td>Jurusan</td>
       <td>
-      <%=@invoice.quantity%> Rit: <%=@invoice.route.name%>,
+      <%=@invoice.quantity%> Rit: <%= @invoice.route.name rescue nil %>,
       <% if @invoice.vehicle_duplicate.present? && @invoice.vehicle_duplicate_id != 0%>
         <strong><%=@invoice.vehicle_duplicate.current_id rescue nil%></strong>
       <% else %>
@@ -124,7 +124,7 @@
     
   <tr>
     <td>Supir</td>
-    <td><%=@invoice.driver.name%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %><% if @invoice.invoices.any? %>, <%=bongkar.driver.name%><%end%></td>
+    <td><%= @invoice.driver.name rescue nil %><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%= @invoice.driver.helpers.first.name rescue nil %>)<% end %><% if @invoice.invoices.any? %>, <%= bongkar.driver.name rescue nil %><%end%></td>
   </tr>
 
   <% if current_user.adminrole || current_user.owner %>
