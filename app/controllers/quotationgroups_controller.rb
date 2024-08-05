@@ -29,7 +29,7 @@ class QuotationgroupsController < ApplicationController
     batas = 40
     halaman = params[:page].present? ? params[:page].to_i : 1
     halaman_awal = (halaman > 1) ? (halaman * batas) - batas : 0
-    halaman_awal = halaman_awal + 1	
+    # halaman_awal = halaman_awal + 1
     additional_query = ""
     if params[:query].present?
       additional_query += " and name ~* '.*#{params[:query]}.*'"
@@ -39,12 +39,12 @@ class QuotationgroupsController < ApplicationController
     end
 
     all_data = Quotationgroup.where("deleted = false#{additional_query}").select(:id).count()
-    @quotationgroups = Quotationgroup.where("deleted = false#{additional_query} AND status != 'confirmed'").limit(batas).order("date asc").order("long_id asc")
+    @quotationgroups = Quotationgroup.where("deleted = false#{additional_query} AND status != 'confirmed'").limit(batas).offset(halaman_awal).order("date asc").order("long_id asc")
 
     @total_page = (all_data.to_f / batas.to_f).ceil
     # render json: @quotationgroups.to_sql
     render partial: "table"
-    
+
   end
 
   def indexconfirm
@@ -56,7 +56,7 @@ class QuotationgroupsController < ApplicationController
     batas = 40
     halaman = params[:page].present? ? params[:page].to_i : 1
     halaman_awal = (halaman > 1) ? (halaman * batas) - batas : 0
-    halaman_awal = halaman_awal + 1	
+    halaman_awal = halaman_awal + 1
     additional_query = ""
     if params[:query].present?
       additional_query += " and name ~* '.*#{params[:query]}.*'"
@@ -71,7 +71,7 @@ class QuotationgroupsController < ApplicationController
     @total_page = (all_data.to_f / batas.to_f).ceil
     # render json: @quotationgroups.to_sql
     render partial: "table"
-    
+
   end
 
   def addnew
@@ -131,13 +131,13 @@ class QuotationgroupsController < ApplicationController
     @quotationgroup.save
     redirect_to quotationgroups_url
   end
-  
+
   def enable
     @quotationgroup = Quotationgroup.find(params[:id])
     @quotationgroup.update_attributes(:enabled => true)
     redirect_to (quotations_url)
   end
-  
+
   def disable
     @quotationgroup = Quotationgroup.find(params[:id])
     @quotationgroup.update_attributes(:enabled => false)
@@ -169,7 +169,7 @@ class QuotationgroupsController < ApplicationController
       @quotations.each do |quotation|
         @route = Route.new
         @routeloc = Routelocation.new
-        
+
         if @quotationgroup.customer_id.blank?
           @route.customer_id = @customer.id
           @routeloc.customer_id = @customer.id
@@ -217,7 +217,7 @@ class QuotationgroupsController < ApplicationController
     @quotationgroup = Quotationgroup.find(params[:id])
     @quotations = Quotation.active.where(quotationgroup_id: params[:id]).order(:price_per)
     @confirmation = User.find(@quotationgroup.confirmed_by)
-    
+
     userroles = Userrole.where(user_id: @quotationgroup.confirmed_by).order(:role_id).first
     @confirmation_role = Role.find(userroles.role_id) rescue nil
 
@@ -251,7 +251,7 @@ class QuotationgroupsController < ApplicationController
     end
     # render json: @quotations.present?
     # return false
-    
+
     respond_to :html
   end
 end
