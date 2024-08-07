@@ -55,10 +55,6 @@
 												    rt.driver_allowance + rt.helper_allowance + rt.misc_allowance + rt.tol_fee > money(0) and invoice_id not in 
 												    (select invoice_id from receipts where (created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}') AND deleted = false)
 												    union
-												    select re.id, re.created_at, 0, 0, money(0), money(0), money(0), money(0), money(0), re.total, re.expensetype, of.description, 're' as type
-												    from receiptexpenses re inner join officeexpenses of on re.officeexpense_id = of.id
-												    where re.officeexpensegroup_id = #{id_group_sangu} and re.deleted = false and (re.created_at >= '#{@startdate.to_date}' and re.created_at < '#{@enddate.to_date + 1}')
-												    union
 												    select be.id, be.date as created_at, 0, 0, money(0), money(0), money(0), money(0), money(0), be.total, 'Debit', be.description, 're' as type
 												    from bankexpenses be
 												    where be.debitgroup_id = #{id_groupbank_sangu} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date + 1}')
