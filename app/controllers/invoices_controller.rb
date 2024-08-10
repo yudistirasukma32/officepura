@@ -1265,33 +1265,47 @@ class InvoicesController < ApplicationController
 
     is_train = params[:train]
     customer_id = params[:customer_id]
+    groups = []
 
-    if is_train == "0"
-
-        # Customer kosongan pura / rdpi
-        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
-
-        # Customer kosongan perlu filter
-        filter_kosongan = Customer.active.where("name ~* '.*RAJAWALI INTI.*'").pluck(:id)
-
-        if cust_kosongan.include? params[:customer_id].to_i
-          @routes = Route.active.where(customer_id: cust_kosongan).order(:name)
-
-          if filter_kosongan.include? params[:customer_id].to_i
-            @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
-          end
-
-        else
-
-            @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
-
-        end
-
-    else
-
-        @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name ~* '.*depo.*'").order(:name)
-
+    if params[:kosongan] == "produktif"
+      groups = Routegroup.active.where("name = 'PP Kosongan Produktif' or name = 'Non PP Kosongan Produktif'").pluck(:id)
+    elsif params[:kosongan] == "non-produktif"
+      groups = Routegroup.active.where("name = 'PP Kosongan' or name = 'Non PP Kosongan'").pluck(:id)
     end
+
+    @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false)
+    @routes = @routes.where("name ~* '.*depo.*'") if (is_train != '0')
+
+    # if is_train == "0"
+
+    #     # Customer kosongan pura / rdpi
+    #     cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+
+    #     # Customer kosongan perlu filter
+    #     filter_kosongan = Customer.active.where("name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+
+    #     if cust_kosongan.include? params[:customer_id].to_i
+    #       @routes = Route.active.where(customer_id: cust_kosongan).order(:name)
+
+    #       if filter_kosongan.include? params[:customer_id].to_i
+    #         @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
+    #       end
+
+    #     else
+
+    #         @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
+
+    #     end
+
+    # else
+
+    #     @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name ~* '.*depo.*'").order(:name)
+
+    # end
+
+    @routes = @routes.where(routegroup_id: groups) if groups.any?
+
+    puts "QUERY: " + @routes.to_sql
 
     render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json;
   end

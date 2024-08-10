@@ -586,20 +586,21 @@ function getRouteTrain2(operator_id) {
 }
 
 function getRoutes(customer_id) {
-
 	$("#route-loader").show();
+
+	kosonganType = $("#invoice_kosongan_type").val();
     
-    if (document.getElementById('invoice_invoicetrain_true').checked) {
-        var transporttype = "1";
-    } else {
-        var transporttype = "0";
-    }
+	if (document.getElementById('invoice_invoicetrain_true').checked) {
+			var transporttype = "1";
+	} else {
+			var transporttype = "0";
+	}
 
 	$.ajax({
 		type: "GET",
-		url: "/invoices/getroutes/" + customer_id + "?train=" + transporttype,
+		url: "/invoices/getroutes/" + customer_id + "?train=" + transporttype + "&kosongan=" + kosonganType,
 		success: function(data) {
-            console.log("/invoices/getroutes/" + customer_id + "?train=" + transporttype);
+			// console.log("/invoices/getroutes/" + customer_id + "?train=" + transporttype);
 			$('#div_routes').html(data.html);
 			$(".chzn-select").chosen();
 			$("#route-loader").hide();

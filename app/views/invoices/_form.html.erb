@@ -235,7 +235,7 @@
   <% if params[:kosongan] || params[:kosongan] == true %>
 
   <input type="hidden" name="invoice[kosongan]" value="true" id="invoice_kosongan">
-  <input type="hidden" name="invoice[kosongan_type]" value="non-produktif">
+  <input type="hidden" name="invoice[kosongan_type]" value="non-produktif" id="invoice_kosongan_type">
 
   <% end %>
   
@@ -245,7 +245,7 @@
     <%= f.label :customer_id, "Pelanggan" %>
 
     <% if @iseditable or current_user.owner %>
-    <select id="invoice_customer_id" name="invoice[customer_id]" class="double combo_route chzn-select" onchange="javascript:getRoutes(this.value);">
+    <select id="invoice_customer_id" name="invoice[customer_id]" class="double combo_route chzn-select">
       <option value="0">- Pelanggan -</option>
       <% @customers.each do |customer| %>
       <option value="<%=customer.id%>"
@@ -469,7 +469,19 @@
   
   <div class="field-row">
     <%= f.label :description, "Keterangan" %>
+    <% if params[:kosongan] || params[:kosongan] == true %> 
+
+      <select id="invoice_description" name="invoice[description]" class="double chzn-select" required='required'>
+      <% @reasons = ['Muat', 'Perbaikan/Rusak', 'Cuci', 'Depo ke Depo', 'Sopir Izin']%>
+      <% @reasons.each do |reason| %>
+      <option value="<%=reason%>"
+        <% if reason == @invoice.description %> selected="selected"<% end %>><%=reason%></option>
+      <% end %>
+      </select>
+
+    <% else %>
     <%= f.text_field :description %>
+    <%end%>
   </div>  
 
   <div class="actions">

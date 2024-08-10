@@ -193,7 +193,7 @@
     <%= f.label :customer_id, "Pelanggan" %>
 
     <% if @iseditable or current_user.owner %>
-    <select id="invoice_customer_id" name="invoice[customer_id]" class="double combo_route chzn-select" onchange="javascript:getRoutes(this.value);">
+    <select id="invoice_customer_id" name="invoice[customer_id]" class="double combo_route chzn-select">
       <option value="0">- Pelanggan -</option>
       <% @customers.each do |customer| %>
       <option value="<%=customer.id%>"
