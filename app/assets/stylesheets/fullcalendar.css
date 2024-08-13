@@ -305,6 +305,21 @@ html .fc,
 	background-color: #b38e1d; /* default BACKGROUND color */	
 }
 
+.fc-event.dp {
+	position: relative;
+  padding-left: 1rem;
+}
+
+.fc-event.dp::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 1rem;
+	background: pink;
+}
+
 a.fc-event {
 	color:#fff;
 	text-decoration: none;

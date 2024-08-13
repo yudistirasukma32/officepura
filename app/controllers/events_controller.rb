@@ -449,7 +449,7 @@ class EventsController < ApplicationController
             end
 
           else
-              completed = false
+            completed = false
           end
 
         end
@@ -478,6 +478,7 @@ class EventsController < ApplicationController
           :start_date => e.start_date,
           :end_date => e.end_date,
           :customer_id => e.customer_id,
+          :downpayment_amount => e.downpayment_amount.to_i,
           :bkk => bkk,
           :invoicetrain => train,
           :half_completed => half_completed,
