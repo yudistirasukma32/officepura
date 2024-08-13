@@ -1955,7 +1955,7 @@ class InvoicesController < ApplicationController
     @section = 'events'
     @where = 'report-invoices-summary'
 
-    @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
+    @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Acidatama.*'").pluck(:id)
     @invoice = Invoice.find(params[:id])
     respond_to :html
 

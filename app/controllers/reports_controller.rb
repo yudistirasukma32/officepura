@@ -97,7 +97,7 @@ class ReportsController < ApplicationController
 
       @section = "estimationreport"
       @where = "estimation"
-      @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
+      @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Acidatama.*'").pluck(:id)
       # render json: @customer_35
 
       render "estimation"
@@ -2677,7 +2677,7 @@ end
         @invoices = @invoices.joins(:vehicle).where('platform_type = ?', @tanktype)
       end
 
-      @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
+      @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Acidatama.*'").pluck(:id)
 
       @section = "estimationreport"
       @where = "estimationincomeexpense"
@@ -2699,7 +2699,7 @@ end
 
 		offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
 		@total = estimation = 0
-    @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
+    @customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Acidatama.*'").pluck(:id)
 	    @invoices.each do |invoice|
 	      # qty = invoice.quantity
 	      # qty -= invoice.receiptreturns.where(:deleted => false).sum(:quantity) if invoice.receiptreturns.where(:deleted => false).any?
@@ -2990,7 +2990,7 @@ end
         invoice_total = 0
         total_estimation = 0
         total_quantity = 0
-        customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
+        customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Acidatama.*'").pluck(:id)
         invoice_summary = event.invoices.active.map do |invoice|
           quantity = invoice.quantity - (invoice.receiptreturns.where(:deleted => false).sum(:quantity).to_i)
           if price_per >= offset
@@ -3125,7 +3125,7 @@ end
       global_invoice_total = 0
       global_total_estimation = 0
       solar_price = Setting.find_by_name("Harga Solar").value.to_i
-      customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
+      customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Acidatama.*'").pluck(:id)
 
       # render json: @eventsa
 
