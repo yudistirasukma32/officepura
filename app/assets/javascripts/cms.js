@@ -1570,7 +1570,7 @@ function getDataEvents(cl)
 				if (object.completed_by_vendor) obj.className = 'completed_by_vendor';
 				if (object.invoiced) obj.className = 'invoiced'; 
 				if (object.downpayment_amount > 0) {
-					obj.className = "dp";
+					obj.className += " dp";
 					obj.title += " (*DP)";
 				}
 				if (object.customer_id > 0) obj.title += " (*P)";
