@@ -1266,13 +1266,13 @@ class InvoicesController < ApplicationController
     customer_id = params[:customer_id]
 
     if is_train == "0"
-      # Customer kosongan perlu filter
-      # filter_kosongan = Customer.active.where("name ~* '.*RAJAWALI INTI.*'").pluck(:id)
-
       # If kosongan
       if params[:kosongan] == 'produktif' || params[:kosongan] == 'non-produktif'
         # Customer kosongan pura / rdpi
         cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+
+        # Customer kosongan perlu filter
+        filter_kosongan = Customer.active.where("name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
         # Filter kosongan type
         groups = []
@@ -1284,12 +1284,9 @@ class InvoicesController < ApplicationController
 
         cust_kosongan.push(params[:customer_id].to_i)
         @routes = Route.active.where(customer_id: cust_kosongan).order(:name)
+        @routes = Route.active.where(customer_id: params[:customer_id]).order(:name) if filter_kosongan.include? params[:customer_id].to_i
+
         @routes = @routes.where(routegroup_id: groups) if groups.any?
-
-        # if filter_kosongan.include? params[:customer_id].to_i
-        #   @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
-        # end
-
       else
         @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
       end
