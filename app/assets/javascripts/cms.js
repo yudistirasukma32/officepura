@@ -2910,7 +2910,7 @@ function checkTank(name) {
 		$(".container_id").hide();
 		// alert('iso');
         
-	}else if (name == 'KONTAINER') {
+	}else if (name == 'KONTAINER STANDART' || name == 'KONTAINER OPENSIDE') {
         $(".isotank_id").hide();
 		$(".container_id").show();
 		// alert('cont');
