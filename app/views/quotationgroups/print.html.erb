@@ -20,7 +20,7 @@
 	}
 
 	.desc {
-		font-size: .85rem;
+		font-size: 11pt;
 	}
 
 	.headsignature {margin-top:0px;margin-left: 250px;}
@@ -36,7 +36,7 @@
 
 	.pttdleft {
 		display: inline-block;
-		width: 40%;
+		width: 47.5%;
 	}
 
 	.pttdright {
@@ -63,8 +63,12 @@
 
 	#main .row-view td {
 		padding: 5px 10px;
-    margin: 0;
-    vertical-align: middle;
+		margin: 0;
+		vertical-align: middle;
+	}
+
+	p {
+		font-size: 11pt;
 	}
 </style>
 <%= render "shared/header" %>
@@ -117,8 +121,16 @@
 			<p class="pright">: <span style="font-weight:700;text-decoration-line: underline;text-decoration-thickness: 3px;">Penawaran Harga</span></p>
 		</div>
 
-		<p style="line-height: 20pt;">Dengan hormat,<br>Menindaklanjuti permintaan jasa angkutan untuk pemenuhan kebutuhan di perusahaan Bapak, berikut kami ajukan penawaran jasa angkutan PT Rajawali Dwi Putra Indonesia Tbk.</p>
-
+		<p style="line-height: 20pt;">
+			Dengan hormat,<br>
+			PT. Putra Rajawali Trans merupakan perusahaan angkutan barang multimoda yang
+			berpengalaman menangani beragam jenis komoditas yang diangkut. Kami memiliki lebih dari
+			200 unit truk milik sendiri yang tersambung dengan fleet management system guna memenuhi
+			kebutuhan pengiriman B2B perusahaan Bapak/Ibu.
+			<br>
+			Terkait dengan layanan yang kami berikan, berikut kami ajukan penawaran jasa angkutan PT.
+			Putra Rajawali Trans.
+		</p>
  		<br class="clear" />
  		<br class="clear" />
 
@@ -151,7 +163,11 @@
 			<p class="desc"><i>Keterangan : <%= nl2br(@quotationgroup.description).html_safe%></i></p>
 		<% end %>
 
-		<p style="line-height:20pt; margin-top:2rem;">Jika Bapak memerlukan informasi lebih lanjut, Bapak dapat menghubungi Indra Susanto telepon 08113001598 email indra@rdpitrans.com atas perhatian Bapak, kami sampaikan terima kasih.</p>
+		<p style="line-height:20pt; margin-top:2rem;">
+			Jika Bapak/Ibu memerlukan informasi lebih lanjut, Ibu dapat menghubungi Indra Susanto
+			telepon 08113001598 / Anin (082234451234) email indra@rdpitrans.com. Atas perhatian
+			Bapak/Ibu, kami sampaikan terima kasih.
+		</p>
 		
 		<div style="margin-top:3rem">
 			<p class="pttdleft">Hormat kami,</p>
