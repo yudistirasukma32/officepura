@@ -255,10 +255,19 @@
 			<% invoicereturn.total = 0 %>
 		<% end %>
 
-		<% total += invoicereturn.total %>
+			<%
+				total += invoicereturn.total
+				invoice = invoicereturn.invoice
+			%>
 			<tr>
 				<td><%=zeropad(invoicereturn.invoice.id)%></td>
-				<td><%=invoicereturn.quantity%> Rit: <%=invoicereturn.invoice.route.name%> <%= invoicereturn.invoice.invoicetrain ? '= Kereta =' : '' %></td>
+				<td>
+					<%= invoicereturn.quantity rescue 0 %> Rit: <%= invoice.route.name rescue nil %> (<%= invoice.driver.name rescue nil %> <%= zeropad(invoice.driver.id) rescue nil %>) <%= invoice.invoicetrain ? '= Kereta =' : '' %> 
+					<%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
+					<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
+					<strong><%= invoice.premi ? "(+premi)" : "" %></strong>
+					<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
+				</td>
 				<td class="<%= invoicereturn.invoice.office.abbr == 'SUB' || invoicereturn.invoice.office.abbr == 'PRB' ? 'red' : '' %>">
 				<%=invoicereturn.invoice.office.abbr if !invoicereturn.invoice.office_id.nil?%>
 				</td>
