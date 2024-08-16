@@ -9,10 +9,10 @@ class Customer < ActiveRecord::Base
 
 	# Setup accessible (or protected) attributes for your model
 	attr_accessible :enabled, :name, :address, :city, :contact, :phone, :mobile, :fax, :email,
-					:npwp, :description, :terms_of_payment_in_days, :wholesale_price, :deleted, 
-					:email_alt, :load_hour, :unload_hour
+					:npwp, :description, :terms_of_payment_in_days, :wholesale_price, :deleted,
+					:email_alt, :load_hour, :unload_hour, :phone2, :phone3, :mobile2, :mobile3
 
-	scope :active, lambda {where(:enabled => true, :deleted => false)}  		
+	scope :active, lambda {where(:enabled => true, :deleted => false)}
 
 	has_many :attachments, :as => :imageable
 
