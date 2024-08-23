@@ -10,7 +10,7 @@
 	      	</tr>
 	      	<tr>
 		        <td>Tanggal</td>
-		        <td><%=@taxinvoice.date.strftime('%d-%m-%Y')%></td>
+		        <td><%= @taxinvoice.date.strftime('%d-%m-%Y') rescue nil %></td>
 		    </tr>
 		    <tr>
 		        <td>Period</td>
@@ -105,16 +105,16 @@
 		          <td align="right"><%=to_currency(taxgenericitem.total)%></td>
 		        </tr>
 		        <% end %>
-		    <% else %>
+					<% else %>
 		        <% @taxinvoice.taxinvoiceitems.each do |taxinvoiceitem|%>
 		        <% subtotal += taxinvoiceitem.total %>
 		        <tr>
-		    	  <td><%=taxinvoiceitem.date.strftime('%d-%m-%Y')%></td>
+		    	  <td><%= taxinvoiceitem.date.strftime('%d-%m-%Y') rescue nil %></td>
 		          <td><%=taxinvoiceitem.invoice.route.name rescue nil%></td>
 		          <td align="right"><%=to_currency(taxinvoiceitem.total)%></td>
 		        </tr>
 		        <% end %>
-		    <% end %>
+					<% end %>
 	        <tr class="total-row">
 	    	  <td>Subtotal</td>
 	          <td>&nbsp;</td>
@@ -184,7 +184,7 @@
 
 	<div class="field-row continue" style="margin-top: 10px;">
 		<label for="paiddate">Tanggal Lunas</label>
-		<input type="text" name="taxinvoice[paiddate]" class="half date-picker" value="<%=@taxinvoice.paiddate.strftime('%d-%m-%Y')%>"/>
+		<input type="text" name="taxinvoice[paiddate]" class="half date-picker" value="<%= @taxinvoice.paiddate.strftime('%d-%m-%Y') rescue nil %>"/>
 	</div>
 	<div class="field-row continue">
 		<label for="total">Total</label>
@@ -206,7 +206,7 @@
 		<h3 style="margin-top:0;"><strong>Pembatalan Down Payment</strong></h3><br />
 
 		<label for="paiddate">Tanggal</label>
-		<input type="text" name="taxinvoice[downpayment_date]" class="half date-picker" value="<%=@taxinvoice.downpayment_date.strftime('%d-%m-%Y')%>" readonly="readonly" />
+		<input type="text" name="taxinvoice[downpayment_date]" class="half date-picker" value="<%= @taxinvoice.downpayment_date.strftime('%d-%m-%Y') rescue nil %>" readonly="readonly" />
 	</div>
 
 	<div class="field-row continue">
@@ -254,7 +254,7 @@
 
 	<div class="field-row continue" style="margin-top: 10px;">
 		<label for="paiddate">Tanggal</label>
-		<input type="text" name="taxinvoice[downpayment_date]" class="half date-picker" value="<%=@taxinvoice.downpayment_date.strftime('%d-%m-%Y')%>"/>
+		<input type="text" name="taxinvoice[downpayment_date]" class="half date-picker" value="<%= @taxinvoice.downpayment_date.strftime('%d-%m-%Y') rescue nil %>"/>
 	</div>
 
 	<div class="field-row continue">
@@ -280,7 +280,7 @@
 		<h3 style="margin-top:0;"><strong>Pembatalan Angsuran</strong></h3><br />
 
 		<label for="paiddate">Tanggal</label>
-		<input type="text" name="taxinvoice[secondpayment_date]" class="half date-picker" value="<%=@taxinvoice.secondpayment_date.strftime('%d-%m-%Y')%>" readonly="readonly" />
+		<input type="text" name="taxinvoice[secondpayment_date]" class="half date-picker" value="<%= @taxinvoice.secondpayment_date.strftime('%d-%m-%Y') rescue nil %>" readonly="readonly" />
 	</div>
 
 	<div class="field-row continue">
@@ -328,7 +328,7 @@
 
 	<div class="field-row continue" style="margin-top: 10px;">
 		<label for="paiddate">Tanggal</label>
-		<input type="text" name="taxinvoice[secondpayment_date]" class="half date-picker" value="<%=@taxinvoice.secondpayment_date.strftime('%d-%m-%Y')%>"/>
+		<input type="text" name="taxinvoice[secondpayment_date]" class="half date-picker" value="<%= @taxinvoice.secondpayment_date.strftime('%d-%m-%Y') rescue nil %>"/>
 	</div>
 
 	<div class="field-row continue">
@@ -354,7 +354,7 @@
 		<h3 style="margin-top:0;"><strong>Pembatalan Angsuran</strong></h3><br />
 
 		<label for="paiddate">Tanggal</label>
-		<input type="text" name="taxinvoice[thirdpayment_date]" class="half date-picker" value="<%=@taxinvoice.thirdpayment_date.strftime('%d-%m-%Y')%>" readonly="readonly" />
+		<input type="text" name="taxinvoice[thirdpayment_date]" class="half date-picker" value="<%= @taxinvoice.thirdpayment_date.strftime('%d-%m-%Y') rescue nil %>" readonly="readonly" />
 	</div>
 
 	<div class="field-row continue">
@@ -402,7 +402,7 @@
 
 	<div class="field-row continue" style="margin-top: 10px;">
 		<label for="paiddate">Tanggal</label>
-		<input type="text" name="taxinvoice[thirdpayment_date]" class="half date-picker" value="<%=@taxinvoice.thirdpayment_date.strftime('%d-%m-%Y')%>"/>
+		<input type="text" name="taxinvoice[thirdpayment_date]" class="half date-picker" value="<%= @taxinvoice.thirdpayment_date.strftime('%d-%m-%Y') rescue nil %>"/>
 	</div>
 
 	<div class="field-row continue">
@@ -428,7 +428,7 @@
 		<h3 style="margin-top:0;"><strong>Pembatalan Angsuran</strong></h3><br />
 
 		<label for="paiddate">Tanggal</label>
-		<input type="text" name="taxinvoice[fourthpayment_date]" class="half date-picker" value="<%=@taxinvoice.fourthpayment_date.strftime('%d-%m-%Y')%>" readonly="readonly" />
+		<input type="text" name="taxinvoice[fourthpayment_date]" class="half date-picker" value="<%= @taxinvoice.fourthpayment_date.strftime('%d-%m-%Y') rescue nil %>" readonly="readonly" />
 	</div>
 
 	<div class="field-row continue">
@@ -476,7 +476,7 @@
 
 	<div class="field-row continue" style="margin-top: 10px;">
 		<label for="paiddate">Tanggal</label>
-		<input type="text" name="taxinvoice[fourthpayment_date]" class="half date-picker" value="<%=@taxinvoice.fourthpayment_date.strftime('%d-%m-%Y')%>"/>
+		<input type="text" name="taxinvoice[fourthpayment_date]" class="half date-picker" value="<%= @taxinvoice.fourthpayment_date.strftime('%d-%m-%Y') rescue nil %>"/>
 	</div>
 
 	<div class="field-row continue">
