@@ -16,7 +16,7 @@
             </th>
             <th width="60" class="{sorter: false, filter: false} sorter-false" data-sorter="false" style="text-align:center;">Upload</th>
             <th width="50">USER</th>
-            <th width="50" class="{sorter: false, filter: false} sorter-false"></th>
+            <th width="70" class="{sorter: false, filter: false} sorter-false"></th>
         </tr>
     </thead>
     <tbody>
@@ -49,12 +49,20 @@
             <% run = true %>
         <% end %>
 
-        <% qty = invoice.quantity %>
-        <% qty -= invoice.receiptreturns.active.sum(:quantity) if invoice.receiptreturns.active.any? %>
+        <%
+            qty = invoice.quantity
+            qty -= invoice.receiptreturns.active.sum(:quantity) if invoice.receiptreturns.active.any?
+            receipttaxinvitem_date = invoice.taxinvoiceitems.first.receipttaxinvitem.printdate rescue nil
+        %>
         <% if qty > 0 && run == true %>
         <tr>
             <td><%=i+=1%>.</td>
-            <td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
+            <td>
+                <strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%>
+                <% if receipttaxinvitem_date.present? %>
+                    <br>(<strong><%=receipttaxinvitem_date.strftime('%d')%></strong>.<%=receipttaxinvitem_date.strftime('%m')%>)
+                <% end %>
+            </td>
             <td>
             <%= invoice.event_id %>
             </td>
@@ -123,6 +131,9 @@
             <% end %>
             </td>
             <td class="center">
+                <% if invoice.taxinvoiceitems.any? && invoice.images.any? && (invoice.taxinvoiceitems.first.receipttaxinvitem_id.blank? rescue false) %>
+                    <input type="checkbox" class="checkbox_receipt" name="receiptitem_id[]" value="<%= invoice.taxinvoiceitems.first.id %>" style="margin-top: 1.2rem; margin-left: 0.2rem;">
+                <% end %>
                 
                 <% if !checkroleonly 'Vendor Supir' %>
                 <a class="cta" style="margin-top:1rem;" href="/taxinvoiceitems/new/<%=invoice.id%>">Isi SJ</a>&nbsp;

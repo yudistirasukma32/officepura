@@ -43,6 +43,7 @@
 		<li class="<%= @where == 'quotation' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Marketing, Marketing'), "Penawaran", "/quotationgroups" %></li>
 		<li class="<%= @where == 'quotation-confirm' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Marketing, Marketing'), "Penawaran Terkonfirmasi", "/quotationgroups/confirmed" %></li>
 
+
 		<li class="<%= @where == 'kosongan_approval' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Marketing, Marketing, Konfirm Kosongan'), "Approval BKK Kosongan", "/invoices/kosongan_approval" %></li>
 	<% end %>
 
@@ -63,8 +64,9 @@
 		<li class="<%= @where == 'cashiers' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Kasir", "/cashiers" %></li>
 	<% end %>
     
-    <% if @section == 'taxinvoiceitems' %>
+	<% if @section == 'taxinvoiceitems' %>
 		<li class="<%= @where == 'taxinvoiceitems' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Surat Jalan'), "Pengisian Surat Jalan", "/taxinvoiceitems" %></li>
+		<li class="<%= @where == 'receipttaxinvitems' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Surat Jalan'), "Tanda Terima SJ", "/receipttaxinvitems" %></li>
 	<% end %>
     
     <% if @section == 'taxinvoices' %>

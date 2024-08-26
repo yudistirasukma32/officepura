@@ -1,0 +1,461 @@
+<style type="text/css">
+	.headsignature {margin-top:0px;margin-left: 250px;}
+
+  footer{
+    background-color: transparent;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 120px;
+    width: 100%;
+    overflow:hidden;
+  }
+
+  .info-box {
+    width: 560px !important; 
+    float: left !important; 
+    clear: left !important;
+    margin-bottom: 30px !important;
+    background-color: transparent;
+  }
+
+  .table-print {
+    display: none;
+  }
+
+  .table-print-border {
+    display: none;
+  }
+
+	@media print{
+
+    body {
+      /* background-color: #FEDFF6 !important; */
+      padding: 2rem;
+    }
+
+		* {
+			-webkit-print-color-adjust: exact !important;   /* Chrome, Safari Edge */
+			color-adjust: exact !important;                 /* Firefox */
+			print-color-adjust: exact !important;           /* Firefox 97+, Safari 15.4+ */
+			}
+		@page { margin-top:0px;margin-bottom:0px; }
+
+    .info-box {
+      width: 100%;
+      background: transparent !important;
+      /* display: none; */
+    }
+
+		.d-none-print {
+			display: none;
+		}
+
+    .content-print {
+      border: 1px solid black;
+      border-collapse: collapse;
+      td {
+        border: 1px solid black;
+        padding: 10px !important;
+      }
+      th {
+        border: 1px solid black;
+        text-align: center !important;
+      }
+    }
+
+    .table-print {
+      display: inline-grid;
+      /* padding: 10px; */
+      /* border: 1px solid black; */
+      td {
+        padding: 2px;
+      }
+    }
+
+    .table-print-border {
+      display: flex;
+      /* padding: 10px; */
+      border: 1px solid black;
+      td {
+        padding: 2px;
+      }
+    }
+
+		.print-pdf {
+			body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		iframe{
+			display:block;
+			width: 100% !important;
+			margin: 0 !important;
+		}
+		object{
+			display:block;
+			width: 100% !important;
+			margin: 0 !important;
+		}
+
+		embed{
+			display:block;
+			width: 100% !important;
+			margin: 0 !important;
+		}
+
+		.d-show-print {
+			display: revert !important;
+		}
+
+		.table-footer {
+			td {
+				padding: 2px !important;
+				text-align: center;
+			}
+		}
+
+		.bg-pura {
+			background-image: url("/assets/backgroundpura-nobg.png") !important;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: auto;
+			display: revert !important;  
+			-webkit-print-color-adjust: exact !important;   /* Chrome, Safari Edge */
+			color-adjust: exact !important;                 /* Firefox */
+			print-color-adjust: exact !important;           /* Firefox 97+, Safari 15.4+ */
+			/* height: 100%; */
+		}
+	}
+	
+	.bg-pura {
+		background-image: url("/assets/backgroundpura-nobg.png");
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: auto;
+		display: revert !important;  
+		/* height: 100%; */
+	}
+
+	.d-show-print {
+		display: none;
+	}
+</style>
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+
+<div id="main">
+	
+	<div id="content-full">
+    <div class="">
+      <div class="d-none">
+        <td width="20%;"><h2 style="margin-bottom: 0px;"><strong>CV MITRALINDO UTAMA</strong></h2></td>
+				<table style="width: 100%;">
+          <tr>
+					</tr>
+          <tr>
+            <td width="85px;">Head Office</td>
+            <td>GUNUNGANYAR TAMBAK KAV. 73 Blok 000 No.000 RT:001 RW:001 </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Kel.GUNUNG ANYAR Kec.GUNUNGANYAR Kota SURABAYA JAWA TIMUR 60294</td>
+          </tr>
+				</table>
+			</div>
+      <a class="btn-txt cancel" href="<%=taxinvoiceitems_path%>"><i class="icon-remove"></i> Batal</a>
+
+      <h1 class="d-none-print">Transaksi / <a href="<%=taxinvoiceitems_path%>">Surat Jalan</a> / Tambah</h1>
+
+      <br class="clearfix" />
+      <div id="filter">
+        <form action="/taxinvoiceitems/new/" method="get">
+          <div class="field-row continue">
+            <label for="invoice_id">No. BKK</label>
+            <input type="text" name="invoice_id" class="half left" value="<%=@invoice_id%>" style="margin-right:10px;" />
+            <input type="submit" class="submit" value="Cari BKK" />    
+          </div>
+        </form>
+      </div>
+
+      <br class="clearfix" /><br />
+
+      <h3 style="position: relative; text-align: center; font-weight: 700;" class="d-show-print">Surat Jalan</h3>
+      <div class="info-box d-none-print">  
+
+        <h3 style="position: relative;" class="d-none-print">Bukti Kas Keluar #12345</h3>
+        <h3 style="position: relative;" class="d-show-print">Surat Jalan</h3>
+
+        <table class="row-view no-border d-none-print">
+          <tr class="d-none-print">
+            <td width="100">Nomor DO</td>
+            <td>12345</td>
+          </tr>
+          <tr>
+            <td width="100">Kantor</td>
+            <td>PURA</td>
+          </tr>
+          <tr>
+            <td>No Surat Jalan</td>
+            <td>230600101032</td>
+          </tr>
+          <tr>
+            <td width="100">Tanggal Kirim</td>
+            <td>23/06/2023</td>
+          </tr>
+          <tr>
+            <td>Pelanggan</td>
+            <td>CV MITRALINDO UTAMA</td>
+          </tr>
+          <tr>
+            <td>Alamat</td>
+            <td>GUNUNGANYAR TAMBAK KAV. 73 Blok 000 No.000 RT:001 RW:001 Kel.GUNUNG ANYAR Kec.GUNUNGANYAR Kota SURABAYA JAWA TIMUR 60294</td>
+          </tr>
+          <tr>
+            <td>NPWP</td>
+            <td>03.105.592.4-615.000</td>
+          </tr>
+          <!-- 
+            <tr>
+              <td>Jurusan Muat</td>
+              <td>
+                1 Rit: Garasi - Lamongan - Bawean,
+                <strong>W 9432 US</strong>
+                  W 9432 US
+                <span style="display: none;">
+                  Plat type
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Jurusan Bkr</td>
+              <td>
+                1 Rit: Garasi - Lamongan - Bawean, 
+                <strong>NOPOL</strong>
+                <span style="display: none;">
+                  Tipe Plat
+                </span>
+              </td>
+            </tr>
+          -->
+          <tr>
+            <td>Jurusan</td>
+            <td>
+              1 Rit: Garasi - Lamongan - Bawean
+              <%# <strong>Nopol</strong> %>
+              <span style="display: none;">
+                Tipe plat
+              </span>
+            </td>
+          </tr>
+          <!--
+            <tr>
+              <td>Harga Lama</td>
+              <td>Harga</td>
+            </tr>
+            <tr>
+              <td>Harga Baru</td>
+              <td>@ Harga </td>
+            </tr>
+            <tr>
+              <td>Harga Muatan</td>
+              <td>Harga*</td>
+            </tr>
+            <tr>
+              <td>Harga Lama</td>
+              <td>@Harga</td>
+            </tr>
+            <tr>
+              <td>Harga Baru</td>
+              <td>@Harga</td>
+            </tr>
+            <tr>
+              <td>Harga Muatan</td>
+              <td>@Harga *</td>
+            </tr>
+          -->
+          <tr><td colspan="2">&nbsp;</td></tr>
+          <tr>
+            <td colspan="2" style="font-size:13px">* Secara default penghitungan total menggunakan harga bongkar. Perubahan penggunaan harga hitung dapat dirubah saat pembuatan tagihan invoice.</td>
+          </tr> 
+        </table>
+      </div>
+
+      <div class="table-print-border row-view">
+        <table class="d-show-print" style="width: 50%; border-right: 1px solid black;">
+          <tr>
+            <td width="100;" style="padding-left: 8px;">Transportir</td>
+            <td>Putra Rajawali Kencana</td>
+          </tr>
+          <tr>
+            <td style="padding-left: 8px;">No Polisi</td>
+            <td>L 8848 UC</td>
+          </tr>
+          <tr>
+            <td style="padding-left: 8px;">Tanggal Kirim</td>
+            <td>30/11/2023</td>
+          </tr>
+        </table>
+        <table class="d-show-print" style="width: 50%">
+          <tr>
+            <td style="padding-left: 8px;">No Surat Jalan</td>
+            <td>231100202437</td>
+          </tr>
+          <tr>
+            <td style="padding-left: 8px;">Quantity (Kg)</td>
+            <td>35.322</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+        </table>
+      </div>
+
+      <%# <br class="clearfix" /> %>
+
+      <form id="taxinvoiceitems" name="taxinvoiceitems" action="/taxinvoiceitems/updateitems" method="post">
+        <input type="hidden" id="price_per" name="taxinvoiceitems[price_per]" value="" />
+        <input type="hidden" id="price_per_new" name="taxinvoiceitems[price_per_new]" value="" />
+        <input type="hidden" name="taxinvoiceitems[invoice_id]" value="" />
+        <input type="hidden" id="taxinvoiceitems_is_wholesale" name="taxinvoiceitems[is_wholesale]" value="" />
+        <input type="hidden" id="wholesale_price" name="taxinvoiceitems[wholesale_price]" value="" />
+
+        <table class="row-view content-print" id="tabTaxinvoiceitems" style="display: none;">
+          <thead>
+            <tr>
+              <th width="30">No.</th>
+              <th width="200">Jurusan</th>
+              <th width="120">Nopol</th>
+              <th width="120" style="text-align: right !important;">Qty Muat (KG)</th>
+              <th width="120" style="text-align: right !important;">Qty Bongkar (KG)</th>
+              <%# <th width="200" style="text-align: center;">Jurusan</th> %>
+              <%# <th class="right">Total</th> %>
+              <%# <th width="30"></th> %>
+            </tr>
+          </thead>
+          <tbody>
+            <%# edit data SJ %>
+            <tr id="1">
+              <td style="text-align: center;">1</td>
+              <%# Jurusan %>
+              <td><span id="jurusan">Garasi - Lamongan - Bawean</span></td>
+
+              <%# nopol %>
+              <td><input required type="text" name="taxinvoiceitems[date]" class="short date-picker" value="W 8432 US" readonly></td>
+
+              <%# Qty Muat %>
+              <td class="text-right"><input type="text" id="weight_gross_" name="taxinvoiceitems[weight_gross_]" class="short weight-field" value="33.609" onkeypress="javascript:return isMoneyKey(this);" readonly="readonly" style="width:100%"></td>
+
+              <%# Qty bongkar %>
+              <td class="text-right"><input type="text" name="taxinvoiceitems[unload_date_]" class="short weight-field" value="33.609" readonly="readonly" style="width:100%"></td>
+
+            </tr>
+            <%# end edit data SJ %>
+          </tbody>
+        </table>
+
+        <table class="row-view table-print" style="border-collapse: collapse; width: 40%; display: table;">
+          <tbody style="border: 1px solid black;">
+            <tr>
+              <td style="padding-left: 8px;">Quantity Muat</td>
+              <td>35.322</td>
+              <td>30/11/2023</td>
+            </tr>
+            <tr>
+              <td style="padding-left: 8px;">Quantity Bongkar</td>
+              <td>35.322</td>
+              <td>30/11/2023</td>
+            </tr>
+            <tr>
+              <td style="padding-left: 8px;"><strong>NETTO</strong></td>
+              <td>35.322</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="actions">
+          <a class="btn right" href="<%=taxinvoiceitems_path({:startdate => $globalStartdate, :enddate => $globalEnddate})%>">Kembali ke Index</a>
+
+          <% if !checkroleonly 'Vendor Supir' %>
+            <input type="submit" class="btn right" value="Tambah Data" />
+          
+            <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
+            <a type="submit" href="/taxinvoiceitems/downloadexcel/<%= params[:invoice_id] %>" class="btn right" style="height: 18px;">Cetak Excel</a>
+            <% end %>
+          <% end %>
+          
+        </div>
+      </form>
+      <br class="clearfix" />
+
+      <table class="row-view no-border d-show-print" style="border:0; width: 100%; border-collapse: unset;">
+        <tr>
+          <th width="150" style="text-align: center;">Pengirim</th>
+          <th width="150" style="text-align: center;">Penerima</th>
+        </tr>
+        <tr>
+          <td>
+            <div style="margin: 0 auto; width: 200px;">
+              <img src="/assets/stempelpuraxttdbututi.png" alt="" class="d-show-print" style="width: 200px;">
+            </div>
+          </td>
+          <td>
+            <div style="margin: 0 auto; width: 200px;">
+              <img src="/assets/ttd-achmad-tiny.png" alt="" class="d-show-print" style="width: 200px;">
+            </div>
+          </td>
+        </tr>
+        <tr style="display: none;">
+          <td style="text-align:center"><%= current_user.staff_id.nil? ? current_user.username : current_user.staff.name %></td>
+          <td>&nbsp;</td>
+        </tr>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<footer style="display: none;">
+  <div style="width: 320px !important; margin: 0 auto !important;">
+    <table class="row-view no-border d-show-print table-footer" style="border:0; width:100%; border-collapse: unset;">
+      <tr>
+        <td style="font-weight: 700;">PT. PUTRA RAJAWALI KENCANA Tbk</td>
+      </tr>
+      <tr>
+        <td>Ruko Section One Blok F7-11 Jl. Rungkut Industri I</td>
+      </tr>
+      <tr>
+        <td>Kendangsari - Tenggilis Mejoyo - Surabaya</td>
+      </tr>
+      <tr>
+        <td>Jawa Timur - Indonesia</td>
+      </tr>
+      <tr>
+        <td>www.puratrans.com email: info@puratrans.com</td>
+      </tr>
+      <tr>
+        <td style="font-weight: 700;">Telp. 031 99013573 Fax. 031 99850898</p></td>
+      </tr>
+    </table>
+  </div>
+</footer>
+
+<%= content_for :js do %>
+	<script>
+		
+	</script>
+<% end %>

@@ -1,0 +1,39 @@
+<table class="tablesorter row-view tablesorterFilters">
+    <thead>
+        <tr>
+            <th width="10">#</th>
+            <th width="25">Kode</th>
+            <th width="25">Tgl Buat</th>
+            <th width="25">Tgl Penyerehaan</th>
+            <th width="50">USER</th>
+            <th width="50">Print Oleh</th>
+            <th width="100">Surat Jalan</th>
+            <th width="30" class="{sorter: false, filter: false} sorter-false"></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% i = 0 %>
+    <% if @receipts.any? %>
+        <% @receipts.each do |receipt| %>
+            <% invids = [] %>
+            <% receipt.taxinvoiceitems.each do |item| %>
+                <% invids << item.invoice_id %>
+            <% end %>
+            <tr>
+                <td><%= i+=1 %>.</td>
+                <td><%= zeropad(receipt.id) %></td>
+                <td><strong><%= receipt.created_at.strftime('%d') %></strong>.<%= receipt.created_at.strftime('%m') %></td>
+                <td><strong><%= receipt.printdate.strftime('%d') rescue nil %></strong>.<%= receipt.printdate.strftime('%m') rescue nil %></td>
+                <td width="50"><%= receipt.user.username rescue nil %></td>
+                <td width="50"><%= User.find(receipt.printuser_id).username rescue nil %></td>
+                <td><%= invids.join(', ') %></td>
+                <td class="center">
+                    <%= link_to '&#xf044;'.html_safe, '#', :class => "edit tipsy btn-edit-receipttaxinv", :title => 'Edit', :data => { :id => receipt.id, :longid => zeropad(receipt.id), :createdat => receipt.created_at.strftime('%d-%m-%Y'), :printdate => (receipt.printdate.strftime('%d-%m-%Y') rescue nil) } %> 
+                    <a href="<%=print_receipttaxinvitem_path(receipt)%>" class="delete tipsy" title="Print Tanda Terima"><i class="icon-print"></i></a>
+                    <%= link_to '&#xf00d;'.html_safe, receipt, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+                </td>
+            </tr>
+        <% end %>
+    <% end %>
+    </tbody>
+</table>

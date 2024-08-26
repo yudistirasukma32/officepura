@@ -1,17 +1,37 @@
 <%= content_for :css do %>	 
-	<style>
-		#main #filter {
-			height: 96px;
-		}
-	</style>
-	<% end %>
-	<%= render "shared/header" %>
-	
-	<div id="nav">
-		<%= render "shared/nav" %>
-	</div>
-	
-	<div id="main">
+<style>
+	#main #filter {
+		height: 96px;
+	}
+
+	#main button.btn-txt {
+		border-radius: 3px;
+    border: 0;
+    margin-top: 10px;
+		margin-bottom: 10px;
+    padding: 5px 10px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    background-color: #24748f !important;
+    background-repeat: repeat-x;
+    background-image: linear-gradient(#2d95b7, #23748e);
+    border-color: #23748e #23748e #216c85;
+    color: #fff !important;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.16);
+    -webkit-font-smoothing: antialiased;
+	}
+</style>
+<% end %>
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
 		
 		<div id="content-full">
 			<% if !checkroleonly 'Vendor Supir' %>
@@ -71,11 +91,14 @@
 				</form>
 			</div>
 	
-			<br class="clearfix" />
-	
-			<%= render "showtable" %>
-			
-			<br class="clearfix" />
+		<%= form_tag create_receipt_receipttaxinvitems_path, method: "post", id: "form-createreceipttaxitem" do %>
+		<button type="submit" class="btn-txt right"><i class="icon-plus-sign"></i> &nbsp;Buat Tanda Terima</button>
+		<br class="clearfix" />
+
+		<%= render "showtable" %>
+		
+		<br class="clearfix" />
+		<% end %>
 	
 		</div>
 	

@@ -262,6 +262,30 @@ function zebraprint(name) {
 	}
 }
 
+function print_receipttaxinvitem () {
+	id = $('#receipt_id').val();
+	printdate = $('#printdate').val();
+
+	if (printdate == "") {
+		$.ajax({
+			type: "POST",
+			url: "/receipttaxinvitems/" + id + "/update_printdate",
+			success: function(data) {
+				var date = new Date(data.printdate);
+				var stringdate = ("0" + date.getDate()).slice(-2) + "-" + ("0"+(date.getMonth()+1)).slice(-2) + "-" + date.getFullYear();
+				$('#printdate').val(stringdate);
+				$('#printdate_label').text("Tanggal : " + stringdate);
+				window.print();		
+			},
+			failure: function() {
+				alert("Error. Mohon refresh browser Anda.");
+			}
+		});
+	} else {
+		window.print();
+	}
+}
+
 function chr(i) {
   return String.fromCharCode(i);
 } 
@@ -3050,6 +3074,17 @@ $(document).ready(function(e){
 	getSentDateLog();
 	$("#myModal").show();
 })
+
+.on("click",".btn-edit-receipttaxinv",function(e){
+	e.preventDefault();
+	$('#receipt_id').val($(this).data("id"));
+	$("#receipt_long_id").text($(this).data("longid"));
+	$('#created_at').val($(this).data("createdat"));
+	$('#printdate').val($(this).data("printdate"));
+
+	$("#myModal").show();
+})
+
 .on("submit","#update_tax",function(e){
 	e.preventDefault();
 	$.ajax({
@@ -3066,6 +3101,24 @@ $(document).ready(function(e){
 		}
 	})
 })
+
+.on("submit","#update_receipttaxinv",function(e){
+	e.preventDefault();
+	$.ajax({
+		url: $(this).attr('action'),
+		method: "POST",
+		dataType: "json",
+		data: $(this).serialize(),
+		success:function(data){
+			showMessageBox(data.message, 5000);
+			console.log(data);
+			location.reload();
+		},error:function(err) {
+			// showMessageBox(data.message,5000);
+		}
+	})
+})
+
 .on("submit",".form_ajax",function(e) {
 	resource_name = $(this).data("resource");
 	e.preventDefault();
@@ -3102,15 +3155,20 @@ $(document).ready(function(e){
 		}
 	});
 })
-.on("keyup change","#chk_price_tax,#routetrain_price_per",function(){
-	price_per = $("#routetrain_price_per").val() != "" ? parseInt($("#routetrain_price_per").val()) : 0;
-	ppn = 0;
-	if (price_per > 0) {
-		ppn = $("#chk_price_tax").is(":checked") ? parseInt(price_per * 11 / 100) : 0;
-	}
-	total = price_per + ppn;
-	$("#routetrain_total").val(total);
-	$("#txt_total").text(total);
+.on("submit", "#form-createreceipttaxitem", function(e) {
+	e.preventDefault();
+	$.ajax({
+		url: $(this).attr('action'),
+		method: "POST",
+		dataType: "json",
+		data: $(this).serialize(),
+		success:function(data){
+			$(".checkbox_receipt:checked").remove();
+			showMessageBox(data.message, 5000);
+		},error:function(err) {
+			showMessageBox("Terjadi kesalahan di sistem", 5000);
+		}
+	})
 })
 ;
 

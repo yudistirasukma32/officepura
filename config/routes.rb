@@ -519,6 +519,18 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
+  resources :receipttaxinvitems do
+    collection do
+      get 'create_receiptinvoice'
+      post 'create_receipt'
+      post 'update_receipt'
+    end
+    member do
+      get 'print'
+      post 'update_printdate'
+    end
+  end
+
   match 'bonusreceipts/index_confirmed' => 'bonusreceipts#index_confirmed'
 
   resources :bonusreceipts do

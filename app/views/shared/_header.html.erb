@@ -118,10 +118,19 @@
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin Hutang Operator'), "Hutang Operator Ro-Ro", "/shipexpenses" %></li>
 				</ul>
 			</li>
-            
-            <li class="<%= @section == 'taxinvoiceitems' ? 'on' : '' %>">
-				<%= link_to_if (checkrole 'Admin Keuangan, Admin Surat Jalan, Vendor Supir'), "Surat Jalan", "/taxinvoiceitems" %>
+
+			<li class="<%= @section == 'taxinvoiceitems' ? 'on' : '' %>">
+				<%= link_to_if (checkrole 'Admin Keuangan, Admin Surat Jalan, Vendor Supir'), "Surat Jalan", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('taxinvoiceitems');".html_safe %>
+
+				<ul id="sub-taxinvoiceitems" class="submenu" style="width:200px;">
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Surat Jalan, Vendor Supir'), "Surat Jalan", "/taxinvoiceitems" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Surat Jalan, Vendor Supir'), "Tanda Terima SJ", "/receipttaxinvitems" %></li>
+				</ul>
 			</li>
+            
+			<!-- <li class="<%= @section == 'taxinvoiceitems' ? 'on' : '' %>">
+				<%= link_to_if (checkrole 'Admin Keuangan, Admin Surat Jalan, Vendor Supir'), "Surat Jalan", "/taxinvoiceitems" %>
+			</li> -->
             
             <li class="<%= @section == 'taxinvoices' ? 'on' : '' %>">
 				<%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan, Staff Invoice Tagihan'), "Inv. Tagihan", "/taxinvoices" %>
