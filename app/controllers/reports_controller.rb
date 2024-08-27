@@ -542,6 +542,12 @@ class ReportsController < ApplicationController
             @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ?)", @startdate.to_date, @enddate.to_date + 1).order("date ASC, taxinvoice_id ASC")
           end
 
+          @event_id = Event.find(params[:event_id]).id rescue nil
+
+          if @event_id
+            @taxinvoiceitems = @taxinvoiceitems.joins(:invoice).where("event_id = ? ", @event_id)
+          end
+
           if checkroleonly 'Vendor Supir'
 
             @vendor = Vendor.where('user_id = ?', current_user.id)
