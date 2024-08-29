@@ -49,6 +49,7 @@
 					<th width="60">No.SJ</th>
 					<th width="60">Tgl Buat SJ</th>
 					<th width="60">Tgl Upload</th> 
+					<th width="60">Tgl Terima</th> 
 					<th width="300">INV Tagihan</th>
 					<!-- <th width="80" class="right">Total</th> -->
 				</tr>
@@ -79,6 +80,7 @@
 						belum upload
 						<% end %>
 					</td>
+					<td><%= taxinvoiceitem.receipttaxinvitem.printdate.strftime('%d/%m') rescue nil %></td>
 					<td>
 						<% if taxinvoiceitem.taxinvoice %>
 						<%= taxinvoiceitem.taxinvoice.date.strftime('%d/%m/%Y') %><br/>
