@@ -134,13 +134,13 @@
         <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Operasional, Marketing, Admin Marketing' %>
         <a class="back left" href="<%= @customer.present? ? edit_customer_path(@customer)+"/#2" : routes_url%>">Kembali ke <%= @customer.present? ? "Pelanggan" : "Jurusan" %></a>
       </div>
-      <!--
-       <% if @customer.present? %>
+<!--       
+       <%# if @customer.present? %>
        <h4></h4>
         <div class="field-row" style="margin-bottom:30px;">
           <label for="">Copy Ke Kantor</label>
           <select id="route_commodity_id" name="route[commodity_id]" class="half left">
-            <% 
+            <%# 
               office_id = Route.active.where("name ~* '.*#{@route.name}.*' and office_id is not null").pluck(:office_id) 
               if office_id.present?
                 offices = Office.active.where("id != ?",@route.office_id).where("id not in (#{office_id.join(",")})").order(:name) 
@@ -148,15 +148,15 @@
                 offices = Office.active.where("id != ?",@route.office_id).order(:name) 
               end
             %>
-            <% offices.each do |office| %>
-              <option value="<%=office.id%>" ><%=office.name%></option>
-            <% end %>
+            <%# offices.each do |office| %>
+              <option value="<%#=office.id%>" ><%#=office.name%></option>
+            <%# end %>
           </select>
         </div>
         <div class="actions">
           <a href="#" class="back left">Copy Jurusan</a>
         </div>
-      <% end %>
+      <%# end %>
       -->
 
       <% end %>  
