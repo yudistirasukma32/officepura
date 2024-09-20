@@ -63,7 +63,7 @@
 			
 			<div class="field-row continue" style="margin-top: 10px; display: flex; column-gap: 10px;">
 				<div style="position: relative; width: fit-content; float: left;">
-					<label for="operator_id"  style="width: 120px;"/>Operator Kereta</label>
+					<label for="operator_id"  style="width: 60px;"/>OP Kereta</label>
 					<select name="operator_id" class="half left chzn-select" style="width: 140px;" onchange="javascript:getRouteTrains(this.value);"/>
 						<option value="all">Semua Operator</option>
 						<% operators = Operator.active %>
@@ -74,7 +74,7 @@
 				</div>
 				<div id="route-trains">
 					<div style="position: relative; width: fit-content; float: left;">
-						<label for="routetrain_id"  style="width: 90px;">Jurusan Kereta</label>
+						<label for="routetrain_id"  style="width: 90px;">Jur Kereta</label>
 						<select name="routetrain_id" class="half left chzn-select" style="width: 450px;">
 							<option value="all">Semua Jurusan</option>
 							<% routetrains = Routetrain.active %>
@@ -83,6 +83,15 @@
 							<% end %>
 						</select>
 					</div>
+				</div>
+				<div style="position: relative; width: fit-content; float: left;">
+					<label for="createdat"  style="width: 50px; padding-right: 5px;">Dibuat</label>
+					<select name="createdat" class="short left combo_route" style="margin-right: 15px;">	
+					<option value="all">Semua</option>
+						<% ['08.00-12.00', '12.00-17.00'].each do |type| %>
+						<option <%= type == params[:createdat] ? 'selected' : '' %>><%=type%></option>
+						<% end %>
+					</select>
 				</div>
 				<input class="submit" type="submit" value="Filter" style="margin-top: -3px; margin-left: 16px;"/>
 			</div>
@@ -96,6 +105,7 @@
 		<tr>
 			<th width="30">No.</th>
 			<th width="40">Tgl</th>
+			<th width="40">Dibuat</th>
 			<th>Keterangan</th>
 			<th>Type</th>
 			<th>KTR</th>
@@ -117,7 +127,10 @@
         
 		<tr<% if i % 2 == 0 %> class="even"<% end %>>
 			<td><%=i+1%>.</td>
-			<td><%=event[:start_date].strftime('%d.%m.%y')%></td>
+			<td>
+				<%=event[:start_date].strftime('%d.%m')%> 
+			</td>
+			<td><%=event[:created_at].strftime('%d.%m %H:%M')%></td>
 			<td><%=event[:description] %>
 			<% if event[:route_train].present? && event[:route_train] != "Kosong" %>
 				<br>
@@ -151,10 +164,10 @@
 			<td align="right"><%=to_currency(@summary[:global_tol_asdp])%></td>
 			<td class="total" align="right"><%=to_currency(@summary[:global_invoice_total])%></td>
 			<td class="total" align="right"><%=to_currency(@summary[:global_total_estimation])%></td>
-            <td align="right" class="total">
-			<span style="display: none">
-			<%= (@summary[:global_invoice_total].to_i == 0 || @summary[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
-			</span>
+			<td align="right" class="total">
+				<span style="display: none">
+				<%= (@summary[:global_invoice_total].to_i == 0 || @summary[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
+				</span>
 			</td>
             <!-- <td></td> -->
 		</tr>

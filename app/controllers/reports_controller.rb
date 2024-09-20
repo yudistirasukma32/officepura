@@ -3080,10 +3080,22 @@ end
 
       @customers = Customer.where('id in (select customer_id from events where deleted = false and start_date between ? and ?)', @startdate.to_date, @enddate.to_date).order(:name)
 
-      @eventsa = Event.active.where("start_date between ? and ?", @startdate.to_date, @enddate.to_date).order(:start_date)
+      @eventsa = Event.active.where("start_date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date).order(:start_date)
 
       @transporttype = params[:transporttype]
       @tanktype = params[:tanktype]
+
+      @createdat = params[:createdat]
+
+      if @createdat.present? and @createdat != 'all'
+        if @createdat == "08.00-12.00"
+          # Filtering records between 08:00 - 12:00
+          @eventsa = @eventsa.where('EXTRACT(HOUR FROM events.created_at) BETWEEN ? AND ?', 0, 12)
+        else
+          # Filtering records between 12:00 - 17:00
+          @eventsa = @eventsa.where('EXTRACT(HOUR FROM events.created_at) BETWEEN ? AND ?', 12, 23)
+        end
+      end
 
       if @customer_id.present? and @customer_id != 'all'
         @eventsa = @eventsa.where('customer_id = ?', @customer_id)
@@ -3199,6 +3211,7 @@ end
           total_estimation: estimation,
           description: description,
           start_date: event.start_date,
+          created_at: event.created_at,
           route_train: (event.routetrain.name rescue "Kosong"),
           route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
           route_train_id: event.routetrain_id
