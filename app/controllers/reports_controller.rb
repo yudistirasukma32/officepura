@@ -3090,12 +3090,14 @@ end
       if @createdat.present? and @createdat != 'all'
         if @createdat == "08.00-12.00"
           # Filtering records between 08:00 - 12:00
-          @eventsa = @eventsa.where('EXTRACT(HOUR FROM events.created_at) BETWEEN ? AND ?', 0, 12)
+          @eventsa = @eventsa.where('EXTRACT(HOUR FROM events.created_at) BETWEEN ? AND ?', 7, 19)
         else
           # Filtering records between 12:00 - 17:00
-          @eventsa = @eventsa.where('EXTRACT(HOUR FROM events.created_at) BETWEEN ? AND ?', 12, 23)
+          @eventsa = @eventsa.where('(EXTRACT(HOUR FROM events.created_at) BETWEEN ? AND ?) OR (EXTRACT(HOUR FROM events.created_at) BETWEEN ? AND ?)', 12, 23, 0, 6)
         end
       end
+      # render json: @eventsa.to_sql
+      # return false
 
       if @customer_id.present? and @customer_id != 'all'
         @eventsa = @eventsa.where('customer_id = ?', @customer_id)
