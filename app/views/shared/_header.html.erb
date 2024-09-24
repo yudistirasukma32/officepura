@@ -208,7 +208,7 @@
 			</li>
 
 			<li class="<%= @section == 'reports2' ? 'on' : '' %>">
-				<%= link_to_if (checkrole 'Admin Operasional, Admin Gudang, Admin HRD, Laporan Pemasukan, Auditor'), "Laporan 2", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('reports2');".html_safe %>
+				<%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin Gudang, Admin HRD, Laporan Pemasukan, Auditor'), "Laporan 2", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('reports2');".html_safe %>
 								
 				<ul id="sub-reports2" class="submenu" style="width:220px;">
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Gudang, Staf Gudang'), "Pengeluaran Kendaraan", "/reports/expenses-vehicle" %></li>
