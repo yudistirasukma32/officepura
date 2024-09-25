@@ -2895,10 +2895,12 @@ end
       @taxinvoices = @taxinvoices.where("paiddate is null AND sentdate BETWEEN ? AND ?", "#{@year}-#{@month}-#{@day}-","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
       # @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}")
 
-      @customer = Customer.find(params[:customer_id]) rescue nil
+      @customers = Customer.active.where("id in (?)", @taxinvoices.pluck('customer_id')).order(:name)
 
-      if @customer.present?
-        @taxinvoices = @taxinvoices.where("customer_id = ?", @customer.id)
+      @customer_id = params[:customer_id]
+
+      if @customer_id.present?
+        @taxinvoices = @taxinvoices.where("customer_id = ?", @customer_id)
       end
 
       if params[:due_date_order].present?
