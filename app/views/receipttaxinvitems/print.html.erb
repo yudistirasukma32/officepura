@@ -1,4 +1,16 @@
 <style type="text/css">
+
+	#main .row-view th {
+		text-transform: uppercase;
+		font-size: 12px;
+		font-weight: 600;
+		padding: 7px 10px 7px 0;
+	}
+
+	#main .row-view td {
+		font-size: 12px;
+	}
+
 	#transfer-div {
 		position: absolute;
 		width: 50%;
@@ -14,7 +26,7 @@
     border-radius: 3px;
     border: 0;
     margin-right: 10px;
-    padding: 5px 10px;
+	padding: 7px 10px;
     text-decoration: none;
     font-size: 13px;
     font-weight: 900;
@@ -76,48 +88,55 @@
 <div id="main">
 	
 	<div id="content-full" class="invoice-paper">
-		<a class="btn-txt cancel hideprint" href="<%= receipttaxinvitems_path(:startdate => @receipt.created_at.strftime('%d-%m-%Y'), :enddate => @receipt.created_at.strftime('%d-%m-%Y'))%>"><i class="icon-remove"></i> Batal</a>
+		<a class="btn-txt cancel hideprint" href="<%= receipttaxinvitems_path(:startdate => @receipt.created_at.strftime('%d-%m-%y'), :enddate => @receipt.created_at.strftime('%d-%m-%y'))%>"><i class="icon-remove"></i> Batal</a>
 		<!-- <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a> -->
-		<button class="btnprint_receipttaxinvitem" onclick="javascript:print_receipttaxinvitem();"><i class="icon-print"></i> Print</button>
+		<button class="btnprint_receipttaxinvitem hideprint" onclick="javascript:print_receipttaxinvitem();"><i class="icon-print"></i> Print</button>
 		<input type="hidden" id="receipt_id" value="<%= @receipt.id %>">
 		<input type="hidden" id="printdate" value="<%= @receipt.printdate rescue nil %>">
 		<h1 class="hideprint"><%=Setting.find_by_name("Client Name").value%> / Tanda Terima Surat Jalan</h1>
-		
 
 		<% if @receipt.taxinvoiceitems.any? %>
 		<h1 style="text-align: center;" id="title_receipt">TANDA TERIMA SURAT JALAN</h1>
  		<br class="clear" />
  		<br class="clear" />
 
-		<table class="row-view no-border" style="width: 97%;">
+		<table class="row-view no-border" style="width: 97%; margin-left: 0">
 		  <tr>
 		    <th width="20" style="text-align:center">NO</th>
-		    <th width="70" class="nopol-col" style="text-align:center">TGL</th>
-		    <th width="70" class="nopol-col" style="text-align:center">DO</th>
-		    <th style="text-align:center">KETERANGAN</th>
-		    <th width="100" style="text-align:center">NOPOL</th>
-		    <th width="150" style="text-align:center">PELANGGAN</th>
-				<th width="40" class="qty-col" style="text-align:center">MUAT</th>
-				<th width="40" class="qty-col" style="text-align:center">BKR</th>
-		    <th style="text-align: center; width: 80px;">S. JALAN</th>
-		    <th style="text-align: center; width: 80px;">SDH INV</th>
-		    <th width="40" class="qty-col" style="text-align:center">UPLOAD</th>
+		    <th width="40" class="nopol-col" style="text-align:center">TGL</th>
+		    <th width="50" class="nopol-col" style="text-align:center">DO</th>
+		    <th width="150" style="text-align:center">KETERANGAN</th>
+		    <th width="90" style="text-align:center">NOPOL</th>
+		    <th width="100" style="text-align:center">PELANGGAN</th>
+		    <th width="100" style="text-align:center">NO SJ</th>
+			<th width="40" class="qty-col" style="text-align:center">TGL MUAT</th>
+			<th width="40" class="qty-col" style="text-align:center">TGL BKR</th>
+			<th width="40" class="qty-col" style="text-align:center">MUAT</th>
+			<th width="40" class="qty-col" style="text-align:center">BKR</th>
+		    <th style="text-align: center; width: 80px;">S<span style="opacity:0;">.</span>J</th>
+		    <th style="text-align: center; width: 80px;">INV</th>
+		    <th width="40" class="qty-col" style="text-align:center">UPlD</th>
 		    <th width="50" class="nopol-col" style="text-align:center">USER</th>
 		  </tr>
 
-			<% @receipt.taxinvoiceitems.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
+			<% @receipt.taxinvoiceitems.order(:date, :sku_id).includes(:invoice, :user).each_with_index do |taxinvoiceitem, i| %>
 				<%
 					invoice = taxinvoiceitem.invoice
 					second_driver = invoice.invoices.active.first.driver.name rescue nil
 				%>
 				<tr>
-					<td style="padding: 5px 10px;"><%=i+1%>.</td>
-					<td style="padding: 5px 10px;"><%= taxinvoiceitem.date.strftime('%d/%m/%Y') rescue nil %></td>
-					<td style="padding: 5px 10px;"><%= invoice.event_id rescue nil %></td>
-					<td style="padding: 5px 10px;">
-            #<%=zeropad(invoice.id)%>: <%= invoice.quantity %> Rit -> <%=invoice.route.name%> (<%=invoice.driver.name%><%= second_driver.nil? ? '' : ', ' +second_driver %>) <%= invoice.user_id.present? ? ('| ' + (invoice.user.username rescue nil)) : '' %>
+					<td style="padding: 3px 6px;"><%=i+1%>.</td>
+					<td style="padding: 3px 6px;"><%= taxinvoiceitem.date.strftime('%d/%m/%y') rescue nil %></td>
+					<td style="padding: 3px 6px;" align="center"><strong><%= invoice.event_id rescue nil %></strong></td>
+					<td style="padding: 3px 6px;">
+					<strong>#<%=zeropad(invoice.id)%></strong>: <%= invoice.quantity %> Rit
+					<%=invoice.route.name%> (<%=invoice.driver.name%><%= second_driver.nil? ? '' : ', ' +second_driver %>) 
+					<%= invoice.user_id.present? ? ('| ' + (invoice.user.username rescue nil)) : '' %>
+					<br/>
+					<strong><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : '' %>
+					<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></strong>
 					</td>
-					<td style="padding: 5px 10px;">
+					<td style="padding: 3px 6px;">
 						<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0 %>
 							<strong><%= invoice.vehicle_duplicate.current_id rescue nil %></strong>
 						<% else %>
@@ -127,15 +146,16 @@
 							<% if invoice.invoicetrain %>,<% if invoice.invoices.first %> <%= taxinvoiceitem.invoice.invoices.first.vehicle.current_id %> <% end %> <% end %>
 						</span>
 					</td>
-					<td style="padding: 5px 10px;"><%= taxinvoiceitem.customer.name rescue nil %></td>
-					<td style="padding: 5px 10px;" align="right">
-						<% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxinvoiceitem.weight_gross)%> <% end %> 
-					</td>
-					<td style="padding: 5px 10px;" align="right"><%=to_currency(taxinvoiceitem.weight_net)%></td>
-					<td style="padding: 5px 10px;" align="center">1 / 1</td>
-					<td style="padding: 5px 10px;" align="center"><%= taxinvoiceitem.invoice_id.present? ? '1' : '0' %> / 1</td>
-					<td style="padding: 5px 10px;" align="center">1 / 1</td>
-					<td style="padding: 5px 10px;"><%= taxinvoiceitem.user.username rescue nil %></td>
+					<td style="padding: 3px 6px;"><%= taxinvoiceitem.customer.name rescue nil %></td>
+					<td style="padding: 3px 6px;"><%= taxinvoiceitem.sku_id rescue nil %></td>
+					<td style="padding: 3px 6px;"><%= taxinvoiceitem.load_date.strftime('%d/%m/%y') rescue nil %></td>
+					<td style="padding: 3px 6px;"><%= taxinvoiceitem.unload_date.strftime('%d/%m/%y') rescue nil %></td>
+					<td style="padding: 3px 6px;" align="right"><% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=taxinvoiceitem.weight_gross%> <% end %> </td>
+					<td style="padding: 3px 6px;" align="right"><%=taxinvoiceitem.weight_net%></td>
+					<td style="padding: 3px 6px;" align="center">1 / 1</td>
+					<td style="padding: 3px 6px;" align="center"><%= taxinvoiceitem.invoice_id.present? ? '1' : '0' %> / 1</td>
+					<td style="padding: 3px 6px;" align="center">1 / 1</td>
+					<td style="padding: 3px 6px;"><%= taxinvoiceitem.user.username rescue nil %></td>
 				</tr>
 			<% end %>
 		</table>
@@ -143,7 +163,7 @@
 		<br>
 		<br>
 		<table style="width: 100%;">
-			<tr><td colspan="2"><strong id="printdate_label">Tanggal : <%= @receipt.printdate.strftime('%d-%m-%Y') rescue nil %></strong></td></tr>
+			<tr><td colspan="2"><strong id="printdate_label">Tanggal : <%= @receipt.printdate.strftime('%d-%m-%y') rescue nil %></strong></td></tr>
 			<tr>
 				<td>Diserahkan</td>
 				<td>Penerima</td>
