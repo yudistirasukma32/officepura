@@ -17,7 +17,7 @@ class Route < ActiveRecord::Base
 								:tol_fee, :ferry_fee, :item_type, :price_per, :price_per_type, 
 								:description, :customer_id, :routegroup_id, :deleted, :transporttype, :pos, 
 								:route_id, :estimated_hour, :office_id, :commodity_id, :kosongan, :kosongan_type,
-								:project
+								:project, :load_province, :unload_province
 
 	scope :active, lambda {where(:enabled => true, :deleted => false)}  					
 
