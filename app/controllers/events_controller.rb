@@ -403,9 +403,9 @@ class EventsController < ApplicationController
             event_qty = e.qty
         end
 
-        if e.is_stapel
-          is_stapel = true
-        end
+        # if e.is_stapel
+        #   is_stapel = true
+        # end
   
         if e.is_insurance
           is_insurance = true
@@ -574,9 +574,9 @@ class EventsController < ApplicationController
         completed_by_vendor = true
       end
 
-      if e.is_stapel
-        is_stapel = true
-      end
+      # if e.is_stapel
+      #   is_stapel = true
+      # end
 
       if e.is_insurance
         is_insurance = true
