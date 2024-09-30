@@ -8,6 +8,24 @@ class RoutesController < ApplicationController
     @where = "routes"
     @price_per_types = ["KG", "LITER", "BORONGAN","M3"]
     @transporttypes = ["TRUK", "ISOTANK", "KERETA", "KAPAL (TOL LAUT)"]
+    @provinces = [
+      "",
+      "Aceh",
+      "Sumatera Utara",
+      "Sumatera Barat",
+      "Jambi",
+      "Bengkulu",
+      "Sumatera Selatan",
+      "Lampung",
+      "Banten",
+      "DKI Jakarta",
+      "Jawa Barat",
+      "Jawa Tengah",
+      "DIY (Yogyakarta)",
+      "Jawa Timur",
+      "Bali",
+      "NTB",
+      "NTT"]
   end
 
   def index
