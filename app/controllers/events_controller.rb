@@ -697,6 +697,7 @@ class EventsController < ApplicationController
       updateinvoice_count e.id
       updateinvoiceconfirmed_count e.id
       updateinvoice_taxitems_count e.id
+      invoice_taxinv_count e.id
     end
 
     render :json => { :success => true }
