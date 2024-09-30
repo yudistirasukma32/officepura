@@ -1,0 +1,156 @@
+<% if @receiptinsurance %>
+
+<%= form_for(@receiptinsurance) do |f| %>
+
+   <% if @errors.include?'receipt' %>
+      <div class="field-row red">
+        <%=@errors['receipt']%>
+      </div>
+    <% end %>
+
+ 
+ <div class="info-box" style="margin-bottom:30px;">  
+ 
+    <h3>Biaya Asuransi BKK #<%=zeropad(@receiptinsurance.insuranceexpense.invoice.id)%></h3>
+
+    <table class="row-view no-border">
+        <tr>
+          <td width="120">Tanggal</td>
+          <td><%=@receiptinsurance.insuranceexpense.invoice.date.strftime('%d %B %Y')%> &nbsp;(KTR: <%=@receiptinsurance.insuranceexpense.invoice.office.name%>)</td>
+        </tr>
+        <tr>
+          <td>Pelanggan</td>
+          <td><%=@receiptinsurance.insuranceexpense.invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td><strong><%=@receiptinsurance.insuranceexpense.invoice.quantity%></strong> Rit: <%=@receiptinsurance.insuranceexpense.invoice.route.name%></td>
+        </tr>
+        <tr>
+          <td>No. DO</td>
+          <td><%=@receiptinsurance.insuranceexpense.invoice.event_id rescue nil%> (<%=@receiptinsurance.insuranceexpense.invoice.event.summary rescue nil%>)</td>
+        </tr>
+
+        <tr>
+          <td>Komoditas</td>
+          <td><%=@receiptinsurance.insuranceexpense.invoice.event.commodity.name rescue nil%></td>
+        </tr>
+
+        <tr>
+          <td>Tonage</td>
+          <td>
+            <% est_volume = @receiptinsurance.insuranceexpense.invoice.event.volume rescue 0 %>
+					  <% qty = @receiptinsurance.insuranceexpense.invoice.event.qty rescue 0 %>
+            <% est_volume = est_volume / qty %>
+            <%= to_currency(est_volume) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Kendaraan</td>
+          <td><%=@receiptinsurance.insuranceexpense.invoice.vehicle.current_id%> &nbsp;(UP: <%= @receiptinsurance.insuranceexpense.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+        </tr>
+        <% if @receiptinsurance.insuranceexpense.invoice.isotank_id != 0 %>
+        <tr>
+          <td>No. Isotank</td>
+          <td id="strIsotank"><%=@receiptinsurance.insuranceexpense.invoice.isotank.isotanknumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@receiptinsurance.insuranceexpense.invoice.isotank_number.nil? %>
+          <tr>
+            <td>No. Isotank</td>
+            <td id="strIsotank"><%=@receiptinsurance.insuranceexpense.invoice.isotank_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+          
+      <% if @receiptinsurance.insuranceexpense.invoice.container_id != 0 %>
+        <tr>
+          <td>No. Kontainer</td>
+          <td id="strIsotank"><%=@receiptinsurance.insuranceexpense.invoice.container.containernumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@receiptinsurance.insuranceexpense.invoice.container_number.nil? %>
+          <tr>
+            <td>No. Kontainer</td>
+            <td id="strIsotank"><%=@receiptinsurance.insuranceexpense.invoice.container_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+        <tr>
+          <td>Supir</td>
+          <td><%=@receiptinsurance.insuranceexpense.invoice.driver.name%> (<%=zeropad(@receiptinsurance.insuranceexpense.invoice.driver.id)%>)<% if !@receiptinsurance.insuranceexpense.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@receiptinsurance.insuranceexpense.invoice.driver.helpers.first.name%>)<% end %></td>
+        </tr>
+        <% if !@receiptinsurance.insuranceexpense.invoice.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td><%= @receiptinsurance.insuranceexpense.invoice.description %></td>
+        </tr>   
+        <% end %>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+          <td>Memo</td>
+          <td><%= @receiptinsurance.insuranceexpense.description rescue nil %></td>
+        </tr>
+    </table>
+
+    <table class="row-view">
+      <tr>
+        <th>Keterangan</th>
+        <th width="160" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr>
+        <td><%= f.label :invoicevendor_id, "Broker" %></td>
+        <td style="text-align: right;"><%= @receiptinsurance.insuranceexpense.insurancevendor.name rescue nil %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :insurance_name, "Asuransi" %></td>
+        <td style="text-align: right;"><%= @receiptinsurance.insuranceexpense.insurance_name rescue nil %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :policy_number, "No. Polis" %></td>
+        <td style="text-align: right;"><%= @receiptinsurance.insuranceexpense.policy_number rescue nil %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :due_date, "Tgl Jatuh Tempo" %></td>
+        <td style="text-align: right;"><%= @receiptinsurance.insuranceexpense.due_date rescue nil %></td>
+      </tr>
+ 
+      <tr>
+        <td><%= f.label :insurance_rate, "Rate" %></td>
+        <td style="text-align: right;"><% rate = @receiptinsurance.insuranceexpense.insurance_rate rescue 0 %><%= rate * 100 %>%</td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :tsi_total, "Nilai Pertanggungan" %></td>
+        <td style="text-align: right;"><% tsi_total = @receiptinsurance.insuranceexpense.invoice.event.tsi_total rescue 0 %><%= to_currency(tsi_total) %></td>
+      </tr>
+ 
+      <tr class="total-row">
+        <td><%= f.label :total, "Total Premi" %></td>
+        <td style="text-align: right;" class="red"><%= to_currency(@receiptinsurance.insuranceexpense.total) %></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="field-row first" style="margin-bottom:-20px;">
+  
+    <%= f.label :created_at, "Tgl Konfirmasi" %>
+    <%= f.text_field :created_at, :class => 'half date-picker', :value => to_currency(@receiptinsurance.created_at.strftime('%d-%m-%Y')) %>
+    <%= f.hidden_field :receiptinsurance_id, :value => @receiptinsurance.id %>
+  </div>
+  
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'submit' %> 
+  </div>
+<% end %>
+
+<% end %>

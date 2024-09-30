@@ -113,7 +113,9 @@
 
 					<li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin Hutang Operator'), "Memo Kontainer", "/containermemos" %></li>
+					
 					<li class="divider"></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin Asuransi'), "Asuransi", "/insuranceexpenses" %></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin Hutang Operator'), "Hutang Operator Kereta", "/trainexpenses" %></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Operasional, Admin Hutang Operator'), "Hutang Operator Ro-Ro", "/shipexpenses" %></li>
 				</ul>

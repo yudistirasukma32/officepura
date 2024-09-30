@@ -1597,6 +1597,14 @@ function getDataEvents(cl)
 					obj.className += " dp";
 					obj.title += " (*DP)";
 				}
+				if (object.is_stapel) {
+					obj.className += " stapel";
+					obj.title += " (*STP)";
+				}
+				if (object.is_insurance) {
+					obj.title += " (*INS)";
+				}
+
 				if (object.customer_id > 0) obj.title += " (*P)";
 				
 				events.push(obj);
@@ -1616,6 +1624,107 @@ function getDataEvents(cl)
 		failure: function() {alert("Error. Mohon refresh browser Anda.");}
 	});		
 }
+
+function getDataEvents2(cl)
+{
+	console.log(cl);
+
+	if (cl == 'drivers') {
+		urlSet = "/drivers/getdaily";
+	} else {
+		urlSet = "/events/geteventsv2/" + cl;
+	}
+
+	var events = [];
+	$.ajax({
+		type: "GET",
+		url: urlSet,
+		success: function(data) {
+            
+            console.log(data);
+            $(".loader.main-dashboard").removeClass('d-block').addClass('d-none');
+
+			for (var i = 0; i < data.length; i++) {
+				var object = data[i];    				
+				var obj = new Object();
+
+				if (cl == 'drivers') {
+					obj.title = object.summary;
+				} else {
+					obj.title = "#"+ object.id + " " + object.summary;
+				}
+				
+				obj.start = object.start_date.toString();
+				obj.end = object.end_date.toString();
+
+				if (cl == 'bookings') {
+					obj.url = '/bookings/' + object.id + '/edit'
+				} else {
+
+					if (cl == 'drivers') {
+						obj.url = '/drivers/' + object.id + '/edit'
+					} else {
+						obj.url = '/events/' + object.id + '/edit'
+					}
+				}
+
+				if (object.handled) obj.className = 'handled';
+				if (object.cancelled) obj.className = 'cancelled';
+				if (object.is_booking) obj.className = 'is_booking';
+				if (object.authorised) obj.className = 'authorised';
+				if (object.half_completed) obj.className = 'half_completed';
+				if (object.completed) obj.className = 'completed';
+				if (object.completed_by_vendor) obj.className = 'completed_by_vendor';
+				if (object.invoiced) obj.className = 'invoiced'; 
+				if (object.taxinvoiced) obj.className = 'taxinvoiced'; 
+
+				if (object.downpayment_amount > 0) {
+					obj.className += " dp";
+					obj.title += " (*DP)";
+				}
+				if (object.is_stapel) {
+					obj.className += " stapel";
+					obj.title += " (*STP)";
+				}
+				if (object.is_insurance) {
+					obj.title += " (*INS)";
+				}
+				
+				if (object.customer_id > 0) obj.title += " (*P)";
+				
+				events.push(obj);
+			}			
+			
+			var bigEvents= [];
+			var a = new Object();
+			a.events = events;	
+
+			bigEvents.push(a);
+
+			$('#calendar2').fullCalendar({
+				eventSources :JSON.parse(JSON.stringify(bigEvents))
+    		});
+			$('#arrayevents').val(JSON.stringify(bigEvents));	
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});		
+}
+
+function resyncEvent(){
+
+	$('#resync').html('<i class="icon-refresh"></i> &nbsp;Sync...');
+
+	$.ajax({
+		type: "GET",
+		url: "/events/resync",
+		success: function(data) {
+			getDataEvents2($('#calendar2').attr('class'));
+			$('#resync').html('<i class="icon-refresh"></i> &nbsp;Re-Sync');
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	}); 
+}
+
 
 function getDataBookings(cl)
 {
@@ -2821,6 +2930,13 @@ $(document).ready(function() {
 
 	if ($('#calendar').length > 0) {
 		getDataEvents($('#calendar').attr('class'));
+	}
+
+	if ($('#calendar2').length > 0) {
+		getDataEvents2($('#calendar2').attr('class'));
+		setInterval(function() {
+			getDataEvents2($('#calendar2').attr('class'));
+		}, 600000);
 	}
 
 	if ($('#calendarBookings').length > 0) {

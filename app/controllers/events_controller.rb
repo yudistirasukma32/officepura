@@ -18,6 +18,24 @@ class EventsController < ApplicationController
     @estimated_tonage_m3 = [45, 47]
     @price_per_types = ["KG", "LITER", "M3", "BORONGAN"]
     @tanktype = ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI']
+    @provinces = [
+      "",
+      "Aceh",
+      "Sumatera Utara",
+      "Sumatera Barat",
+      "Jambi",
+      "Bengkulu",
+      "Sumatera Selatan",
+      "Lampung",
+      "Banten",
+      "DKI Jakarta",
+      "Jawa Barat",
+      "Jawa Tengah",
+      "DIY (Yogyakarta)",
+      "Jawa Timur",
+      "Bali",
+      "NTB",
+      "NTT"]
   end
 
   def getestimatedtonage
@@ -35,6 +53,11 @@ class EventsController < ApplicationController
   end
 
   def index
+  end
+
+  def version2
+    @where = "version-2"
+    respond_to :html
   end
 
   def new
@@ -149,6 +172,9 @@ class EventsController < ApplicationController
         @event.eventvendors.create(eventvendors)
       end
 #      redirect_to(events_path + query, :notice => 'Data Event telah ditambah')
+
+      # update province
+      update_route_province @event.route_id, @event.load_province, @event.unload_province
 
       redirect_to(edit_event_url(@event), :notice => 'Data Event / DO berhasil ditambah.')
 
@@ -366,12 +392,23 @@ class EventsController < ApplicationController
         train = false
         completed_by_vendor = false
 
+        is_stapel = false
+        is_insurance = false
+
         bkk = ''
         taxinvoice = ''
         event_qty = 1
 
         if e.qty
             event_qty = e.qty
+        end
+
+        if e.is_stapel
+          is_stapel = true
+        end
+  
+        if e.is_insurance
+          is_insurance = true
         end
 
         if e.need_vendor && vendor.count > 0
@@ -485,7 +522,9 @@ class EventsController < ApplicationController
           :completed => completed,
           :completed_by_vendor => completed_by_vendor,
           :invoiced => invoiced,
-          :sj => taxinvoices
+          :sj => taxinvoices,
+          :is_stapel => is_stapel,
+          :is_insurance => is_insurance
         }
 
       end
@@ -496,6 +535,173 @@ class EventsController < ApplicationController
      end
   end
 
+  def geteventsv2
+
+    @events = Event.active.where("start_date >= ?", 2.months.ago).order(:id)
+
+    # @events = Event.active.where("id = 44746 or id = 44747")
+    user_office_id = current_user.office_id
+    if !cek_roles 'Admin Keuangan'
+      if user_office_id.present? && !current_user.owner
+        @events = @events.where("office_id = ?", user_office_id)
+      end
+    end
+
+    @events = @events.map do |e|
+
+      # init status
+      train = false
+      completed_by_vendor = false
+      is_stapel = false
+      is_insurance = false
+
+      handled = false
+      half_completed = false
+      completed = false
+      invoiced = false
+      taxinvoiced = false
+
+      event_qty = e.qty rescue 1
+
+      # vendor
+      vendor = Taxinvoiceitemv.active.select('event_id, total').where("event_id IN (?) AND taxinvoiceitemvs.total > '0'", e.id)
+
+      if e.need_vendor && vendor.count > 0
+        if vendor.count >= event_qty / 2
+          invoiced = true
+        end
+      elsif e.need_vendor
+        completed_by_vendor = true
+      end
+
+      if e.is_stapel
+        is_stapel = true
+      end
+
+      if e.is_insurance
+        is_insurance = true
+      end
+
+      # bkk
+      bkk_unconfirmed = e.invoice_count
+      bkk_confirmed = e.invoiceconfirmed_count
+      invoice_taxitems_count = e.invoice_taxitems_count
+      invoice_taxinv_count = e.invoice_taxinv_count
+
+      if bkk_unconfirmed.to_i > 0
+        handled = true
+      end
+
+      if bkk_confirmed.to_i > 0 || vendor.count > 0
+
+        invoicetrain = e.invoicetrain
+
+        if invoicetrain
+          train = true
+          if bkk_confirmed.to_i >= event_qty.to_i*2
+            completed = true
+          else
+            half_completed = true
+          end
+
+          if invoice_taxitems_count.to_i > 0 && invoice_taxitems_count.to_i >= bkk_confirmed.to_i/2
+            invoiced = true
+          end
+
+          if invoice_taxinv_count.to_i > 0
+            taxinvoiced = true
+          end
+
+        else
+
+          if bkk_confirmed.to_i >= event_qty.to_i
+            completed = true
+          else
+            half_completed = true
+          end
+
+          if invoice_taxitems_count.to_i > 0 && invoice_taxitems_count.to_i == bkk_confirmed.to_i
+            invoiced = true
+          end
+
+          if invoice_taxinv_count.to_i > 0
+            taxinvoiced = true
+          end
+
+        end
+
+      end
+
+      if e.company.nil?
+        company = ' [RDPI]'
+        summary = e.summary + company + ' / ' + e.user.username rescue nil
+      else
+
+        if e.office.nil?
+          company = e.company.abbr
+          summary = e.summary + ' ['+company+']' + ' / ' + e.user.username rescue nil
+        else
+          company = e.company.abbr
+          summary = e.summary + ' ['+company+'] / ' + e.office.abbr + ' / ' + e.user.username rescue nil
+        end
+
+      end
+
+      {
+        :id => e.id,
+        :handled => handled,
+        :authorised => e.authorised,
+        :summary => summary,
+        :cancelled => e.cancelled,
+        :start_date => e.start_date,
+        :end_date => e.end_date,
+        :customer_id => e.customer_id,
+        :downpayment_amount => e.downpayment_amount.to_i,
+        :invoicetrain => train,
+        :half_completed => half_completed,
+        :completed => completed,
+        :completed_by_vendor => completed_by_vendor,
+        :is_stapel => is_stapel,
+        :is_insurance => is_insurance,
+        :vendor => vendor.count,
+        :invoiced => invoiced,
+        :taxinvoiced => taxinvoiced,
+        :bkk => bkk_unconfirmed,
+        :bkk_confirmed => bkk_confirmed,
+        :sj => invoice_taxitems_count,
+        :tagihan => invoice_taxinv_count
+      }
+
+    end
+
+    # respond_to do |format|
+    #   format.json { render :json => @events }
+    # end
+
+    render :json => @events
+
+  end
+
+  def resync
+    @events = Event.active.where("start_date >= ?", 2.month.ago).order(:id)
+
+    # @events = Event.active.where("id = 44746 or id = 44747")
+    user_office_id = current_user.office_id
+    if !cek_roles 'Admin Keuangan'
+      if user_office_id.present? && !current_user.owner
+        @events = @events.where("office_id = ?", user_office_id)
+      end
+    end
+
+    @events = @events.map do |e|
+      updateinvoice_count e.id
+      updateinvoiceconfirmed_count e.id
+      updateinvoice_taxitems_count e.id
+    end
+
+    render :json => { :success => true }
+
+  end
 
   def report_events
 
@@ -609,7 +815,7 @@ class EventsController < ApplicationController
 
   def getdodetail
     @event = Event.find(params[:event_id])
-    render json: { operator_id: @event.operator_id, office_id: @event.office_id, cargo_type: @event.cargo_type, tanktype: @event.tanktype, route_id: @event.route_id, routetrain_id: @event.routetrain_id }, status: 200
+    render json: { operator_id: @event.operator_id, office_id: @event.office_id, cargo_type: @event.cargo_type, tanktype: @event.tanktype, route_id: @event.route_id, routetrain_id: @event.routetrain_id, is_insurance: @event.is_insurance}, status: 200
   end
 
   def add_dovendor

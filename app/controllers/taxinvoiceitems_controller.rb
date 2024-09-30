@@ -217,7 +217,13 @@ class TaxinvoiceitemsController < ApplicationController
           item.save
         end
       end
-      redirect_to("/taxinvoiceitems/new/" + @invoice.id.to_s, :notice => 'Data Surat Tagihan sukses di simpan.')
+
+      # recount event stats
+      if @invoice.event_id.present?
+        updateinvoice_taxitems_count @invoice.event_id
+      end
+
+      redirect_to("/taxinvoiceitems/new/" + @invoice.id.to_s, :notice => 'Data Surat Jalan sukses disimpan.')
     else
       redirect_to("/taxinvoiceitems/new/" + @invoice.id.to_s)      
     end    

@@ -1,6 +1,6 @@
 <% if @invoice %>
 
-<%= form_for(@trainexpense) do |f| %>
+<%= form_for(@insuranceexpense) do |f| %>
 
   <%= f.hidden_field :invoice_id, :value => @invoice.id %>
 
@@ -23,8 +23,24 @@
         </tr>
         <tr>
           <td>No. DO</td>
-          <td><%=@invoice.event_id rescue nil%></td>
+          <td><%=@invoice.event_id rescue nil%> (<%=@invoice.event.summary rescue nil%>)</td>
         </tr>
+
+        <tr>
+          <td>Komoditas</td>
+          <td><%=@invoice.event.commodity.name rescue nil%></td>
+        </tr>
+
+        <tr>
+          <td>Tonage</td>
+          <td>
+            <% est_volume = @invoice.event.volume rescue 0 %>
+					  <% qty = @invoice.event.qty rescue 0 %>
+            <% est_volume = est_volume / qty %>
+            <%= to_currency(est_volume) %>
+          </td>
+        </tr>
+
         <tr>
           <td>Kendaraan</td>
           <td><%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
@@ -70,18 +86,7 @@
             <td></td>
             <td></td>
         </tr>
-        <tr>
-            <td>Operator</td>
-            <td><%= @invoice.routetrain.operator.name rescue nil %></td>
-        </tr>
-        <tr>
-            <td>Jurusan Kereta</td>
-            <td><%= @invoice.routetrain.name rescue nil %></td>
-        </tr>
-        <tr>
-            <td>Tipe</td>
-            <td><%= @invoice.routetrain.container_type rescue nil %></td>
-        </tr>
+
         <tr>
           <td>Memo</td>
           <td><%= f.text_area :description, :class => '', style: "border: 2px solid #d7d7d7; height: 50px;".html_safe, rows: 10 %></td>
@@ -95,27 +100,50 @@
       </tr>
 
       <tr>
-        <td><%= f.label :price_per, "Tarif" %></td>
-        <td><%= f.text_field :price_per, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per.to_i), :readOnly => 'true' %></td>
-      </tr>
-      <tr>
-        <td><%= f.label :misc_total, "Lain-lain" %></td>
-        <td><%= f.text_field :misc_total, :class => 'half allowance-field', onkeyup: "count_trainexpense()", onchange: "count_trainexpense()", :value => 0 %></td>
-      </tr>
-      <tr>
-        <td>PPN 11% &nbsp; <input type="checkbox" id="routetrain_has_ppn" value="Yes" onchange="" />  </td>
-        <td><%= f.text_field :gst_tax, :class => 'half allowance-field disabled', :onkeypress => 'javascript:return isNumberKey(this);', readonly: true, value: 0 %></td>
+        <td><%= f.label :invoicevendor_id, "Broker" %></td>
+        <td>
+          <select id="insuranceexpense_insurancevendor_id" name="insuranceexpense[insurancevendor_id]" class="half combo_route">
+              <option value="0">- Vendor -</option>
+              <% Insurancevendor.active.order(:name).each do |vendor| %>
+              <option value="<%=vendor.id%>"<%= vendor.id == @insuranceexpense.insurancevendor_id ? ' selected="selected"' : '' %>><%=vendor.name%></option>
+            <% end %>
+          </select>
+        </td>
       </tr>
 
+      <tr>
+        <td><%= f.label :insurance_name, "Asuransi" %></td>
+        <td><%= f.text_field :insurance_name, :class => 'half'%></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :policy_number, "No. Polis" %></td>
+        <td><%= f.text_field :policy_number, :class => 'half'%></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :due_date, "Tgl Jatuh Tempo" %></td>
+        <td><%= f.text_field :due_date, :class => 'half date-picker'%></td>
+      </tr>
+ 
+      <tr>
+        <td><%= f.label :insurance_rate, "Rate" %></td>
+        <td><%= f.text_field :insurance_rate, :class => 'half disabled allowance-field', :value => rate = 0.0005, :readOnly => 'true' %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :tsi_total, "Nilai Pertanggungan" %></td>
+        <td><%= f.text_field :tsi_total, :class => 'half allowance-field', onkeyup: "count_insuranceexpense()", onchange: "count_insuranceexpense()", :value => to_currency(tsitotal = @invoice.event.tsi_total rescue 500000000) %></td>
+      </tr>
+ 
       <tr class="total-row">
-        <td><%= f.label :total, "Total" %></td>
-        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.routetrain.price_per.to_i), :readOnly => 'true' %></td>
+        <td><%= f.label :total, "Total Premi" %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(tsitotal * rate), :readOnly => 'true' %></td>
       </tr>
     </table>
 
     <div class="field-row continue">
 
-      <%= f.hidden_field :routetrain_id, :value => @invoice.routetrain_id %>
       <%= f.hidden_field :user_id, :value => current_user.id %>
 
       <%= f.submit "Tambah Data", :class => 'submit right' %>    
@@ -155,25 +183,36 @@
     function clean_currency(string) {
       return parseInt(string.replaceAll(".","").replaceAll(",","."));
     }
-     function count_trainexpense() {
-      price_per = $("#trainexpense_price_per").val();
-      misc_total = $("#trainexpense_misc_total").val();
-      price_per = price_per == "" ? 0 : clean_currency(price_per);
-      misc_total = misc_total == "" ? 0 : clean_currency(misc_total);
-      ppn = 0;
-      if ($("#routetrain_has_ppn").is(":checked")) {
-        ppn = parseInt(price_per * 11 / 100);
-      }
 
-      $("#trainexpense_gst_tax").val(formatRupiah(ppn));
-      $("#trainexpense_total").val(formatRupiah(price_per + ppn + misc_total));
+     function count_insuranceexpense() {
+      rate = $("#insuranceexpense_insurance_rate").val();
+      tsi = $("#insuranceexpense_tsi_total").val();
+
+      $("#insuranceexpense_tsi_total").val(formatRupiah(tsi));
+
+      rate = rate == "" ? 0 : rate;
+      tsi = tsi == "" ? 0 : clean_currency(tsi);
+      
+      console.log(rate);
+      console.log(tsi);
+
+      calc = rate * tsi;
+      // ppn = 0;
+      // if ($("#routetrain_has_ppn").is(":checked")) {
+      //   ppn = parseInt(price_per * 11 / 100);
+      // }
+
+      // $("#insuranceexpense_gst_tax").val(formatRupiah(ppn));
+      console.log(calc)
+      $("#insuranceexpense_total").val(formatRupiah(calc));
+      
     }
 
     $(document).ready(function() {
       
     })
     .on("click","#routetrain_has_ppn",function(){
-      count_trainexpense();
+      count_insuranceexpense();
 
     });
 
@@ -181,15 +220,15 @@
       
     // })
     // .on("click","#routetrain_has_ppn",function(){
-    //   price_per = $("#trainexpense_price_per").val();
+    //   price_per = $("#insuranceexpense_price_per").val();
     //   price_per = price_per == "" ? 0 : clean_currency(price_per);
     //   ppn = 0;
     //   if ($(this).is(":checked")) {
     //     ppn = parseInt(price_per * 11 / 100);
     //   }
 
-    //   $("#trainexpense_gst_tax").val(formatRupiah(ppn));
-    //   $("#trainexpense_total").val(formatRupiah(price_per + ppn));
+    //   $("#insuranceexpense_gst_tax").val(formatRupiah(ppn));
+    //   $("#insuranceexpense_total").val(formatRupiah(price_per + ppn));
 
     // });
   </script>

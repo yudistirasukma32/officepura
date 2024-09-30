@@ -103,6 +103,65 @@ module ApplicationHelper
 		return number_to_currency(number, :unit => unit, :precision => 2, :separator => ",", :delimiter => ".")
 	end
 
+	def update_route_province route_id, load_province, unload_province
+		route = Route.find(route_id)
+		if !route.nil?
+			route.load_province = load_province if route.load_province.nil?
+			route.unload_province = unload_province if route.unload_province.nil?
+			route.save
+		end
+	end
+
+	def updateinvoice_count event_id
+
+		event = Event.find(event_id) rescue nil
+		if !event.nil?
+			invoice_count = Invoice.active.where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').count
+			event.invoice_count = invoice_count
+			event.save
+		end
+
+	end
+
+	def updateinvoiceconfirmed_count event_id
+
+		event = Event.find(event_id) rescue nil
+		if !event.nil?
+			invoiceconfirmed_count = Invoice.active.where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').where('id in (select invoice_id from receipts where deleted = false)').count
+			event.invoiceconfirmed_count = invoiceconfirmed_count
+			event.save
+		end
+
+	end
+
+	def updateinvoice_taxitems_count event_id
+
+		event = Event.find(event_id) rescue nil
+
+		if !event.nil?
+			invoices = Invoice.active.select('id').where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').where('id in (select invoice_id from receipts where deleted = false)')
+			invoice_taxitems_count = Taxinvoiceitem.active.select('invoice_id, total')
+									 .where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0'", invoices).count
+			event.invoice_taxitems_count = invoice_taxitems_count
+			event.save
+		end
+
+	end
+
+	def invoice_taxinv_count event_id
+
+	event = Event.find(event_id) rescue nil
+
+	if !event.nil?
+		invoices = Invoice.active.select('id').where('event_id = ?', event.id).where('id not in (select invoice_id from invoicereturns where deleted = false)').where('id in (select invoice_id from receipts where deleted = false)')
+		invoice_taxinv_count = Taxinvoiceitem.active.select('invoice_id, total')
+								 .where("taxinvoiceitems.invoice_id IN (?) AND taxinvoiceitems.total > '0' AND taxinvoiceitems.taxinvoice_id is not null", invoices).count
+		event.invoice_taxinv_count = invoice_taxinv_count
+		event.save
+	end
+
+	end
+
 	def updateproductstock value, product_id
 		product = Product.find(product_id)
 		if !product.nil?

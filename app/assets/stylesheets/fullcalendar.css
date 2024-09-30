@@ -305,6 +305,11 @@ html .fc,
 	background-color: #b38e1d; /* default BACKGROUND color */	
 }
 
+.fc-event.taxinvoiced {
+	border: 1px solid #FFC107; /* default BORDER color */
+	background-color: #FFC107; /* default BACKGROUND color */	
+}
+
 .fc-event.dp {
 	position: relative;
   padding-left: 1rem;

@@ -424,6 +424,51 @@
 		</tbody>
 	<% end %>
 
+
+	<% if @insuranceexpenses.any? %>
+	<% total = 0 %>
+		<tbody class="tablesorter-no-sort">
+			<tr class="subheading">
+				<th colspan="6" style="color:#000;">Biaya Asuransi (<%=@insuranceexpenses.count%>)</th>
+			</tr>
+		</tbody>
+		<tbody>	
+		<% @insuranceexpenses.each_with_index do |insuranceexpense| %>
+		<% total += insuranceexpense.total %>
+			<tr>
+				<td><%=zeropad(insuranceexpense.invoice_id)%></td>
+				<td><%=insuranceexpense.invoice.quantity%> Rit: <%=insuranceexpense.invoice.route.name rescue nil%> (<%= insuranceexpense.invoice.driver.name rescue nil%> <%=zeropad(insuranceexpense.invoice.driver.id) rescue nil%>)
+					<%= (insuranceexpense.invoice.isotank_id.present? && insuranceexpense.invoice.isotank_id.to_i != 0) ? ("Isotank = " + insuranceexpense.invoice.isotank.isotanknumber) : '' %>
+					<%= (insuranceexpense.invoice.container_id.present? && insuranceexpense.invoice.container_id.to_i != 0) ? ("Kontainer = " + insuranceexpense.invoice.container.containernumber) : '' %>
+					<%= (insuranceexpense.invoice.event_id.present? && insuranceexpense.invoice.event_id != 0 ) ? "[DO " + insuranceexpense.invoice.event_id.to_s + "]" : ''%>
+					<br/>
+					<%=insuranceexpense.insurancevendor.name rescue nil %> :: No. Polis: <strong><%=insuranceexpense.policy_number rescue nil %></strong>
+				</td>
+	
+				<td class="">
+					<%=insuranceexpense.invoice.office.abbr if !insuranceexpense.invoice.office_id.nil?%>
+				</td>
+	
+				<td><%=insuranceexpense.invoice.vehicle.current_id rescue nil%></td>
+				<td align="right" class="red">
+					<%=to_currency(insuranceexpense.total)%>
+				</td>
+				<td class="right">
+					<a class="cta" href="<%=new_receiptinsurance_path%>/<%=insuranceexpense.id%>">Konfirm</a>
+				</td>
+			</tr>
+		<% end %>
+		</tbody>
+		<tbody class="tablesorter-no-sort">
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="red"><strong><%=to_currency(total.abs)%></strong></td>
+				<td colspan="3">&nbsp;</td>
+			</tr>
+		</tbody>
+	<% end %>
+	
 	<% if @incentives.any? %>
 	<% total = 0 %>
 

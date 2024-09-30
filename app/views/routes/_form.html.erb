@@ -69,6 +69,13 @@
       </div>
       <% end %>
 
+      <div class="field-row flex">
+        <%= f.label :load_province, "Provinsi Muat" %>
+        <%= f.select :load_province, options_for_select(@provinces.collect {|w| [w, w]}, @route.load_province), {}, :class => 'half chzn-select', :required => true %>
+        <%= f.label :unload_province, "Bongkar", :class => 'middle' %>
+        <%= f.select :unload_province, options_for_select(@provinces.collect {|w| [w, w]}, @route.unload_province), {}, :class => 'half chzn-select', :required => true %>
+      </div>
+
       <div class="field-row">
       <%= f.label :transporttype, "Jenis Moda"  %>
       <%= f.select :transporttype, options_for_select(@transporttypes.collect {|w| [w, w]}, @route.transporttype), {}, { :class => 'half chzn-select' } %>

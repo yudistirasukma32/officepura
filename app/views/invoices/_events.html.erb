@@ -52,6 +52,12 @@
             $('#invoice_cargo_type_cair').prop('checked', true);
           }
 
+          if (data.is_insurance == true){
+            $('#is_insurance').prop('checked', true);
+          } else {
+            $('#is_insurance').prop('checked', false);
+          }
+
           $.ajax({
             type: "GET",
             url: "/invoices/gettanktype/" + data.cargo_type,

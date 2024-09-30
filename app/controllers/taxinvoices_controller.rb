@@ -257,10 +257,22 @@ class TaxinvoicesController < ApplicationController
           if params["cb_" + taxinvoiceitem.id.to_s] == 'on'
             taxinvoiceitem.taxinvoice_id = @taxinvoice.id
             taxinvoiceitem.wholesale_price = customer_wholesaleprice
+
             taxinvoiceitem.save
+
+            # recount event stats
+            if taxinvoiceitem.invoice.event_id.present?
+              invoice_taxinv_count taxinvoiceitem.invoice.event_id
+            end
+
           else
             taxinvoiceitem.taxinvoice_id = nil
             taxinvoiceitem.save
+
+            # recount event stats
+            if taxinvoiceitem.invoice.event_id.present?
+              invoice_taxinv_count taxinvoiceitem.invoice.event_id
+            end
           end
         end
       end
@@ -306,9 +318,19 @@ class TaxinvoicesController < ApplicationController
           end
 
           taxinvoiceitem.save
+
+          # recount event stats
+          if taxinvoiceitem.invoice.event_id.present?
+            invoice_taxinv_count taxinvoiceitem.invoice.event_id
+          end
         else
           taxinvoiceitem.taxinvoice_id = nil
           taxinvoiceitem.save
+
+          # recount event stats
+          if taxinvoiceitem.invoice.event_id.present?
+            invoice_taxinv_count taxinvoiceitem.invoice.event_id
+          end
         end
       end
 
@@ -696,6 +718,11 @@ class TaxinvoicesController < ApplicationController
     @taxinvoice.taxinvoiceitems.each do |taxinvoiceitem|
       taxinvoiceitem.taxinvoice_id = nil
       taxinvoiceitem.save
+
+      # recount event stats
+      if taxinvoiceitem.invoice.event_id.present?
+        invoice_taxinv_count taxinvoiceitem.invoice.event_id
+      end
     end
 
     @taxinvoice.taxinvoiceitemvs.each do |taxinvoiceitemv|

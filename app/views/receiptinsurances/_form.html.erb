@@ -1,0 +1,153 @@
+<% if @receiptinsurance %>
+
+<%= form_for(@receiptinsurance) do |f| %>
+
+  <%= f.hidden_field :invoice_id, :value => @insuranceexpense.invoice.id %>
+  <%= f.hidden_field :insuranceexpense_id, :value => @insuranceexpense.id %>
+
+  <div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
+
+    <h3>Biaya Asuransi BKK #<%=zeropad(@insuranceexpense.invoice.id)%></h3>
+
+    <table class="row-view no-border">
+        <tr>
+          <td width="120">Tanggal</td>
+          <td><%=@insuranceexpense.invoice.date.strftime('%d %B %Y')%> &nbsp;(KTR: <%=@insuranceexpense.invoice.office.name%>)</td>
+        </tr>
+        <tr>
+          <td>Pelanggan</td>
+          <td><%=@insuranceexpense.invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td><strong><%=@insuranceexpense.invoice.quantity%></strong> Rit: <%=@insuranceexpense.invoice.route.name%></td>
+        </tr>
+        <tr>
+          <td>No. DO</td>
+          <td><%=@insuranceexpense.invoice.event_id rescue nil%> (<%=@insuranceexpense.invoice.event.summary rescue nil%>)</td>
+        </tr>
+
+        <tr>
+          <td>Komoditas</td>
+          <td><%=@insuranceexpense.invoice.event.commodity.name rescue nil%></td>
+        </tr>
+
+        <tr>
+          <td>Tonage</td>
+          <td>
+            <% est_volume = @insuranceexpense.invoice.event.volume rescue 0 %>
+					  <% qty = @insuranceexpense.invoice.event.qty rescue 0 %>
+            <% est_volume = est_volume / qty %>
+            <%= to_currency(est_volume) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Kendaraan</td>
+          <td><%=@insuranceexpense.invoice.vehicle.current_id%> &nbsp;(UP: <%= @insuranceexpense.invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)</td>
+        </tr>
+        <% if @insuranceexpense.invoice.isotank_id != 0 %>
+        <tr>
+          <td>No. Isotank</td>
+          <td id="strIsotank"><%=@insuranceexpense.invoice.isotank.isotanknumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@insuranceexpense.invoice.isotank_number.nil? %>
+          <tr>
+            <td>No. Isotank</td>
+            <td id="strIsotank"><%=@insuranceexpense.invoice.isotank_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+          
+      <% if @insuranceexpense.invoice.container_id != 0 %>
+        <tr>
+          <td>No. Kontainer</td>
+          <td id="strIsotank"><%=@insuranceexpense.invoice.container.containernumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@insuranceexpense.invoice.container_number.nil? %>
+          <tr>
+            <td>No. Kontainer</td>
+            <td id="strIsotank"><%=@insuranceexpense.invoice.container_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+        <tr>
+          <td>Supir</td>
+          <td><%=@insuranceexpense.invoice.driver.name%> (<%=zeropad(@insuranceexpense.invoice.driver.id)%>)<% if !@insuranceexpense.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@insuranceexpense.invoice.driver.helpers.first.name%>)<% end %></td>
+        </tr>
+        <% if !@insuranceexpense.invoice.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td><%= @insuranceexpense.invoice.description %></td>
+        </tr>   
+        <% end %>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+          <td>Memo</td>
+          <td><%= f.text_area :description, :class => '', style: "border: 2px solid #d7d7d7; height: 50px;".html_safe, rows: 10 %></td>
+        </tr>
+    </table>
+
+    <table class="row-view">
+      <tr>
+        <th>Keterangan</th>
+        <th width="160" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr>
+        <td><%= f.label :invoicevendor_id, "Broker" %></td>
+        <td style="text-align: right;"><%= @insuranceexpense.insurancevendor.name rescue nil %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :insurance_name, "Asuransi" %></td>
+        <td style="text-align: right;"><%= @insuranceexpense.insurance_name rescue nil %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :policy_number, "No. Polis" %></td>
+        <td style="text-align: right;"><%= @insuranceexpense.policy_number rescue nil %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :due_date, "Tgl Jatuh Tempo" %></td>
+        <td style="text-align: right;"><%= @insuranceexpense.due_date rescue nil %></td>
+      </tr>
+ 
+      <tr>
+        <td><%= f.label :insurance_rate, "Rate" %></td>
+        <td style="text-align: right;"><% rate = @insuranceexpense.insurance_rate rescue 0 %><%= rate * 100 %>%</td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :tsi_total, "Nilai Pertanggungan" %></td>
+        <td style="text-align: right;"><% tsi_total = @insuranceexpense.invoice.event.tsi_total rescue 0 %><%= to_currency(tsi_total) %></td>
+      </tr>
+ 
+      <tr class="total-row">
+        <td><%= f.label :total, "Total Premi" %></td>
+        <td style="text-align: right;" class="red"><%= to_currency(@insuranceexpense.total) %></td>
+      </tr>
+    </table>
+
+    <div class="field-row continue">
+
+      <%= f.hidden_field :user_id, :value => current_user.id %>
+      <%= f.hidden_field :insurance_rate, :value => @insuranceexpense.insurance_rate %>
+      <%= f.hidden_field :tsi_total, :value => @insuranceexpense.invoice.event.tsi_total %>
+      <%= f.hidden_field :total, :value => @insuranceexpense.total %>
+
+      <%= f.submit "Tambah Data", :class => 'submit right' %>    
+    </div>
+
+  </div>
+
+<% end %>
+
+<% end %>

@@ -97,6 +97,11 @@ class ReceiptsController < ApplicationController
             end
           end
 
+          # recount event stats
+          if @invoice.event_id.present?
+            updateinvoiceconfirmed_count @invoice.event_id
+          end
+
           redirect_to(cashiers_path(:date => @invoice.date.strftime('%d-%m-%Y')), :notice => 'BKK No. ' + zeropad(inputs[:invoice_id]) + ' sukses di tambah.')
         else
           redirect_to(cashiers_url)

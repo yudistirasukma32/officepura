@@ -54,6 +54,7 @@
 
 	<% if @section == 'events' %>
 		<li class="<%= @where == 'events' ? 'on' : '' %>"><%= link_to "Kalender Events", "/events" %></li>
+		<li class="<%= @where == 'version-2' ? 'on' : '' %>"><%= link_to link_to_if (checkrole 'Admin Marketing, Marketing'), "Kalender V2 (ujicoba)", "/events/version-2" %></li>
 		<li class="<%= @where == 'events-cancelled' ? 'on' : '' %>"><%= link_to "DO Ditolak", "/events?type=cancelled" %></li>
 		<li class="<%= @where == 'bookings' ? 'on' : '' %>"><%= link_to "Kalender OPS", "/bookings" %></li>
 		<li class="<%= @where == 'report-events-summary' ? 'on' : '' %>"><%= link_to "Kalender Summary", "/report-events-summary" %></li>
@@ -237,6 +238,11 @@
 	<% if @section == "shipexpenses" %> 
 		<li class="<%= @where == 'shipexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan'), "Hutang Operator Ro-Ro", "/shipexpenses" %></li>
 		<li class="<%= @where == 'shipexpenses-paid' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan'), "Hutang Operator Ro-Ro - Terbayar", "/shipexpenses-paid" %></li>
+	<% end %>
+
+	<% if @section == "insuranceexpenses" %> 
+		<li class="<%= @where == 'insuranceexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan, Admin Asuransi'), "Asuransi", "/insuranceexpenses" %></li>
+		<li class="<%= @where == 'insuranceexpenses-paid' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan, Admin Asuransi'), "Asuransi - Polis Premi", "/insuranceexpenses-paid" %></li>
 	<% end %>
 
 	<% if @section == "mechaniclogs" || @section == "ops" %>

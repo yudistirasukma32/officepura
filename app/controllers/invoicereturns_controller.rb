@@ -104,6 +104,12 @@ class InvoicereturnsController < ApplicationController
         end
         
         @invoicereturn.save
+
+        # recount event stats
+        if @invoice.event_id.present?
+          updateinvoice_count @invoice.event_id
+        end
+
         redirect_to(invoicereturns_path, :notice => 'BKK No. ' + zeropad(inputs[:invoice_id]) + ' sukses di tambah.')
       end
     else

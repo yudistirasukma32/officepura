@@ -7,9 +7,9 @@
 <div id="main">
 	
 	<div id="content-full">
-		<a class="btn-txt cancel" href="<%=insuranceexpenses_path%>"><i class="icon-remove"></i> Batal</a>
+		<a class="btn-txt cancel" href="<%=cashiers_path(:date => @insuranceexpense.date.strftime('%d-%m-%Y'))%>"><i class="icon-remove"></i> Batal</a>
 
-		<h1>Transaksi / <a href="<%=insuranceexpenses_path%>">Asuransi</a> / Tambah</h1>
+		<h1>Kasir / <a href="<%=cashiers_path%>">Biaya Polis Asuransi</a></h1>
 
 		<br class="clearfix" />
 		<%= render "form" %>

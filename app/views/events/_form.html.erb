@@ -33,7 +33,11 @@
     <%= f.label :customer_id, "Pelanggan" %>
     <select id="event_customer_id" name="event[customer_id]" class="double chzn-select" onchange="javascript:getRoutesOnly2(this.value);">
       <option value="0">- Pilih Pelanggan -</option>
-      <% Customer.active.order(:name).each do |customer| %>
+      <%
+        cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+        @customers = Customer.active.where('id NOT IN (?)', cust_kosongan).order(:name)
+      %>
+      <% @customers.order(:name).each do |customer| %>
       <option value="<%=customer.id%>"
         <% if customer.id == @event.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase if customer.city.present?%></option>
       <% end %>
@@ -45,7 +49,7 @@
       <%= f.text_field :summary, :placeholder => 'Berita Acara' %>
   </div>
 
-<div class="field-row">
+  <div class="field-row">
     <%= f.label :invoicetrain, "Multimoda" %>
     <% if active_node == "edit" %>
         <%= f.label :invoicetrain, :value => "false", :class => 'checkbox', :style => 'width: 150px;' do %>
@@ -76,18 +80,7 @@
   </div>
 
     <% if @process == 'new' %>
-    <div id="div_opstrains" style="display: none;">
-      <div class="field-row ">
-        <%= f.label :operator_id, "Operator Kereta" %>
-        <select id="event_operator_id" name="event[operator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteTrain2(this.value);">
-          <option value="0">- Operator -</option>
-          <% Operator.active.each do |operator| %>
-          <option value="<%=operator.id%>"
-            <% if operator.id == @event.operator_id %> selected="selected"<% end %>><%=operator.name%> (<%=operator.abbr%>)</option>
-          <% end %>
-        </select>
-      </div>
-    </div>
+    <div id="div_opstrains"></div>
 
     <div id="div_routetrains" style="display: none;">
       <div class="field-row">
@@ -119,7 +112,7 @@
           <%= f.label :operator_id, "Operator Kereta" %>
           <select id="event_operator_id" name="event[operator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteTrain2(this.value);">
             <option value="0">- Operator -</option>
-            <% Operator.active.each do |operator| %>
+            <% Operator.active.where(operatortype: "TRAIN").each do |operator| %>
             <option value="<%=operator.id%>"
               <% if operator.id == @event.operator_id %> selected="selected"<% end %>><%=operator.name%> (<%=operator.abbr%>)</option>
             <% end %>
@@ -148,6 +141,27 @@
         </div>
       </div>
 
+      <% elsif @event.invoiceship %>
+      <div id="div_opstrains">
+        <div class="field-row ">
+          <%= f.label :operator_id, "Operator Kapal" %>
+          <select id="event_operator_id" name="event[operator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteTrain2(this.value);">
+            <option value="0">- Operator -</option>
+            <% Operator.active.where(operatortype: "MULTIMODE").each do |operator| %>
+            <option value="<%=operator.id%>"
+              <% if operator.id == @event.operator_id %> selected="selected"<% end %>><%=operator.name%> (<%=operator.abbr%>)</option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+
+      <div id="div_routetrains">
+        <div class="field-row">
+          <%= f.label :routeship_id, "Jurusan Kapal" %>
+          <input type="text" class="double disabled" value="<%= !@event.routeship.nil? ? @event.routeship.name : 'Harap memilih pelanggan terlebih dahulu.' %>" />
+          <%= f.hidden_field :routeship_id, :value => @event.routeship_id %>
+        </div>
+      </div>
       <% end %>
 
     <% end %>
@@ -174,6 +188,13 @@
         </div>
 
     <% end %>
+
+  <div class="field-row flex">
+    <%= f.label :load_province, "Provinsi Muat" %>
+    <%= f.select :load_province, options_for_select(@provinces.collect {|w| [w, w]}, @event.load_province), {}, :class => 'half chzn-select', :required => true %>
+    <%= f.label :unload_province, "Bongkar", :class => 'middle' %>
+    <%= f.select :unload_province, options_for_select(@provinces.collect {|w| [w, w]}, @event.unload_province), {}, :class => 'half chzn-select', :required => true %>
+  </div>  
 
   <div class="field-row">
     <%= f.label :commodity_id, "Komoditas" %>
@@ -357,6 +378,22 @@
   <% end %>
 	
 	<div class="field-row">
+ 		<%= f.label :is_stapel, "Ada Stapel?" %>
+ 		<%= f.check_box :is_stapel %>
+	</div>
+
+  <div class="field-row">
+ 		<%= f.label :is_insurance, "Ada Asuransi?" %>
+ 		<%= f.check_box :is_insurance %>
+	</div>
+
+  <div class="field-row hide" id="tsi">
+    <%= f.label :tsi_total, "Nilai Pertanggungan" %>    
+    <%= f.text_field :tsi_total, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => @event.tsi_total.to_i %>
+    <strong>Rupiah</strong>
+  </div>
+  
+	<div class="field-row">
  		<%= f.label :cancelled, "DO Ditolak?", :style => 'font-weight:700;' %>
  		<%= f.check_box :cancelled %>
 	</div>
@@ -411,7 +448,19 @@
 <%= content_for :js do %>
 <script>
   $(document).ready(function() {
-    
+    if ($("#event_is_insurance").is(':checked')) {
+        $('#tsi').show();
+    } else {
+        $('#tsi').hide();
+    }
+  })
+
+  .on("change", "#event_is_insurance", function() {
+    if ($(this).is(':checked')) {
+        $('#tsi').show();
+    } else {
+        $('#tsi').hide();
+    }
   })
 
   .on("click","#btn-add-so",function(){

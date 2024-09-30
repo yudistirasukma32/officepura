@@ -472,6 +472,7 @@ OfficePuraErp::Application.routes.draw do
   resources :ports
   resources :receipttrains
   resources :receiptships
+  resources :receiptinsurances
 
   resources :mechanics
 
@@ -569,7 +570,12 @@ OfficePuraErp::Application.routes.draw do
   match 'events/getdovvendors/:multimoda' => 'events#getdovvendors'
   match 'events/getdovvendorroutes/:vendor_id' => 'events#getdovvendorroutes'
   match 'events/transferdov' => 'events#transferdov'
+  
+  get 'events/geteventsv2(/:type)' => 'events#geteventsv2'
   get 'events/getevents(/:type)' => 'events#getevents'
+
+  match 'events/version-2' => 'events#version2'
+  get 'events/resync' => 'events#resync'
   resources :events do
     collection do
       get 'getdovendor' => 'events#getdovendor'
@@ -833,8 +839,13 @@ OfficePuraErp::Application.routes.draw do
     match 'shipexpenses/new/:invoice_id' => 'shipexpenses#new'
     match 'shipexpenses/delete/:invoice_id' => 'shipexpenses#delete'
 
+    match 'insuranceexpenses-paid' => 'insuranceexpenses#paid'
+    match 'insuranceexpenses/new/:invoice_id' => 'insuranceexpenses#new'
+    match 'insuranceexpenses/delete/:invoice_id' => 'insuranceexpenses#delete'
+
     match 'receipttrains/new/:trainexpense_id' => 'receipttrains#new'
     match 'receiptships/new/:shipexpense_id' => 'receiptships#new'
+    match 'receiptinsurances/new/:insuranceexpense_id' => 'receiptinsurances#new'
 
     match 'mechaniclogs-done' => 'mechaniclogs#done'
     match 'mechaniclogs/new/:invoice_id' => 'mechaniclogs#new'

@@ -8,7 +8,7 @@
 	
 	<div id="content-full">
 
-		<h1>Transaksi / <a href="<%=trainexpenses_path%>">Hutang Operator Kereta - Terbayar</a> / Index</h1>
+		<h1>Transaksi / <a href="<%=insuranceexpenses_path%>">Asuransi</a> / Index Polis Premi</h1>
 
 		<br class="clearfix" />
 
@@ -20,25 +20,24 @@
 			</div>
 
 			<div class="field-row continue">
-				<label for="startdate" class="" style="float:none">Tgl Bayar Awal</label> &nbsp; &nbsp;
-				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />&nbsp; &nbsp;
-				<label for="enddate" class="middle short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
-				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />&nbsp; &nbsp;
-				<label for="operator_id" class="middle short" style='width:50px;float:none;'>Operator</label> &nbsp; &nbsp;
-				<select name="operator_id" class="middle short">
+				<label for="startdate" class="" style="width:50px; float:none">Periode</label>
+				<input type="text" name="startdate" class="short date-picker" value="<%=@startdate%>" />
+				<label for="enddate" class="middle short" style='width:30px; float:none;'>s/d</label>
+				<input type="text" name="enddate" class="short date-picker" value="<%=@enddate%>" />
+				<label for="insurancevendor_id" class="middle short" style='width:60px;float:none;'>Broker</label>
+				<select name="insurancevendor_id" class="middle half">
 					<option value="">Semua</option>
-					<% Operator.active.order(:name).each do |ope| %>
-					<option value="<%=ope.id%>"<% if ope.id == @ope %> selected='selected'<% end %>><%=ope.abbr%></option>
+					<% Insurancevendor.active.order(:name).each do |ope| %>
+					<option value="<%=ope.id%>"<% if ope.id == @ope %> selected='selected'<% end %>><%=ope.name%></option>
+					<% end %>
+				</select> &nbsp; &nbsp;
+				<label for="commodity_id" style="width:60px; float:none;">Komoditas</label>
+					<select name="commodity_id" class="middle half">
+					<option value="">Semua Komoditas</option>
+					<% Commodity.active.order(:name).each do |comodity| %>
+						<option value="<%= comodity.id %>"<% if comodity.id == @commodity_id.to_i %> selected='selected'<% end %>><%= comodity.name %></option>
 					<% end %>
 				</select>
-				<label for="type" class="middle short" style='width:50px;float:none;'>Jenis Cont.</label> &nbsp; &nbsp;
-				<select name="containertype" class="middle short">
-					<option value="">Semua</option>
-					<% @contype.each do |contype| %>
-					<option value="<%=contype%>" <% if contype == @containertype %> selected='selected'<% end %>><%=contype%></option>
-					<% end %>
-				</select>
-
 				<input class="submit" type="submit" value="Filter" />
 			</div>
 			</form>
@@ -48,70 +47,57 @@
 
 			<table class="row-view">
 				<tr>
-					<th width="50">TGL BYR</th>
-					<th width="50">TGL BKK</th>
-					<th width="50">No. BKK</th>
-					<th width="200">Keterangan</th>
-					<th width="60">NoPol</th>
-                    <th width="80">Kontainer/Iso</th>
+					<th width="50">No. Polis</th>
 					<th width="50">No. DO</th>
-					<th width="80">Type</th>
-					<th width="40">Operator</th>
-					<th width="90" class="right">Total</th>
+					<th width="200">Keterangan</th>
+					<th width="70">NoPol</th>
+                    <th width="90">Cont/Iso</th>
+                    <th width="90">Komoditas</th>
+                    <th width="50">Ton</th>
+                    <th width="50">Broker</th>
+					<th width="80" class="right">Pertanggungan</th>
+					<th width="50" class="right">Rate</th>
+					<th width="90" class="right">Total Premi</th>
 					<th width="40"></th>
 				</tr>
 
 				<% @grandTotal = 0%>
-				<% @trainexpenses.each do |trainexpense| %>
-					<% if trainexpense.deleted %>
-						<% @grandTotal += 0 %>
-						<% if current_user.adminrole %>
-						<tr class="deleted">
-							<td><strong><%=trainexpense.date.strftime('%d')%></strong>.<%=trainexpense.date.strftime('%m')%></td>
-							<td><strong><%=trainexpense.invoice.date.strftime('%d')%></strong>.<%=trainexpense.invoice.date.strftime('%m')%></td>
-							<td><%= zeropad(trainexpense.invoice.id) %></td>
-							<td>
-								<%=trainexpense.invoice.quantity%> Rit: <%=trainexpense.invoice.route.name rescue nil%> (<%=trainexpense.invoice.driver.name rescue nil%>) <% if !trainexpense.invoice.description.blank?%> <br /> <%=trainexpense.invoice.description%>  <% end %> 
-								<br/>
-								<%=trainexpense.invoice.routetrain.name rescue nil %>
- 							</td>
-							<td><%=trainexpense.invoice.vehicle.current_id rescue nil%></td>
-							<td><%= (trainexpense.invoice.isotank_id.present? && trainexpense.invoice.isotank_id.to_i != 0) ? ( trainexpense.invoice.isotank.isotanknumber) : '' %>
-							<%= (trainexpense.invoice.container_id.present? && trainexpense.invoice.container_id.to_i != 0) ? ( trainexpense.invoice.container.containernumber) : '' %></td>
-							<td><%= zeropad(trainexpense.invoice.event_id) rescue nil %></td>
-							<td><%= trainexpense.invoice.routetrain.container_type rescue nil %></td>
-							<td><%= trainexpense.invoice.routetrain.operator.abbr rescue nil %></td>
-							<td align="right" class="red"><%=to_currency(trainexpense.invoice.routetrain.total)%></td>
-							<td class="right" width="60">&nbsp;</td>
-						</tr>
-						<% end %>
 
-					<% else %>
+				<% @insuranceexpenses.each do |insuranceexpense| %>
 
-						<% @grandTotal += trainexpense.total %>
+					<% tsitotal = insuranceexpense.invoice.event.tsi_total rescue 0 %>
+					<% rate = 0.0005 %>
+					<% rate_text = 0.0005 * 100 %>
+					<% est_premi = rate * tsitotal %>
+					<% qty = insuranceexpense.invoice.event.qty rescue 0 %>
+					<% est_volume = insuranceexpense.invoice.event.volume rescue 0 %>
+					<% est_volume = est_volume / qty %>
+					<% total = insuranceexpense.total rescue 0 %>
+
+						<% @grandTotal += total %>
 
 						<tr>
-							<td><strong><%=trainexpense.date.strftime('%d')%></strong>.<%=trainexpense.date.strftime('%m')%></td>
-							<td><strong><%=trainexpense.invoice.date.strftime('%d')%></strong>.<%=trainexpense.invoice.date.strftime('%m')%></td>
-							<td><%= zeropad(trainexpense.invoice.id) %></td>
-							<td><%=trainexpense.invoice.quantity%> Rit: <%=trainexpense.invoice.route.name rescue nil%> (<%=trainexpense.invoice.driver.name rescue nil%>) <% if !trainexpense.invoice.description.blank?%> <br /> <%=trainexpense.invoice.description%>  <% end %> 
-							<br/>
-							<strong><%=trainexpense.invoice.routetrain.name rescue nil %></strong>
+							<td><%=insuranceexpense.policy_number rescue nil%></td> 
+							<td><%= zeropad(insuranceexpense.invoice.event_id) rescue nil %></td> 
+							<td><strong>#<%= zeropad(insuranceexpense.invoice.id) %></strong> (<%=insuranceexpense.invoice.date.strftime('%d')%>.<%=insuranceexpense.invoice.date.strftime('%m')%>)<br/>
+							<%=insuranceexpense.invoice.quantity%> Rit: <%=insuranceexpense.invoice.route.name rescue nil%> <br/>(<%=insuranceexpense.invoice.driver.name rescue nil%>)
 							</td>
-							<td><%=trainexpense.invoice.vehicle.current_id rescue nil%></td>
-							<td><%= (trainexpense.invoice.isotank_id.present? && trainexpense.invoice.isotank_id.to_i != 0) ? ( trainexpense.invoice.isotank.isotanknumber) : '' %>
-							<%= (trainexpense.invoice.container_id.present? && trainexpense.invoice.container_id.to_i != 0) ? ( trainexpense.invoice.container.containernumber) : '' %></td>
-							<td><%= zeropad(trainexpense.invoice.event_id) rescue nil %></td>
-							<td><%= trainexpense.invoice.routetrain.container_type rescue nil %></td>
-							<td><%= trainexpense.invoice.routetrain.operator.abbr rescue nil %></td>
-							<td align="right" class="red"><%=to_currency(trainexpense.total)%></td>
+							<td><%=insuranceexpense.invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (insuranceexpense.invoice.isotank_id.present? && insuranceexpense.invoice.isotank_id.to_i != 0) ? ( insuranceexpense.invoice.isotank.isotanknumber) : '' %>
+							<%= (insuranceexpense.invoice.container_id.present? && insuranceexpense.invoice.container_id.to_i != 0) ? ( insuranceexpense.invoice.container.containernumber) : '' %></td>
+							<td><%=insuranceexpense.invoice.event.commodity.name rescue nil%></td>
+							<td><%= est_volume %></td>
+							<td><%=insuranceexpense.insurancevendor.name rescue nil%></td>
+							<td class="right"><%= to_currency(tsitotal) %></td>
+							<td class="right"><%= rate_text %>%</td>
+							<td class="red right"><%= to_currency(total) %></td>
 							<td class="right" width="60">
 
 								<% if (current_user.adminrole || current_user.owner)%>
 
-									<% if trainexpense.receipttrains.active.count == 0 %>
+									<% if insuranceexpense.receiptinsurances.active.count == 0 %>
 
-										<a class="cta" style="opacity: 1;" href="trainexpenses/delete/<%=trainexpense.invoice.id%>">Batal</a>
+										<a class="cta" style="opacity: 1;" href="insuranceexpenses/delete/<%=insuranceexpense.invoice.id%>">Batal</a>
 									
 									<% else %>
 
@@ -123,7 +109,7 @@
 								
 								<% if checkrole 'Admin Operasional' %>
 
-									<% if trainexpense.receipttrains.active.count != 0 %>
+									<% if insuranceexpense.receiptinsurances.active.count != 0 %>
 
 										<span>confirmed</span>
 
@@ -139,11 +125,12 @@
 
 							</td>
 						</tr>
-					<% end %>
+
 				<% end %>	
 			
 				<tr class="footer">
-					<td class="total" align="right" colspan="9">TOTAL</td>
+					<td class="" colspan="2"><i><span style="font-size: 11px;"><%= @insuranceexpenses.count %> Premi ditemukan</span></i></td>
+					<td class="total" align="right" colspan="8">TOTAL</td>
 					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
 				</tr>
 			</table>

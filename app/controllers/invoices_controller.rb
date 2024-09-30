@@ -974,6 +974,12 @@ class InvoicesController < ApplicationController
       end
 
       if @invoice.save
+
+          # recount event stats
+          if @invoice.event_id.present?
+            updateinvoice_count @invoice.event_id
+          end
+
           redirect_to(step2_invoice_url(@invoice))
       else
           to_flash(@invoice)

@@ -10,23 +10,35 @@ class InsuranceexpensesController < ApplicationController
   end
 
   def set_role
-    @user_role = 'Admin Operasional, Admin Keuangan'
+    @user_role = 'Admin Keuangan, Admin Operasional, Admin Asuransi'
   end
 
   def index
-    @where = "insuranceexpenses"
 
-    @startdate = params[:startdate]
-    @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
-    @enddate = params[:enddate]
-    @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
+    role = cek_roles @user_role
+    if role
+     
+      @where = "insuranceexpenses"
 
-    @insuranceexpenses = Invoice.where('is_insurance = true AND date between ? and ? AND invoices.id not in (select invoice_id from insuranceexpenses where deleted = false) AND invoices.id not in (select invoice_id from invoicereturns where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
+      @startdate = params[:startdate]
+      @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
+  
+      @insuranceexpenses = Invoice.where('invoices.is_insurance = true AND invoices.date between ? and ? AND invoices.id not in (select invoice_id from insuranceexpenses where deleted = false) AND invoices.id not in (select invoice_id from invoicereturns where deleted = false)', @startdate.to_date, @enddate.to_date).order(:date, :event_id)
+  
+      @commodity_id = params[:commodity_id]
 
-    # if @operator_id.present?
-    #   @insuranceexpenses = @insuranceexpenses.where('invoices.operator_id = ?', @operator_id)
-    # end
-    respond_to :html
+      if @commodity_id.present?
+        @insuranceexpenses = @insuranceexpenses.joins(:event).where('events.commodity_id = ?', @commodity_id)
+      end
+
+
+      respond_to :html
+
+    else
+      redirect_to root_path()
+    end
 
   end
 
@@ -39,14 +51,19 @@ class InsuranceexpensesController < ApplicationController
     @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
 
     @insurancevendor_id = params[:insurancevendor_id]
-    @containertype = params[:containertype]
+    @commodity_id = params[:commodity_id]
 
     # @insuranceexpenses = Invoice.where('invoiceinsurance = true AND routeinsurance_id is not null AND routeinsurance_id !=0  AND date between ? and ? AND invoices.id in (select invoice_id from insuranceexpenses where deleted = false)', @startdate.to_date, @enddate.to_date).order(:id)
     @insuranceexpenses = Insuranceexpense.where('insuranceexpenses.date between ? and ? and insuranceexpenses.deleted = false', @startdate.to_date, @enddate.to_date).order(:id)
 
-    # if @insurancevendor_id.present?
-    #   @insuranceexpenses = @insuranceexpenses.joins(:invoice).where('invoices.operator_id = ?', @operator_id)
-    # end
+    if @insurancevendor_id.present?
+      @insuranceexpenses = @insuranceexpenses.joins(:invoice).where('insuranceexpenses.insurancevendor_id = ?', @insurancevendor_id)
+    end
+
+    if @commodity_id.present?
+      @insuranceexpenses = @insuranceexpenses.joins(invoice: :event).where('events.commodity_id = ?', @commodity_id)
+    end
+
     respond_to :html
   
   end
