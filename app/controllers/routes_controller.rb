@@ -9,7 +9,6 @@ class RoutesController < ApplicationController
     @price_per_types = ["KG", "LITER", "BORONGAN","M3"]
     @transporttypes = ["TRUK", "ISOTANK", "KERETA", "KAPAL (TOL LAUT)"]
     @provinces = [
-      "",
       "Aceh",
       "Sumatera Utara",
       "Sumatera Barat",
@@ -25,7 +24,9 @@ class RoutesController < ApplicationController
       "Jawa Timur",
       "Bali",
       "NTB",
-      "NTT"]
+      "NTT",
+      "Riau"
+    ]
   end
 
   def index
@@ -54,7 +55,7 @@ class RoutesController < ApplicationController
       @routes = Route.where("deleted = false#{additional_query}").limit(batas).offset(halaman_awal).order("name asc")
     end
 
-    
+
 
     @total_page = (all_data.to_f / batas.to_f).ceil
 
@@ -88,7 +89,7 @@ class RoutesController < ApplicationController
     @route.bonus = @route.bonus.to_i
 
     @routeloc = Routelocation.where("route_id = ?", params[:id]).order("id DESC").limit(1)
-		
+
 		if @routeloc.first.nil?
 			@routelocation = Routelocation.new
 			@routelocation.route_id = @route.id
@@ -143,13 +144,13 @@ class RoutesController < ApplicationController
     #end
 
     if @route.update_attributes(inputs)
-      
-      
+
+
       if checkrole 'Marketing, Admin Marketing'
 
         @route.price_per = inputs[:price_per].delete('.').gsub(",",".") || 0
- 
-      end      
+
+      end
 
       @route.save
 
@@ -178,7 +179,7 @@ class RoutesController < ApplicationController
       #     end
       #   end
       # end
-      
+
       redirect_to(edit_route_url(@route, :operational => true), :notice => 'Data Jurusan sukses disimpan.')
     else
       to_flash(@route)
@@ -191,14 +192,14 @@ class RoutesController < ApplicationController
     customer_id = @route.customer_id
     @route.destroy
     redirect_to edit_customer_url(customer_id)+'/#2'
-  end  
-  
+  end
+
   def enable
     @route = Route.find(params[:id])
     @route.update_attributes(:enabled => true)
     redirect_to (routes_url)
   end
-  
+
   def disable
     @route = Route.find(params[:id])
     @route.update_attributes(:enabled => false)

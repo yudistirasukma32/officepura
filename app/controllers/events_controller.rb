@@ -19,7 +19,6 @@ class EventsController < ApplicationController
     @price_per_types = ["KG", "LITER", "M3", "BORONGAN"]
     @tanktype = ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI']
     @provinces = [
-      "",
       "Aceh",
       "Sumatera Utara",
       "Sumatera Barat",
@@ -35,7 +34,9 @@ class EventsController < ApplicationController
       "Jawa Timur",
       "Bali",
       "NTB",
-      "NTT"]
+      "NTT",
+      "Riau"
+    ]
   end
 
   def getestimatedtonage
@@ -406,7 +407,7 @@ class EventsController < ApplicationController
         # if e.is_stapel
         #   is_stapel = true
         # end
-  
+
         if e.is_insurance
           is_insurance = true
         end
