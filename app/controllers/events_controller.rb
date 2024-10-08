@@ -779,40 +779,71 @@ class EventsController < ApplicationController
     @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
     @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
 
-    @customer = Customer.find(params[:customer_id]) rescue nil
-    @customer_id = @customer.id if @customer
+    # @customer = Customer.find(params[:customer_id]) rescue nil
+    # @customer_id = @customer.id if @customer
+
+    @events = Event.active.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
+
+    @customer_id = params[:customer_id]
+
+    if @customer_id.present?
+      @customer = Customer.find(params[:customer_id]) rescue nil
+      @events = @events.where('customer_id = ?', @customer_id)
+    end
+
+    @offices = Office.active.where("id in (?)", @events.pluck('office_id')).order(:name)
+    @office_id = params[:office_id]
+
+    if @office_id.present? and @office_id != "all"
+      @office = Office.find(params[:office_id]) rescue nil
+      @events = @events.where('office_id = ?', @office_id)
+    end
 
     @id = params[:id]
-
-    # render json: @customer.events.where(a: "a")
-    # return false
-
-    if @customer.present?
-      @events = @customer.events.active
-    else
-      @events = Event.active
-    end
-
-    @events = @events.where("start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
-
     if @id.present?
-
       @events = Event.where('id = ?', @id)
-
     end
 
-    # @events = @customer.events.active if @customer
     @events = @events.order(:start_date)
-
-    @invoices = Invoice.active.select('event_id').where("date >= ?", 12.months.ago).pluck(:event_id)
+    @customers = Customer.active.where("id in (?)", @events.pluck('customer_id')).order(:name)
 
     render "report-events-summary"
-    # render json: {
-    #   startdate: @startdate,
-    #   enddate: @enddate,
-    #   events: @events,
-    #   invoices: @invoices
-    # }
+  end
+
+  def cancelled
+
+    @where = 'events-cancelled'
+    @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
+    @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
+
+    # @customer = Customer.find(params[:customer_id]) rescue nil
+    # @customer_id = @customer.id if @customer
+
+    @events = Event.where("(deleted = true OR cancelled = true) AND start_date BETWEEN :startdate AND :enddate", {:startdate => @startdate.to_date, :enddate => @enddate.to_date})
+    @customer_id = params[:customer_id]
+
+    if @customer_id.present?
+      @customer = Customer.find(params[:customer_id]) rescue nil
+      @events = @events.where('customer_id = ?', @customer_id)
+    end
+
+    @offices = Office.active.where("id in (?)", @events.pluck('office_id')).order(:name)
+    @office_id = params[:office_id]
+
+    if @office_id.present? and @office_id != "all"
+      @office = Office.find(params[:office_id]) rescue nil
+      @events = @events.where('office_id = ?', @office_id)
+    end
+
+    @id = params[:id]
+    if @id.present?
+      @events = Event.where('id = ?', @id)
+    end
+
+    @events = @events.order(:start_date)
+    @customers = Customer.active.where("id in (?)", @events.pluck('customer_id')).order(:name)
+
+    render "cancelled"
   end
 
   def getdodetail

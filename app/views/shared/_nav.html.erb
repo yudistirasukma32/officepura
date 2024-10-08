@@ -55,7 +55,8 @@
 	<% if @section == 'events' %>
 		<li class="<%= @where == 'events' ? 'on' : '' %>"><%= link_to "Kalender Events", "/events" %></li>
 		<li class="<%= @where == 'version-2' ? 'on' : '' %>"><%= link_to link_to_if (checkrole 'Admin Marketing, Marketing'), "Kalender V2 (ujicoba)", "/events/version-2" %></li>
-		<li class="<%= @where == 'events-cancelled' ? 'on' : '' %>"><%= link_to "DO Ditolak", "/events?type=cancelled" %></li>
+		<li class="<%= @where == 'events-cancelled' ? 'on' : '' %>"><%= link_to "DO Ditolak", "/events/cancelled" %></li>
+		
 		<li class="<%= @where == 'bookings' ? 'on' : '' %>"><%= link_to "Kalender OPS", "/bookings" %></li>
 		<li class="<%= @where == 'report-events-summary' ? 'on' : '' %>"><%= link_to "Kalender Summary", "/report-events-summary" %></li>
 		<li class="<%= @where == 'report-invoices-summary' ? 'on' : '' %>"><%= link_to "BKK Kalender Summary", "/report-invoices-summary" %></li>
