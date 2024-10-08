@@ -94,7 +94,9 @@
 				<td class="right"><%= event.qty %></td>
 				<td class="right" width="60">
 					<%= link_to '&#xf044;'.html_safe, edit_event_path(event, origin: 'report'), :class => "edit tipsy", :title => 'Edit' %> 
+					<% if !event.deleted %>
 					<%= link_to '&#xf00d;'.html_safe, event, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+					<% end %>
 				</td>
 			</tr>
 		<% end %>

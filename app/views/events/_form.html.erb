@@ -421,6 +421,19 @@
   
 	<% query = @event.cancelled ? "cancelled" : "" %>
 
+  <% if @event.deleted %>
+
+  <div class="actions">
+
+    <span class="flex">
+    <a class="btn-txt cancel" style="pointer-events: none !important;">DO sudah Dihapus</a>
+    <a class="back left" href="<%= events_path + '?type=' + query %>">Kembali ke Index</a>
+    </span>
+  
+  </div>
+
+  <% else %>
+
 	<div class="actions">
 
   	<% if @isdelete %>
@@ -435,6 +448,8 @@
   	
   	<a class="back left" href="<%= events_path + '?type=' + query %>">Kembali ke Index</a>
 	</div>
+
+  <% end %>
 
 <% end %>
 

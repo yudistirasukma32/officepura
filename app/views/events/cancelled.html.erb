@@ -86,8 +86,10 @@
 					<%= event.deleted ? '[dihapus]' : ''%>
 				</td>
 				<td class="right" width="60">
-					<%= link_to '&#xf044;'.html_safe, edit_event_path(event, origin: 'report'), :class => "edit tipsy", :title => 'Edit' %> 
+					<%= link_to '&#xf044;'.html_safe, edit_event_path(event, origin: 'report'), :class => "edit tipsy", :title => 'Edit' %>
+					<% if !event.deleted %>
 					<%= link_to '&#xf00d;'.html_safe, event, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+					<% end %>
 				</td>
 			</tr>
 		<% end %>
@@ -95,7 +97,7 @@
 		</tbody>
 
 		<tr class="footer">
-			<td class="" colspan="15"><i><span style="font-size: 11px;"><%= @events.count %> DO tolakan ditemukan</span></i></td>
+			<td class="" colspan="15"><i><span style="font-size: 11px;"><%= @events.where('cancelled = true').count %> DO tolakan, <%= @events.where('deleted = true').count %> DO dihapus ditemukan</span></i></td>
 		</tr>
 
 		</table>

@@ -21,6 +21,12 @@
                 <%= @event.user.username%></strong>
                 </p>
                 <% end %>
+                
+                <% if !@event.deleteuser_id.nil? %>
+                <p>Dihapus oleh <strong id="strCreator">
+                <%= User.find(@event.deleteuser_id).username%></strong>
+                </p>
+                <% end %>
     
             </div>
 

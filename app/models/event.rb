@@ -28,7 +28,8 @@ class Event < ActiveRecord::Base
     :downpayment_amount, :downpayment_date, :losing, :price_per_type, :invoiceship, :routeship_id, :is_stapel,
     :invoice_count, :invoiceconfirmed_count, :invoice_taxitems_count, :invoice_taxinv_count,
     :is_insurance, :tsi_total,
-    :load_province, :unload_province
+    :load_province, :unload_province,
+    :deleteuser_id
 
     scope :active, lambda {where(:deleted => false)}
 
