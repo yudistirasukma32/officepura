@@ -7,6 +7,7 @@ log/*
 vendor/cache/*
 db/data*
 db/schema.rb
+schema.rb
 public/data/*
 public/system/*
 public/assets/*

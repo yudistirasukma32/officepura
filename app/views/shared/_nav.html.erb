@@ -215,6 +215,8 @@
 		<li class="<%= @where == 'estimation' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Estimasi BKK", "/reports/estimation" %></li> 
 		<li class="<%= @where == 'estimationincomeexpense' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Perbandingan BKK & Estimasi", "/reports/estimation-income-expense" %></li> 
 		<li class="<%= @where == 'estimation_event_invoice' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Perbandingan BKK & DO", "/reports/estimation-event-expense" %></li> 
+		<li class="<%= @where == 'branches' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Laporan Cabang", "/reports/branches" %></li> 
+		<li class="<%= @where == 'branches-stats' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Stats Cabang", "/reports/branches-stats" %></li>
 	<% end %>
 
 	<% if @section == "logs" %> 

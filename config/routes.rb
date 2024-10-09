@@ -705,6 +705,11 @@ OfficePuraErp::Application.routes.draw do
     match 'revenue-breakdown' => 'reports#revenuebreakdown'
     match 'estimation-event-expense' => 'reports#estimation_event_expense'
 
+    match 'branches' => 'reports#branches'
+    match 'branches-stats' => 'reports#branches_stats'
+    match 'getbranchstats' => 'reports#apibranchstats'
+    match 'getbranchstatsbkk' => 'reports#apibranchstatsbkk'
+
     match 'shrinkreport' => 'reports#shrinkreport'
     get "driver-rit" => 'reports#driver_rit'
     get 'unpaid_invoice' => 'reports#unpaid_invoice'

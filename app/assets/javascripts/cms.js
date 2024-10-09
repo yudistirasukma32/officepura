@@ -1986,6 +1986,256 @@ function getGraphCustomer()
 	});	
 }
 
+function getBranchStats(){
+
+	var startdate = $("#startdate").val();
+    var enddate = $("#enddate").val();
+    
+    $.ajax({
+		type: "GET",
+		url: "/reports/getbranchstats?type=customers&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.customers;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'Jumlah Pelanggan Unik',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+					},
+					colors:['#31bfff']
+				};
+		
+				var chart = new ApexCharts($("#customers-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstats?type=events&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.events;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'Jumlah KE',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+					}
+				};
+		
+				var chart = new ApexCharts($("#events-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstats?type=eventsomzet&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.estimations;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'Est. Omzet Cabang',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: false
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+					},
+					colors:['#1fc20e']
+				};
+		
+				var chart = new ApexCharts($("#events-omzet-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstatsbkk?type=bkk&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.bkk;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'BKK Muat',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+					},
+					colors:['#ff5f6a']
+				};
+		
+				var chart = new ApexCharts($("#bkk-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstatsbkk?type=kos&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.bkkkos;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'Kos Prod',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+					},
+					colors:['#FF1020']
+				};
+		
+				var chart = new ApexCharts($("#bkk-kos-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstatsbkk?type=non&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.bkknon;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'Non Prod',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+					},
+					colors:['#cf0000']
+				};
+		
+				var chart = new ApexCharts($("#bkk-non-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+}
+
 function getproductgroupnames(group_id){
 	var groupname = "";
 	$.ajax({
@@ -2953,6 +3203,10 @@ $(document).ready(function() {
 
 	if($('#chartcustomer').length > 0){
 		getGraphCustomer();
+	}
+
+	if($('#customers-stats').length > 0){
+		getBranchStats();
 	}
 
 	if($('#div_annualvehiclegraph').length > 0){
