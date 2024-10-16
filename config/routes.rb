@@ -709,6 +709,7 @@ OfficePuraErp::Application.routes.draw do
     match 'branches-stats' => 'reports#branches_stats'
     match 'getbranchstats' => 'reports#apibranchstats'
     match 'getbranchstatsbkk' => 'reports#apibranchstatsbkk'
+    match 'getbranchstatsbkkbreakdown' => 'reports#apibranchstatsbkkbreakdown'
 
     match 'shrinkreport' => 'reports#shrinkreport'
     get "driver-rit" => 'reports#driver_rit'

@@ -2020,7 +2020,7 @@ function getBranchStats(){
 						enabled: true
 					},
 					xaxis: {
-						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
 					},
 					colors:['#31bfff']
 				};
@@ -2061,7 +2061,7 @@ function getBranchStats(){
 						enabled: true
 					},
 					xaxis: {
-						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
 					}
 				};
 		
@@ -2101,7 +2101,7 @@ function getBranchStats(){
 						enabled: false
 					},
 					xaxis: {
-						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
 					},
 					colors:['#1fc20e']
 				};
@@ -2142,7 +2142,7 @@ function getBranchStats(){
 						enabled: true
 					},
 					xaxis: {
-						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
 					},
 					colors:['#ff5f6a']
 				};
@@ -2183,7 +2183,7 @@ function getBranchStats(){
 						enabled: true
 					},
 					xaxis: {
-						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
 					},
 					colors:['#FF1020']
 				};
@@ -2223,12 +2223,180 @@ function getBranchStats(){
 						enabled: true
 					},
 					xaxis: {
-						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya', 'Sumatera']
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
 					},
 					colors:['#cf0000']
 				};
 		
 				var chart = new ApexCharts($("#bkk-non-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+
+	// bkk-truk-stats
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstatsbkkbreakdown?type=truk&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.bkktruk;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'BKK Truk',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
+					},
+					colors:['#cf0000']
+				};
+		
+				var chart = new ApexCharts($("#bkk-truk-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+
+	// bkk-kereta-stats
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstatsbkkbreakdown?type=kereta&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.bkkkereta;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'BKK Kereta',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
+					},
+					colors:['#cf0000']
+				};
+		
+				var chart = new ApexCharts($("#bkk-kereta-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+
+	// bkk-roro-stats
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstatsbkkbreakdown?type=roro&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.bkk_roro;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'BKK Kereta',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
+					},
+					colors:['#cf5000']
+				};
+		
+				var chart = new ApexCharts($("#bkk-roro-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+
+	// bkk-losing-stats
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstatsbkkbreakdown?type=losing&startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.bkk_losing;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'BKK Losing',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
+					},
+					colors:['#cf5000']
+				};
+		
+				var chart = new ApexCharts($("#bkk-losing-stats")[0], options);
 				chart.render();
 			}
 		},

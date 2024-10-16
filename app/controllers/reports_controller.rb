@@ -3,7 +3,7 @@ class ReportsController < ApplicationController
   include ActionView::Helpers::NumberHelper
 	layout "application", :except => []
   before_filter :authenticate_user!, :set_section
-  protect_from_forgery :except => [:ledger]
+  protect_from_forgery :except => [:ledger, :apibranchstats, :apibranchstatsbkk, :apibranchstatsbkkbreakdown]
 
   def set_section
 
@@ -4164,6 +4164,39 @@ end
     end
   
     render :json => { :success => true, :bkk => bkk, :bkkkos => bkkkos, :bkknon => bkknon }
+  end
+
+  def apibranchstatsbkkbreakdown
+
+    @startdate = params[:startdate]
+    @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+    @enddate = params[:enddate]
+    @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+
+    bkk = []
+    bkkkereta = []
+    bkk_roro = []
+    bkk_losing = []
+
+    @offices = Office.active.order(:id).each_with_index.map do |office, index|
+
+      @events = Event.active.where("start_date BETWEEN ? AND ? AND office_id = ? ", @startdate.to_date, @enddate.to_date, office.id).order(:start_date)
+      @events_roro = @events.where('invoiceship = true')
+      @events_losing = @events.where('losing = true')
+
+      @bkk = Invoice.where('invoicetrain = false AND deleted = false AND kosongan = false AND office_id = ? AND event_id in (?)', office.id, @events.pluck(:id))
+      @bkkkereta = Invoice.where('invoicetrain = true AND deleted = false AND kosongan = false AND office_id = ? AND event_id in (?)', office.id, @events.pluck(:id))
+
+      @bkk_roro = Invoice.where('deleted = false AND kosongan = false AND office_id = ? AND event_id in (?)', office.id, @events_roro.pluck(:id))
+      @bkk_losing = Invoice.where('deleted = false AND kosongan = false AND office_id = ? AND event_id in (?)', office.id, @events_losing.pluck(:id))
+
+      bkk[index] = @bkk.count()
+      bkkkereta[index] = @bkkkereta.count()
+      bkk_roro[index] = @bkk_roro.count()
+      bkk_losing[index] = @bkk_losing.count()
+    end
+  
+    render :json => { :success => true, :bkktruk => bkk, :bkkkereta => bkkkereta, :bkk_roro => bkk_roro, :bkk_losing => bkk_losing }
   end
 
   def get_routetrains
