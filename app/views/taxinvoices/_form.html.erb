@@ -34,8 +34,13 @@
 <% end %>
 
 <div class="update-box">
+
+  Apakah Anda ingin membuat Invoice DP?<br /><br />
+  <a class="btn" href="/taxinvoices/dp_only<%= !@customer.nil? ? '?customer_id=' + @customer.id.to_s : '' %>">Buat Invoice DP</a>
+  <br /><br /><hr /><br />
+
   Apakah Anda ingin membuat Invoice Generic?<br /><br />
-  <a class="btn" href="/taxinvoices/generic<%= !@customer.nil? ? '?customer_id=' + @customer.id.to_s : '' %>">Bikin Invoice Generic</a>
+  <a class="btn" href="/taxinvoices/generic<%= !@customer.nil? ? '?customer_id=' + @customer.id.to_s : '' %>">Buat Invoice Generic</a>
   <br /><br /><hr /><br />
   
   Jika Anda ingin mengganti pelanggan pada Master Pelanggan atau Jurusan dan ingin memperbarui invoice tagihan, mohon ikuti langkah berikut :
@@ -273,6 +278,12 @@
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
+  <label for="extra_cost" class="half left">Down Payment</label>
+  <input type="text" class="half left" id="taxinvoice_dp_cost" name="dp_cost" value="<%=@taxinvoice.dp_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/>
+  <input type="hidden" name="is_dp" value="<%=@taxinvoice.is_dp ? 'true' : '' %>"> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
   <label for="extra_cost" class="half left">Biaya Tambahan</label>
   <input type="text" class="half left" id="taxinvoice_extra_cost" name="extra_cost" value="<%=@taxinvoice.extra_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/> 
 </div>
@@ -415,22 +426,16 @@
       </td>
       <td><%=taxinvoiceitem.invoice.event_id rescue nil%></td>
       <td>
-
-      <%
-        if taxinvoiceitem.invoice.event
-      %>
+        <% if taxinvoiceitem.invoice.event %>
           <strong><%=taxinvoiceitem.invoice.event.summary%></strong><br/> 
-      <%
-        end
-      %>
+        <% end %>
 
         <%=taxinvoiceitem.invoice.route.name%><br>
         <% if taxinvoiceitem.invoice.invoicetrain %>
         <% if taxinvoiceitem.invoice.invoices.first %>
-        <%= taxinvoiceitem.invoice.invoices.first.route.name %> 
+          <%= taxinvoiceitem.invoice.invoices.first.route.name %> 
         <% end %>
         <% end %>
-  
       </td>
       <td align="right">
         <input type="text" id="event_name_<%= taxinvoiceitem.id %>" name="event_name_<%= taxinvoiceitem.id %>" class="half right" value="<%= taxinvoiceitem.event_name.present? ? taxinvoiceitem.event_name : taxinvoiceitem.invoice.event.summary rescue nil %>">
@@ -525,8 +530,16 @@
     <td colspan="7"></td>
     <td align="right">Biaya Tambahan</td>
     <td align="right">&nbsp;</td>
-    <td align="right">&nbsp;</td>
+     <td align="right">&nbsp;</td>
     <td align="right"><span id="txt_extra_cost"><%=to_currency_bank(@taxinvoice.extra_cost)%></span></td>
+  </tr>
+
+  <tr id="-2">
+    <td colspan="7"></td>
+    <td align="right">Down Payment</td>
+    <td align="right">&nbsp;</td>
+     <td align="right">&nbsp;</td>
+    <td align="right"><span id="txt_dp_cost" class="red"><%= to_currency_bank(0 - @taxinvoice.dp_cost)%></span></td>
   </tr>
 
   <tr id="-3">
@@ -577,6 +590,7 @@
   <input type="submit" id="taxinvoice_submit" value="Simpan Tagihan Invoice" class="right" />
   <% if @process == 'edit'%>
    <input type="button" value="Tambah Item" class="right btn" onclick="javascript: getTaxinvoiceItems();"/>
+   <input type="hidden" id="edited">
    <% end %>
 </div>
 

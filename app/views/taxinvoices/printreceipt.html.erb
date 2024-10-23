@@ -37,7 +37,7 @@
 		<br/>Telp. 031 99013573 Fax. 031 99850898
 		<br/>E-Mail : <%= current_user.staff_id.nil? ? 'info@puratrans.com' : current_user.staff.email %></p>
         
-        <span class="showprint"><hr/></span>
+		<span class="showprint"><hr/></span>
 		<br />
 
 		<div style="border: 2px solid #000000; padding: 0.25rem 0.5rem; width: fit-content;">
@@ -75,9 +75,12 @@
 
 		<div class="field-row continue">
 			<label class="left" style="width: 120px;">Untuk Pembayaran</label>
+			<% if !@taxinvoice.is_dp%>
 			<input type="text" class="disabled left" value=":  Jasa Angkutan" />
+			<% else %>
+			<input type="text" class="disabled left" value=":  Down Payment Jasa Angkutan" />
+			<% end %>
 		</div>
-
 
 		<div class="field-row continue">
 			<label class="left" style="width: 120px; font-weight: bold;">Jumlah</label>

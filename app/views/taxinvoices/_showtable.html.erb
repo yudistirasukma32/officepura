@@ -43,6 +43,7 @@
 		<td>
 			<%=taxinvoice.customer.name%> <% if !taxinvoice.ship_name.blank? %> (<%=taxinvoice.ship_name%>) <% end %> <% if !taxinvoice.waybill.blank? %>(<%= taxinvoice.waybill %>)<% end %> <% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %>
 			<% if taxinvoice.bank_id.to_i > 0 %><br/>(<%= taxinvoice.bank.bank_account_number %>)<% end %>
+			<% if taxinvoice.is_dp %>&nbsp;<i class="icon-bookmark grey"></i><% end %>
 		</td>
 		<td>
 			<%=taxinvoice.sentdate.strftime('%d-%m') rescue nil%>
@@ -101,6 +102,7 @@
 		<td><%=taxinvoice.customer.name rescue nil%> <% if !taxinvoice.ship_name.blank? %>(<%=taxinvoice.ship_name%>) <% end %> <% if !taxinvoice.waybill.blank? %>(<%= taxinvoice.waybill %>)<% end %> <% if taxinvoice.generic %>&nbsp;<i class="icon-star grey"></i><% end %>
 			<% if taxinvoice.bank_id.to_i > 0 %><br/>(<%= taxinvoice.bank.bank_account_number %>)<% end %>
 			<% if taxinvoice.downpayment > 0 %><br />Deposit <%=to_currency_bank(taxinvoice.downpayment_date.strftime('%d-%m'))%><% end %>
+			<% if taxinvoice.is_dp %>&nbsp;<i class="icon-bookmark grey"></i><% end %>
 		</td>
 		<td>
 			<%=taxinvoice.sentdate.strftime('%d-%m') rescue nil%>

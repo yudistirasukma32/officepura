@@ -1,0 +1,381 @@
+<style>
+
+.danger {
+  background-image: linear-gradient(#e61818, #a61111) !Important;
+  border-color: #a61111 #a61111 #961010 !Important;
+}
+
+.mini {
+  padding: 4px 8px !Important;
+  font-size: 0.75rem !Important;
+}
+
+.update-box img {
+  max-width: 280px;
+  width: 100%;
+}
+
+</style>
+
+<% if @process !='edit'%>
+  <div id="filter" style="margin-bottom:20px;">
+    <form id="filterform" name="filterform" action="" method="get">
+      <div class="field-row continue" style="display: flex; align-items: center;">
+        <label for="customer_id">Pelanggan</label>&nbsp;&nbsp;
+        <select name="customer_id" class="third left chzn-select" onchange="javascript: submitFormFilter();">
+            <option value="0">- Harap Pilih -</option>
+            <% @customerlist.each do |customer| %>
+            <option value="<%=customer.id%>"<% if @customer and customer.id == @customer.id %> selected='selected'<% end %>>
+              <%=customer.name%>
+            </option>
+            <% end %>
+          </select>
+          <span style="font-size: 10px;">*Pelanggan yang muncul adalah pelanggan dengan KE yang memiliki DP</span>
+      </div>
+    </form>
+  </div>
+<% end %>
+
+<div class="update-box">
+  <% if @customer %>
+  <p>List DO Pelanggan</p>
+  <ul>
+    <% @events_cust_dp.where('customer_id = ?', @customer.id).each do |event| %>
+    <li>
+      <a href="/events/<%= event.id %>/edit" target="_blank">#<%= event.id %> (<%= event.start_date.strftime('%d-%m-%y') %>) :: <%= event.summary %> </a>
+      <br>
+      <span>DP: <%= to_currency(event.downpayment_amount)%></span>
+    </li>
+    <% end %>
+  </ul>
+  <% end %>
+</div>
+
+<% if @customer %>
+
+<form action="/taxinvoices/updateitems" method="post">
+  <input type="hidden" id ="taxinvoice_id" name="id" value="<%=params[:id]%>" />
+  <input type="hidden" id ="process" name="process" value="<%=@process%>" />
+  <input type="hidden" id="customer_id" value="<%=@taxinvoice.customer_id%>"/>
+
+ <% if @process =='edit'%>
+  <div class="field-row" style="padding-bottom:0px;">
+    <label>Pelanggan</label>
+    <input type="text" class="disabled" value="<%=@customer.name%>"/>
+  </div>
+<% end %>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="long_id" class="left">No. Invoice</label>
+  <input type="text" class="left" name="long_id" value="<%=@long_id%>" style="font-weight:700;" />
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+	<label for="date" class="left">Tgl Penagihan</label>
+	<input type="text" class="half left date-picker" name="date" value="<%=@taxinvoice.date.strftime('%d-%m-%Y') if !@taxinvoice.date.nil?%>" />  
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+	<label for="sentdate" class="left">Tgl Kirim Invoice</label>
+	<input type="text" class="half left date-picker" name="sentdate" value="<%=@taxinvoice.sentdate.to_date.strftime('%d-%m-%Y') rescue nil%>" />  
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px; margin-bottom: 10px;">
+	<label for="confirmeddate" class="left">Tgl Konfirm Inv.</label>
+	<input type="text" class="half left date-picker" name="confirmeddate" value="<%=@taxinvoice.confirmeddate.strftime('%d-%m-%Y') if !@taxinvoice.confirmeddate.nil?%>" />
+  <small>Tgl Pelanggan Konfirmasi Terima Invoice Tagihan</small>  
+</div>
+ 
+ <% if @process == 'edit' %>
+	<div class="field-row continue" style="padding-bottom:0px;">
+		<label for="date" class="left">Tgl Inv Dibuat</label>
+		<input type="text" class="half left date-picker" name="createdAt" value="<%=@taxinvoice.created_at.strftime('%d-%m-%Y') if !@taxinvoice.created_at.nil?%>" readonly="readonly"/>  
+	</div>
+ <% end %>
+
+ <div class="field-row continue" style="padding-bottom:0px;">
+  <% if @process == 'edit' %>
+  <label for="period_start" class="left">Periode</label>
+  <input type="text" class="none left" name="customer_address" value="<%=@strPeriod%>" readonly="readonly" />  
+  <input type="hidden" name="period_start" value="<%=@taxinvoice.period_start.strftime('%d-%m-%Y') if !@taxinvoice.period_start.nil?%>" /> 
+  <input type="hidden" name="period_end" value="<%=@taxinvoice.period_end.strftime('%d-%m-%Y') if !@taxinvoice.period_end.nil?%>" /> 
+  <% end %>
+ </div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="customer_address">Alamat</label>
+  <textarea cols="40" rows="20" class="none left" name="customer_address" readonly="readonly"><%=@customer.address%></textarea>  
+  <input type="hidden" name="customer_id" value="<%=@customer.id%>" /> 
+</div>
+
+<% if !@customer.city.blank? %>
+<div class="field-row continue" style="padding-bottom:0px;display:none">
+  <label>&nbsp;</label>
+  <input type="text" class="none left" name="customer_city" value="<%=@customer.city%>" readonly="readonly" />  
+</div>
+<% end %>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="customer_npwp">N.P.W.P</label>
+  <input type="text" class="left half" name="customer_npwp" value="<%=@customer.npwp%>" />  
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="customer_phone" class="left" style>No. Telp</label>
+  <input type="text" class="half left" name="customer_phone" value="<%= @customer.phone %>" />
+  <label for="customer_mobile" class="middle half">No. HP</label>
+  <input type="text" class="middle half" name="customer_mobile" value="<%= @customer.mobile %>" />
+</div>  
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="product_name" class="left" style>Barang</label>
+  <input type="text" class="half left" name="product_name" value="<%=@taxinvoice.product_name%>" />
+  <label for="spk_no" class="middle half">SPK</label>
+  <input type="text" class="middle half" name="spk_no" value="<%=@taxinvoice.spk_no%>" />
+</div>  
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="ship_name" class="half left">Nama Kapal</label>
+  <input type="text" class="half left" id="taxinvoice_ship_name" name="ship_name" value="<%=@taxinvoice.ship_name%>" /> 
+  <label for="po_no" class="middle half">PO</label>
+  <input type="text" class="middle half" name="po_no" value="<%=@taxinvoice.po_no%>"/>
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+
+   <label for="spo_no" class="half left">SPO</label>
+  <input type="text" class="half left" name="spo_no" value="<%=@taxinvoice.spo_no%>"/>
+
+  <label for="tank_name" class="middle half">Jns Tangki</label>
+
+  <select class="middle half chzn-select" name="tank_name">
+    <option value="">-- Jenis Tangki --</option>
+    <option value="Stainless" <% if @taxinvoice.tank_name == 'Stainless'%> selected="selected" <% end%> >Stainless</option>
+    <option value="Besi" <% if @taxinvoice.tank_name == 'Besi'%> selected="selected" <% end%> >Besi</option>
+  </select>
+</div>
+    
+<div class="field-row continue" style="padding-bottom:0px;">
+
+    <label for="so_no" class="half left">SO</label>
+    <input type="text" class="half left" name="so_no" value="<%=@taxinvoice.so_no%>"/>
+
+    <label for="sto_no" class="middle half">STO</label>
+    <input type="text" class="middle half" name="sto_no" value="<%=@taxinvoice.sto_no%>"/>
+    
+</div>
+    
+<div class="field-row continue" style="padding-bottom:0px;">
+    
+    <label for="do_no" class="half left">DO</label>
+    <input type="text" class="half left" name="do_no" value="<%=@taxinvoice.do_no%>"/> 
+
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+    <label for="waybill" class="half left">No. Resi Pengiriman</label>
+    <input type="text" class="half left" name="waybill" value="<%=@taxinvoice.waybill%>"/> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:20px;">
+    <label for="booking_code" class="half left">Kode Booking</label>
+    <input type="text" class="half left" name="booking_code" value="<%=@taxinvoice.booking_code%>"/> 
+</div>
+
+<div class="field-row" style="padding: 15px 0 0;">
+  <label for="bank_id" class="half left">BANK</label>
+  <select id="" name="bank_id" class="double chzn-select">
+  <option value="0">- Pilih Bank -</option>
+  <% Bank.active.order(:id).each do |bank| %>
+  <option value="<%=bank.id%>"
+    <% if bank.id == @taxinvoice.bank_id %> selected="selected"<% end %>><%=bank.name%> (<%=bank.bank_account_number%>)</option>
+  <% end %>
+  </select>
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="extra_cost_info" class="half left">Memo</label>
+  <input type="text" class="double left" id="taxinvoice_extra_cost_info" name="extra_cost_info" value="<%=@taxinvoice.extra_cost_info%>" /> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="extra_cost" class="half left">Down Payment</label>
+  <input type="text" class="half left" id="taxinvoice_dp_cost" name="dp_cost" value="<%=@taxinvoice.dp_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/> 
+  <input type="hidden" name="is_dp" value="Yes">
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="extra_cost" class="half left">Biaya Tambahan</label>
+  <input type="text" class="half left" id="taxinvoice_extra_cost" name="extra_cost" value="<%=@taxinvoice.extra_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="insurance_cost" class="half left">Potongan Asuransi</label>
+  <input type="text" class="half left" id="taxinvoice_insurance_cost" name="insurance_cost" value="<%=@taxinvoice.insurance_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="claim_cost" class="half left">Potongan Klem Susut</label>
+  <input type="text" class="half left" id="taxinvoice_claim_cost" name="claim_cost" value="<%=@taxinvoice.claim_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:20px;">
+  <label for="extra_cost" class="half left">Harga Borongan</label>
+  <input type="text" id="wholesale_price" name="wholesale_price" class="short none" readonly="readonly" value="<%=to_currency(@customer.wholesale_price) %>" /> 
+</div>
+
+<%
+    ppn = Setting.where(name: 'ppn')
+    ppn = ppn.blank? ? 10 : ppn[0].value
+    taxinvoice_ppn = @taxinvoice.get_ppn(ppn) 
+    # ppn = taxinvoice_ppn == 10 ? 10 : ppn
+%>
+  <input type="hidden" id="ppn" value="<%= ppn %>"/>    
+<div class="field-row" style="padding-bottom:0px;">
+  <label style="color:#000; font-weight:700;">PPN</label>
+  <input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax" value="11" onchange="javascript:changeTaxes();"<% if (@taxinvoice.gst_tax > 0 && @taxinvoice.gst_percentage.to_f == 0) || (@taxinvoice.gst_percentage.to_f == ppn.to_f) %> checked="checked"<% end %> /> &nbsp; PPN 11 &nbsp;
+  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="10" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 10 %> checked="checked"<% end %> /> &nbsp; PPN 10 &nbsp;
+  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1.1" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 1.1 %> checked="checked"<% end %> /> &nbsp; PPN 1,1 &nbsp;
+  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 1 %> checked="checked"<% end %> /> &nbsp; PPN 1 &nbsp;
+  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="0" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 0 && @taxinvoice.gst_tax.to_i == 0 %> checked="checked"<% end %> /> &nbsp; No PPN &nbsp;
+
+
+</div>
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label style="color:#000; font-weight:700;">PPH</label>
+  <input type="checkbox" id="chk_price_tax" name="price_tax" value="Yes" onchange="javascript:changeTaxes();" <% if @taxinvoice.price_tax > 0 %> checked="checked"<% end %> /> &nbsp; PPh PASAL 23 2%
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label style="color:#000; font-weight:700;">Harga Hitung </label>
+  <input type="radio" id="price_by" name="price_by" value="is_net" onchange="javascript:changeWholesalePriceInvoice();" <% if @taxinvoice.price_by == 'is_net' %>checked="checked"<% end%> /> &nbsp; Bongkar &nbsp; 
+  <input type="radio" id="price_by" name="price_by" value="is_gross" onchange="javascript:changeWholesalePriceInvoice();" <% if @taxinvoice.price_by == 'is_gross' %>checked="checked"<% end%>/> &nbsp; Muat &nbsp;
+  <input type="radio" id="price_by" name="price_by" value="is_wholesale" onchange="javascript:changeWholesalePriceInvoice();" <% if @taxinvoice.price_by == 'is_wholesale' %>checked="checked"<% end%>/> &nbsp; Borongan
+</div>
+
+<div class="field-row continue" style="padding-bottom:10px;">
+  <label style="color:#000; font-weight:700;">+/-</label>
+  <input type="checkbox" id="is_weightlost" name="is_weightlost" value="Yes" <% if @taxinvoice.is_weightlost %> checked="checked"<% end %> /> &nbsp; Tampilkan data susut saat print invoice &nbsp; 
+</div>
+
+<div class="field-row continue" style="padding-bottom:10px;">
+  <label style="color:#000; font-weight:700;">Qty Muat</label>
+  <input type="checkbox" id="is_showqty_loaded" name="is_showqty_loaded" value="Yes" <% if @taxinvoice.is_showqty_loaded %> checked="checked"<% end %> /> &nbsp; Tampilkan quantity muat saat print invoice &nbsp; 
+</div>
+
+<div class="field-row continue" style="padding-bottom:10px;">
+  <label style="color:#000; font-weight:700;">Qty Bongkar</label>
+  <input type="checkbox" id="is_showqty_unloaded" name="is_showqty_unloaded" value="Yes" <% if @taxinvoice.is_showqty_unloaded %> checked="checked"<% end %> /> &nbsp; Tampilkan quantity bongkar saat print invoice &nbsp; 
+</div>
+
+<div class="field-row continue" style="padding-bottom:10px;">
+  <label style="color:#000; font-weight:700;">Pembulatan Nominal</label>
+  <input type="checkbox" id="is_rounded" name="pembulatan" onclick="bulatkan()" /> &nbsp; Bulatkan angka - angka yang bernilai Decimal &nbsp; 
+</div>
+
+<div class="field-row" style="padding-bottom:0px;">
+  <label for="total_in_words" class="half left">Terbilang</label>
+  <input type="text" class="double left" id="taxinvoice_total_in_words" name="total_in_words" value="<%=@taxinvoice.total_in_words%>" /> 
+</div>
+
+<div class="field-row continue" style="margin-bottom:15px;">
+  <label for="description" class="half left">Keterangan</label>
+  <textarea cols="40" id="taxinvoice_description" name="description" rows="20"><%=@taxinvoice.description%></textarea>
+</div>
+
+<div class="field-row continue" style="margin-bottom:30px;">
+  <label for="remarks" class="half left">Keterangan Lain</label>
+  <textarea cols="40" id="taxinvoice_remarks" name="remarks" rows="20"><%=@taxinvoice.remarks%></textarea>
+  <small>Penyebab Invoice gantung / tidak bisa ditagihkan (Sebagai Catatan Internal)</small>
+</div>
+
+<br class="clear" />
+ 
+    <table class="row-view" id="tbItem">
+    <thead>
+    <tr id="0">
+      <th width="20"></th>
+      <th width="30">No</th>
+      <th width="30" colspan="8" >Item</th>
+      <th width="70" class="right">Total</th>
+      <th width="30" style="display:none">BRGN</th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+    <tr id="1">
+      <td></td>
+      <td>1.</td>
+      <td colspan="8">Down Payment</td>
+      <td class="right" align="right"><span id="txt_dp_cost"><%=to_currency_bank(@taxinvoice.dp_cost)%></span></td>
+    </tr>
+
+
+
+    <tr id="-2">
+      <td colspan="7"></td>
+      <td align="right">Biaya Tambahan</td>
+      <td align="right">&nbsp;</td>
+      <td align="right">&nbsp;</td>
+      <td align="right"><span id="txt_extra_cost"><%=to_currency_bank(@taxinvoice.extra_cost)%></span></td>
+    </tr>
+
+    <tr id="-3">
+      <td colspan="7"></td>
+      <td align="right">Potongan Asuransi</td>
+      <td align="right">&nbsp;</td>
+      <td align="right">&nbsp;</td>
+      <td align="right"><span id="txt_insurance_cost" <% if @taxinvoice.insurance_cost > 0 %> class="red" <% end %>><%=to_currency_bank(0 - @taxinvoice.insurance_cost)%></span></td>
+    </tr>
+
+    <tr id="-3">
+      <td colspan="7"></td>
+      <td align="right">Potongan Klem Susut</td>
+      <td align="right">&nbsp;</td>
+      <td align="right">&nbsp;</td>
+      <td align="right"><span id="txt_claim_cost" <% if @taxinvoice.claim_cost > 0 %> class="red" <% end %>><%=to_currency_bank(0 - @taxinvoice.claim_cost)%></span></td>
+    </tr>
+    
+    <tr id="ppn-row" style="<%= taxinvoice_ppn == 0 ? "display: none;".html_safe : "" %>">
+      <td colspan="7"></td>
+      <td align="right">PPN <span id="ppn_amount"><%= taxinvoice_ppn - taxinvoice_ppn.to_i > 0 ? taxinvoice_ppn.to_f : taxinvoice_ppn.to_i %></span>%</td>
+      <td align="right">&nbsp;</td>
+      <td align="right">&nbsp;</td>
+      <td align="right"><span id="txt_gst_tax"><%=to_currency_bank(@taxinvoice.gst_tax)%></span></td>
+    </tr>
+
+    <tr id="-4">
+      <td colspan="7"></td>
+      <td align="right">PPH 2%</td>
+      <td align="right">&nbsp;</td>
+      <td align="right">&nbsp;</td>
+      <td align="right"><span id="txt_price_tax" <% if @taxinvoice.price_tax > 0 %> class="red" <% end %> ><%=to_currency_bank(0 - @taxinvoice.price_tax)%></span></td>
+    </tr>
+
+    <tr id="-5" class="footer">
+      <td colspan="7"></td>
+      <td align="right" class="total">TOTAL</td>
+      <td align="right">&nbsp;</td>
+      <td align="right">&nbsp;</td>
+      <td align="right" class="total"><span id="txt_total"><%=to_currency_bank(@taxinvoice.total)%></span></td>
+    </tr>
+  </tbody>
+
+</table>
+
+<div class="actions">
+  <a class="btn right" href="<%=taxinvoices_path({:customer_id => $globalCustomer_id, :month => $globalMonth, :year => $globalYear})%>">Kembali ke Index</a>
+  <input type="submit" id="taxinvoice_submit" value="Simpan Tagihan Invoice" class="right" />
+  <% if @process == 'edit'%>
+   <input type="button" value="Tambah Item" class="right btn" onclick="javascript: getTaxinvoiceItems();"/>
+   <% end %>
+</div>
+
+</form>
+
+<div style="position: relative; width: 100%; max-width: 480px; margin-top: 3rem;">
+<em>Apabila ada <strong>tulisan tebal</strong> item tersebut sudah terkoneksi dengan DO / Kelendar Event. Yang akan tampil pada kolom jurusan halaman print adalah <strong>Berita Acara yang tercetak tebal</strong>. Namun apabila tidak ada kata bercetak tebal, maka yang akan ditampilkan di halaman print adalah jurusan dari BKK.</em>
+</div>
+
+<% end %>

@@ -502,6 +502,7 @@ OfficePuraErp::Application.routes.draw do
       get 'generic-vehicles' => 'taxgenericinvoices#generic_vehicles'
       match 'generic/updateitems' => 'taxgenericinvoices#updateitems'
       match 'generic(/:id)' => 'taxgenericinvoices#new'
+      match 'dp_only(/:id)' => 'taxinvoices#newdp'
 
       post 'updatepayment' => 'taxinvoices#updatepayment'
       post 'downpayment' => 'taxinvoices#downpayment'
@@ -570,14 +571,14 @@ OfficePuraErp::Application.routes.draw do
   match 'events/getdovvendors/:multimoda' => 'events#getdovvendors'
   match 'events/getdovvendorroutes/:vendor_id' => 'events#getdovvendorroutes'
   match 'events/transferdov' => 'events#transferdov'
-  
+
   get 'events/geteventsv2(/:type)' => 'events#geteventsv2'
   get 'events/getevents(/:type)' => 'events#getevents'
 
   match 'events/version-2' => 'events#version2'
   get 'events/resync' => 'events#resync'
   get 'events/cancelled' => 'events#cancelled'
-  
+
   resources :events do
     collection do
       get 'getdovendor' => 'events#getdovendor'

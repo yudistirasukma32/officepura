@@ -235,6 +235,8 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.do_no = params[:do_no]
       @taxinvoice.confirmeddate = params[:confirmeddate]
       @taxinvoice.waybill = params[:waybill]
+      @taxinvoice.dp_cost = params[:dp_cost].to_i
+      @taxinvoice.is_dp = params[:is_dp] == "Yes" ? true : false
       @taxinvoice.extra_cost = params[:extra_cost].to_i
       @taxinvoice.extra_cost_info = params[:extra_cost_info]
       # @taxinvoice.total_in_words = params[:total_in_words]
@@ -257,7 +259,6 @@ class TaxinvoicesController < ApplicationController
           if params["cb_" + taxinvoiceitem.id.to_s] == 'on'
             taxinvoiceitem.taxinvoice_id = @taxinvoice.id
             taxinvoiceitem.wholesale_price = customer_wholesaleprice
-
             taxinvoiceitem.save
 
             # recount event stats
@@ -323,6 +324,7 @@ class TaxinvoicesController < ApplicationController
           if taxinvoiceitem.invoice.event_id.present?
             invoice_taxinv_count taxinvoiceitem.invoice.event_id
           end
+
         else
           taxinvoiceitem.taxinvoice_id = nil
           taxinvoiceitem.save
@@ -418,6 +420,7 @@ class TaxinvoicesController < ApplicationController
       puts "LOG : #{subtotal}"
 
       # subtotal = subtotal.to_i
+      dp_cost = @taxinvoice.dp_cost.to_f
       extra_cost = @taxinvoice.extra_cost.to_f
 
       @taxinvoice.period_start = period_start
@@ -427,7 +430,21 @@ class TaxinvoicesController < ApplicationController
         ppn = Setting.where(name: 'ppn')
         ppn = ppn.blank? ? 10 : ppn[0].value
 
-      subtotal += extra_cost
+      if @taxinvoice.taxinvoiceitems.count > 0
+        @taxinvoice.is_dp = false
+      end
+
+      if !@taxinvoice.is_dp
+
+        subtotal += extra_cost - dp_cost
+
+      else
+
+        subtotal += extra_cost + dp_cost
+
+      end
+
+
       ppn_percentage = params[:gst_tax].to_f
       if ppn_percentage > 0
         @taxinvoice.gst_tax = subtotal.to_f * (ppn_percentage.to_f / 100)
@@ -600,7 +617,7 @@ class TaxinvoicesController < ApplicationController
 
     bankexpensedownpayment @taxinvoice, old_amount if @taxinvoice.save
 
-    redirect_to(request.referer, :notice => "Deposit Invoice untuk pelanggan<br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses disimpan.".html_safe)
+    redirect_to(request.referer, :notice => "Down Payment untuk pelanggan<br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong> sukses disimpan.".html_safe)
   end
 
   def canceldownpayment
@@ -1494,4 +1511,66 @@ class TaxinvoicesController < ApplicationController
 		# end
   end
 
+  def newdp
+
+    @section = "taxinvoices"
+    @where = "taxinvoices"
+
+    @errors = Hash.new
+    @taxinvoice = Taxinvoice.new
+    @taxinvoice.date = Date.today.strftime('%d-%m-%Y')
+    @customer = Customer.find(params[:customer_id]) rescue nil
+    @taxinvoice.period_start = Date.today.strftime('%d-%m-%Y')
+    @taxinvoice.period_end = Date.today.strftime('%d-%m-%Y')
+    @taxinvoice.price_by = 'is_net'
+    @taxinvoice.user_id = current_user.id
+    @needupdate = false
+    @taxinvoice.sentdate = params[:sentdate]
+
+    #cari pelanggan yang punya KE dengan DP saja
+    @events_cust_dp = Event.active.where('money(downpayment_amount) > money(0)').reorder(:start_date)
+    @events_cust_dp_list = @events_cust_dp.pluck(:customer_id)
+    @customerlist = Customer.active.reorder(:name).where('id in (?)', @events_cust_dp_list)
+
+    if @customer
+      romenumber = getromenumber (Date.today.month.to_i)
+      @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoiceitems.deleted = false AND taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date, :sku_id)
+      @taxinvoiceitemvs = @customer.taxinvoiceitemvs.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date, :sku_id)
+      @taxinvoice.period_start = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).minimum(:date) || Date.today.strftime('%d-%m-%Y')
+      @taxinvoice.period_end = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).maximum(:date) || Date.today.strftime('%d-%m-%Y')
+      @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
+      @long_id = ("%04d" % @long_id.to_s) + ' / TGH / RDPI / ' + romenumber + ' / ' + Date.today.year.to_s
+
+      if params[:update] == 'true'
+        @taxinvoiceitems.each do |item|
+          item.price_per = item.invoice.route.price_per.to_f
+          if item.is_gross
+            item.total = item.weight_gross.to_i * item.price_per.to_f
+          elsif item.is_wholesale
+            item.total = item.wholesale_price.to_f
+          else
+            item.total = item.weight_net.to_i * item.price_per.to_f
+          end
+          item.save
+        end
+      end
+
+      @taxinvoiceitems.each do |item|
+        if item.price_per.to_f != item.invoice.route.price_per.to_f
+          @needupdate = true
+          break
+        end
+      end
+
+    end
+
+    @strPeriod = ""
+    if !@taxinvoice.period_start.nil? and !@taxinvoice.period_end.nil?
+      if @taxinvoice.period_start == @taxinvoice.period_end
+        @strPeriod = @taxinvoice.period_start.strftime('%d-%m-%Y')
+      else
+        @strPeriod = @taxinvoice.period_start.strftime('%d-%m-%Y') + "s/d" + @taxinvoice.period_end.strftime('%d-%m-%Y')
+      end
+    end
+  end
 end

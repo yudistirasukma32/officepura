@@ -1011,14 +1011,26 @@ function changeTaxes() {
 	var price_tax = 0;
 
     var ppn = Number($('#ppn').val());
-	var total = Number($('#taxinvoice_subtotal').val());
+
+	if ($("#taxinvoice_subtotal").length > 0) {
+		var total = Number($('#taxinvoice_subtotal').val());
+	} else {
+		var total = 0;
+	}
+
+	if ($("#taxinvoice_dp_cost").length > 0) {
+		var dp_cost = Number($('#taxinvoice_dp_cost').val().split('.').join('').replace(',','.'));
+	} else {
+		var dp_cost = 0;
+	}
+
 	var extra_cost = Number($('#taxinvoice_extra_cost').val().split('.').join('').replace(',','.'));
 	var insurance_cost = Number($('#taxinvoice_insurance_cost').val().split('.').join('').replace(',','.'));
 	var claim_cost = Number($('#taxinvoice_claim_cost').val().split('.').join('').replace(',','.'));
 
 	if ($(".gst_tax:checked").length > 0) {
 		ppn = $(".gst_tax:checked").first().val();
-		gst_tax = (total + extra_cost) * (ppn/100);
+		gst_tax = (total + extra_cost + dp_cost) * (ppn/100);
 		$("#ppn_amount").text((ppn));
 		if (parseFloat($(".gst_tax:checked").val()) > 0) {
 			$("#ppn-row").show();
@@ -1030,13 +1042,20 @@ function changeTaxes() {
 	// 	gst_tax = (total + extra_cost) * (ppn/100);
 	// }
 	if ($('#chk_price_tax').prop('checked')) {
-		price_tax = (total + extra_cost) * 0.02;
+		price_tax = (total + extra_cost + dp_cost) * 0.02;
 	}
 
 	var is_rounded = $("#is_rounded").is(":checked");
 
-	total += extra_cost + gst_tax - insurance_cost - price_tax - claim_cost;
 
+	if ($("#edited").length > 0) {
+		total += extra_cost + gst_tax - insurance_cost - price_tax - claim_cost - dp_cost;
+	} else {
+		total += dp_cost + extra_cost + gst_tax - insurance_cost - price_tax - claim_cost;
+	}
+	
+
+	$('#txt_dp_cost').html(dp_cost.formatMoney(2,',','.'));
 	$('#txt_extra_cost').html(extra_cost.formatMoney(2,',','.'));
 	$('#txt_gst_tax').html(gst_tax.formatMoney(2,',','.'));
 	
@@ -1689,7 +1708,6 @@ function getDataEvents2(cl)
 				if (object.is_insurance) {
 					obj.title += " (*INS)";
 				}
-				
 				if (object.customer_id > 0) obj.title += " (*P)";
 				
 				events.push(obj);
@@ -3529,12 +3547,21 @@ $(document).ready(function(e){
 	$("#txt_claim_cost").text();
 	$("#txt_insurance_cost").text();
 	$("#txt_extra_cost").text();
+
+	if($("#txt_dp_cost").length > 0){
+		$("#txt_dp_cost").text();
+	}
+	
 	$("#txt_gst_tax").text();
 	$("#txt_price_tax").text();
 	$("#txt_claim").text();
 	$("#txt_total").text();
 	$("#lbl_subtotal").text($(this).data("subtotal").formatMoney(2,',','.'));
 	$("#txt_extra_cost").text($(this).data("extra-cost").formatMoney(2,',','.'));
+	
+	if($("#txt_dp_cost").length > 0){
+		$("#txt_dp_cost").text($(this).data("dp-cost").formatMoney(2,',','.'));
+	}
 
 	// $("#txt_claim").text($(this).data("claim").formatMoney(2,',','.'));
 	
@@ -3598,6 +3625,7 @@ $(document).ready(function(e){
 
 	$("#taxinvoice_subtotal").val($(this).data("subtotal"));
 	$("#taxinvoice_extra_cost").val($(this).data("extra-cost"));
+	$("#taxinvoice_dp_cost").val($(this).data("dp-cost"));
 	$("#taxinvoice_claim").val($(this).data("claim"));
 
 	changeTaxes();
