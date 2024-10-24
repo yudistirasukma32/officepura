@@ -18,10 +18,18 @@ class TaxgenericinvoicesController < ApplicationController
   end
 
   def generic_vehicles
-    @vehicle = Vehicle.active.order(:current_id).pluck(:current_id)
+    @vehicles = []
+    Vehicle.active.order(:current_id).each do |vehicle|
+      if vehicle.previous_id.present?
+        @vehicles.push({ label: vehicle.current_id + ' (' + vehicle.previous_id + ')', value: vehicle.current_id })
+      else
+        @vehicles.push({ label: vehicle.current_id, value: vehicle.current_id })
+      end
+    end
+
 
     render :json => { :success => true, :layout => false,
-        :vehicle => @vehicle
+        :vehicle => @vehicles
       }.to_json;
     # render :json => Vehicle.active.order(:current_id).pluck(:current_id)
   end
