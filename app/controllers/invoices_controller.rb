@@ -1290,7 +1290,7 @@ class InvoicesController < ApplicationController
 
         cust_kosongan.push(params[:customer_id].to_i)
         @routes = Route.active.where(customer_id: cust_kosongan).order(:name)
-        @routes = Route.active.where(customer_id: params[:customer_id]).order(:name) if filter_kosongan.include? params[:customer_id].to_i
+        # @routes = Route.active.where(customer_id: params[:customer_id]).order(:name) if filter_kosongan.include? params[:customer_id].to_i
 
         @routes = @routes.where(routegroup_id: groups) if groups.any?
       else
