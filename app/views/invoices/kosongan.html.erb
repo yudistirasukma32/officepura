@@ -19,12 +19,13 @@
 		<div id="filter">
 			<form id="filterform" name="filterform" action="" method="get">
 			<div class="field-row continue">
-				<label for="date" >Pilih Tanggal</label>
-				<input type="text" name="date" class="half left date-picker" value="<%=@date%>" onchange="javascript:submitFormFilter();" />
+				<label for="startdate" >Pilih Tanggal</label>
+				<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>"/>
+				<label for="enddate" style="width: 18px;" >&nbsp;&nbsp;&nbsp;s/d</label>
+				<input type="text" name="enddate" class="half left date-picker" value="<%=@enddate%>"/>
                 
                 <label for="office_id" class="middle">Pilih Kantor</label>
                 <select name="office_id" class="half left ">
-                    
                     <option value="all">All</option>
                     <% @offices.each do |office| %>
                     <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
@@ -53,7 +54,21 @@
 			</tr>
 
 			<tr class="subheading">
-				<th colspan="7" style="color:#000;">BKK Kosongan Non-Produktif <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%=@invoices.count%>)</span></th>
+				<th colspan="7" style="color:#000;">BKK Kosongan Non-Produktif 
+				<% if (@startdate != @enddate) %>
+				<span class="red"><%=@startdate.to_date.strftime('%d-%m-%Y')%> s/d </span>
+				<% end %>
+				<span class="red">
+					<%=@enddate.to_date.strftime('%d-%m-%Y')%> 
+					(<%=@invoices.where('deleted = false').count%>)
+					<br/>
+					<small>Konfirm:
+					(<%=@invoices.where('deleted = false AND kosongan_confirmed = true').count%>)
+					&nbsp;Menunggu:
+					(<%=@invoices.where('deleted = false AND kosongan_confirmed = false').count%>)
+					</small>
+				</span>
+				</th>
 				<th class="right" style="padding: 5px 10px 5px 0; color: #010101;"><%=to_currency(@invoices.where('deleted = false').sum('total'))%></th>
 			</tr>
 
@@ -75,7 +90,6 @@
                     <% else %>
                     <td><%=invoice.office.abbr%></td>
                     <% end %>
-					
 					<td>
 						<%=invoice.vehicle.current_id rescue nil%>
 						<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
@@ -103,6 +117,7 @@
 					<% end %> 
 					</td>
                     <td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
+					<td></td>
 					<td align="right">        
 						<%=to_currency(invoice.total)%>
 					</td>

@@ -180,6 +180,7 @@ class InvoicesController < ApplicationController
   end
 
   def kosongan
+    @pagetitle = 'BKK Kosongan'
     @where = "invoices_kosongan"
 
     if checkroleonly 'Vendor Supir'
@@ -209,14 +210,19 @@ class InvoicesController < ApplicationController
 
     else
 
-      @date = params[:date]
-      @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
 
-      @invoices = Invoice.where("date = ? and invoicetrain is false and kosongan_type != 'produktif'", @date.to_date)
 
-      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
-      @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
+      @startdate = params[:startdate]
+      @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
+
+      @invoices = Invoice.where("date between ? and ? and invoicetrain is false and kosongan_type != 'produktif'", @startdate.to_date, @enddate.to_date)
+
+      # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+
+      # @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
 
       #kosongan non-prod
 
@@ -264,6 +270,8 @@ class InvoicesController < ApplicationController
   end
 
   def kosongan_prod
+
+    @pagetitle = 'BKK Kosongan Produktif'
     @where = "invoices_kosongan_produktif"
 
     if checkroleonly 'Vendor Supir'
@@ -293,10 +301,15 @@ class InvoicesController < ApplicationController
 
     else
 
-      @date = params[:date]
-      @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+      @startdate = params[:startdate]
+      @startdate = Date.today.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
 
-      @invoices = Invoice.where("date = ? and invoicetrain = false and kosongan = true and kosongan_type = 'produktif'", @date.to_date)
+      @invoices = Invoice.where("date between ? and ? and invoicetrain = false and kosongan = true and kosongan_type = 'produktif'", @startdate.to_date, @enddate.to_date)
+
+
+      # @invoices = Invoice.where("date = ? and invoicetrain = false and kosongan = true and kosongan_type = 'produktif'", @date.to_date)
 
       cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 

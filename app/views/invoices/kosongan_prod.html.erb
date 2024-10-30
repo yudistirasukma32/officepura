@@ -18,8 +18,10 @@
 		<div id="filter">
 			<form id="filterform" name="filterform" action="" method="get">
 			<div class="field-row continue">
-				<label for="date" >Pilih Tanggal</label>
-				<input type="text" name="date" class="half left date-picker" value="<%=@date%>" onchange="javascript:submitFormFilter();" />
+				<label for="startdate" >Pilih Tanggal</label>
+				<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>"/>
+				<label for="enddate" style="width: 18px;" >&nbsp;&nbsp;&nbsp;s/d</label>
+				<input type="text" name="enddate" class="half left date-picker" value="<%=@enddate%>"/>
                 
                 <label for="office_id" class="middle">Pilih Kantor</label>
                 <select name="office_id" class="half left ">
@@ -41,6 +43,7 @@
 		<table class="row-view">
 			<tr>
 				<th width="50">No.</th>
+				<th width="50">BKK Lama</th>
 				<th>Keterangan</th>
 				<th width="40">Ktr</th>
 				<th width="80">NoPol</th>
@@ -51,7 +54,11 @@
 			</tr>
 
 			<tr class="subheading">
-				<th colspan="6" style="color:#000;">BKK Kosongan Produktif <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%=@invoices.count%>)</span></th>
+				<th colspan="7" style="color:#000;">BKK Kosongan Produktif 
+				<% if (@startdate != @enddate) %>
+				<span class="red"><%=@startdate.to_date.strftime('%d-%m-%Y')%> s/d </span>
+				<% end %>
+				<span class="red"><%=@enddate.to_date.strftime('%d-%m-%Y')%> (<%=@invoices.where('deleted = false').count%>)</span></th>
 				<th class="right" style="padding: 5px 10px 5px 0; color: #010101;"><%=to_currency(@invoices.where('deleted = false').sum('total'))%></th>
 			</tr>
 
@@ -60,19 +67,21 @@
 				<% if current_user.adminrole %>
 				<tr class="deleted">
 					<td><%=zeropad(invoice.id) %></td>
+					<td><%=zeropad(invoice.kosongan_previous_invoice_id) if invoice.kosongan_previous_invoice_id.present? %></td>
 					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
 					<% if invoice.by_vendor %>
 						<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
 					<% end %>
 					</td>
-                    <% if 
+
+					<% if
 						# invoice.office.abbr == 'SUB' || invoice.office.abbr == 'PRB' || invoice.office.abbr == 'SMT' || invoice.office.abbr == 'CP' 
 						invoice.office.abbr == ''
 					%>
-                    <td class="red"><%=invoice.office.abbr%></td>    
-                    <% else %>
-                    <td><%=invoice.office.abbr%></td>
-                    <% end %>
+						<td class="red"><%=invoice.office.abbr%></td>    
+					<% else %>
+						<td><%=invoice.office.abbr%></td>
+					<% end %>
 					
 					<td>
 						<%=invoice.vehicle.current_id rescue nil%>
@@ -120,6 +129,7 @@
 			<% else %>
 			<tr>
 				<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice) %></td>
+				<td><%=zeropad(invoice.kosongan_previous_invoice_id) if invoice.kosongan_previous_invoice_id.present? %></td>
 				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> 
 				<% if invoice.by_vendor %>
 					<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
