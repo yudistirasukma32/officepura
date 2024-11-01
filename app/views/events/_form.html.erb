@@ -80,7 +80,18 @@
   </div>
 
     <% if @process == 'new' %>
-    <div id="div_opstrains"></div>
+    <div id="div_opstrains" style="display: none;">
+      <div class="field-row ">
+        <%= f.label :operator_id, "Operator Kereta" %>
+        <select id="event_operator_id" name="event[operator_id]" class="double combo_route chzn-select" onchange="javascript:getRouteTrain2(this.value);">
+          <option value="0">- Operator -</option>
+          <% Operator.active.where(operatortype: "TRAIN").each do |operator| %>
+          <option value="<%=operator.id%>"
+            <% if operator.id == @event.operator_id %> selected="selected"<% end %>><%=operator.name%> (<%=operator.abbr%>)</option>
+          <% end %>
+        </select>
+      </div>
+    </div>
 
     <div id="div_routetrains" style="display: none;">
       <div class="field-row">
