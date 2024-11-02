@@ -59,7 +59,8 @@ class AttachmentsController < ApplicationController
 
 	def removeTaxInv
     @attachment = Attachment.find(params[:id])
-    @attachment.destroy
+    @attachment.enabled = false
+    @attachment.save
     redirect_to("/taxinvoiceitems/new/" + @attachment.imageable_id.to_s, :notice => 'File berhasil dihapus.')  
 	end
 

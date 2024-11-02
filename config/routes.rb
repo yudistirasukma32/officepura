@@ -653,6 +653,7 @@ OfficePuraErp::Application.routes.draw do
   scope "reports" do
     match "taxinvoices_report" => 'reports#taxinvoices_report'
     match "taxinvoiceitems_report" => 'reports#taxinvoiceitems_report'
+    match "taxinvoiceitems_upload_report" => 'reports#taxinvoiceitems_upload_report'
     match "isotanks_report" => 'reports#isotanks_report'
     match "containers_report" => 'reports#containers_report'
 

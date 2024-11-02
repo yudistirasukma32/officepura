@@ -9,7 +9,7 @@
 	<div id="content-full">
 		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
 
-		<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Surat Jalan :<span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+		<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Upload SJ :<span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
 
 		<br class="clearfix" />
 
@@ -44,13 +44,14 @@
 					<th width="30">No.</th>
 					<th width="80">No. DO</th>
 					<th width="80">Tgl BKK</th>
+					<th width="80">Tipe</th>
 					<th width="300">Keterangan</th>
 					<th width="80">Nopol</th>
 					<th width="60">No. SJ</th>
 					<th width="60">Tgl SJ</th>
+					<!-- <th width="60">Tgl BKR</th> -->
 					<th width="60">Tgl Upload</th> 
 					<th width="60">Tgl Terima</th> 
-					<th width="300">INV Tagihan</th>
 					<!-- <th width="80" class="right">Total</th> -->
 				</tr>
 			</thead>
@@ -64,6 +65,7 @@
 					<td><%=i+=1%>.</td>
 					<td><a style="font-weight: bolder;" href="/events/<%=taxinvoiceitem.invoice.event_id rescue nil%>/edit"><%=taxinvoiceitem.invoice.event_id rescue nil %></a></td>
 					<td><%=taxinvoiceitem.invoice.date.strftime('%d/%m') rescue nil %></td>
+					<td><%= taxinvoiceitem.invoice.invoicetrain ? 'Kereta' : 'Truk' %></td>
 					<td>
 						<a style="font-weight: bolder;" href="/taxinvoiceitems/new/<%= taxinvoiceitem.invoice_id %>" target="_blank">#<%=taxinvoiceitem.invoice_id %></a><br/>
 						<%=taxinvoiceitem.invoice.route.name rescue nil %><br/>
@@ -72,34 +74,36 @@
 					<td><%=taxinvoiceitem.invoice.vehicle.current_id rescue nil %> </td>
 					<td><%=taxinvoiceitem.sku_id %> </td>
 					<td><%=taxinvoiceitem.date.strftime('%d/%m') rescue nil %> </td>
-					<td>
+					<!-- <td><%=taxinvoiceitem.unload_date.strftime('%d/%m') rescue nil %> </td> -->
+					<td class="center" align="center">
 						<% if taxinvoiceitem.invoice.images.any? %>
 						<% img = taxinvoiceitem.invoice.images.first %>
 						<%= img.created_at.strftime('%d/%m') rescue nil %>
 						<% else %>
 						belum upload
 						<% end %>
+
+						<% offset = taxinvoiceitem.invoice.invoicetrain ? 7 : 5 %>
+
+						<% if taxinvoiceitem.date.present? && taxinvoiceitem.invoice.images.any? %>
+							<% if (img.created_at.to_date - taxinvoiceitem.date.to_date).to_i <= offset %>
+								<% status = 'On Time' %>
+							<% else %>
+								<% status = 'Terlambat' %>
+							<% end %>
+						<% end %>
+
+						<br/>
+						<span style="color: <%= status != 'On Time' ? 'red' : 'green' %>">
+						<%= status %>
+						</span>
+
 					</td>
 					<td><%= taxinvoiceitem.receipttaxinvitem.created_at.strftime('%d/%m') rescue nil %></td>
-					<td>
-						<% if taxinvoiceitem.taxinvoice %>
-						<%= taxinvoiceitem.taxinvoice.date.strftime('%d/%m/%Y') %><br/>
-						<%= taxinvoiceitem.taxinvoice.long_id %> 
-						<%else%> belum inv
-						<%end%> 
-					</td>
-					<!-- <td align="right">
-						<%=to_currency_bank(taxinvoiceitem.total) rescue '0' %>
-					</td> -->
 				</tr>
 				<% end %>				
 			<% end %>
 
-				<!-- <tr class="footer">
-					<td>&nbsp;</td>
-					<td class="total" colspan="5">TOTAL</td>
-					<td class="total" align="right"><%= to_currency(total) %></td>
-				</tr> -->
 			</tbody>
 		</table>
 

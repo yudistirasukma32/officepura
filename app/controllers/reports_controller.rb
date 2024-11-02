@@ -526,49 +526,79 @@ class ReportsController < ApplicationController
   end
 
   def taxinvoiceitems_report
-    #    role = current_user.owner
-        role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
-        if role
-          @startdate = params[:startdate]
-          @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
-          @enddate = params[:enddate]
-          @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+    role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
+    if role
+      @startdate = params[:startdate]
+      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
 
-          @customer_id = Customer.find(params[:customer_id]).id rescue nil
+      @customer_id = Customer.find(params[:customer_id]).id rescue nil
 
-          if @customer_id
-            @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ? AND taxinvoiceitems.customer_id = ?)", @startdate.to_date, @enddate.to_date + 1, @customer_id).order("date, taxinvoice_id")
-          else
-            @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ?)", @startdate.to_date, @enddate.to_date + 1).order("date ASC, taxinvoice_id ASC")
-          end
+      if @customer_id
+        @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ? AND taxinvoiceitems.customer_id = ?)", @startdate.to_date, @enddate.to_date + 1, @customer_id).order("taxinvoiceitems.date, taxinvoiceitems.taxinvoice_id")
+      else
+        @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ?)", @startdate.to_date, @enddate.to_date + 1).order("taxinvoiceitems.date ASC, taxinvoiceitems.taxinvoice_id ASC")
+      end
 
-          @event_id = Event.find(params[:event_id]).id rescue nil
+      @event_id = Event.find(params[:event_id]).id rescue nil
 
-          if @event_id
-            @taxinvoiceitems = @taxinvoiceitems.joins(:invoice).where("event_id = ? ", @event_id)
-          end
+      if @event_id
+        @taxinvoiceitems = @taxinvoiceitems.joins(:invoice).where("event_id = ? ", @event_id)
+      end
 
-          if checkroleonly 'Vendor Supir'
+      if checkroleonly 'Vendor Supir'
 
-            @vendor = Vendor.where('user_id = ?', current_user.id)
+        @vendor = Vendor.where('user_id = ?', current_user.id)
 
-            if @vendor.present?
-              @drivers = Driver.order('name')
-              @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
+        if @vendor.present?
+          @drivers = Driver.order('name')
+          @drivers = @drivers.where("vendor_id = ?", @vendor[0].id)
 
-              @taxinvoiceitems = @taxinvoiceitems.joins(:invoice).where("invoices.driver_id in (select id from drivers where vendor_id = ?)", @vendor[0].id)
-            end
-
-          end
-
-          @section = "reports1"
-          @where = "taxinvoiceitems-report"
-          render "taxinvoiceitems-report"
-        else
-          redirect_to root_path()
+          @taxinvoiceitems = @taxinvoiceitems.joins(:invoice).where("invoices.driver_id in (select id from drivers where vendor_id = ?)", @vendor[0].id)
         end
 
       end
+
+      @section = "reports1"
+      @where = "taxinvoiceitems-report"
+      render "taxinvoiceitems-report"
+    else
+      redirect_to root_path()
+    end
+
+  end
+
+  def taxinvoiceitems_upload_report
+    role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
+    if role
+      @startdate = params[:startdate]
+      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+
+      @customer_id = Customer.find(params[:customer_id]).id rescue nil
+
+      if @customer_id
+        @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ? AND taxinvoiceitems.customer_id = ?)", @startdate.to_date, @enddate.to_date + 1, @customer_id).order("taxinvoiceitems.date, taxinvoiceitems.invoice_id")
+      else
+        @taxinvoiceitems = Taxinvoiceitem.active.where("(taxinvoiceitems.date >= ? and taxinvoiceitems.date < ?)", @startdate.to_date, @enddate.to_date + 1).order("taxinvoiceitems.date ASC, taxinvoiceitems.invoice_id ASC")
+      end
+
+      @event_id = Event.find(params[:event_id]).id rescue nil
+
+      if @event_id
+        @taxinvoiceitems = @taxinvoiceitems.joins(:invoice).where("event_id = ? ", @event_id)
+      end
+
+      @section = "reports1"
+      @where = "taxinvoiceitems-upload-report"
+      render "taxinvoiceitems-upload-report"
+    else
+      redirect_to root_path()
+    end
+
+  end
 
   def isotanks_report
     role = cek_roles 'Admin Operasional, Admin HRD, Admin Gudang'
