@@ -210,8 +210,8 @@
 
 		<h3 class="zone" style="font-weight: bold;">Upload Gambar Surat Jalan</h3>
 
-			<% if @invoice.images.where("enabled = false and file_uid is not null and file_uid <> ''").any? %>
-        <% @invoice.images.where("enabled = false and file_uid is not null and file_uid <> ''").each do |img| %>
+			<% if @invoice.images.where("enabled = true and file_uid is not null and file_uid <> ''").any? %>
+        <% @invoice.images.where("enabled = true and file_uid is not null and file_uid <> ''").each do |img| %>
           <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 	
           <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
