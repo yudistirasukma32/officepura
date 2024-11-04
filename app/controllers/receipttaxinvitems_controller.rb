@@ -10,9 +10,9 @@ class ReceipttaxinvitemsController < ApplicationController
   end
 
   def index
-    @startdate = params[:startdate] || Date.today.at_beginning_of_month.strftime('%d-%m-%Y')
+    @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
     @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
-    @receipts = Receipttaxinvitem.active.where("to_char(created_at, 'DD-MM-YYYY') BETWEEN ? AND ?", @startdate, @enddate).order("created_at desc")
+    @receipts = Receipttaxinvitem.active.where("created_at BETWEEN ? AND ?", @startdate.to_datetime, @enddate.to_datetime.end_of_day).order("created_at desc")
     respond_to :html
   end
 
@@ -60,11 +60,12 @@ class ReceipttaxinvitemsController < ApplicationController
     time = receipt.created_at.strftime('%H:%M:%S')
     receipt.created_at = params[:created_at] + ' ' + time if params[:created_at].present?
     receipt.printdate = params[:printdate] if params[:printdate].present?
+    receipt.billingdate = params[:billingdate] if params[:billingdate].present?
 
     if receipt.save
       render json: { status: 200, message: "Data berhasil disimpan.".html_safe }, status: 200
     else
-      render json: { status: 400, message: "Data Invoice gagal diupdate" }, status: 400
+      render json: { status: 400, message: "Data gagal diupdate" }, status: 400
     end
   end
 
@@ -81,6 +82,15 @@ class ReceipttaxinvitemsController < ApplicationController
 
   def print
     @receipt = Receipttaxinvitem.find(params[:id])
+  end
+
+  def confirm_billing
+    receipt = Receipttaxinvitem.find(params[:id])
+    receipt.billingdate = Date.today
+    receipt.save
+
+    flash[:notice] = 'Data berhasil dikonfirmasi'
+    redirect_to receipttaxinvitems_path(:startdate => receipt.created_at.strftime('%d-%m-%Y'), :enddate => receipt.created_at.strftime('%d-%m-%Y'))
   end
 
   def update_printdate

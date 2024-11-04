@@ -3647,6 +3647,7 @@ $(document).ready(function(e){
 	$("#receipt_long_id").text($(this).data("longid"));
 	$('#created_at').val($(this).data("createdat"));
 	$('#printdate').val($(this).data("printdate"));
+	$('#billingdate').val($(this).data("billingdate"));
 
 	$("#myModal").show();
 })

@@ -529,6 +529,7 @@ OfficePuraErp::Application.routes.draw do
     end
     member do
       get 'print'
+      post 'confirm_billing'
       post 'update_printdate'
     end
   end
