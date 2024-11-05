@@ -24,6 +24,16 @@
 		text-shadow: 0 -1px 0 rgb(0 0 0 / 16%);
 		-webkit-font-smoothing: antialiased;
 	}
+
+	.modal {
+		padding-top: 128px;
+	}
+	
+	.modal-content {
+		max-width: 480px;
+		width: 100%;
+	}
+
 	</style>
 
 <%= render "shared/header" %>
@@ -65,17 +75,19 @@
 
 <!-- Begin::edit modal -->
 <div id="myModal" class="modal">
-  <div class="modal-content" style="height: 25%;">
-		<span class="close">&times;</span>
+  <div class="modal-content" style="height: 50%;">
+		<span class="close" style="margin-top: -0.5rem;">&times;</span>
 		<form method="POST" id="update_receipttaxinv" action="<%= update_receipt_receipttaxinvitems_url %>">
 			<h3 class="text-center" style="text-align: center; margin-top: unset; font-weight: bold;">Edit Tanda Terima SJ #<span id="receipt_long_id"></span></h3>
 
-			<div class="" style="padding-bottom:0px; display: flex; margin-top: 10px;">
+			<div class="" style="padding-bottom:0px; display: flex; margin-top: 32px;">
 				<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
-					<label style="color:#000; font-weight:700;">Tanggal</label>
+					<label style="color:#000; font-weight:700;">Tanggal Buat</label>
 				</div>
-				<div style="width: 50%; display: flex; align-items: center;">
-					<input type="text" name="created_at" class="date-picker" id="created_at" autocomplete="off">
+				<div style="width: 50%; max-width: 320px; display: block;">
+					<input type="text" name="created_at" class="date-picker" id="created_at" autocomplete="off" style="width: 320px; margin-bottom: 0.35rem;">
+					<br/>
+					<small>Tanggal Buat Data Tanda Terima</small>
 				</div>
 			</div>
 
@@ -83,8 +95,21 @@
 				<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
 					<label style="color:#000; font-weight:700;">Tanggal Penyerahan</label>
 				</div>
-				<div style="width: 50%; display: flex; align-items: center;">
-					<input type="text" name="printdate" class="date-picker" id="printdate" autocomplete="off">
+				<div style="width: 50%; max-width: 320px; display: block;">
+					<input type="text" name="printdate" class="date-picker" id="printdate" autocomplete="off" style="width: 320px; margin-bottom: 0.35rem;">
+					<br/>
+					<small>Tanggal Penyerahan Tanda Terima</small>
+				</div>
+			</div>
+
+			<div class="" style="padding-bottom:0px; display: flex; margin-top: 10px;">
+				<div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+					<label style="color:#000; font-weight:700;">Penagihan Terima</label>
+				</div>
+				<div style="width: 50%; max-width: 320px; display: block;">
+					<input type="text" name="billingdate" class="date-picker" id="billingdate" autocomplete="off" style="width: 320px; margin-bottom: 0.35rem;">
+					<br/>
+					<small>Tanggal Diterima Penagihan</small>
 				</div>
 			</div>
 
