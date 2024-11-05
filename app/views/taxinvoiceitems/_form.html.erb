@@ -204,6 +204,7 @@
   </div> 
 <% end %>
  
+<!--  Jika Bukan Vendor -->
 <% if !checkroleonly 'Vendor Supir' %>
 	<div class="hideprint" style="width:300px; float:right; clear:right;">
 		<% if @invoice %>
@@ -226,7 +227,11 @@
           
           <% end %>
 
-          <br /><br /><%= link_to '&raquo; Hapus File'.html_safe, '/attachments/removeTaxInv/' + @invoice.images.first.id.to_s %>
+          <br />
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
+          <span style="font-size: 10px; color: #717171;">Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+          <%= link_to '&raquo; Hapus File'.html_safe, '/attachments/removeTaxInv/' + @invoice.images.first.id.to_s %>
+          </div>
           <br>
           <br>
         <% end %>
