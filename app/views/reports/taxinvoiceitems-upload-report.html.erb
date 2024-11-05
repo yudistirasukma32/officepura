@@ -77,7 +77,7 @@
 					<!-- <td><%=taxinvoiceitem.unload_date.strftime('%d/%m') rescue nil %> </td> -->
 					<td class="center" align="center">
 						<% if taxinvoiceitem.invoice.images.any? %>
-						<% img = taxinvoiceitem.invoice.images.first %>
+						<% img = taxinvoiceitem.invoice.images.reorder(:created_at).first %>
 						<%= img.created_at.strftime('%d/%m') rescue nil %>
 						<% else %>
 						belum upload
