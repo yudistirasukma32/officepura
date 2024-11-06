@@ -211,12 +211,15 @@
 		</tr>
 		<% end %>
 
-
-		  <% if !@taxinvoice.generic %>
-			  <% @taxinvoice.taxinvoiceitems.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
-				<% subtotal += taxinvoiceitem.total %>
-				<% weight_gross += taxinvoiceitem.weight_gross %>
-				<% weight_net += taxinvoiceitem.weight_net %>
+		<% if !@taxinvoice.generic %>
+			<% num = 1 %>
+			<% @taxinvoice.taxinvoiceitems.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
+				<%
+					subtotal += taxinvoiceitem.total
+					weight_gross += taxinvoiceitem.weight_gross
+					weight_net += taxinvoiceitem.weight_net
+					num += 1
+				%>
 				<tr>
 					<td><%=i+1%>.</td>
 					<td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
@@ -266,13 +269,14 @@
 						</a>
 					</td>
 				</tr>
-			 <% end %>
-			 <% @taxinvoice.taxinvoiceitemvs.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
+			<% end %>
+
+			<% @taxinvoice.taxinvoiceitemvs.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
 				<% subtotal += taxinvoiceitem.total %>
 				<% weight_gross += taxinvoiceitem.weight_gross %>
 				<% weight_net += taxinvoiceitem.weight_net %>
 				<tr>
-					<td><%=i+1%>.</td>
+					<td><%= i+num %>.</td>
 					<td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
 					<td><%= taxinvoiceitem.vehicle_number rescue nil %></td>
 					<td><% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
@@ -291,9 +295,11 @@
 					<td colspan="2" style="text-align:left"><%=taxinvoiceitem.event.summary rescue nil%></td>
 					<td align="right"><%= to_currency(taxinvoiceitem.total)%>  </td>
 				</tr>
-			 <% end %>
-		  <% else %>
-		  	 <% @taxinvoice.taxgenericitems.active.order(:date, :sku_id).each_with_index do |taxgenericitem, i| %>
+			<% end %>
+
+		<% else %>
+
+			<% @taxinvoice.taxgenericitems.active.order(:date, :sku_id).each_with_index do |taxgenericitem, i| %>
 			  <% subtotal += taxgenericitem.total %>
 			  <% weight_gross += taxgenericitem.weight_gross %>
 			  <% weight_net += taxgenericitem.weight_net %>		  	 
@@ -318,8 +324,8 @@
 			    <td colspan="2" style="text-align:left"><%=taxgenericitem.description%></td>
 			    <td align="right"><%= to_currency(taxgenericitem.total)%></td>
 			  </tr>
-			 <% end %>
-		  <% end %>
+			<% end %>
+		<% end %>
 
 		  <tr>
 		  	<td></td>
