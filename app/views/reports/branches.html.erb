@@ -144,6 +144,31 @@
                 <% end %>
                 
                 <div id="office_1">
+                    <h2>Pelanggan Sidoarjo</h2>
+                    <table class="row-view">
+                        <thead>
+                        <tr> 
+                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                            <th class="{filter: false, sorter: false}">Nama</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+         
+                        <% @summary_sda[:list_cust_sda].each_with_index do |customer, c| %>
+                            <% c = c + 1 %>
+                            <tr>
+                                <td><%= c %></td>
+                                <td><%= customer.name %></td>
+                            </tr>
+                        
+                        <% end %>	
+                        </tbody>
+        
+                    </table>
+ 
+                    <br/>
+                    <br class="clearfix" />
+
                     <% if @events.any? %>
                         <table class="tablesorter row-view tablesorterFilters">
                         <tr>
@@ -218,6 +243,7 @@
                     <% end %>
                 </div>
             </div>
+
             <div class="sliding_tab" id="tab_2" style="width: 1080px;">
                 <br class="clearfix" />
 
@@ -263,6 +289,31 @@
                 <% end %>
 
                 <div id="office_2">
+                    <h2>Pelanggan Surabaya</h2>
+                    <table class="row-view">
+                        <thead>
+                        <tr> 
+                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                            <th class="{filter: false, sorter: false}">Nama</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+         
+                        <% @summary_sby[:list_cust_sby].each_with_index do |customer, c| %>
+                            <% c = c + 1 %>
+                            <tr>
+                                <td><%= c %></td>
+                                <td><%= customer.name %></td>
+                            </tr>
+                        
+                        <% end %>	
+                        </tbody>
+        
+                    </table>
+ 
+                    <br/>
+                    <br class="clearfix" />
+
                     <% if @events.any? %>
                         <table class="tablesorter row-view tablesorterFilters">
                         <tr>
@@ -382,6 +433,32 @@
                 <% end %>
 
                 <div id="office_3">
+
+                    <h2>Pelanggan Probolinggo</h2>
+                    <table class="row-view">
+                        <thead>
+                        <tr> 
+                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                            <th class="{filter: false, sorter: false}">Nama</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+         
+                        <% @summary_prb[:list_cust_prb].each_with_index do |customer, c| %>
+                            <% c = c + 1 %>
+                            <tr>
+                                <td><%= c %></td>
+                                <td><%= customer.name %></td>
+                            </tr>
+                        
+                        <% end %>	
+                        </tbody>
+        
+                    </table>
+ 
+                    <br/>
+                    <br class="clearfix" />
+
                     <% if @events.any? %>
                         <table class="tablesorter row-view tablesorterFilters">
                         <tr>
@@ -501,6 +578,32 @@
                 <% end %>
 
                 <div id="office_4">
+
+                    <h2>Pelanggan Semarang</h2>
+                    <table class="row-view">
+                        <thead>
+                        <tr> 
+                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                            <th class="{filter: false, sorter: false}">Nama</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+         
+                        <% @summary_smg[:list_cust_smg].each_with_index do |customer, c| %>
+                            <% c = c + 1 %>
+                            <tr>
+                                <td><%= c %></td>
+                                <td><%= customer.name %></td>
+                            </tr>
+                        
+                        <% end %>	
+                        </tbody>
+        
+                    </table>
+ 
+                    <br/>
+                    <br class="clearfix" />
+
                     <% if @events.any? %>
                         <table class="tablesorter row-view tablesorterFilters">
                         <tr>
@@ -620,6 +723,29 @@
                 <% end %>
 
                 <div id="office_5">
+
+                    <h2>Pelanggan Jakarta</h2>
+                    <table class="row-view">
+                        <thead>
+                        <tr> 
+                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                            <th class="{filter: false, sorter: false}">Nama</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+         
+                        <% @summary_jkt[:list_cust_jkt].each_with_index do |customer, c| %>
+                            <% c = c + 1 %>
+                            <tr>
+                                <td><%= c %></td>
+                                <td><%= customer.name %></td>
+                            </tr>
+                        
+                        <% end %>	
+                        </tbody>
+        
+                    </table>
+
                     <% if @events.any? %>
                         <table class="tablesorter row-view tablesorterFilters">
                         <tr>
@@ -739,6 +865,29 @@
                 <% end %>
 
                 <div id="office_6">
+
+                    <h2>Pelanggan Sumatera</h2>
+                    <table class="row-view">
+                        <thead>
+                        <tr> 
+                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                            <th class="{filter: false, sorter: false}">Nama</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+         
+                        <% @summary_smt[:list_cust_smt].each_with_index do |customer, c| %>
+                            <% c = c + 1 %>
+                            <tr>
+                                <td><%= c %></td>
+                                <td><%= customer.name %></td>
+                            </tr>
+                        
+                        <% end %>	
+                        </tbody>
+        
+                    </table>
+
                     <% if @events.any? %>
                         <table class="tablesorter row-view tablesorterFilters">
                         <tr>
