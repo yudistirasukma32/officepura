@@ -3522,7 +3522,7 @@ end
 
       # render json: @events_sda.map { |event| event[:id] }
       @customers_sda = @customers.where('id in (select customer_id from events where id in (?))', @events_sda.map { |event| event[:id] })
-      @vehicles_sda = Vehicle.where('office_id = 1 AND id in (select vehicle_id from invoices where deleted = false AND office_id = 1 AND event_id in (?))', @events_sda.map { |event| event[:id] }).count()
+      @vehicles_sda = Vehicle.where('office_id = 1 AND id in (select vehicle_id from invoices where deleted = false AND office_id = 1 AND event_id in (?))', @events_sda.map { |event| event[:id] })
       @drivers_sda = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 1 AND event_id in (?))', @events_sda.map { |event| event[:id] }).count()
       @ship_sda = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_sda.map { |event| event[:id] }).count()
       @train_sda = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_sda.map { |event| event[:id] }).count()
@@ -3533,9 +3533,10 @@ end
       # render json: @drivers_sda.select(:name).order(:name).count()
 
       @summary_sda = {
+        list_vehicles_sda: @vehicles_sda,
         list_cust_sda: @customers_sda,
         count_drivers: @drivers_sda,
-        count_vehicles: @vehicles_sda,
+        count_vehicles: @vehicles_sda.count(),
         count_train: @train_sda,
         count_roro: @ship_sda,
         count_industry: @industry_sda,
@@ -3624,7 +3625,7 @@ end
       end
       # render json: @events_sby.map { |event| event[:id] }
       @customers_sby = @customers.where('id in (select customer_id from events where id in (?))', @events_sby.map { |event| event[:id] })
-      @vehicles_sby = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 5 AND event_id in (?))', @events_sby.map { |event| event[:id] }).count()
+      @vehicles_sby = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 5 AND event_id in (?))', @events_sby.map { |event| event[:id] })
       @drivers_sby = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 5 AND event_id in (?))', @events_sby.map { |event| event[:id] }).count()
       @ship_sby = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_sby.map { |event| event[:id] }).count()
       @train_sby = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_sby.map { |event| event[:id] }).count()
@@ -3635,9 +3636,10 @@ end
       # render json: @kosongans
 
       @summary_sby = {
+        list_vehicles_sby: @vehicles_sby,
         list_cust_sby: @customers_sby,
         count_drivers: @drivers_sby,
-        count_vehicles: @vehicles_sby,
+        count_vehicles: @vehicles_sby.count(),
         count_train: @train_sby,
         count_roro: @ship_sby,
         count_industry: @industry_sby,
@@ -3727,7 +3729,7 @@ end
       end
       # render json: @events_jkt.map { |event| event[:id] }
       @customers_jkt = @customers.where('id in (select customer_id from events where id in (?))', @events_jkt.map { |event| event[:id] })
-      @vehicles_jkt = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 2 AND event_id in (?))', @events_jkt.map { |event| event[:id] }).count()
+      @vehicles_jkt = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 2 AND event_id in (?))', @events_jkt.map { |event| event[:id] })
       @drivers_jkt = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 2 AND event_id in (?))', @events_jkt.map { |event| event[:id] }).count()
       @ship_jkt = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_jkt.map { |event| event[:id] }).count()
       @train_jkt = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_jkt.map { |event| event[:id] }).count()
@@ -3738,9 +3740,10 @@ end
       # render json: @kosongan_jkt
 
       @summary_jkt = {
+        list_vehicles_jkt: @vehicles_jkt,
         list_cust_jkt: @customers_jkt,
         count_drivers: @drivers_jkt,
-        count_vehicles: @vehicles_jkt,
+        count_vehicles: @vehicles_jkt.count(),
         count_train: @train_jkt,
         count_roro: @ship_jkt,
         count_industry: @industry_jkt,
@@ -3829,7 +3832,7 @@ end
       end
       # render json: @events_prb.map { |event| event[:id] }
       @customers_prb = @customers.where('id in (select customer_id from events where id in (?))', @events_prb.map { |event| event[:id] })
-      @vehicles_prb = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 3 AND event_id in (?))', @events_prb.map { |event| event[:id] }).count()
+      @vehicles_prb = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 3 AND event_id in (?))', @events_prb.map { |event| event[:id] })
       @drivers_prb = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 3 AND event_id in (?))', @events_prb.map { |event| event[:id] }).count()
       @ship_prb = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_prb.map { |event| event[:id] }).count()
       @train_prb = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_prb.map { |event| event[:id] }).count()
@@ -3840,9 +3843,10 @@ end
       # render json: @kosongan_prb
 
       @summary_prb = {
+        list_vehicles_prb: @vehicles_prb,
         list_cust_prb: @customers_prb,
         count_drivers: @drivers_prb,
-        count_vehicles: @vehicles_prb,
+        count_vehicles: @vehicles_prb.count(),
         count_train: @train_prb,
         count_roro: @ship_prb,
         count_industry: @industry_prb,
@@ -3932,7 +3936,7 @@ end
       end
       # render json: @events_smg.map { |event| event[:id] }
       @customers_smg = @customers.where('id in (select customer_id from events where id in (?))', @events_smg.map { |event| event[:id] })
-      @vehicles_smg = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 4 AND event_id in (?))', @events_smg.map { |event| event[:id] }).count()
+      @vehicles_smg = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 4 AND event_id in (?))', @events_smg.map { |event| event[:id] })
       @drivers_smg = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 4 AND event_id in (?))', @events_smg.map { |event| event[:id] }).count()
       @ship_smg = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_smg.map { |event| event[:id] }).count()
       @train_smg = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_smg.map { |event| event[:id] }).count()
@@ -3943,9 +3947,10 @@ end
       # render json: @train_smg
 
       @summary_smg = {
+        list_vehicles_smg: @vehicles_smg,
         list_cust_smg: @customers_smg,
         count_drivers: @drivers_smg,
-        count_vehicles: @vehicles_smg,
+        count_vehicles: @vehicles_smg.count(),
         count_train: @train_smg,
         count_roro: @ship_smg,
         count_industry: @industry_smg,
@@ -4035,7 +4040,7 @@ end
       end
       # render json: @events_smt.map { |event| event[:id] }
       @customers_smt = @customers.where('id in (select customer_id from events where id in (?))', @events_smt.map { |event| event[:id] })
-      @vehicles_smt = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 6 AND event_id in (?))', @events_smt.map { |event| event[:id] }).count()
+      @vehicles_smt = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 6 AND event_id in (?))', @events_smt.map { |event| event[:id] })
       @drivers_smt = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 6 AND event_id in (?))', @events_smt.map { |event| event[:id] }).count()
       @ship_smt = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_smt.map { |event| event[:id] }).count()
       @train_smt = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_smt.map { |event| event[:id] }).count()
@@ -4046,9 +4051,10 @@ end
       # render json: @kosongan_smt
 
       @summary_smt = {
+        list_vehicles_smt: @vehicles_smt,
         list_cust_smt: @customers_smt,
         count_drivers: @drivers_smt,
-        count_vehicles: @vehicles_smt,
+        count_vehicles: @vehicles_smt.count(),
         count_train: @train_smt,
         count_roro: @ship_smt,
         count_industry: @industry_smt,

@@ -144,27 +144,66 @@
                 <% end %>
                 
                 <div id="office_1">
-                    <h2>Pelanggan Sidoarjo</h2>
-                    <table class="row-view">
-                        <thead>
-                        <tr> 
-                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                            <th class="{filter: false, sorter: false}">Nama</th>
-                        </tr>
-                        <thead>
-                        <tbody>
-         
-                        <% @summary_sda[:list_cust_sda].each_with_index do |customer, c| %>
-                            <% c = c + 1 %>
-                            <tr>
-                                <td><%= c %></td>
-                                <td><%= customer.name %></td>
-                            </tr>
-                        
-                        <% end %>	
-                        </tbody>
-        
-                    </table>
+                    <div class="flex" style="justify-content: space-between;">
+                        <div class="">
+                            <h2>Pelanggan Sidoarjo</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                                    <th class="{filter: false, sorter: false}">Nama</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                
+                                <% @summary_sda[:list_cust_sda].each_with_index do |customer, c| %>
+                                    <% c = c + 1 %>
+                                    <tr>
+                                        <td><%= c %></td>
+                                        <td><%= customer.name %></td>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
+
+                        <div class="">
+                            <h2>Unit Sidoarjo</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{sorter: false}" width="30"></th>
+                                    <th>No Pol</th>
+                                    <th>Tipe</th>
+                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th width="60" class="{sorter: false}">Aktif</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                                <% @summary_sda[:list_vehicles_sda].each_with_index do |vehicle, v| %>
+                                    <% v = v + 1 %>
+                                    <tr>
+                                        <td><%= v %></td>
+                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+                                        <td><%= vehicle.vehicle_type %></td>
+                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
+                                        <% if vehicle.enabled %>
+                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+                                        <% else %>
+                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+                                        <% end %>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
+                    </div>
  
                     <br/>
                     <br class="clearfix" />
@@ -289,27 +328,66 @@
                 <% end %>
 
                 <div id="office_2">
-                    <h2>Pelanggan Surabaya</h2>
-                    <table class="row-view">
-                        <thead>
-                        <tr> 
-                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                            <th class="{filter: false, sorter: false}">Nama</th>
-                        </tr>
-                        <thead>
-                        <tbody>
-         
-                        <% @summary_sby[:list_cust_sby].each_with_index do |customer, c| %>
-                            <% c = c + 1 %>
-                            <tr>
-                                <td><%= c %></td>
-                                <td><%= customer.name %></td>
-                            </tr>
-                        
-                        <% end %>	
-                        </tbody>
-        
-                    </table>
+                    <div class="flex" style="justify-content: space-between;">
+                        <div class="">
+                            <h2>Pelanggan Surabaya</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                                    <th class="{filter: false, sorter: false}">Nama</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                
+                                <% @summary_sby[:list_cust_sby].each_with_index do |customer, c| %>
+                                    <% c = c + 1 %>
+                                    <tr>
+                                        <td><%= c %></td>
+                                        <td><%= customer.name %></td>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
+
+                        <div class="">
+                            <h2>Unit Surabaya</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{sorter: false}" width="30"></th>
+                                    <th>No Pol</th>
+                                    <th>Tipe</th>
+                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th width="60" class="{sorter: false}">Aktif</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                                <% @summary_sby[:list_vehicles_sby].each_with_index do |vehicle, v| %>
+                                    <% v = v + 1 %>
+                                    <tr>
+                                        <td><%= v %></td>
+                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+                                        <td><%= vehicle.vehicle_type %></td>
+                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
+                                        <% if vehicle.enabled %>
+                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+                                        <% else %>
+                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+                                        <% end %>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
+                    </div>
  
                     <br/>
                     <br class="clearfix" />
@@ -433,28 +511,66 @@
                 <% end %>
 
                 <div id="office_3">
+                    <div class="flex" style="justify-content: space-between;">
+                        <div class="">
+                            <h2>Pelanggan Probolinggo</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                                    <th class="{filter: false, sorter: false}">Nama</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                
+                                <% @summary_prb[:list_cust_prb].each_with_index do |customer, c| %>
+                                    <% c = c + 1 %>
+                                    <tr>
+                                        <td><%= c %></td>
+                                        <td><%= customer.name %></td>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
 
-                    <h2>Pelanggan Probolinggo</h2>
-                    <table class="row-view">
-                        <thead>
-                        <tr> 
-                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                            <th class="{filter: false, sorter: false}">Nama</th>
-                        </tr>
-                        <thead>
-                        <tbody>
-         
-                        <% @summary_prb[:list_cust_prb].each_with_index do |customer, c| %>
-                            <% c = c + 1 %>
-                            <tr>
-                                <td><%= c %></td>
-                                <td><%= customer.name %></td>
-                            </tr>
-                        
-                        <% end %>	
-                        </tbody>
-        
-                    </table>
+                        <div class="">
+                            <h2>Unit Probolinggo</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{sorter: false}" width="30"></th>
+                                    <th>No Pol</th>
+                                    <th>Tipe</th>
+                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th width="60" class="{sorter: false}">Aktif</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                                <% @summary_prb[:list_vehicles_prb].each_with_index do |vehicle, v| %>
+                                    <% v = v + 1 %>
+                                    <tr>
+                                        <td><%= v %></td>
+                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+                                        <td><%= vehicle.vehicle_type %></td>
+                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
+                                        <% if vehicle.enabled %>
+                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+                                        <% else %>
+                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+                                        <% end %>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
+                    </div>
  
                     <br/>
                     <br class="clearfix" />
@@ -578,28 +694,66 @@
                 <% end %>
 
                 <div id="office_4">
+                    <div class="flex" style="justify-content: space-between;">
+                        <div class="">
+                            <h2>Pelanggan Semarang</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                                    <th class="{filter: false, sorter: false}">Nama</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                
+                                <% @summary_smg[:list_cust_smg].each_with_index do |customer, c| %>
+                                    <% c = c + 1 %>
+                                    <tr>
+                                        <td><%= c %></td>
+                                        <td><%= customer.name %></td>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
 
-                    <h2>Pelanggan Semarang</h2>
-                    <table class="row-view">
-                        <thead>
-                        <tr> 
-                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                            <th class="{filter: false, sorter: false}">Nama</th>
-                        </tr>
-                        <thead>
-                        <tbody>
-         
-                        <% @summary_smg[:list_cust_smg].each_with_index do |customer, c| %>
-                            <% c = c + 1 %>
-                            <tr>
-                                <td><%= c %></td>
-                                <td><%= customer.name %></td>
-                            </tr>
-                        
-                        <% end %>	
-                        </tbody>
-        
-                    </table>
+                        <div class="">
+                            <h2>Unit Semarang</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{sorter: false}" width="30"></th>
+                                    <th>No Pol</th>
+                                    <th>Tipe</th>
+                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th width="60" class="{sorter: false}">Aktif</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                                <% @summary_smg[:list_vehicles_smg].each_with_index do |vehicle, v| %>
+                                    <% v = v + 1 %>
+                                    <tr>
+                                        <td><%= v %></td>
+                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+                                        <td><%= vehicle.vehicle_type %></td>
+                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
+                                        <% if vehicle.enabled %>
+                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+                                        <% else %>
+                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+                                        <% end %>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
+                    </div>
  
                     <br/>
                     <br class="clearfix" />
@@ -723,29 +877,70 @@
                 <% end %>
 
                 <div id="office_5">
+                    <div class="flex" style="justify-content: space-between;">
+                        <div class="">
+                            <h2>Pelanggan Jakarta</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                                    <th class="{filter: false, sorter: false}">Nama</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                
+                                <% @summary_jkt[:list_cust_jkt].each_with_index do |customer, c| %>
+                                    <% c = c + 1 %>
+                                    <tr>
+                                        <td><%= c %></td>
+                                        <td><%= customer.name %></td>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
 
-                    <h2>Pelanggan Jakarta</h2>
-                    <table class="row-view">
-                        <thead>
-                        <tr> 
-                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                            <th class="{filter: false, sorter: false}">Nama</th>
-                        </tr>
-                        <thead>
-                        <tbody>
-         
-                        <% @summary_jkt[:list_cust_jkt].each_with_index do |customer, c| %>
-                            <% c = c + 1 %>
-                            <tr>
-                                <td><%= c %></td>
-                                <td><%= customer.name %></td>
-                            </tr>
-                        
-                        <% end %>	
-                        </tbody>
-        
-                    </table>
+                        <div class="">
+                            <h2>Unit Jakarta</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{sorter: false}" width="30"></th>
+                                    <th>No Pol</th>
+                                    <th>Tipe</th>
+                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th width="60" class="{sorter: false}">Aktif</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                                <% @summary_jkt[:list_vehicles_jkt].each_with_index do |vehicle, v| %>
+                                    <% v = v + 1 %>
+                                    <tr>
+                                        <td><%= v %></td>
+                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+                                        <td><%= vehicle.vehicle_type %></td>
+                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
+                                        <% if vehicle.enabled %>
+                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+                                        <% else %>
+                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+                                        <% end %>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
+                    </div>
 
+                    <br/>
+                    <br class="clearfix" />
+ 
                     <% if @events.any? %>
                         <table class="tablesorter row-view tablesorterFilters">
                         <tr>
@@ -865,28 +1060,69 @@
                 <% end %>
 
                 <div id="office_6">
+                    <div class="flex" style="justify-content: space-between;">
+                        <div class="">
+                            <h2>Pelanggan Sumatera</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                                    <th class="{filter: false, sorter: false}">Nama</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                
+                                <% @summary_smt[:list_cust_smt].each_with_index do |customer, c| %>
+                                    <% c = c + 1 %>
+                                    <tr>
+                                        <td><%= c %></td>
+                                        <td><%= customer.name %></td>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
 
-                    <h2>Pelanggan Sumatera</h2>
-                    <table class="row-view">
-                        <thead>
-                        <tr> 
-                            <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                            <th class="{filter: false, sorter: false}">Nama</th>
-                        </tr>
-                        <thead>
-                        <tbody>
-         
-                        <% @summary_smt[:list_cust_smt].each_with_index do |customer, c| %>
-                            <% c = c + 1 %>
-                            <tr>
-                                <td><%= c %></td>
-                                <td><%= customer.name %></td>
-                            </tr>
-                        
-                        <% end %>	
-                        </tbody>
-        
-                    </table>
+                        <div class="">
+                            <h2>Unit Sumatera</h2>
+                            <table class="row-view">
+                                <thead>
+                                <tr> 
+                                    <th class="{sorter: false}" width="30"></th>
+                                    <th>No Pol</th>
+                                    <th>Tipe</th>
+                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    <th width="60" class="{sorter: false}">Aktif</th>
+                                </tr>
+                                <thead>
+                                <tbody>
+                                <% @summary_smt[:list_vehicles_smt].each_with_index do |vehicle, v| %>
+                                    <% v = v + 1 %>
+                                    <tr>
+                                        <td><%= v %></td>
+                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+                                        <td><%= vehicle.vehicle_type %></td>
+                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
+                                        <% if vehicle.enabled %>
+                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+                                        <% else %>
+                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+                                        <% end %>
+                                    </tr>
+                                
+                                <% end %>	
+                                </tbody>
+                
+                            </table>
+                        </div>
+                    </div>
+
+                    <br/>
+                    <br class="clearfix" />
 
                     <% if @events.any? %>
                         <table class="tablesorter row-view tablesorterFilters">
