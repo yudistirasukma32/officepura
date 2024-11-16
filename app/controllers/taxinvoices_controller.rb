@@ -1371,144 +1371,117 @@ class TaxinvoicesController < ApplicationController
   def clone
 
     @taxinvoice = Taxinvoice.find(params[:id])
-
-    require "uri"
-		require "net/http"
-		require "openssl"
-		require 'json'
-
-    url = URI("https://office.puratrans.com/api_customers/get_all_customers")
-
-		http = Net::HTTP.new(url.host, url.port)
-		http.use_ssl = true
-		http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-		request = Net::HTTP::Get.new(url.request_uri)
-
-		response = http.request(request)
-		@response = response.read_body
-
-		if JSON(@response)['status'] == 404
-
-		@customerlist = ''
-
-		else
-
-		@customerlist = JSON(@response)['data']
-
-		end
-
-  end
-
-  def transfer
-
-    # @taxinvoice = Taxinvoice.find(params[:id])
-    # customer_destinaton = params[:customer_id]
-    # is_generic = @taxinvoice.generic
-
+    @customerlist = []
+    
     # require "uri"
 		# require "net/http"
 		# require "openssl"
 		# require 'json'
 
-    # url = URI("https://office.puratrans.com/api_taxinvoices/create_taxinvoice")
+    # url = URI("https://rajawali.puratrans.com/api_customers/get_all_customers")
 
 		# http = Net::HTTP.new(url.host, url.port)
 		# http.use_ssl = true
 		# http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-		# request = Net::HTTP::Post.new(url.request_uri)
-    # request["Content-Type"] = "application/json"
-    # request.body = JSON.dump({
-    #   "taxinvoices": {
-    #     "customer_id": customer_destinaton,
-    #     "date": @taxinvoice.date,
-    #     "long_id": @taxinvoice.long_id,
-    #     "period_start": @taxinvoice.period_start,
-    #     "period_end": @taxinvoice.period_end,
-    #     "generic": true,
-    #     "gst_tax": @taxinvoice.gst_tax,
-    #     "gst_percentage": 0,
-    #     "price_tax": @taxinvoice.price_tax,
-    #     "description": 'Cloning dari Internal RDPI',
-    #     "total": @taxinvoice.total,
-    #     "user_id": 76,
-    #   }
-    # })
+		# request = Net::HTTP::Get.new(url.request_uri)
 
 		# response = http.request(request)
 		# @response = response.read_body
 
-		# if JSON(@response)['status'] == 404
+		# if JSON(@response)['status'] != 404
+		#   @customerlist = JSON(@response)['data']
+		# end
 
-		# render json: { status: 400, message: "Customers not found" }, status: 400
+  end
 
-		# else
+  def transfer
 
-    #   @taxinvoice_id_destination = JSON(@response)['data']['id']
+    # populate array id
+    # inv_tagihan = []
+    # array = []
 
-    #   if is_generic
-    #     taxinvoiceitems = Taxgenericitem.where('taxinvoice_id = ?', @taxinvoice.id)
+    # array.each do |tax_id|
+
+    #   @taxinvoice = Taxinvoice.find(tax_id)
+    #   is_generic = @taxinvoice.generic
+
+    #   inv_tagihan << @taxinvoice.long_id 
+
+    #   require "uri"
+    #   require "net/http"
+    #   require "openssl"
+    #   require 'json'
+
+    #   url = URI("https://rajawali.puratrans.com/api_taxinvoices/create_taxinvoice_2")
+
+    #   http = Net::HTTP.new(url.host, url.port)
+    #   http.use_ssl = true
+    #   http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    #   request = Net::HTTP::Post.new(url.request_uri)
+    #   form_data = [['customer_name', @taxinvoice.customer.name],['date', @taxinvoice.date.to_s],['long_id', @taxinvoice.long_id],['period_start', @taxinvoice.period_start.to_s],['period_end', @taxinvoice.period_end.to_s],['due_date', @taxinvoice.duedate.to_s],['paiddate', @taxinvoice.paiddate.to_s],['generic', 'true'],['gst_tax', @taxinvoice.gst_tax.to_i],['gst_percentage', @taxinvoice.gst_percentage.to_i],['price_tax', @taxinvoice.price_tax.to_i],['total', @taxinvoice.total.to_s],['origin', 'PURA']]
+    #   request.set_form form_data, 'multipart/form-data'
+    #   response = http.request(request)
+    #   @response = response.read_body
+
+    #   if JSON(@response)['status'] == 404
+
+    #     render json: { status: 400, message: "Customers not found" }, status: 400
+
     #   else
-    #     taxinvoiceitems = Taxinvoiceitem.where('taxinvoice_id = ?', @taxinvoice.id)
-    #   end
 
-    #   if taxinvoiceitems.present?
+    #     @taxinvoice_id_destination = JSON(@response)['taxinvoice_id']
 
-    #     taxinvoiceitems = taxinvoiceitems.map do |t|
-
-    #       url = URI("https://office.puratrans.com/api_taxinvoices/create_taxinvoice_taxgenericitem")
-
-    #       http = Net::HTTP.new(url.host, url.port)
-    #       http.use_ssl = true
-    #       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    #       request = Net::HTTP::Post.new(url.request_uri)
-    #       request["Content-Type"] = "application/json"
-
-    #       if is_generic
-    #         request.body = JSON.dump({
-    #           "taxgenericitems": {
-    #             "date": t.date,
-    #             "load_date": t.date,
-    #             "unload_date": t.date,
-    #             "description": t.description,
-    #             "sku_id": t.sku_id,
-    #             "vehicle_id": t.vehicle.current_id,
-    #             "taxinvoice_id": @taxinvoice_id_destination,
-    #             "weight_gross": t.weight_gross,
-    #             "weight_net": t.weight_net,
-    #             "price_per": t.price_per,
-    #             "total": t.total
-    #           }
-    #         })
-    #       else
-    #         request.body = JSON.dump({
-    #           "taxgenericitems": {
-    #             "date": t.date,
-    #             "load_date": t.date,
-    #             "unload_date": t.date,
-    #             "description": t.invoice.route.name,
-    #             "sku_id": t.sku_id,
-    #             "vehicle_id": t.invoice.vehicle.current_id,
-    #             "taxinvoice_id": @taxinvoice_id_destination,
-    #             "weight_gross": t.weight_gross,
-    #             "weight_net": t.weight_net,
-    #             "price_per": t.price_per,
-    #             "total": t.total
-    #           }
-    #         })
-    #       end
-
-    #       response = http.request(request)
+    #     if is_generic
+    #       taxinvoiceitems = Taxgenericitem.where('taxinvoice_id = ?', @taxinvoice.id)
+    #     else
+    #       taxinvoiceitems = Taxinvoiceitem.where('taxinvoice_id = ?', @taxinvoice.id)
     #     end
 
+    #     if taxinvoiceitems.present?
+
+    #       taxinvoiceitems = taxinvoiceitems.map do |t|
+
+    #         if is_generic
+    #           vehicle_number = t.vehicle.current_id
+    #         else
+    #           vehicle_number = t.invoice.vehicle.current_id
+    #         end
+
+    #         url = URI("https://rajawali.puratrans.com/api_taxinvoices/create_taxinvoice_taxgenericitem_2")
+
+    #         http = Net::HTTP.new(url.host, url.port)
+    #         http.use_ssl = true
+    #         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    #         request = Net::HTTP::Post.new(url.request_uri)
+    #         request["Content-Type"] = "application/json"
+          
+    #         form_data = [['taxinvoice_id', @taxinvoice_id_destination.to_s],['vehicle_id', vehicle_number],['date', t.date.to_s],['description', t.description],['sku_id', t.sku_id,],['weight_gross', t.weight_gross.to_s],['weight_net', t.weight_net.to_s],['price_per', t.price_per.to_s],['total', t.total.to_s]]
+  
+    #         request.set_form form_data, 'multipart/form-data'
+    #         response = http.request(request)
+
+    #       end
+
+    #     end
+
+    #     # render json: {
+    #     #   status: 200,
+    #     #   taxinvoice_id: @taxinvoice_id_destination,
+    #     #   data: JSON(@response)['data']['id'],
+    #     #   message: 'Success Create Taxinvoice',
+    #     #   }, status: 200
+
     #   end
 
-    #   render json: {
-    #     status: 200,
-    #     data: JSON(@response)['data']['id'],
-    #     message: 'Success Create Taxinvoice',
-    #     }, status: 200
+    # end
 
-		# end
+    # render json: {
+    #   status: 200,
+    #   taxinvoice_id: array,
+    #   taxinvoice_long_id: inv_tagihan,
+    #   message: 'Success Create Taxinvoices',
+    # }, status: 200
+
   end
 
   def newdp

@@ -294,7 +294,7 @@
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
-  <label for="claim_cost" class="half left">Potongan Klem Susut</label>
+  <label for="claim_cost" class="half left">Potongan Klaim Selisih</label>
   <input type="text" class="half left" id="taxinvoice_claim_cost" name="claim_cost" value="<%=@taxinvoice.claim_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/> 
 </div>
 
@@ -552,7 +552,7 @@
 
   <tr id="-3">
     <td colspan="7"></td>
-    <td align="right">Potongan Klem Susut</td>
+    <td align="right">Potongan Klaim Selisih</td>
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
     <td align="right"><span id="txt_claim_cost" <% if @taxinvoice.claim_cost > 0 %> class="red" <% end %>><%=to_currency_bank(0 - @taxinvoice.claim_cost)%></span></td>
