@@ -437,6 +437,7 @@ class InvoicesController < ApplicationController
     @invoice.ferry_fee = params[:invoice][:ferry_fee].delete('.')
     @invoice.tol_fee = params[:invoice][:tol_fee].delete('.')
     @invoice.total = params[:invoice][:total].delete('.')
+    @invoice.user_id = current_user.id
 
     @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
 
