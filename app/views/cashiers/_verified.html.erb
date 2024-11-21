@@ -32,6 +32,7 @@
 		
 		<td class="red" align="right"><%=to_currency(receipt.total)%></td>
 		<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+		<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 		<td class="right">
 			<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receipt_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -83,6 +84,7 @@
 		</td>
 		<td class="red" align="right"><%=to_currency(receipt.total)%></td>
 		<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+		<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 		<td class="right">
 			<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receipt_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -130,6 +132,7 @@
 				<%=to_currency(receipttrain.trainexpense.total)%>
 			</td>
 			<td><%= receipttrain.user.username if !receipttrain.user_id.nil? %></td>
+			<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 			<td class="right">
 				<% if current_user.owner %>
 				<%= link_to '&#xf044;'.html_safe, edit_receipttrain_path(receipttrain), :class => "edit tipsy", :title => 'Edit' %> 
@@ -176,6 +179,7 @@
 				<%=to_currency(receiptship.shipexpense.total)%>
 			</td>
 			<td><%= receiptship.user.username if !receiptship.user_id.nil? %></td>
+			<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 			<td class="right">
 				<% if current_user.owner %>
 				<%= link_to '&#xf044;'.html_safe, edit_receiptship_path(receiptship), :class => "edit tipsy", :title => 'Edit' %> 
@@ -223,6 +227,7 @@
 				<%=to_currency(receiptinsurance.insuranceexpense.total)%>
 			</td>
 			<td><%= receiptinsurance.user.username if !receiptinsurance.user_id.nil? %></td>
+			<td><%= (receiptinsurance.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 			<td class="right">
 				<% if current_user.owner %>
 				<%= link_to '&#xf044;'.html_safe, edit_receiptinsurance_path(receiptinsurance), :class => "edit tipsy", :title => 'Edit' %> 
@@ -277,6 +282,7 @@
 		</td>
 		<td class="green" align="right"><%=to_currency(receipt.total)%></td>
 		<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+		<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 		<td class="right">
 			<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receiptreturn_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -315,6 +321,7 @@
 	<td><%=receipt.invoice.vehicle.current_id%></td>
 	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
 	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 	<td class="right">
 		<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receiptpremi_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -353,6 +360,7 @@
 	<td><%=receipt.invoice.vehicle.current_id%></td>
 	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
 	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 	<td class="right">
 		<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receiptincentive_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -396,6 +404,7 @@
 	<td><%=receipt.productorder.productrequest.vehicle.current_id if !receipt.productorder.productrequest.nil? and !receipt.productorder.productrequest.vehicle_id.blank? %></td>
 	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
 	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 	<td class="right">
 		<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receiptorder_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -442,6 +451,7 @@
 	<td><%=receipt.officeexpense.vehicle.current_id if !receipt.officeexpense.vehicle_id.blank? %></td>
 	<td class="<% if receipt.expensetype == 'Kredit' %>red<% else %>green<% end %>" align="right"><%=to_currency(receipt.total)%></td>
 	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 	<td class="right">
 		<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receiptexpense_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -485,6 +495,7 @@
 	<td>&nbsp;</td>
 	<td class="green" align="right"><%=to_currency(receipt.total)%></td>
 	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 	<td class="right">
 		<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receiptsale_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -527,6 +538,7 @@
 	<td>&nbsp;</td>
 	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
 	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 	<td class="right">
 		<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receiptdriver_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -569,6 +581,7 @@
 	<td><%=receipt.payroll.vehicle.current_id if !receipt.payroll.vehicle_id.blank? %></td>
 	<td class="green" align="right"><%=to_currency(receipt.total)%></td>
 	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 	<td class="right">
 		<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receiptpayrollreturn_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
@@ -612,6 +625,7 @@
 	<td><%=receipt.payroll.vehicle.current_id if !receipt.payroll.vehicle_id.blank? %></td>
 	<td class="red" align="right"><%=to_currency(receipt.total)%></td>
 	<td><%= receipt.user.username if !receipt.user_id.nil? %></td>
+	<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 	<td class="right">
 		<% if current_user.owner %>
 			<%= link_to '&#xf044;'.html_safe, edit_receiptpayroll_path(receipt), :class => "edit tipsy", :title => 'Edit' %> 
