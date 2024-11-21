@@ -250,6 +250,12 @@ class EventsController < ApplicationController
       # end
       @event.save
 
+      if @event.cancelled
+        add_eventlog @event.id, 'DO dibatalkan'
+      else
+        add_eventlog @event.id, 'DO diedit'
+      end
+
       Eventsalesorder.where(event_id: @event.id).delete_all
       if params[:so_number].present?
         eventso = params[:so_number].map do |so_number|
@@ -277,6 +283,9 @@ class EventsController < ApplicationController
     @event.deleted = true
     @event.deleteuser_id = current_user.id
     @event.save
+
+    add_eventlog @event.id, 'DO dihapus'
+    
     redirect_to(events_path)
   end
 

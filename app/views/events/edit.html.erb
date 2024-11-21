@@ -213,8 +213,32 @@
         <% end %>
  
         <br/>
-        </div>
         
+        <h2 class="title" style="font-weight: bold;">Riwayat DO
+        </h2>
+        <br/>
+        <table class="row-view" style="margin-bottom: 4.5rem;">
+            <thead>
+                <tr>
+                <th>Tgl.</th>
+                <th>Deskripsi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><%= @event.created_at.strftime('%d-%m-%Y @ %H:%I:%S') %> WIB</td>
+                    <td>DO dibuat oleh <strong><%=@event.user.username %></strong></td>
+                </tr>
+                <% Eventlog.where('event_id = ?', params[:id]).each do |log| %>
+                <tr>
+                    <td><%= log.created_at.strftime('%d-%m-%Y @ %H:%I:%S') %> WIB</td>
+                    <td><%= log.name %> oleh <strong><%=log.user.username %></strong> </td>
+                </tr>
+                <% end %>
 
+            </tbody>
+        </table>
+
+        </div>
 	</div>
 </div>

@@ -181,7 +181,18 @@ module ApplicationHelper
 		  officecash.value = officecash.value.to_i + val
 		  officecash.save
 		end
-	end	
+	end
+	
+	def add_eventlog event_id, name
+
+		event = Event.find(event_id) rescue nil
+
+		if !event.nil?
+			note = name + ' oleh ' + current_user.username rescue 'admin'
+			Eventlog.create(event_id: event_id, user_id: current_user.id, name: name, note: note)
+		end
+
+	end
 
 	# def updatecashdailylogold total, date = nil, officecash = 0
 	# 	date = Date.today.strftime('%d-%m-%Y') if date.nil?

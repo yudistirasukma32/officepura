@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20231113071631) do
+ActiveRecord::Schema.define(:version => 20241121035825) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -203,6 +203,7 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.timestamp "created_at",       :limit => 6,                                                   :null => false
     t.timestamp "updated_at",       :limit => 6,                                                   :null => false
     t.decimal   "insurance_amount",              :precision => 19, :scale => 2, :default => 0.0
+    t.string    "industry"
   end
 
   create_table "companies", :force => true do |t|
@@ -266,17 +267,17 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
   end
 
   create_table "contracts", :force => true do |t|
-    t.boolean  "deleted",       :default => false
-    t.boolean  "enabled",       :default => true
-    t.string   "name"
-    t.string   "code"
-    t.date     "date_start"
-    t.date     "date_end"
-    t.integer  "customer_id"
-    t.string   "contract_type"
-    t.string   "description"
-    t.datetime "created_at",                       :null => false
-    t.datetime "updated_at",                       :null => false
+    t.boolean   "deleted",                    :default => false
+    t.boolean   "enabled",                    :default => true
+    t.string    "name"
+    t.string    "code"
+    t.date      "date_start"
+    t.date      "date_end"
+    t.integer   "customer_id"
+    t.string    "contract_type"
+    t.string    "description"
+    t.timestamp "created_at",    :limit => 6,                    :null => false
+    t.timestamp "updated_at",    :limit => 6,                    :null => false
   end
 
   create_table "customers", :force => true do |t|
@@ -299,6 +300,10 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.string    "email_alt"
     t.time      "load_hour",                :limit => 6
     t.time      "unload_hour",              :limit => 6
+    t.string    "phone2"
+    t.string    "phone3"
+    t.string    "mobile2"
+    t.string    "mobile3"
   end
 
   create_table "driverexpenses", :force => true do |t|
@@ -382,6 +387,19 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.timestamp "updated_at",       :limit => 6,                    :null => false
   end
 
+  create_table "eventlogs", :force => true do |t|
+    t.boolean  "deleted",      :default => false
+    t.boolean  "enabled",      :default => true
+    t.string   "name"
+    t.string   "note"
+    t.integer  "event_id"
+    t.integer  "user_id"
+    t.integer  "confirmed_by"
+    t.datetime "confirmed_at"
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
+  end
+
   create_table "eventmemos", :force => true do |t|
     t.boolean   "deleted",                    :default => false
     t.boolean   "enabled",                    :default => true
@@ -404,34 +422,34 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
   end
 
   create_table "events", :force => true do |t|
-    t.boolean   "deleted",                                                        :default => false
+    t.boolean   "deleted",                                                            :default => false
     t.date      "start_date"
     t.date      "end_date"
     t.string    "summary"
     t.text      "description"
-    t.timestamp "created_at",         :limit => 6,                                                   :null => false
-    t.timestamp "updated_at",         :limit => 6,                                                   :null => false
-    t.boolean   "cancelled",                                                      :default => false
+    t.timestamp "created_at",             :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",             :limit => 6,                                                   :null => false
+    t.boolean   "cancelled",                                                          :default => false
     t.integer   "customer_id"
-    t.boolean   "authorised",                                                     :default => false
-    t.timestamp "authorised_dated",   :limit => 6
+    t.boolean   "authorised",                                                         :default => false
+    t.timestamp "authorised_dated",       :limit => 6
     t.string    "payments_by"
     t.integer   "qty"
-    t.boolean   "invoicetrain",                                                   :default => false
+    t.boolean   "invoicetrain",                                                       :default => false
     t.string    "cargo_number"
     t.string    "cargo_type"
     t.integer   "volume"
     t.integer   "office_id"
-    t.boolean   "pos_sby",                                                        :default => false
-    t.boolean   "pos_smg",                                                        :default => false
-    t.boolean   "pos_jkt",                                                        :default => false
-    t.boolean   "pos_smt",                                                        :default => false
-    t.boolean   "pos_lorry",                                                      :default => false
+    t.boolean   "pos_sby",                                                            :default => false
+    t.boolean   "pos_smg",                                                            :default => false
+    t.boolean   "pos_jkt",                                                            :default => false
+    t.boolean   "pos_smt",                                                            :default => false
+    t.boolean   "pos_lorry",                                                          :default => false
     t.string    "vendor_name"
     t.string    "long_id"
     t.integer   "station_id"
     t.string    "route_summary"
-    t.boolean   "need_vendor",                                                    :default => false
+    t.boolean   "need_vendor",                                                        :default => false
     t.integer   "user_id"
     t.integer   "commodity_id"
     t.integer   "route_id"
@@ -443,11 +461,21 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.date      "unload_date"
     t.integer   "operator_id"
     t.integer   "routetrain_id"
-    t.decimal   "downpayment_amount",              :precision => 19, :scale => 2
+    t.decimal   "downpayment_amount",                  :precision => 19, :scale => 2
     t.date      "downpayment_date"
-    t.boolean   "losing",                                                         :default => false
+    t.boolean   "losing",                                                             :default => false
     t.string    "price_per_type"
-    t.boolean   "invoiceship",                                                    :default => false
+    t.boolean   "invoiceship",                                                        :default => false
+    t.boolean   "is_insurance",                                                       :default => false
+    t.decimal   "tsi_total",                           :precision => 19, :scale => 2, :default => 0.0
+    t.string    "load_province"
+    t.string    "unload_province"
+    t.integer   "invoice_count",                                                      :default => 0
+    t.integer   "invoiceconfirmed_count",                                             :default => 0
+    t.integer   "invoice_taxitems_count",                                             :default => 0
+    t.integer   "invoice_taxinv_count",                                               :default => 0
+    t.integer   "routeship_id"
+    t.integer   "deleteuser_id"
   end
 
   add_index "events", ["id", "start_date", "end_date", "customer_id"], :name => "index_events_on_customer_id"
@@ -529,6 +557,10 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.decimal   "tsi_total",                          :precision => 19, :scale => 2, :default => 0.0
     t.float     "insurance_rate",                                                    :default => 0.0
     t.decimal   "total",                              :precision => 19, :scale => 2, :default => 0.0
+    t.string    "policy_number"
+    t.string    "insurance_name"
+    t.integer   "top_days",                                                          :default => 0
+    t.date      "due_date"
   end
 
   create_table "insurancevendors", :force => true do |t|
@@ -544,6 +576,7 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.integer   "term_of_payment_in_day"
     t.timestamp "created_at",             :limit => 6,                    :null => false
     t.timestamp "updated_at",             :limit => 6,                    :null => false
+    t.string    "group"
   end
 
   create_table "invoicereturns", :force => true do |t|
@@ -569,8 +602,8 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
   end
 
   create_table "invoices", :force => true do |t|
-    t.boolean   "deleted",                                                                  :default => false
-    t.boolean   "enabled",                                                                  :default => true
+    t.boolean   "deleted",                                                                    :default => false
+    t.boolean   "enabled",                                                                    :default => true
     t.date      "date"
     t.string    "ship_name"
     t.integer   "driver_id"
@@ -579,68 +612,109 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.integer   "route_id"
     t.integer   "vehiclegroup_id"
     t.integer   "quantity"
-    t.integer   "gas_litre",                                                                :default => 0
-    t.integer   "gas_voucher",                                                              :default => 0
-    t.integer   "gas_leftover",                                                             :default => 0
-    t.float     "insurance_rate",                                                           :default => 0.0
+    t.integer   "gas_litre",                                                                  :default => 0
+    t.integer   "gas_voucher",                                                                :default => 0
+    t.integer   "gas_leftover",                                                               :default => 0
+    t.float     "insurance_rate",                                                             :default => 0.0
     t.string    "trip_type"
     t.text      "description"
     t.integer   "office_id"
     t.integer   "invoice_id"
-    t.timestamp "created_at",                   :limit => 6,                                                    :null => false
-    t.timestamp "updated_at",                   :limit => 6,                                                    :null => false
-    t.decimal   "gas_cost",                                  :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "gas_allowance",                             :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "driver_allowance",                          :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "ferry_fee",                                 :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "tol_fee",                                   :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "price_per",                                 :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "insurance",                                 :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "total",                                     :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "misc_allowance",                            :precision => 19, :scale => 2, :default => 0.0
+    t.timestamp "created_at",                     :limit => 6,                                                    :null => false
+    t.timestamp "updated_at",                     :limit => 6,                                                    :null => false
+    t.decimal   "gas_cost",                                    :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "gas_allowance",                               :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "driver_allowance",                            :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "ferry_fee",                                   :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "tol_fee",                                     :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "price_per",                                   :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "insurance",                                   :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "total",                                       :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "misc_allowance",                              :precision => 19, :scale => 2, :default => 0.0
     t.integer   "user_id"
-    t.decimal   "helper_allowance",                          :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "need_helper",                                                              :default => false
+    t.decimal   "helper_allowance",                            :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "need_helper",                                                                :default => false
     t.integer   "deleteuser_id"
-    t.integer   "gas_start",                                                                :default => 0
+    t.integer   "gas_start",                                                                  :default => 0
     t.string    "spk_number"
-    t.decimal   "incentive",                                 :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "invoicetrain",                                                             :default => false
+    t.decimal   "incentive",                                   :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "invoicetrain",                                                               :default => false
     t.string    "driver_phone"
     t.integer   "isotank_id"
-    t.string    "transporttype",                                                            :default => "TRUK"
+    t.string    "transporttype",                                                              :default => "TRUK"
     t.integer   "port_id"
     t.integer   "ship_id"
-    t.decimal   "train_fee",                                 :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "train_fee",                                   :precision => 19, :scale => 2, :default => 0.0
     t.integer   "container_id"
     t.string    "tanktype"
     t.string    "container_number"
     t.string    "isotank_number"
     t.integer   "event_id"
-    t.boolean   "premi",                                                                    :default => false
-    t.decimal   "premi_allowance",                           :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "premi",                                                                      :default => false
+    t.decimal   "premi_allowance",                             :precision => 19, :scale => 2, :default => 0.0
     t.integer   "routetrain_id"
     t.integer   "operator_id"
     t.integer   "shipoperator_id"
     t.integer   "routeship_id"
-    t.boolean   "invoicemultimode",                                                         :default => false
+    t.boolean   "invoicemultimode",                                                           :default => false
     t.string    "cargo_type"
     t.string    "vehicle_duplicate"
     t.integer   "vehicle_duplicate_id"
-    t.integer   "weight_gross",                                                             :default => 0
+    t.integer   "weight_gross",                                                               :default => 0
     t.date      "load_date"
-    t.boolean   "is_insurance",                                                             :default => false
-    t.decimal   "tsi_total",                                 :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "by_vendor",                                                                :default => false
+    t.boolean   "is_insurance",                                                               :default => false
+    t.decimal   "tsi_total",                                   :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "by_vendor",                                                                  :default => false
     t.integer   "truckvendor_id"
-    t.boolean   "kosongan",                                                                 :default => false
+    t.boolean   "kosongan",                                                                   :default => false
     t.string    "kosongan_type"
-    t.boolean   "kosongan_confirmed",                                                       :default => false
+    t.boolean   "kosongan_confirmed",                                                         :default => false
     t.integer   "kosongan_confirmed_by"
     t.integer   "kosongan_previous_invoice_id"
+    t.string    "payment_train"
+    t.string    "payment_ship"
+    t.boolean   "is_approval_operator",                                                       :default => false
+    t.integer   "approval_operator_confirmed_by"
   end
 
   add_index "invoices", ["date", "customer_id", "event_id", "invoicetrain"], :name => "invoice_events"
+
+  create_table "invoicestapels", :force => true do |t|
+    t.boolean  "deleted",                                      :default => false
+    t.boolean  "enabled",                                      :default => true
+    t.integer  "invoice_id"
+    t.datetime "startdate"
+    t.datetime "enddate"
+    t.text     "description"
+    t.integer  "user_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                                                      :null => false
+    t.datetime "updated_at",                                                      :null => false
+    t.decimal  "price_per",     :precision => 19, :scale => 2, :default => 0.0
+    t.decimal  "total",         :precision => 19, :scale => 2, :default => 0.0
+  end
+
+  create_table "invoicetrains", :force => true do |t|
+    t.boolean   "deleted",                                                      :default => false
+    t.boolean   "enabled",                                                      :default => true
+    t.date      "date"
+    t.string    "code"
+    t.string    "train_status"
+    t.integer   "operator_id"
+    t.integer   "station_id"
+    t.integer   "route_id"
+    t.string    "container_type"
+    t.integer   "isotank_id"
+    t.string    "isotank_number"
+    t.integer   "container_id"
+    t.string    "container_number"
+    t.string    "description"
+    t.integer   "user_id"
+    t.integer   "deleteuser_id"
+    t.timestamp "created_at",       :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",       :limit => 6,                                                   :null => false
+    t.decimal   "total",                         :precision => 19, :scale => 2, :default => 0.0
+  end
 
   create_table "isotanks", :force => true do |t|
     t.boolean   "deleted",                    :default => false
@@ -943,61 +1017,61 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
   end
 
   create_table "quotationgroups", :force => true do |t|
-    t.boolean  "deleted",                                        :default => false
-    t.boolean  "enabled",                                        :default => true
-    t.string   "long_id"
-    t.date     "date"
-    t.date     "confirmed_date"
-    t.integer  "customer_id"
-    t.datetime "created_at",                                                        :null => false
-    t.datetime "updated_at",                                                        :null => false
-    t.string   "status"
-    t.integer  "created_by"
-    t.integer  "confirmed_by"
-    t.integer  "rejected_by"
-    t.text     "description"
-    t.text     "notes"
-    t.decimal  "total",           :precision => 19, :scale => 2, :default => 0.0
-    t.string   "customer_name"
-    t.string   "customer_pic"
-    t.string   "customer_number"
-    t.string   "customer_email"
+    t.boolean   "deleted",                                                     :default => false
+    t.boolean   "enabled",                                                     :default => true
+    t.string    "long_id"
+    t.date      "date"
+    t.date      "confirmed_date"
+    t.integer   "customer_id"
+    t.timestamp "created_at",      :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",      :limit => 6,                                                   :null => false
+    t.string    "status"
+    t.integer   "created_by"
+    t.integer   "confirmed_by"
+    t.integer   "rejected_by"
+    t.text      "description"
+    t.text      "notes"
+    t.decimal   "total",                        :precision => 19, :scale => 2, :default => 0.0
+    t.string    "customer_name"
+    t.string    "customer_pic"
+    t.string    "customer_number"
+    t.string    "customer_email"
   end
 
   create_table "quotationlogs", :force => true do |t|
-    t.boolean  "deleted",                                      :default => false
-    t.boolean  "enabled",                                      :default => true
-    t.integer  "quotation_id"
-    t.integer  "updated_by"
-    t.string   "name"
-    t.text     "description"
-    t.datetime "created_at",                                                      :null => false
-    t.datetime "updated_at",                                                      :null => false
-    t.decimal  "old_price_per", :precision => 19, :scale => 2, :default => 0.0
-    t.decimal  "new_price_per", :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "deleted",                                                   :default => false
+    t.boolean   "enabled",                                                   :default => true
+    t.integer   "quotation_id"
+    t.integer   "updated_by"
+    t.string    "name"
+    t.text      "description"
+    t.timestamp "created_at",    :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",    :limit => 6,                                                   :null => false
+    t.decimal   "old_price_per",              :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "new_price_per",              :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "quotations", :force => true do |t|
-    t.boolean  "deleted",                                          :default => false
-    t.boolean  "enabled",                                          :default => true
-    t.string   "name"
-    t.integer  "commodity_id"
-    t.integer  "office_id"
-    t.integer  "routegroup_id"
-    t.string   "transporttype"
-    t.integer  "distance"
-    t.string   "price_per_type"
-    t.datetime "created_at",                                                          :null => false
-    t.datetime "updated_at",                                                          :null => false
-    t.string   "longitude_start"
-    t.string   "latitude_start"
-    t.string   "address_start"
-    t.string   "longitude_end"
-    t.string   "latitude_end"
-    t.string   "address_end"
-    t.decimal  "price_per",         :precision => 19, :scale => 2, :default => 0.0
-    t.text     "description"
-    t.integer  "quotationgroup_id"
+    t.boolean   "deleted",                                                       :default => false
+    t.boolean   "enabled",                                                       :default => true
+    t.string    "name"
+    t.integer   "commodity_id"
+    t.integer   "office_id"
+    t.integer   "routegroup_id"
+    t.string    "transporttype"
+    t.integer   "distance"
+    t.string    "price_per_type"
+    t.timestamp "created_at",        :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",        :limit => 6,                                                   :null => false
+    t.string    "longitude_start"
+    t.string    "latitude_start"
+    t.string    "address_start"
+    t.string    "longitude_end"
+    t.string    "latitude_end"
+    t.string    "address_end"
+    t.decimal   "price_per",                      :precision => 19, :scale => 2, :default => 0.0
+    t.text      "description"
+    t.integer   "quotationgroup_id"
   end
 
   create_table "receiptcontainers", :force => true do |t|
@@ -1207,6 +1281,34 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.integer   "deleteuser_id"
   end
 
+  create_table "receiptstapels", :force => true do |t|
+    t.boolean  "deleted",                                         :default => false
+    t.boolean  "enabled",                                         :default => true
+    t.integer  "invoicestapel_id"
+    t.date     "date"
+    t.datetime "startdate"
+    t.datetime "enddate"
+    t.text     "description"
+    t.integer  "user_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                                                         :null => false
+    t.datetime "updated_at",                                                         :null => false
+    t.decimal  "price_per",        :precision => 19, :scale => 2, :default => 0.0
+    t.decimal  "total",            :precision => 19, :scale => 2, :default => 0.0
+  end
+
+  create_table "receipttaxinvitems", :force => true do |t|
+    t.boolean   "deleted",                    :default => false
+    t.boolean   "enabled",                    :default => true
+    t.integer   "user_id"
+    t.integer   "deleteuser_id"
+    t.integer   "printuser_id"
+    t.date      "printdate"
+    t.timestamp "created_at",    :limit => 6,                    :null => false
+    t.timestamp "updated_at",    :limit => 6,                    :null => false
+    t.date      "billingdate"
+  end
+
   create_table "receipttrains", :force => true do |t|
     t.boolean   "deleted",                                                           :default => false
     t.integer   "trainexpense_id"
@@ -1260,8 +1362,8 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
   end
 
   create_table "routes", :force => true do |t|
-    t.boolean   "deleted",                                                    :default => false
-    t.boolean   "enabled",                                                    :default => true
+    t.boolean   "deleted",                                                     :default => false
+    t.boolean   "enabled",                                                     :default => true
     t.string    "name"
     t.integer   "distance"
     t.string    "price_per_type"
@@ -1269,25 +1371,27 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.text      "description"
     t.integer   "customer_id"
     t.integer   "routegroup_id"
-    t.timestamp "created_at",     :limit => 6,                                                    :null => false
-    t.timestamp "updated_at",     :limit => 6,                                                    :null => false
-    t.decimal   "bonus",                       :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "tol_fee",                     :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "ferry_fee",                   :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "price_per",                   :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "is_train",                                                   :default => false
-    t.boolean   "is_sea",                                                     :default => false
-    t.boolean   "is_isotank",                                                 :default => false
-    t.string    "transporttype",                                              :default => "TRUK"
+    t.timestamp "created_at",      :limit => 6,                                                    :null => false
+    t.timestamp "updated_at",      :limit => 6,                                                    :null => false
+    t.decimal   "bonus",                        :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "tol_fee",                      :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "ferry_fee",                    :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "price_per",                    :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "is_train",                                                    :default => false
+    t.boolean   "is_sea",                                                      :default => false
+    t.boolean   "is_isotank",                                                  :default => false
+    t.string    "transporttype",                                               :default => "TRUK"
     t.string    "pos"
     t.integer   "route_id"
     t.integer   "estimated_hour"
     t.integer   "office_id"
     t.integer   "commodity_id"
-    t.boolean   "kosongan",                                                   :default => false
+    t.boolean   "kosongan",                                                    :default => false
     t.string    "kosongan_type"
-    t.boolean   "project",                                                    :default => false
+    t.boolean   "project",                                                     :default => false
     t.integer   "quotation_id"
+    t.string    "load_province"
+    t.string    "unload_province"
   end
 
   add_index "routes", ["name", "customer_id", "office_id"], :name => "route_office"
@@ -1476,30 +1580,32 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
   end
 
   create_table "taxinvoiceitems", :force => true do |t|
-    t.boolean   "deleted",                                                     :default => false
+    t.boolean   "deleted",                                                          :default => false
     t.date      "date"
     t.string    "sku_id"
-    t.integer   "weight_gross",                                                :default => 0
-    t.integer   "weight_net",                                                  :default => 0
+    t.integer   "weight_gross",                                                     :default => 0
+    t.integer   "weight_net",                                                       :default => 0
     t.text      "description"
     t.integer   "invoice_id"
     t.integer   "customer_id"
     t.integer   "taxinvoice_id"
     t.integer   "office_id"
-    t.timestamp "created_at",      :limit => 6,                                                   :null => false
-    t.timestamp "updated_at",      :limit => 6,                                                   :null => false
-    t.decimal   "price_per",                    :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "total",                        :precision => 19, :scale => 2, :default => 0.0
+    t.timestamp "created_at",           :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",           :limit => 6,                                                   :null => false
+    t.decimal   "price_per",                         :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "total",                             :precision => 19, :scale => 2, :default => 0.0
     t.date      "load_date"
     t.date      "unload_date"
-    t.boolean   "is_wholesale",                                                :default => false
-    t.decimal   "wholesale_price",              :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "is_gross",                                                    :default => false
-    t.boolean   "is_net",                                                      :default => false
+    t.boolean   "is_wholesale",                                                     :default => false
+    t.decimal   "wholesale_price",                   :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "is_gross",                                                         :default => false
+    t.boolean   "is_net",                                                           :default => false
     t.integer   "user_id"
     t.string    "note"
-    t.boolean   "rejected",                                                    :default => false
+    t.boolean   "rejected",                                                         :default => false
     t.string    "reject_reason"
+    t.string    "event_name"
+    t.integer   "receipttaxinvitem_id"
   end
 
   create_table "taxinvoiceitemvs", :force => true do |t|
@@ -1529,18 +1635,18 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
   end
 
   create_table "taxinvoices", :force => true do |t|
-    t.boolean   "deleted",                                                        :default => false
+    t.boolean   "deleted",                                                         :default => false
     t.date      "date"
     t.string    "long_id"
     t.string    "ship_name"
     t.text      "description"
     t.integer   "customer_id"
     t.integer   "office_id"
-    t.timestamp "created_at",         :limit => 6,                                                   :null => false
-    t.timestamp "updated_at",         :limit => 6,                                                   :null => false
-    t.decimal   "total",                           :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "gst_tax",                         :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "price_tax",                       :precision => 19, :scale => 2, :default => 0.0
+    t.timestamp "created_at",          :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",          :limit => 6,                                                   :null => false
+    t.decimal   "total",                            :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "gst_tax",                          :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "price_tax",                        :precision => 19, :scale => 2, :default => 0.0
     t.date      "duedate"
     t.date      "paiddate"
     t.date      "period_start"
@@ -1549,31 +1655,39 @@ ActiveRecord::Schema.define(:version => 20231113071631) do
     t.string    "spk_no"
     t.string    "po_no"
     t.string    "tank_name"
-    t.decimal   "extra_cost",                      :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "extra_cost",                       :precision => 19, :scale => 2, :default => 0.0
     t.text      "extra_cost_info"
     t.text      "total_in_words"
     t.string    "price_by"
     t.boolean   "is_weightlost"
     t.string    "spo_no"
     t.date      "sentdate"
-    t.boolean   "generic",                                                        :default => false
-    t.decimal   "downpayment",                     :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "generic",                                                         :default => false
+    t.decimal   "downpayment",                      :precision => 19, :scale => 2, :default => 0.0
     t.date      "downpayment_date"
     t.string    "so_no"
     t.string    "sto_no"
     t.string    "do_no"
     t.string    "waybill"
     t.date      "confirmeddate"
-    t.float     "gst_percentage",                                                 :default => 0.0
+    t.float     "gst_percentage",                                                  :default => 0.0
     t.text      "remarks"
-    t.decimal   "insurance_cost",                  :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "claim_cost",                      :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "insurance_cost",                   :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "claim_cost",                       :precision => 19, :scale => 2, :default => 0.0
     t.integer   "company_id"
     t.integer   "user_id"
     t.integer   "bank_id"
     t.string    "booking_code"
-    t.decimal   "secondpayment",                   :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "secondpayment",                    :precision => 19, :scale => 2, :default => 0.0
     t.date      "secondpayment_date"
+    t.boolean   "is_showqty_loaded",                                               :default => false
+    t.boolean   "is_showqty_unloaded",                                             :default => false
+    t.decimal   "thirdpayment",                     :precision => 19, :scale => 2, :default => 0.0
+    t.date      "thirdpayment_date"
+    t.decimal   "fourthpayment",                    :precision => 19, :scale => 2, :default => 0.0
+    t.date      "fourthpayment_date"
+    t.boolean   "is_dp",                                                           :default => false
+    t.decimal   "dp_cost",                          :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "tirebudgets", :force => true do |t|
