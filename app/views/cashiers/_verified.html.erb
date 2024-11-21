@@ -179,7 +179,7 @@
 				<%=to_currency(receiptship.shipexpense.total)%>
 			</td>
 			<td><%= receiptship.user.username if !receiptship.user_id.nil? %></td>
-			<td><%= (receipt.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
+			<td><%= (receiptship.created_at).strftime('%d-%m-%Y %H:%M:%S') %></td>
 			<td class="right">
 				<% if current_user.owner %>
 				<%= link_to '&#xf044;'.html_safe, edit_receiptship_path(receiptship), :class => "edit tipsy", :title => 'Edit' %> 
