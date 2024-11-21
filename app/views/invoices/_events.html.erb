@@ -41,9 +41,9 @@
 				type: "GET",
 				url: "/events/getdodetail?event_id=" + event_id + "&train=" + train,
 				success: function(data) {
-					$("#invoice_operator_id").val(data.operator_id).trigger("chosen:updated");
+					$("#invoice_operator_id").val(data.operator_id).trigger("chosen:updated").prop('disabled',true);
           $("#invoice_operator_id").trigger("liszt:updated");
-					$("#invoice_office_id").val(data.office_id).trigger("chosen:updated");
+					$("#invoice_office_id").val(data.office_id).trigger("chosen:updated").prop('disabled',true);
           $("#invoice_office_id").trigger("liszt:updated");
           
           if (data.cargo_type == "padat"){
@@ -67,7 +67,7 @@
 
               $("#invoice_tanktype").val(data.tanktype).trigger("chosen:updated");
               $("#invoice_tanktype").trigger("liszt:updated");
-              $("#invoice_route_id").val(data.route_id).trigger("chosen:updated");
+              $("#invoice_route_id").val(data.route_id).trigger("chosen:updated").prop('disabled',true);
               $("#invoice_route_id").trigger("liszt:updated");
 
               getRouteTrain(data.operator_id);
@@ -78,10 +78,8 @@
             failure: function() {alert("Error. Mohon refresh browser Anda.");}
           });
 
-					
-
           setTimeout(function(){
-            $("#invoice_routetrain_id").val(data.routetrain_id).trigger("chosen:updated");
+            $("#invoice_routetrain_id").val(data.routetrain_id).trigger("chosen:updated").prop('disabled',true);
             $("#invoice_routetrain_id").trigger("liszt:updated");
           }, 2000);
           

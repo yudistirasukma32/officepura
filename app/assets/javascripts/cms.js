@@ -3067,6 +3067,12 @@ $(document).ready(function() {
 	$('#invoice_submit').live('click', function(e) {
 		e.preventDefault();
 
+		//enabled form field
+		$("#invoice_office_id").prop('disabled',false);
+		$("#invoice_operator_id").prop('disabled',false);
+		$("#invoice_route_id").prop('disabled',false);
+		$("#invoice_routetrain_id").prop('disabled',false);
+
 		var errors = "";
 		var form = $(this).closest("form");
 
