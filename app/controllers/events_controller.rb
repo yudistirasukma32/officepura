@@ -5,7 +5,7 @@ class EventsController < ApplicationController
   require 'json'
 	include ApplicationHelper
   include ActionView::Helpers::NumberHelper
-	layout "application", :except => [:getevents, :getestimatedtonage]
+	layout "application", :except => [:getevents, :getestimatedtonage, :resync, :get_unpaid_inv]
   before_filter :authenticate_user!, :set_section
 
   def set_section
@@ -67,6 +67,11 @@ class EventsController < ApplicationController
     @event.start_date = Date.today.strftime('%d-%m-%Y')
     @event.end_date = Date.today.strftime('%d-%m-%Y')
     @isdelete = false
+    
+    @customer = @event.customer
+    @taxinvoice = Taxinvoice.active.where("paiddate is null and customer_id = ?", @event.customer_id)
+    @taxinvoice_total = @taxinvoice.sum(:total)
+
   end
 
   def edit
@@ -75,7 +80,10 @@ class EventsController < ApplicationController
     @event.start_date = @event.start_date.strftime('%d-%m-%Y') if !@event.start_date.blank?
     @event.end_date = @event.end_date.strftime('%d-%m-%Y') if !@event.end_date.blank?
     @isdelete = true
-
+    
+    @customer = @event.customer
+    @taxinvoice = Taxinvoice.active.where("paiddate is null and customer_id = ?", @event.customer_id)
+    @taxinvoice_total = @taxinvoice.sum(:total)
 
     @eventmemos = Eventmemo.active.where('event_id = ?', @event.id)
     @eventcleaningmemos = Eventcleaningmemo.active.where('event_id = ?', @event.id)
@@ -708,7 +716,6 @@ class EventsController < ApplicationController
       updateinvoice_count e.id
       updateinvoiceconfirmed_count e.id
       updateinvoice_taxitems_count e.id
-      invoice_taxinv_count e.id
     end
 
     render :json => { :success => true }
@@ -1137,4 +1144,15 @@ class EventsController < ApplicationController
     redirect_to events_add_dovendor_url
     # render json: data["status"] == 200
   end
+
+  def get_unpaid_inv
+
+    customer_id = params[:customer_id]
+    @customer = Customer.find(customer_id) rescue nil
+    @taxinvoice = Taxinvoice.active.where("paiddate is null and customer_id = ?", customer_id)
+    @taxinvoice_total = @taxinvoice.sum(:total)
+
+    render :json => { :success => true, :html => render_to_string(:partial => "events/unpaid_inv", :layout => false) }.to_json;
+  end
+
 end

@@ -12,9 +12,23 @@
 		<h1><a href="<%=events_path%>">Kalendar Event</a> / Tambah</h1>
 
 		<br class="clearfix" />
+
+		<div id="content" style="width: 60%; float: left;">
 		
 		<%= render "form" %>
+
+		</div>
+
+		<div class="float-left" style="width: 40%; float: left; margin-top: 30px;">
+
+        <div id="event_unpaid_inv" style="display: flex; justify-content: space-between; align-items: center; background: #FFF; padding: 8px;">
+            <%= render "unpaid_inv" %>
+        </div>
+		<br/>
 		
+
+		</div>
+
 		<br class="clearfix" />
 		
 	</div>

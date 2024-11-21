@@ -559,6 +559,19 @@ function getRoutesOnly2(customer_id) {
 		},
 		failure: function() {alert("Error. Mohon refresh browser Anda.");}
 	});
+
+	getunpaidinvoice(customer_id);
+}
+
+function getunpaidinvoice(customer_id){
+	$.ajax({
+		type: "GET",
+		url: "/events/get_unpaid_inv?customer_id=" + customer_id,
+		success: function(data) {
+			$('#event_unpaid_inv').html(data.html);
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
 }
 
 function getRouteTrain(operator_id) {

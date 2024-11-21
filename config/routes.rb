@@ -579,6 +579,7 @@ OfficePuraErp::Application.routes.draw do
   match 'events/version-2' => 'events#version2'
   get 'events/resync' => 'events#resync'
   get 'events/cancelled' => 'events#cancelled'
+  get 'events/get_unpaid_inv' => 'events#get_unpaid_inv'
 
   resources :events do
     collection do

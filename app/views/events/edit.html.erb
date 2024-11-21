@@ -33,6 +33,12 @@
         </div>
 
         <div class="float-left" style="width: 40%; float: left; margin-top: 30px;">
+        <% if checkrole 'Admin Marketing, Piutang Pelanggan' %>
+        <div id="event_unpaid_inv" style="display: flex; justify-content: space-between; align-items: center; background: #FFF; padding: 8px;">
+            <%= render "unpaid_inv" %>
+        </div>
+        <br/>
+        <% end %>
 
         <h2 class="title" style="font-weight: bold;">Memo 
             <span class="button-add" style="text-align: right; float: right;">

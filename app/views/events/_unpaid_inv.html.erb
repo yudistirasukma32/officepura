@@ -1,0 +1,8 @@
+<span style="width: 60%;">
+    <h2 class="title" style="font-weight: bold; margin: 0;">Total Piutang</h2>
+    <span id="event_cust_name" style="font-size:12px; color: grey;"><%= @customer.name rescue 'pilih pelanggan dahulu' %></span>
+</span>
+<span style="text-align: right;">
+    <h2 class="title" style="font-weight: bold; margin: 0;"><%= number_to_currency(@taxinvoice_total, unit: "Rp ", precision: 2, delimiter: ".", separator: ",") %></h2>
+    <span style="font-size:12px; color: grey;"><%= @taxinvoice.count.to_s + ' Invoice Belum Terbayar' %></span>
+</span>
