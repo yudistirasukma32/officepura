@@ -54,7 +54,7 @@
 
 	<% if @section == 'events' %>
 		<li class="<%= @where == 'events' ? 'on' : '' %>"><%= link_to "Kalender Events", "/events" %></li>
-		<li class="<%= @where == 'version-2' ? 'on' : '' %>"><%= link_to link_to_if (checkrole 'Admin Marketing, Marketing'), "Kalender V2 (ujicoba)", "/events/version-2" %></li>
+		<!-- <li class="<%= @where == 'version-2' ? 'on' : '' %>"><%= link_to link_to_if (checkrole 'Admin Marketing, Marketing'), "Kalender V2 (ujicoba)", "/events/version-2" %></li> -->
 		<li class="<%= @where == 'events-cancelled' ? 'on' : '' %>"><%= link_to "DO Ditolak", "/events/cancelled" %></li>
 		
 		<li class="<%= @where == 'bookings' ? 'on' : '' %>"><%= link_to "Kalender OPS", "/bookings" %></li>

@@ -1,0 +1,33 @@
+
+
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>		
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<% if checkrole 'Admin Marketing' %>
+		<a class="print btn" href="<%=new_event_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<% end%>
+		
+        <% if params[:type] %>
+        <h1><a href="<%=events_path%>">Kalendar Event</a> / <a href="<%=events_path + '?type=cancelled' %>">DO Ditolak</a> / Index</h1>
+        <% else %>
+		<h1><a href="<%=events_path%>">Kalendar Event</a> / Index</h1>
+        <% end%>
+
+		<input type="hidden" id="arrayevents" />
+		
+		<br class="clearfix" />
+				
+		<div id='calendar' class='<%=params[:type]%>'></div>
+
+		<br class="clearfix" />
+        
+        <div class="loader main-dashboard d-block" style="margin:3rem auto 0 auto;"></div>
+	</div>
+
+</div>
