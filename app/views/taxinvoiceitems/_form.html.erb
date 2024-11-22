@@ -401,15 +401,15 @@
   <a class="btn right" href="<%=taxinvoiceitems_path({:startdate => $globalStartdate, :enddate => $globalEnddate})%>">Kembali ke Index</a>
 
   <% if !checkroleonly 'Vendor Supir' %>
-    <input type="submit" class="btn right" value="Tambah Data" />
+    <input type="submit" class="btn right" value="Tambah Data" style="font-family: MuseoSans, Helvetica, Arial, sans-serif;"/>
   
     <% if current_user.adminrole || current_user.owner || checkrole = 'Excel' %>
-    <a type="submit" href="/taxinvoiceitems/downloadexcel/<%= params[:invoice_id] %>" class="btn right" style="height: 18px;">Cetak Excel</a>
+    <a type="submit" href="/taxinvoiceitems/downloadexcel/<%= params[:invoice_id] %>" class="btn right" style="height: 15px;">Cetak Excel</a>
     <% end %>
   <% end %>
 
   <% if @invoice.images.any? && (@invoice.taxinvoiceitems.first.receipttaxinvitem_id.blank? rescue false) %>
-    <a href="<%= create_receiptinvoice_receipttaxinvitems_url(invoice_id: params[:invoice_id]) %>" class="btn right" style="height: 18px;">Buat Tanda Terima SJ</a>
+    <a href="<%= create_receiptinvoice_receipttaxinvitems_url(invoice_id: params[:invoice_id]) %>" class="btn right" style="height: 15px;">Buat Tanda Terima SJ</a>
   <% end %>
   
 </div>
