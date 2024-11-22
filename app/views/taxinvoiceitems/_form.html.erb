@@ -352,7 +352,7 @@
 	<tr id="<%=taxinvoiceitem.id%>">
 		<td><%=i+1%>.</td>
     <td><input required type="text" name="taxinvoiceitems[date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
-		<td><input type="text" name="taxinvoiceitems[sku_id_<%=taxinvoiceitem.id%>]" style="width:120px;" class="<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.sku_id%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+		<td><input required type="text" name="taxinvoiceitems[sku_id_<%=taxinvoiceitem.id%>]" style="width:120px;" class="<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.sku_id%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
     <td>
       <%
         default_load_date = 0
@@ -364,7 +364,7 @@
           default_load_date = load_date
         end
       %>
-      <input type="text" name="taxinvoiceitems[load_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=default_load_date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> />
+      <input required type="text" name="taxinvoiceitems[load_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=default_load_date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> />
     </td>
 		<td>
       <%
@@ -377,10 +377,10 @@
           default_weight_gross = taxinvoiceitem.weight_gross
         end
       %>
-      <input type="text" id="weight_gross_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[weight_gross_<%=taxinvoiceitem.id%>]" class="short weight-field<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=default_weight_gross%>" onchange="javascript:getWeightLost('<%=taxinvoiceitem.id%>')" onkeypress="javascript:return isMoneyKey(this);" <% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %>/>
+      <input required type="text" id="weight_gross_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[weight_gross_<%=taxinvoiceitem.id%>]" class="short weight-field<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=default_weight_gross%>" onchange="javascript:getWeightLost('<%=taxinvoiceitem.id%>')" onkeypress="javascript:return isMoneyKey(this);" <% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %>/>
     </td>
-    <td><input type="text" name="taxinvoiceitems[unload_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=unload_date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
-		<td><input type="text" id="weight_net_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[weight_net_<%=taxinvoiceitem.id%>]" class="short weight-field<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.weight_net%>" onchange="javascript:getWeightLost('<%=taxinvoiceitem.id%>')" onkeypress="javascript:return isMoneyKey(this);" <% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+    <td><input required type="text" name="taxinvoiceitems[unload_date_<%=taxinvoiceitem.id%>]" class="short<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% else %> date-picker<% end %>" value="<%=unload_date%>"<% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
+		<td><input required type="text" id="weight_net_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[weight_net_<%=taxinvoiceitem.id%>]" class="short weight-field<% if !taxinvoiceitem.taxinvoice_id.nil? %> none<% end %>" value="<%=taxinvoiceitem.weight_net%>" onchange="javascript:getWeightLost('<%=taxinvoiceitem.id%>')" onkeypress="javascript:return isMoneyKey(this);" <% if !taxinvoiceitem.taxinvoice_id.nil? %> readonly="readonly"<% end %> /></td>
 		<td align="right"><span id="txt_weight_lost_<%=taxinvoiceitem.id%>"><%=taxinvoiceitem.weight_gross - taxinvoiceitem.weight_net%></span></td>
 		<td align="right"><span id="txt_total_<%=taxinvoiceitem.id%>"><%=to_currency_bank(taxinvoiceitem.total)%></span><input type="hidden" id="total_<%=taxinvoiceitem.id%>" name="taxinvoiceitems[total_<%=taxinvoiceitem.id%>]" value="<%=taxinvoiceitem.total%>" /></td>
     <td align="right">
