@@ -39,7 +39,7 @@ class QuotationgroupsController < ApplicationController
     end
 
     all_data = Quotationgroup.where("deleted = false#{additional_query}").select(:id).count()
-    @quotationgroups = Quotationgroup.where("deleted = false#{additional_query} AND status != 'confirmed'").limit(batas).offset(halaman_awal).order("date asc").order("long_id asc")
+    @quotationgroups = Quotationgroup.where("deleted = false#{additional_query} AND status != 'confirmed'").limit(batas).offset(halaman_awal).order("date desc").order("long_id asc")
 
     @total_page = (all_data.to_f / batas.to_f).ceil
     # render json: @quotationgroups.to_sql
@@ -66,7 +66,7 @@ class QuotationgroupsController < ApplicationController
     end
 
     all_data = Quotationgroup.where("deleted = false#{additional_query}").select(:id).count()
-    @quotationgroups = Quotationgroup.where("deleted = false#{additional_query} AND status = 'confirmed'").limit(batas).order("long_id desc")
+    @quotationgroups = Quotationgroup.where("deleted = false#{additional_query} AND status = 'confirmed'").limit(batas).order("date desc").order("long_id desc")
 
     @total_page = (all_data.to_f / batas.to_f).ceil
     # render json: @quotationgroups.to_sql
