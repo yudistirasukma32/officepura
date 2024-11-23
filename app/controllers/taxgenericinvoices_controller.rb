@@ -53,7 +53,7 @@ class TaxgenericinvoicesController < ApplicationController
       if @customer
         romenumber = getromenumber (Date.today.month.to_i)
         @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
-        @long_id = ("%04d" % @long_id.to_s) + ' / INV / RI / ' + romenumber + ' / BAK / ' + Date.today.year.to_s
+        @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / BAK / ' + Date.today.year.to_s
 
         @taxinvoice.long_id = @long_id
       end
