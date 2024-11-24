@@ -1,0 +1,104 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+
+		<h1>Pusat Bantuan / Cari BKK</h1>
+
+		<br class="clearfix" />
+		
+		<div id="filter">
+			<form id="filterform" name="filter" action="" method="get">
+
+				<div class="field-row continue">
+					<label for="date" class="">Cari no #BKK:</label>
+					<input type="text" name="invoice_id" class="half left" value="<%=params[:invoice_id]%>" />
+					<input class="submit" type="submit"  class="" value="Filter" >
+				</div>
+
+			</form>
+		</div>
+
+		<br class="clearfix" />
+ 
+		<% if @invoices.any? %>
+		<table id="reportevent" class="row-view tablesorter sortable tablesorterFilters">
+		<thead>
+			<tr>
+			<th width="30">No.</th>
+			<th width="30">Tgl</th>
+			<th width="250">Keterangan</th>
+            <th width="150">No. DO</th>
+            <th width="40">KTR</th>
+			<th>BKK</th>
+			<th width="75">NO.Pol</th>
+			<th>ISO/KTNR</th>
+			<th width="80" class="right sorter:true, filter: false">Total (Rp.)</th>
+			<th width="50" class="{sorter:false, filter: false}"></th>
+		</tr>
+		</thead>
+		
+		<tbody>
+		<% total_header, driver_allowance_total, helper_allowance_total, gas_allowance_total, misc_allowance_total, tol_fee_total, ferry_fee_total, premi_allowance_total = 0, 0, 0, 0, 0, 0, 0, 0 %>
+		<% @invoices.each_with_index do |invoice, i|
+
+			driver_allowance = invoice.driver_allowance
+			helper_allowance = invoice.helper_allowance
+			gas_allowance = invoice.gas_allowance
+			misc_allowance = invoice.misc_allowance
+			tol_fee = invoice.tol_fee
+			ferry_fee = invoice.ferry_fee
+			premi_allowance = invoice.premi_allowance
+			total = driver_allowance + helper_allowance + gas_allowance + misc_allowance + tol_fee + ferry_fee + premi_allowance
+
+            driver_allowance_total += driver_allowance
+			helper_allowance_total += helper_allowance
+            gas_allowance_total += gas_allowance
+            misc_allowance_total += misc_allowance
+            tol_fee_total += tol_fee
+            ferry_fee_total += ferry_fee
+            premi_allowance_total += premi_allowance
+            total_header += total
+        %>
+		<tr <% if invoice.deleted %>class="deleted" <% end %>  >
+			<td><strong><%= invoice.id %></strong></td>
+			<td><%=invoice.date.strftime('%d/%m/%y')%></td>
+			<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)</td>
+            <td><strong><%=invoice.event.id rescue nil%></strong><br/><%=invoice.event.summary rescue nil%></td>
+            <% if invoice.office.abbr == '' %>
+            <td class="red"><%=invoice.office.abbr%></td>    
+            <% else %>
+            <td><%=invoice.office.abbr%></td>
+            <% end %>
+			<td><%= invoice.invoicetrain ? 'KERETA' : 'TRUK' %></td>
+			<td><%=invoice.vehicle.current_id rescue nil%></td>
+			<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %>
+			<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %></td>
+			<td align="right"><%=to_currency(total)%></td>
+			<td>
+				<% if invoice.deleted %>
+					Deleted
+				<% else %> 
+					<%= link_to '&#xf044;'.html_safe, updatedata_path(invoice), :class => "edit tipsy", :title => 'Update Data' %> 
+					<%= link_to '&#xf00d;'.html_safe, invoice, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+				<% end %>
+			</td>
+		</tr>
+			
+		<% end %>	
+		</tbody>
+		</table>
+		<% else %>
+		<p>Tidak ada data</p>
+ 		<% end %>	
+			
+		<br class="clearfix" />
+
+	</div>
+
+</div>

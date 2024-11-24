@@ -2,7 +2,7 @@ class InvoicesController < ApplicationController
   include ApplicationHelper
   include ActionView::Helpers::NumberHelper
 	layout "application", :except => [:get_routes, :get_allowances, :get_vehicles, :get_vehicle, :get_vehiclegroupid, :get_trainroute, :get_trainroute2, :get_shiproute, :get_shiproute2, :get_routesbyoffice, :get_tanktype]
-  protect_from_forgery :except => [:add, :updateinvoice, :updateaddweight, :updateship, :updatetrain]
+  protect_from_forgery :except => [:add, :updateinvoice, :updateaddweight, :updateship, :updatetrain, :updatedata, :updatedatabkk]
   before_filter :authenticate_user!, :set_section
 
   def set_section
@@ -12,6 +12,31 @@ class InvoicesController < ApplicationController
     @tanktype = ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI']
     @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER STANDART", "KONTAINER OPENSIDE", "MULTIFUNGSI"]
     @tanktypesCair = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK"]
+  end
+
+  def updatedata
+    @section = "helpdesk"
+    @where = "updatedata"
+    @invoice = Invoice.find(params[:invoice_id])
+  end
+
+  def updatedatabkk
+
+    inputs = params[:invoice]
+
+    @invoice = Invoice.find(inputs[:invoice_id])
+
+    @invoice.date = inputs[:date]
+    @invoice.driver_id = inputs[:driver_id]
+    @invoice.vehicle_id = inputs[:vehicle_id]
+    @invoice.route_id = inputs[:route_id]
+    @invoice.isotank_id = inputs[:isotank_id]
+    @invoice.container_id = inputs[:container_id]
+
+    if @invoice.save
+      redirect_to("/search?invoice_id="+@invoice.id.to_s, :notice => 'Data BKK berhasil diupdate.')
+    end
+
   end
 
   def invoice_summary

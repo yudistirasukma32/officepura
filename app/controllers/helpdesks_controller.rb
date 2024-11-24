@@ -4,12 +4,29 @@ class HelpdesksController < ApplicationController
 	before_filter :set_section
 	protect_from_forgery except: [:create, :updateticket]
 	
-  def set_section
-    @section = "helpdesk"
+	def set_section
+		@section = "helpdesk"
 		@where = "helpdesk"
-  end	
+	end
 	
-  def index
+	def search
+		@where = "search"
+
+		invoice_id = params[:invoice_id]
+		@invoices = Invoice.where('id = ?', invoice_id)
+	
+	end
+
+	def searchevents
+
+		@where = "searchevents"
+
+		event_id = params[:event_id]
+		@events = Event.where('id = ?', event_id)
+
+	end
+	
+	def index
 
 		require "uri"
 		require "net/http"
@@ -85,7 +102,7 @@ class HelpdesksController < ApplicationController
 			
 		end
 		
-  end
+	end
 	
 	def edit
 		
@@ -115,7 +132,7 @@ class HelpdesksController < ApplicationController
 		
 	end
 	
-  def show
+	def show
 		
 		require "uri"
 		require "net/http"
@@ -140,14 +157,14 @@ class HelpdesksController < ApplicationController
 		@response = response.read_body
 		
 		@ticket = JSON(@response)['value']
- 
-  end
 	
-  def new
+	end
+	
+	def new
 		
 		@process = 'new'
- 
-  end
+	
+	end
 	
 	def create
 		
@@ -178,7 +195,7 @@ class HelpdesksController < ApplicationController
 		
 	end
 
-  def updateticket
+	def updateticket
 		
 		require "uri"
 		require "net/http"
@@ -211,9 +228,9 @@ class HelpdesksController < ApplicationController
 		request.set_form form_data, 'multipart/form-data'
 		@response = http.request(request)
 #		puts response.read_body
- 
+	
 		redirect_to(helpdesks_url, :notice => 'Data Ticket berhasil diperbarui')
 		
-  end
+	end
 
-end
+end	

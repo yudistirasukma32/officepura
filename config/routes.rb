@@ -288,6 +288,9 @@ OfficePuraErp::Application.routes.draw do
   match 'invoices/add_weight/:invoice_id' => 'invoices#add_weight'
   post 'invoices/updateaddweight/' => 'invoices#updateaddweight'
 
+  match 'invoices/updatedata/:invoice_id' => 'invoices#updatedata', as: 'updatedata'
+  post 'invoices/updatedatabkk/' => 'invoices#updatedatabkk'
+
   #kosonganProduktif
   match 'invoices/kosongan_prod' => 'invoices#kosongan_prod'
   match 'invoices/add_kosongan' => 'invoices#add_kosongan'
@@ -783,6 +786,9 @@ OfficePuraErp::Application.routes.draw do
   end
 
 	match "helpdesks" => "helpdesks#index"
+  match "search" => "helpdesks#search"
+  match "searchevents" => "helpdesks#searchevents"
+
 	match "helpdesks/edit/:id" => "helpdesks#edit"
 	match "helpdesks/show/:id" => "helpdesks#show"
 	match "helpdesks/new" => "helpdesks#new"

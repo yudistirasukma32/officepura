@@ -7,10 +7,14 @@
 <div id="main">
 	
 	<div id="content-full">
+		<% if current_user.owner %>
+		<a class="btn print" href="search"><i class="icon-search"></i> &nbsp;Cari BKK</a>
+		<a class="btn print" href="searchevents"><i class="icon-search"></i> &nbsp;Cari DO</a>
+		<% end %>
 		<a class="btn print" href="helpdesks/new"><i class="icon-plus-sign"></i> &nbsp;Buat Tiket</a>
 		
 		<% if current_user.owner %>
-			<h1>Pusat Bantuan / Semua Support Ticket PURA</h1>
+			<h1>Pusat Bantuan / Semua Support Ticket</h1>
 			<h3><strong><%= @periode %></strong></h3>
 		<% else %>
 			<h1>Pusat Bantuan / Ticket Anda</h1>

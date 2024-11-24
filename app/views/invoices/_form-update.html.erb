@@ -1,0 +1,250 @@
+<% if @invoice %>
+
+
+  <form id="invoice" name="invoice" action="/invoices/updatedatabkk/" method="post">
+
+    <div class="" style="width: 590px; float:left; margin-bottom: 1rem;">
+
+    <div class="field-row">
+      <label for="invoice_date">Tanggal</label>
+      <input type="text" name="invoice[date]" class="half left date-picker" value="<%=@invoice.date.strftime('%d-%m-%Y')%>" />
+      <small>(tgl/bln/thn)</small>
+    </div>
+
+    <div class="field-row">
+      <label for="invoice_vehicle_id">Kendaraan</label>
+      <select id="invoice_vehicle_id" name="invoice[vehicle_id]" class="chzn-select half left combo_route">
+        <option value="">- No Pol -</option>
+        <% Vehicle.active.order(:current_id).each do |vehicle| %>
+        <option value="<%=vehicle.id%>" <%= vehicle.id == @invoice.vehicle_id ? ' selected="selected"' : '' %>><%=vehicle.current_id%></option>
+        <% end %>
+      </select> 
+    </div>
+
+    <div class="field-row">
+      <label for="invoice_driver_id">Driver</label>
+      <select id="invoice_driver_id" name="invoice[driver_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
+        <option value="0">- Supir -</option>
+        <% Driver.active.order(:name).each do |driver| %>
+        <option value="<%=driver.id%>"<%= driver.id == @invoice.driver_id ? ' selected="selected"' : '' %>><%=driver.name%> (<%=zeropad(driver.id)%>)</option>
+        <% end %>
+      </select> 
+    </div>
+
+    <div class="field-row">
+      <label for="route_id">Jurusan</label>
+      <select id="invoice_route_id" name="invoice[route_id]" class="chzn-select double combo_route" onchange="javascript:getAllowances();">
+        <option value="0">- Pilih Jurusan -</option>
+        <% Route.active.where('customer_id = ?', @invoice.customer_id).order(:name).each do |route| %>
+        <option value="<%=route.id%>" <%= route.id == @invoice.route_id ? ' selected="selected"' : '' %>><%=route.name%> (<%=route.routegroup.name rescue ""%>)</option>
+        <% end %>
+      </select>
+      <small>*Jurusan yang ditampilkan diatas berdasarkan Pelanggan.</small>
+    </div>
+
+    <div class="field-row">
+      <label for="invoice_isotank_id">No. Isotank</label> 
+      <select id="invoice_isotank_id" name="invoice[isotank_id]" class="double combo_route chzn-select">
+        <option value="0">- Isotank -</option>
+        <% Isotank.active.each do |isotank| %>
+        <option value="<%=isotank.id%>"<%= isotank.id == @invoice.isotank_id ? ' selected="selected"' : '' %>>
+        <%=isotank.isotanknumber%><% if isotank.category == 'SEWA' %> (SW)<% elsif isotank.category == 'FREEUSE' %> (FR)<%else%> (BL)<%end%></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="field-row">
+      <label for="invoice_container_id">No. Kontainer</label> 
+      <select id="invoice_container_id" name="invoice[container_id]" class="double combo_route chzn-select">
+        <option value="0">- Kontainer -</option>
+        <% Container.active.order(:containernumber).each do |container| %>
+        <option value="<%=container.id%>"<%= container.id == @invoice.container_id ? ' selected="selected"' : '' %>>
+        <%=container.containernumber%><% if container.category == 'SEWA' %> (SW)<% elsif container.category == 'FREEUSE' %> (FR)<%else%> (BL)<%end%></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="field-row continue" style="margin-top: 1.5rem; text-align: right;">
+      <input class="submit" name="commit" style="margin-left: 0;" type="submit" value="Edit Data">
+      <input type="hidden" name="invoice[invoice_id]" value="<%=@invoice.id%>">
+      <br/>
+    </div>
+
+    </div>
+
+  </form>
+
+  <div class="info-box" style="margin-bottom:30px; width:420px; float:left;">  
+
+    <table class="row-view no-border">
+      <tr valign="top">
+        <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+        <td align="right" class="header">Bukti Kas Keluar <%= @invoice.invoicetrain ? "Kereta" : ""%><br/>#<%=zeropad(@invoice.id)%><input type="hidden" id="strInvoiceId" value="#<%=zeropad(@invoice.id)%>" /></td>
+      </tr>
+    </table>
+    <hr style="width:600px;" />
+    <table class="row-view no-border">
+      <tr>
+        <td width="90">Tanggal</td>
+        <td><span id="strDate"><%=@invoice.date.strftime('%d %B %Y')%></span> &nbsp;(KTR: <span id="strOffice"><%=@invoice.office.name%></span>)</td>
+      </tr>
+
+      <tr>
+        <td>Pelanggan</td>
+        <td id="strCustomer"><%=@invoice.customer.name%></td>
+      </tr>
+      <tr>
+        <td>Jurusan</td>
+        <td>
+          <strong><span id="strQty"><%=@invoice.quantity%></span></strong> Rit: <span id="strRoute"><%=@invoice.route.name%></span>
+         </td>
+      </tr>
+      <tr>
+        <td>Tipe</td>
+        <td id="strType"><%=@invoice.route.routegroup.name%></td>
+      </tr>
+
+      <% if @invoice.vehicle_duplicate_id.present? && @invoice.vehicle_duplicate_id != 0 %>
+      <tr>
+        <td>Kendaraan Asli</td>
+        <td>
+          <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+          <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+        </td>
+      </tr>
+      <tr>
+        <td>Kendaraan Jalan/Pinjam</td>
+        <td>
+          <strong><%=@invoice.vehicle_duplicate.current_id%></strong> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+          <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle_duplicate.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+        </td>
+      </tr>
+      <% else %>
+      <tr>
+        <td>Kendaraan</td>
+        <td>
+          <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+          <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+        </td>
+      </tr>
+      <% end %>
+        
+    <% if @invoice.isotank_id != 0 %>
+      <tr>
+        <td>No. Isotank</td>
+        <td id="strIsotank"><%=@invoice.isotank.isotanknumber rescue nil%></td>
+      </tr>
+    <% else %>
+      <% if !@invoice.isotank_number.nil? %>
+        <tr>
+          <td>No. Isotank</td>
+          <td id="strIsotank2"><%=@invoice.isotank_number%></td>
+        </tr>
+      <% end %>
+    <% end %>
+          
+    <% if @invoice.container_id != 0 %>
+      <tr>
+        <td>No. Kontainer</td>
+        <td id="strContainer"><%=@invoice.container.containernumber rescue nil%></td>
+      </tr>
+    <% else %>
+      <% if !@invoice.container_number.nil? %>
+        <tr>
+          <td>No. Kontainer</td>
+          <td id="strContainer2"><%=@invoice.container_number%></td>
+        </tr>
+      <% end %>
+    <% end %>
+
+    <tr>
+      <td>Supir</td>
+      <td>
+        <%=@invoice.driver.name rescue nil%> (<%= zeropad(@invoice.driver.id) rescue nil%>)
+        <% if !@invoice.driver.helpers.first.nil? && @invoice.need_helper %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil %>)<% end %>
+        <input type="hidden" id="strDriver" value="<%=@invoice.driver.name rescue nil%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil%>)<% end %>" />
+      </td>
+    </tr>
+
+    <tr>
+      <td style="padding-top: 1.5rem;">
+        <strong>Kereta</strong>
+      </td>
+    </tr>
+    <tr>
+        <td>Operator</td>
+        <td><%= @invoice.routetrain.operator.name rescue nil %></td>
+    </tr>
+    <tr>
+        <td>Jurusan Kereta</td>
+        <td><%= @invoice.routetrain.name rescue nil %></td>
+    </tr>
+
+    <% if @invoice.event_id %>
+    <tr>
+      <td style="padding-top: 1.5rem;">
+        <strong>Target</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>Tgl Muat</td>
+      <td><%= @invoice.event.load_date.strftime('%d %B %Y') rescue nil %></td>
+    </tr>
+
+    <tr>
+      <td>Tgl Bongkar</td>
+      <td><%= @invoice.event.unload_date.strftime('%d %B %Y') rescue nil %></td>
+    </tr>
+      
+    <% end %>
+
+    <% if @invoice.route.distance.present? %>
+    <tr>
+      <td style="padding-top: 1.5rem;">
+        <strong>Informasi</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>Jarak</td>
+      <td><%= @invoice.route.distance rescue nil %> km</td>
+    </tr>
+    <% end %>
+
+    <% if @invoice.route.routelocation.present? %>
+    <tr>
+      <td>Alamat Muat</td>
+      <td><%= @routelocation.address_start rescue nil %></td>
+    </tr>
+    <tr>
+      <td>Alamat Bongkar</td>
+      <td><%= @routelocation.address_end rescue nil %></td>
+    </tr>
+    <% end %>
+
+    <% if @invoice.transporttype == "Kereta (TOL LAUT)" %>
+
+    <tr>
+      <td>Kereta</td>
+      <td id="strShip"><%=@invoice.ship.name rescue nil%></td>
+    </tr>
+    
+    <tr>
+      <td>Pelabuhan</td>
+      <td id="strPort"><%=@invoice.port.name rescue nil%></td>
+    </tr>
+
+    <% end %>
+
+    <% if !@invoice.description.blank? %>
+      <tr>
+        <td>Keterangan</td>
+        <td id="strDescription"><%= @invoice.description %></td>
+      </tr>   
+      <% end %>     
+    </table>
+
+    <p>Dibuat oleh <strong id="strCreator"><%= @invoice.user_id.nil? ? current_user.username : @invoice.user.username%></strong></p>
+
+  </div>
+
+<% end %>
