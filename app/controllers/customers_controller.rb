@@ -42,6 +42,12 @@ class CustomersController < ApplicationController
     inputs = params[:customer]
     @customer = Customer.new(inputs)
 
+    if inputs[:price_tax] == 'Yes'
+      @customer.price_tax = true
+    else
+      @customer.price_tax = false
+    end
+
     if @customer.save
       redirect_to(edit_customer_url(@customer), :notice => 'Data Pelanggan sukses di tambah.')
     else
@@ -55,6 +61,14 @@ class CustomersController < ApplicationController
     @customer = Customer.find(params[:id])
 
     if @customer.update_attributes(inputs)
+
+      if inputs[:price_tax] == 'Yes'
+        @customer.price_tax = true
+      else
+        @customer.price_tax = false
+      end
+
+
       @customer.save
       redirect_to(edit_customer_url(@customer), :notice => 'Data Pelanggan sukses di simpan.')
     else

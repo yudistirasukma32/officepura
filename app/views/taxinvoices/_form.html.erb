@@ -312,17 +312,24 @@
   <input type="hidden" id="ppn" value="<%= ppn %>"/>    
 <div class="field-row" style="padding-bottom:0px;">
   <label style="color:#000; font-weight:700;">PPN</label>
-  <input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax" value="11" onchange="javascript:changeTaxes();"<% if (@taxinvoice.gst_tax > 0 && @taxinvoice.gst_percentage.to_f == 0) || (@taxinvoice.gst_percentage.to_f == ppn.to_f) %> checked="checked"<% end %> /> &nbsp; PPN 11 &nbsp;
-  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="10" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 10 %> checked="checked"<% end %> /> &nbsp; PPN 10 &nbsp;
-  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1.1" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 1.1 %> checked="checked"<% end %> /> &nbsp; PPN 1,1 &nbsp;
-  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 1 %> checked="checked"<% end %> /> &nbsp; PPN 1 &nbsp;
-  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="0" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 0 && @taxinvoice.gst_tax.to_i == 0 %> checked="checked"<% end %> /> &nbsp; No PPN &nbsp;
-
-
+  <% if @process != 'edit'%>
+  <% @taxinvoice.gst_percentage = Customer.find(params[:customer_id]).gst_percentage.to_f %>
+  <% end %>
+  <input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax" value="11" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 11 %> checked="checked"<% end %> /> &nbsp; PPN 11 &nbsp;
+  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="10" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 10  %> checked="checked"<% end %> /> &nbsp; PPN 10 &nbsp;
+  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1.1" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 1.1   %> checked="checked"<% end %> /> &nbsp; PPN 1,1 &nbsp;
+  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 1  %> checked="checked"<% end %> /> &nbsp; PPN 1 &nbsp;
+  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="0" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 0 && @taxinvoice.gst_tax.to_i == 0 %> checked="checked"<% end %> /> &nbsp; PPN 0 &nbsp;
 </div>
+
 <div class="field-row continue" style="padding-bottom:0px;">
   <label style="color:#000; font-weight:700;">PPH</label>
-  <input type="checkbox" id="chk_price_tax" name="price_tax" value="Yes" onchange="javascript:changeTaxes();" <% if @taxinvoice.price_tax > 0 %> checked="checked"<% end %> /> &nbsp; PPh PASAL 23 2%
+  <% if @process != 'edit'%>
+  <% @taxinvoice.price_tax = Customer.find(params[:customer_id]).price_tax %>
+  <% end %>
+  <input type="checkbox" id="chk_price_tax" name="price_tax" value="Yes" 
+  onchange="javascript:changeTaxes();" <% if @taxinvoice.price_tax > 0 %> checked="checked"<% end %> /> 
+  &nbsp; PPh PASAL 23 (2%)
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">

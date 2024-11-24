@@ -37,7 +37,9 @@
 
   <div class="field-row">
     <%= f.label :city, "Kota" %>
-    <%= f.text_field :city %>
+    <%= f.text_field :city, :class => 'half left' %>
+    <%= f.label :province, "Provinsi", :class => 'middle' %>
+    <%= f.text_field :province, :class => 'half left' %>
   </div>
 
   <div class="field-row">
@@ -86,6 +88,20 @@
     <%= f.label :wholesale_price, "Tarif Borongan" %>
     <%= f.text_field :wholesale_price, :class => 'half', :onkeypress => "javascript:return isNumberKey(this);", :readonly => !current_user.owner %>
     <% if !current_user.owner %>&nbsp; <i class="icon-lock red"></i><% end %>
+  </div>
+
+  <div class="field-row">
+    <label style="">PPN</label>
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="11" <% if (@customer.gst_percentage.to_f == 11 ) %> checked="checked"<% end %> /> &nbsp; PPN 11 &nbsp;
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="10" <% if @customer.gst_percentage.to_f  == 10 %> checked="checked"<% end %> /> &nbsp; PPN 10 &nbsp;
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="1.1" <% if @customer.gst_percentage.to_f  == 1.1 %> checked="checked"<% end %> /> &nbsp; PPN 1,1 &nbsp;
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="1" <% if @customer.gst_percentage.to_f  == 1 %> checked="checked"<% end %> /> &nbsp; PPN 1 &nbsp;
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="0" <% if @customer.gst_percentage.to_f  == 0 && @customer.gst_percentage.to_i == 0 %> checked="checked"<% end %> /> &nbsp; Tanpa PPN &nbsp;
+  </div>
+
+  <div class="field-row">
+    <label style="">PPH</label>
+    <input type="checkbox" id="chk_price_tax" name="customer[price_tax]" value="Yes" <% if @customer.price_tax %> checked="checked"<% end %> /> &nbsp; PPh PASAL 23 (2%)
   </div>
 
   <div class="field-row">
