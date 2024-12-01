@@ -68,6 +68,29 @@ class CustomersController < ApplicationController
         @customer.price_tax = false
       end
 
+      if inputs[:is_weightlost] == 'Yes'
+        @customer.is_weightlost = true
+      else
+        @customer.is_weightlost = false
+      end
+
+      if inputs[:is_showqty_loaded] == 'Yes'
+        @customer.is_showqty_loaded = true
+      else
+        @customer.is_showqty_loaded = false
+      end
+
+      if inputs[:is_showqty_unloaded] == 'Yes'
+        @customer.is_showqty_unloaded = true
+      else
+        @customer.is_showqty_unloaded = false
+      end
+
+      if inputs[:is_rounded] == 'Yes'
+        @customer.is_rounded = true
+      else
+        @customer.is_rounded = false
+      end
 
       @customer.save
       redirect_to(edit_customer_url(@customer), :notice => 'Data Pelanggan sukses di simpan.')

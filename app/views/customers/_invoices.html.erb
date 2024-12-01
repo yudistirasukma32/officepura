@@ -1,0 +1,138 @@
+
+<style>
+
+.danger {
+  background-image: linear-gradient(#e61818, #a61111) !Important;
+  border-color: #a61111 #a61111 #961010 !Important;
+}
+
+.mini {
+  padding: 4px 8px !Important;
+  font-size: 0.75rem !Important;
+}
+
+.update-box img {
+  max-width: 280px;
+  width: 100%;
+}
+
+</style>
+
+<div style="float: left; width: 600px;">
+<p>Setting default untuk profil invoice tagihan saat membuat invoice tagihan baru.</p>
+<%= form_for(@customer) do |f| %>
+  <div class="field-row first">
+    <label style="">PPN</label>
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="11" <% if (@customer.gst_percentage.to_f == 11 ) %> checked="checked"<% end %> /> &nbsp; PPN 11 &nbsp;
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="10" <% if @customer.gst_percentage.to_f  == 10 %> checked="checked"<% end %> /> &nbsp; PPN 10 &nbsp;
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="1.1" <% if @customer.gst_percentage.to_f  == 1.1 %> checked="checked"<% end %> /> &nbsp; PPN 1,1 &nbsp;
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="1" <% if @customer.gst_percentage.to_f  == 1 %> checked="checked"<% end %> /> &nbsp; PPN 1 &nbsp;
+    <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="0" <% if @customer.gst_percentage.to_f  == 0 && @customer.gst_percentage.to_i == 0 %> checked="checked"<% end %> /> &nbsp; Tanpa PPN &nbsp;
+  </div>
+
+  <div class="field-row">
+    <label style="">PPH</label>
+    <input type="checkbox" id="chk_price_tax" name="customer[price_tax]" value="Yes" <% if @customer.price_tax %> checked="checked"<% end %> /> &nbsp; PPh PASAL 23 (2%)
+  </div>
+
+  <div class="field-row" style="padding-bottom:10px;">
+    <label style="">Harga Hitung </label>
+    <input type="radio" id="price_by" name="customer[price_by]" value="is_net" <% if @customer.price_by == 'is_net' %>checked="checked"<% end%> /> &nbsp; Bongkar &nbsp; 
+    <input type="radio" id="price_by" name="customer[price_by]" value="is_gross" <% if @customer.price_by == 'is_gross' %>checked="checked"<% end%>/> &nbsp; Muat &nbsp;
+    <input type="radio" id="price_by" name="customer[price_by]" value="is_wholesale" <% if @customer.price_by == 'is_wholesale' %>checked="checked"<% end%>/> &nbsp; Borongan
+  </div>
+
+  <div class="field-row" style="padding-bottom:10px;">
+    <label style="">+/-</label>
+    <input type="checkbox" id="is_weightlost" name="customer[is_weightlost]" value="Yes" <% if @customer.is_weightlost %> checked="checked"<% end %> /> &nbsp; Tampilkan data susut/selisih saat print invoice &nbsp; 
+  </div>
+
+  <div class="field-row" style="padding-bottom:10px;">
+    <label style="">Qty Muat</label>
+    <input type="checkbox" id="is_showqty_loaded" name="customer[[is_showqty_loaded]" value="Yes" <% if @customer.is_showqty_loaded %> checked="checked"<% end %> /> &nbsp; Tampilkan quantity muat saat print invoice &nbsp; 
+  </div>
+
+  <div class="field-row" style="padding-bottom:10px;">
+    <label style="">Qty Bongkar</label>
+    <input type="checkbox" id="is_showqty_unloaded" name="customer[is_showqty_unloaded]" value="Yes" <% if @customer.is_showqty_unloaded %> checked="checked"<% end %> /> &nbsp; Tampilkan quantity bongkar saat print invoice &nbsp; 
+  </div>
+
+  <div class="field-row" style="padding-bottom:10px;">
+    <label style="line-height: 1.25;">Pembulatan Nominal</label>
+    <input type="checkbox" id="is_rounded" name="customer[is_rounded]" value="Yes" <% if @customer.is_rounded %> checked="checked"<% end %> /> &nbsp; Bulatkan angka - angka yang bernilai Decimal &nbsp; 
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Keuangan, Admin Marketing, Marketing' %>
+    <a class="back left" href="<%=customers_path%>">Kembali ke Index</a>
+  </div>
+<% end %>
+</div>
+
+<% if @process == 'edit' %>
+
+<div class="update-box" style="padding-top: 0; border-top: none;">
+<h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment</h3>
+
+<% if @customer.images.any? %>
+
+<ul style="margin-left: 0; padding-left: 0;">
+
+  <% @customer.images.each do |img| %>
+
+    <% if img.file_uid.present? %>
+
+    <li style="margin-bottom: 2.5rem; list-style: none;">
+
+      <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+
+      <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+      
+        <a href="<%= img.file.url() %>" target="_blank">
+            <%= image_tag img.file.url(:suffix => "/#{img.name}") if img.file_uid %>
+        </a>
+      
+      <% else %>
+      
+        <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid).truncate(40) %></a>
+      
+      <% end %>
+
+      <br /><br /><br /><%= link_to 'Hapus File'.html_safe, '/attachments/remove/'+ img.id.to_s, class: "btn-txt danger mini" %>
+
+      </li>          
+    <% end %>
+
+  <% end %>
+ 
+</ul>
+
+<% end %>
+
+<br />
+
+<form action="/attachments/upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+  <input type="hidden" name="model_name" value="Customer" />
+  <input type="hidden" name="item_id" value="<%=@customer.id%>" />
+
+<div class="field-row" style="width: 300px;">
+  <label for="name">Nama</label>
+  <input type="text" name="attachment[name]" style="width: 300px;"/>
+</div>
+
+<div class="field-row continue" style="width: 300px;">
+  <label for="file">Browse File</label>
+  <input type="file" name="attachment[file]"/>
+</div>
+
+<div class="actions">
+  <input type="submit" value="Simpan File" />
+</div>
+
+</form>
+
+ 
+
+</div>
+
+<% end %>

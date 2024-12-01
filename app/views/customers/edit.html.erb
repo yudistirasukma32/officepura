@@ -17,6 +17,9 @@
 			<% if checkrole 'Admin Jurusan, Admin Marketing, Marketing' %>
 			<li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
 			<% end %>
+			<% if checkrole 'Admin Invoice Tagihan' %>
+			<li><a id="link_<%=tab+=1%>" href="">Data Tagihan</a></li>
+			<% end %>
 		</ul>
 
 		<br class="clearfix" />
@@ -31,6 +34,10 @@
 
 			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
 						<%= render "routes" %>
+			    </div>
+
+				<div class="sliding_tab" id="tab_<%=tab+=1%>">
+						<%= render "invoices" %>
 			    </div>
 
 			</div>

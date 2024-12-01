@@ -11,7 +11,8 @@ class Customer < ActiveRecord::Base
 	attr_accessible :enabled, :name, :address, :city, :contact, :phone, :mobile, :fax, :email,
 					:npwp, :description, :terms_of_payment_in_days, :wholesale_price, :deleted,
 					:email_alt, :load_hour, :unload_hour, :phone2, :phone3, :mobile2, :mobile3,
-					:province, :gst_percentage, :price_tax, :rating
+					:province, :gst_percentage, :price_tax, :rating,
+					:price_by, :is_weightlost, :is_showqty_loaded, :is_showqty_unloaded, :is_rounded
 
 	scope :active, lambda {where(:enabled => true, :deleted => false)}
 
