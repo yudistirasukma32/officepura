@@ -194,6 +194,43 @@ module ApplicationHelper
 
 	end
 
+	def get_customer_estimation customer_id, office_id, startdate, enddate
+
+		offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
+		customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
+
+		startdate = startdate
+		startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if startdate.nil?
+		enddate = enddate
+		enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if enddate.nil?
+
+		total_estimation = 0
+		eventsa = Event.active.where("start_date BETWEEN ? AND ?", startdate.to_date, enddate.to_date).order(:start_date)
+		eventsa = eventsa.includes(:route).where("office_id = ? AND customer_id = ?", office_id, customer_id).map do |event|
+			route = event.route
+			price_per = route.price_per.to_i rescue 0
+			price_per_type = route.price_per_type rescue 'KG'
+			quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
+	
+			quantity = event.qty.to_i rescue 0
+			event_price_per_type = event.price_per_type rescue 'KG'
+			event_tonage = event.estimated_tonage.to_i rescue 0 
+	
+			if price_per >= offset
+			  estimation = quantity * price_per
+			elsif customer_35.include? event.customer_id
+			  estimation = quantity * 20000 * price_per
+			else
+			  estimation = quantity * event_tonage *  price_per
+			end
+
+			total_estimation += estimation
+		end
+
+		return to_currency(total_estimation)
+
+	end
+
 	# def updatecashdailylogold total, date = nil, officecash = 0
 	# 	date = Date.today.strftime('%d-%m-%Y') if date.nil?
 

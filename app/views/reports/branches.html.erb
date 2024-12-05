@@ -152,6 +152,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Estimasi</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -161,6 +162,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= customer.name %></td>
+                                        <td class="right"><%= get_customer_estimation customer.id, 1, @startdate, @enddate %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -168,13 +170,13 @@
                 
                             </table>
 
-
                             <h2>Supir Sidoarjo</h2>
                             <table class="row-view">
                                 <thead>
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Kota</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -184,6 +186,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= driver.name %></td>
+                                        <td><%= driver.city %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -360,6 +363,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Estimasi</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -369,6 +373,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= customer.name %></td>
+                                        <td class="right"><%= get_customer_estimation customer.id, 5, @startdate, @enddate %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -382,6 +387,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Kota</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -391,6 +397,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= driver.name %></td>
+                                        <td><%= driver.city %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -565,6 +572,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Estimasi</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -574,6 +582,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= customer.name %></td>
+                                        <td class="right"><%= get_customer_estimation customer.id, 3, @startdate, @enddate %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -587,6 +596,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Kota</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -596,6 +606,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= driver.name %></td>
+                                        <td><%= driver.city %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -770,6 +781,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Estimasi</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -779,6 +791,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= customer.name %></td>
+                                        <td class="right"><%= get_customer_estimation customer.id, 4, @startdate, @enddate %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -792,6 +805,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Kota</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -801,6 +815,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= driver.name %></td>
+                                        <td><%= driver.city %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -975,6 +990,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Estimasi</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -984,6 +1000,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= customer.name %></td>
+                                        <td class="right"><%= get_customer_estimation customer.id, 2, @startdate, @enddate %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -997,6 +1014,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Kota</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -1006,6 +1024,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= driver.name %></td>
+                                        <td><%= driver.city %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -1180,6 +1199,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Estimasi</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -1189,6 +1209,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= customer.name %></td>
+                                        <td class="right"><%= get_customer_estimation customer.id, 6, @startdate, @enddate %></td>
                                     </tr>
                                 
                                 <% end %>	
@@ -1202,6 +1223,7 @@
                                 <tr> 
                                     <th class="{filter: false, sorter: false}" width="30">NO.</th>
                                     <th class="{filter: false, sorter: false}">Nama</th>
+                                    <th class="{filter: false, sorter: false}">Kota</th>
                                 </tr>
                                 <thead>
                                 <tbody>
@@ -1211,6 +1233,7 @@
                                     <tr>
                                         <td><%= c %></td>
                                         <td><%= driver.name %></td>
+                                        <td><%= driver.city %></td>
                                     </tr>
                                 
                                 <% end %>	
