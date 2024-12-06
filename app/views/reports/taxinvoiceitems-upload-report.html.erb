@@ -96,10 +96,10 @@
 							<% if inv_bongkar.present? %>
 								<% date_check = inv_bongkar.date.to_date %>
 							<% else %>
-								<% date_check = taxinvoiceitem.load_date.to_date %>
+								<% date_check = taxinvoiceitem.load_date.to_date rescue taxinvoiceitem.invoice.date %>
 							<% end %>
 						<% else %>
-							<% date_check = taxinvoiceitem.load_date.to_date %>
+							<% date_check = taxinvoiceitem.load_date.to_date rescue taxinvoiceitem.invoice.date %>
 						<% end %>
 
 						<% if taxinvoiceitem.date.present? && taxinvoiceitem.invoice.images.any? %>
