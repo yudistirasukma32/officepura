@@ -31,7 +31,7 @@
     <td><%= @invoice.office.name rescue nil %></td>
   </tr>
   <tr>
-    <td width="100">Tgl. Bikin</td>
+    <td width="100">Tgl. dibuat</td>
     <td><%=@invoice.created_at.strftime('%d-%m-%Y')%></td>
   </tr>
   <% if @invoice.by_vendor %>
