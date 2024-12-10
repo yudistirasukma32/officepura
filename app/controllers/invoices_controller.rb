@@ -154,7 +154,7 @@ class InvoicesController < ApplicationController
       @date = params[:date]
       @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
       # @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date).order(:id)
-      @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date)
+      @invoices = Invoice.where("date = ? and invoicetrain is false AND kosongan = false", @date.to_date)
 
       cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
@@ -295,7 +295,6 @@ class InvoicesController < ApplicationController
   end
 
   def kosongan_prod
-
     @pagetitle = 'BKK Kosongan Produktif'
     @where = "invoices_kosongan_produktif"
 
@@ -336,9 +335,9 @@ class InvoicesController < ApplicationController
 
       # @invoices = Invoice.where("date = ? and invoicetrain = false and kosongan = true and kosongan_type = 'produktif'", @date.to_date)
 
-      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+      # cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
-      @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
+      # @invoices = @invoices.where("customer_id IN (?)", cust_kosongan).order(:id)
 
       @office_id = params[:office_id]
 
@@ -446,13 +445,23 @@ class InvoicesController < ApplicationController
       @invoice.container_id = @invoice_ori.container_id
 
       respond_to :html
+    elsif params[:is_nonbkk]
+      @gascost = Setting.find_by_name("Harga Solar").value.to_i rescue nil || 0
+      @invoice = Invoice.new
+
+      @iseditable = true
+      @invoice.enabled = true
+      @invoice.date = Date.today
+      @invoice.invoicetrain = true
+
+      respond_to :html
     end
   end
 
   def createkosongan
     # render json: params
     # return false
-    @invoice_ori = Invoice.find(params[:invoice_id])
+    @invoice_ori = Invoice.find(params[:invoice_id]) rescue nil
     @invoice = Invoice.new(params[:invoice])
     @invoice.driver_allowance = params[:invoice][:driver_allowance].delete('.')
     @invoice.helper_allowance = params[:invoice][:helper_allowance].delete('.')
@@ -466,23 +475,26 @@ class InvoicesController < ApplicationController
 
     @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
 
-    if @taxinvoiceitem.blank?
+    if @taxinvoiceitem.blank? && @invoice_ori
       @taxinvoiceitem = Taxinvoiceitem.new
       @taxinvoiceitem.customer_id = @invoice_ori.customer_id
       @taxinvoiceitem.office_id = @invoice_ori.office_id
       @taxinvoiceitem.price_per = @invoice_ori.route.price_per.to_i
     end
 
-    @taxinvoiceitem.sku_id = params[:sku_id]
-    @taxinvoiceitem.weight_gross = params[:weight_gross]
-    @taxinvoiceitem.weight_net = params[:weight_net]
-    @taxinvoiceitem.invoice_id = params[:invoice_id]
-    @taxinvoiceitem.total = params[:weight_net].to_i * @invoice_ori.route.price_per.to_f
-    @taxinvoiceitem.load_date = params[:load_date].to_date
-    @taxinvoiceitem.unload_date = params[:unload_date].to_date
-    @taxinvoiceitem.user_id = current_user.id
+    if @invoice_ori
+      @taxinvoiceitem.sku_id = params[:sku_id]
+      @taxinvoiceitem.weight_gross = params[:weight_gross]
+      @taxinvoiceitem.weight_net = params[:weight_net]
+      @taxinvoiceitem.invoice_id = params[:invoice_id]
+      @taxinvoiceitem.total = params[:weight_net].to_i * @invoice_ori.route.price_per.to_f
+      @taxinvoiceitem.load_date = params[:load_date].to_date
+      @taxinvoiceitem.unload_date = params[:unload_date].to_date
+      @taxinvoiceitem.user_id = current_user.id
 
-    @taxinvoiceitem.save
+      @taxinvoiceitem.save
+    end
+
     @invoice.save
 
     redirect_to("/invoices/kosongan_prod")

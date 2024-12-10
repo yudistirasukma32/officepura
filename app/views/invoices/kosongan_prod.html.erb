@@ -67,7 +67,7 @@
 				<% if current_user.adminrole %>
 				<tr class="deleted">
 					<td><%=zeropad(invoice.id) %></td>
-					<td><%=zeropad(invoice.kosongan_previous_invoice_id) if invoice.kosongan_previous_invoice_id.present? %></td>
+					<td><%= invoice.kosongan_previous_invoice_id.present? ? zeropad(invoice.kosongan_previous_invoice_id) : 'Tanpa SJ' %></td>
 					<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
 					<% if invoice.by_vendor %>
 						<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
@@ -129,7 +129,7 @@
 			<% else %>
 			<tr>
 				<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice) %></td>
-				<td><%=zeropad(invoice.kosongan_previous_invoice_id) if invoice.kosongan_previous_invoice_id.present? %></td>
+				<td><%= invoice.kosongan_previous_invoice_id.present? ? zeropad(invoice.kosongan_previous_invoice_id) : 'Tanpa SJ' %></td>
 				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> 
 				<% if invoice.by_vendor %>
 					<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>

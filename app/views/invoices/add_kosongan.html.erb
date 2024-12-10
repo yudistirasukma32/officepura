@@ -17,19 +17,24 @@
 				<div class="field-row continue">
 					<label for="invoice_id">No. BKK</label>
 					<input type="text" name="invoice_id" class="half left" value="<%= params[:invoice_id] %>" style="margin-right:10px;" />
-					<input type="submit" class="submit" value="Cari BKK" />    
+					<input type="submit" class="submit" value="Cari BKK" />   
+					<a href="/invoices/add_kosongan/?is_nonbkk=true" class="btn">Produktif Tanpa SJ</a> 
 				</div>
 			</form>
 		</div>
 
-		<% if @invoice_ori.present? && @have_kosongan.blank? && @have_receipt.present? %>
+		<% if @invoice_ori.present? && @have_kosongan.blank? && @have_receipt.present? || params[:is_nonbkk] %>
 			<div style="background: #fff; padding: 1rem 1rem 0;">
 				<strong>Perhatian.</strong>
-				<p>Anda membuat <strong>BKK Kosongan (Produktif)</strong> dari BKK Sebelumnya
-				<a href="../../invoices/<%=@invoice_ori.id%>/edit" target="_blank" style="text-decoration: underline; color: #2c92b3;"><strong>#<%= @invoice_ori.id %></strong></a> 
-				(No. Do <%= @invoice_ori.event_id %>)
-				<%= @invoice_ori.route.name %>
-				</p>
+				<% if params[:is_nonbkk].blank? %>
+					<p>Anda membuat <strong>BKK Kosongan (Produktif)</strong> dari BKK Sebelumnya
+					<a href="../../invoices/<%=@invoice_ori.id%>/edit" target="_blank" style="text-decoration: underline; color: #2c92b3;"><strong>#<%= @invoice_ori.id %></strong></a> 
+					(No. Do <%= @invoice_ori.event_id %>)
+					<%= @invoice_ori.route.name %>
+					</p>
+				<% else %>
+					<p>Anda membuat BKK Kosongan (Produktif) tanpa SJ / BKK sebelumnya</p>
+				<% end %>
 			</div>
 
 			<br class="clearfix" />

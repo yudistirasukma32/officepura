@@ -2,30 +2,32 @@
   
   <%= render "info-box", :f => f %>
 
-  <h2 style="font-weight:bold">Surat Jalan BKK Sebelumnya</h2>
-  <div class="field-row first" style="float: none">
-    <label for="sku_id">No. Surat Jalan</label>
-    <input type="text" id="sku_id" class="double" name="sku_id" value="<%= @taxinvoiceitem.sku_id rescue nil %>" />
-  </div>
+  <% if params[:is_nonbkk].blank? %>
+    <h2 style="font-weight:bold">Surat Jalan BKK Sebelumnya</h2>
+    <div class="field-row first" style="float: none">
+      <label for="sku_id">No. Surat Jalan</label>
+      <input type="text" id="sku_id" class="double" name="sku_id" value="<%= @taxinvoiceitem.sku_id rescue nil %>" />
+    </div>
 
-  <div class="field-row" style="float:none; margin-bottom:1.5rem;">
-    <label for="load_date">Tgl Muat</label>
-    <input class="half left date-picker" id="load_date" name="load_date" type="text" value="<%= @taxinvoiceitem.load_date.strftime('%d-%m-%Y') rescue nil %>">
-    <label for="unload_date" class="middle">Tgl Bongkar</label>
-    <input class="half left date-picker" id="unload_date" name="unload_date" type="text" value="<%= @taxinvoiceitem.unload_date.strftime('%d-%m-%Y') rescue nil %>">
-  </div>
+    <div class="field-row" style="float:none; margin-bottom:1.5rem;">
+      <label for="load_date">Tgl Muat</label>
+      <input class="half left date-picker" id="load_date" name="load_date" type="text" value="<%= @taxinvoiceitem.load_date.strftime('%d-%m-%Y') rescue nil %>">
+      <label for="unload_date" class="middle">Tgl Bongkar</label>
+      <input class="half left date-picker" id="unload_date" name="unload_date" type="text" value="<%= @taxinvoiceitem.unload_date.strftime('%d-%m-%Y') rescue nil %>">
+    </div>
 
-  <div class="field-row" style="float: none">
-    <label for="weight_gross">Muat</label>
-    <input class="half left" id="weight_gross" name="weight_gross" type="text" value="<%= @taxinvoiceitem.weight_gross rescue nil %>">
-    <label for="weight_net" class="middle">Bongkar</label>
-    <input class="half left" id="weight_net" name="weight_net" type="text" value="<%= @taxinvoiceitem.weight_net rescue nil %>">
-  </div>
+    <div class="field-row" style="float: none">
+      <label for="weight_gross">Muat</label>
+      <input class="half left" id="weight_gross" name="weight_gross" type="text" value="<%= @taxinvoiceitem.weight_gross rescue nil %>">
+      <label for="weight_net" class="middle">Bongkar</label>
+      <input class="half left" id="weight_net" name="weight_net" type="text" value="<%= @taxinvoiceitem.weight_net rescue nil %>">
+    </div>
 
-  <br>
-  <br>
-  <hr>
-  <h2 style="font-weight:bold">BKK Kosongan Produktif</h2>
+    <br>
+    <br>
+    <hr>
+    <h2 style="font-weight:bold">BKK Kosongan Produktif</h2>
+  <% end %>
 
   <div class="field-row first">
     <%= f.label :office_id, "Kantor" %>
@@ -92,7 +94,7 @@
             <%= f.radio_button :invoicetrain, false, :checked => true , data: {behavior: "toggle-standart"}  %> Standart
           <% end %>
           <%= f.label :invoicetrain, :value => "true", :class => 'checkbox' do %>
-            <%= f.radio_button :invoicetrain, true, data: {behavior: "toggle-train"} %> Kereta
+            <%= f.radio_button :invoicetrain, true, :checked => false, :disabled => true, data: {behavior: "toggle-train"} %> Kereta
           <% end %>
       <% end %>
 
@@ -107,18 +109,17 @@
         <%= f.radio_button :invoicetrain, true, :disabled => true, :checked => false %> Kereta
       <% end %>
     </div>
-
-      <%= f.hidden_field :kosongan, :value => true %>
-      <%= f.hidden_field :kosongan_type, :value => 'produktif' %>
-      <%= f.hidden_field :kosongan_confirmed, :value => true %>
-      <%= f.hidden_field :kosongan_previous_invoice_id, :value => @invoice_ori.id %>
-      <%= f.hidden_field :vehicle_id, :value => @invoice_ori.vehicle_id %>
-      <%= f.hidden_field :driver_id, :value => @invoice_ori.driver_id %>
-      <%= f.hidden_field :isotank_id, :value => @invoice_ori.isotank_id %>
-      <%= f.hidden_field :container_id, :value => @invoice_ori.container_id %>
-      <input type="hidden" name="invoice_id" value="<%= params[:invoice_id] %>">
+    <%= f.hidden_field :kosongan_confirmed, :value => true %>
+    <%= f.hidden_field :kosongan_previous_invoice_id, :value => @invoice_ori.id %>
+    <%= f.hidden_field :vehicle_id, :value => @invoice_ori.vehicle_id %>
+    <%= f.hidden_field :driver_id, :value => @invoice_ori.driver_id %>
+    <%= f.hidden_field :isotank_id, :value => @invoice_ori.isotank_id %>
+    <%= f.hidden_field :container_id, :value => @invoice_ori.container_id %>
+    <input type="hidden" name="invoice_id" value="<%= params[:invoice_id] %>">
 
   <% end %>
+  <%= f.hidden_field :kosongan, :value => true %>
+  <%= f.hidden_field :kosongan_type, :value => 'produktif' %>
 
   <div class="field-row">
   <%= f.label :cargo_type, "Tipe Kargo" %>
@@ -144,33 +145,42 @@
 
       <% end %>
 
-  <% else %>
+  <% elsif params[:is_nonbkk].blank? %>
+    <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+    <%
+      if @invoice_ori.cargo_type == "padat" 
+        @checked_padat = true
+        @checked_cair = false
+      else
+        @checked_cair = true
+        @checked_padat = false
+      end
+    %>
+    <%= f.radio_button :cargo_type, "padat", :checked => @checked_padat, :disabled => @checked_cair %> Padat
+    <% end %>
+    <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+    <%= f.radio_button :cargo_type, "cair", :checked => @checked_cair, :disabled => @checked_padat %> Cair
+    <% end %>
 
-      <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
-        <%
-        if @invoice_ori.cargo_type == "padat" 
-          @checked_padat = true
-          @checked_cair = false
-        else
-          @checked_cair = true
-          @checked_padat = false
-        end
-        %>
-        <%= f.radio_button :cargo_type, "padat", :checked => @checked_padat, :disabled => @checked_cair %> Padat
-      <% end %>
-      <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
-        <%= f.radio_button :cargo_type, "cair", :checked => @checked_cair, :disabled => @checked_padat %> Cair
-      <% end %>
+  <% else %>
+    <%= f.label :cargo_type, :value => "padat", :class => 'checkbox' do %>
+    <%= f.radio_button :cargo_type, "padat", :checked => true %> Padat
+    <% end %>
+    <%= f.label :cargo_type, :value => "cair", :class => 'checkbox' do %>
+    <%= f.radio_button :cargo_type, "cair" %> Cair
+    <% end %>
 
   <% end %>
 
 </div>
 
-<% if active_node == "edit" %>
+<% if active_node == "edit" || params[:is_nonbkk] %>
 
-  <div class="field-row">
-    <%= f.label :tanktype, "Tipe Tangki"  %>
-    <input type="text" class="double disabled" value="<%= !@invoice.tanktype.nil? ? @invoice.tanktype : 'Harap memilih Tipe Kargo terlebih dahulu.' %>" />
+  <div id="div_tanktype">
+    <div class="field-row">
+      <%= f.label :tanktype, "Tipe Tangki"  %>
+      <input type="text" class="double disabled" value="<%= !@invoice.tanktype.nil? ? @invoice.tanktype : 'Harap memilih Tipe Kargo terlebih dahulu.' %>" />
+    </div>
   </div>
 
 <% else %>
@@ -184,7 +194,8 @@
 <% end %>
 
   <% 
-    @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%RDPI%' OR name LIKE '%PURA%' OR name LIKE '%INTI'").order(:name) 
+    # @customers = Customer.where(:enabled => true, :deleted => false).where("name LIKE '%RDPI%' OR name LIKE '%PURA%' OR name LIKE '%INTI'").order(:name)
+    @customers = Customer.active.order(:name)
   %>
   
   <% if !@customers.first.nil? %>
@@ -197,7 +208,7 @@
       <option value="0">- Pelanggan -</option>
       <% @customers.each do |customer| %>
       <option value="<%=customer.id%>"
-        <% if customer.id == @invoice.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase%></option>
+        <% if customer.id == @invoice.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase rescue nil%></option>
       <% end %>
     </select>
     <% else %>
@@ -231,7 +242,7 @@
     <select id="invoice_vehicle_id" name="invoice[vehicle_id]" class="chzn-select half left combo_route" onchange="javascript:getAllowances();">
       <option value="0">- No Pol -</option>
       <% Vehicle.active.order(:current_id).each do |vehicle| %>
-      <option value="<%=vehicle.id%>"<%= vehicle.id == @invoice_ori.vehicle_id ? ' selected="selected"' : '' %>><%=vehicle.current_id%></option>
+      <option value="<%=vehicle.id%>"<%= vehicle.id == (@invoice_ori.vehicle_id rescue nil) ? ' selected="selected"' : '' %>><%=vehicle.current_id%></option>
       <% end %>
     </select>  
     <% else %>
@@ -246,7 +257,7 @@
     <select id="invoice_driver_id" name="invoice[driver_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
       <option value="0">- Supir -</option>
       <% Driver.active.order(:name).each do |driver| %>
-      <option value="<%=driver.id%>"<%= driver.id == @invoice_ori.driver_id ? ' selected="selected"' : '' %>><%=driver.name%> (<%=zeropad(driver.id)%>)</option>
+      <option value="<%=driver.id%>"<%= driver.id == (@invoice_ori.driver_id rescue nil) ? ' selected="selected"' : '' %>><%=driver.name%> (<%=zeropad(driver.id)%>)</option>
       <% end %>
     </select> 
     <%#= f.select :driver_id, options_for_select(Driver.active.order(:name).collect {|g| [g.name, g.id]}, @invoice.driver_id), {:include_blank => '- Supir -'}, :class => 'double chzn-select' %>
