@@ -62,6 +62,22 @@
     <input type="checkbox" id="is_rounded" name="customer[is_rounded]" value="Yes" <% if @customer.is_rounded %> checked="checked"<% end %> /> &nbsp; Bulatkan angka - angka yang bernilai Decimal &nbsp; 
   </div>
 
+  <div class="field-row" style="padding-bottom:10px;">
+    <label for="bank_id" class="half left">BANK</label>
+    <select id="bank_id" name="customer[bank_id]" class="double chzn-select">
+    <option value="0">- Pilih Bank -</option>
+    <% Bank.active.order(:id).each do |bank| %>
+    <option value="<%=bank.id%>"
+      <% if bank.id == @customer.bank_id %> selected="selected"<% end %>><%=bank.name%> (<%=bank.bank_account_number%>)</option>
+    <% end %>
+    </select>
+  </div>
+
+  <div class="field-row" style="padding-bottom:10px;">
+    <label for="memo" class="half left">Memo</label>
+    <input type="text" class="double left" id="memo" name="customer[memo]" value="<%=@customer.memo%>" /> 
+  </div>
+
   <div class="actions">
     <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Keuangan, Admin Marketing, Marketing' %>
     <a class="back left" href="<%=customers_path%>">Kembali ke Index</a>

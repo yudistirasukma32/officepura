@@ -262,6 +262,10 @@
 </div>
 
 <div class="field-row" style="padding: 15px 0 0;">
+  <% if @process != 'edit'%>
+  <% @taxinvoice.bank_id = Customer.find(params[:customer_id]).bank_id %>
+  <% end %>
+
   <label for="bank_id" class="half left">BANK</label>
   <select id="" name="bank_id" class="double chzn-select">
   <option value="0">- Pilih Bank -</option>
@@ -273,6 +277,9 @@
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
+  <% if @process != 'edit'%>
+  <% @taxinvoice.extra_cost_info = Customer.find(params[:customer_id]).memo %>
+  <% end %>
   <label for="extra_cost_info" class="half left">Memo</label>
   <input type="text" class="double left" id="taxinvoice_extra_cost_info" name="extra_cost_info" value="<%=@taxinvoice.extra_cost_info%>" /> 
 </div>
