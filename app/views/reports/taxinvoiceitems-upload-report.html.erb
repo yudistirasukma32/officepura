@@ -1,3 +1,9 @@
+<style>
+table {
+	font-size: 12px;
+}
+</style>
+
 <%= render "shared/header" %>
 
 <div id="nav">
@@ -58,6 +64,8 @@
 
 			<tbody>
 			<% total = i = 0 %>
+			<% total_late_upload = 0 %>
+			<% total_late_receive = 0 %>
 			<% @taxinvoiceitems.includes(:receipttaxinvitem, :invoice, :taxinvoice).each do |taxinvoiceitem| %>
 				<% if taxinvoiceitem.total > 0 %>
 				<% total += taxinvoiceitem.total %>
@@ -106,7 +114,8 @@
 							<% if (img.created_at.to_date - date_check).to_i <= offset %>
 								<% status = 'On Time' %>
 							<% else %>
-								<% status = 'Terlambat' %>
+								<% status = 'Terlambat'
+								total_late_upload += 1%>
 							<% end %>
 						<% end %>
 
@@ -120,19 +129,58 @@
 						</span>
 
 					</td>
-					<td><%= taxinvoiceitem.receipttaxinvitem.created_at.strftime('%d/%m') rescue nil %></td>
+					<td class="center" align="center">
+						
+						<%= taxinvoiceitem.receipttaxinvitem.created_at.strftime('%d/%m') rescue nil %>
+
+						<% offset = 7 %>
+
+						<% if taxinvoiceitem.invoice.invoicetrain %>
+							<% inv_bongkar = Invoice.active.where('invoice_id = ?', taxinvoiceitem.invoice_id).first %>
+							<% if inv_bongkar.present? %>
+								<% date_check = inv_bongkar.date.to_date %>
+							<% else %>
+								<% date_check = taxinvoiceitem.load_date.to_date rescue taxinvoiceitem.invoice.date %>
+							<% end %>
+						<% else %>
+							<% date_check = taxinvoiceitem.load_date.to_date rescue taxinvoiceitem.invoice.date %>
+						<% end %>
+
+						<% if taxinvoiceitem.receipttaxinvitem.present? %>
+							<% if (taxinvoiceitem.receipttaxinvitem.created_at.to_date - date_check).to_i <= offset %>
+								<% status = 'On Time' %>
+							<% else %>
+								<% status = 'Terlambat'
+								total_late_receive += 1%>
+							<% end %>
+						<% else %>
+							<% status = '' %>
+						<% end %>
+
+						<br/>
+						<span style="color: <%= status != 'On Time' ? 'red' : 'green' %>">
+						<%= status %>
+						</span>
+					
+					</td>
 				</tr>
 				<% end %>				
 			<% end %>
 
 			</tbody>
+			<tr class="footer">
+				<td class="" colspan="15"><i><span style="font-size: 11px;"><%= total_late_upload %> SJ Terlambat Diupload, <%= total_late_receive %> SJ Terlambat Diterima</span></i></td>
+			</tr>
 		</table>
 
 		<br>
 		<small>
 		Acuan Tepat Waktu (on time): <br>
+
 		Truk: max upload 5 hari dari tanggal muat di SJ.<br>
 		Kereta: max upload 5 hari dari tanggal BKK kereta bongkar (BKK ke-2)<br>
+		Tanggal Terima: max 7 hari tanggal BKK
+		<br>
 
 		* = Tanggal BKK Kereta Bongkar
 		</small>

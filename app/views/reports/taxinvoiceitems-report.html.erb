@@ -1,3 +1,9 @@
+<style>
+table {
+	font-size: 12px;
+}
+</style>
+
 <%= render "shared/header" %>
 
 <div id="nav">
@@ -41,8 +47,8 @@
 		<table class="row-view report-view">
 			<thead>
 				<tr>
-					<th width="30">No.</th>
-					<th width="80">No. DO</th>
+					<th width="20">No.</th>
+					<th width="70">No. DO</th>
 					<th width="80">Tgl BKK</th>
 					<th width="300">Keterangan</th>
 					<th width="80">Nopol</th>
@@ -52,11 +58,20 @@
 					<th width="60">Tgl Terima</th>
 					<th width="60">Penagihan Terima</th>
 					<th width="300">INV Tagihan</th>
+					<th width="60">Tgl Buat Inv</th>
+					<th width="60">Tgl Kirim Inv</th>
 					<!-- <th width="80" class="right">Total</th> -->
 				</tr>
 			</thead>
 
 			<tbody>
+			<% offset = 7 %>
+			<% offset_sent = 10 %>
+			<% total_late_upload = 0 %>
+			<% total_late_receive = 0 %>
+			<% total_late = 0 %>
+			<% total_late_send = 0 %>
+			<% total_draft = 0 %>
 			<% total = i = 0 %>
 			<% @taxinvoiceitems.includes(:receipttaxinvitem, :invoice, :taxinvoice).each do |taxinvoiceitem| %>
 				<% if taxinvoiceitem.total > 0 %>
@@ -64,7 +79,13 @@
 				<tr id="<%=taxinvoiceitem.id%>">
 					<td><%=i+=1%>.</td>
 					<td><a style="font-weight: bolder;" href="/events/<%=taxinvoiceitem.invoice.event_id rescue nil%>/edit"><%=taxinvoiceitem.invoice.event_id rescue nil %></a></td>
-					<td><%=taxinvoiceitem.invoice.date.strftime('%d/%m') rescue nil %></td>
+					<td>
+						<%=taxinvoiceitem.invoice.date.strftime('%d/%m') rescue nil %>
+						<% if taxinvoiceitem.invoice.invoicetrain %>
+						<br/>
+						<span style="color: grey;">*<%= inv_bongkar = Invoice.active.where('invoice_id = ?', taxinvoiceitem.invoice_id).first.date.strftime('%d/%m') rescue 'Belum ada BKK Bongkar'%></span>
+						<% end %>	
+						</td>
 					<td>
 						<a style="font-weight: bolder;" href="/taxinvoiceitems/new/<%= taxinvoiceitem.invoice_id %>" target="_blank">#<%=taxinvoiceitem.invoice_id %></a><br/>
 						<%=taxinvoiceitem.invoice.route.name rescue nil %><br/>
@@ -73,22 +94,127 @@
 					<td><%=taxinvoiceitem.invoice.vehicle.current_id rescue nil %> </td>
 					<td><%=taxinvoiceitem.sku_id %> </td>
 					<td><%=taxinvoiceitem.date.strftime('%d/%m') rescue nil %> </td>
-					<td>
+					<td class="center" align="center">
 						<% if taxinvoiceitem.invoice.images.any? %>
 						<% img = taxinvoiceitem.invoice.images.reorder(:created_at).first %>
 						<%= img.created_at.strftime('%d/%m') rescue nil %>
 						<% else %>
 						belum upload
 						<% end %>
+
+						<% offset = 5 %>
+
+						<% if taxinvoiceitem.invoice.invoicetrain %>
+							<% inv_bongkar = Invoice.active.where('invoice_id = ?', taxinvoiceitem.invoice_id).first %>
+							<% if inv_bongkar.present? %>
+								<% date_check = inv_bongkar.date.to_date %>
+							<% else %>
+								<% date_check = taxinvoiceitem.load_date.to_date rescue taxinvoiceitem.invoice.date %>
+							<% end %>
+						<% else %>
+							<% date_check = taxinvoiceitem.load_date.to_date rescue taxinvoiceitem.invoice.date %>
+						<% end %>
+
+						<% if taxinvoiceitem.date.present? && taxinvoiceitem.invoice.images.any? %>
+							<% if (img.created_at.to_date - date_check).to_i <= offset %>
+								<% status = 'On Time' %>
+							<% else %>
+								<% status = 'Terlambat'
+								total_late_upload += 1%>
+							<% end %>
+						<% end %>
+
+						<% if taxinvoiceitem.invoice.invoicetrain && !inv_bongkar.present? %>
+							<% status = 'Belum ada BKK Bongkar' %>
+						<% end %>
+
+						<br/>
+						<span style="color: <%= status != 'On Time' ? 'red' : 'green' %>">
+						<%= status %>
+						</span>
+
 					</td>
-					<td><%= taxinvoiceitem.receipttaxinvitem.created_at.strftime('%d/%m') rescue nil %></td>
+					<td class="center" align="center">
+						
+						<%= taxinvoiceitem.receipttaxinvitem.created_at.strftime('%d/%m') rescue nil %>
+
+						<% offset = 7 %>
+
+						<% if taxinvoiceitem.invoice.invoicetrain %>
+							<% inv_bongkar = Invoice.active.where('invoice_id = ?', taxinvoiceitem.invoice_id).first %>
+							<% if inv_bongkar.present? %>
+								<% date_check = inv_bongkar.date.to_date %>
+							<% else %>
+								<% date_check = taxinvoiceitem.load_date.to_date rescue taxinvoiceitem.invoice.date %>
+							<% end %>
+						<% else %>
+							<% date_check = taxinvoiceitem.load_date.to_date rescue taxinvoiceitem.invoice.date %>
+						<% end %>
+
+						<% if taxinvoiceitem.receipttaxinvitem.present? %>
+							<% if (taxinvoiceitem.receipttaxinvitem.created_at.to_date - date_check).to_i <= offset %>
+								<% status = 'On Time' %>
+							<% else %>
+								<% status = 'Terlambat'
+								total_late_receive += 1%>
+							<% end %>
+						<% else %>
+							<% status = '' %>
+						<% end %>
+
+						<br/>
+						<span style="color: <%= status != 'On Time' ? 'red' : 'green' %>">
+						<%= status %>
+						</span>
+					
+					</td>
 					<td><%= taxinvoiceitem.receipttaxinvitem.billingdate.strftime('%d/%m') rescue nil %></td>
 					<td>
 						<% if taxinvoiceitem.taxinvoice %>
-						<%= taxinvoiceitem.taxinvoice.date.strftime('%d/%m/%Y') %><br/>
-						<%= taxinvoiceitem.taxinvoice.long_id %> 
-						<%else%> belum inv
+						<strong><%= taxinvoiceitem.taxinvoice.customer.name rescue nil %></strong><br/>
+						<%= taxinvoiceitem.taxinvoice.long_id %><br/> 
+						<span style="color: grey;"><%= taxinvoiceitem.taxinvoice.date.strftime('%d/%m/%Y') %></span>
+						<%else%> Belum Inv
 						<%end%> 
+					</td>
+					<td class="center" align="center">
+						<%= taxinvoiceitem.taxinvoice.created_at.strftime('%d/%m') rescue nil %>
+						<% if taxinvoiceitem.taxinvoice.present? && taxinvoiceitem.taxinvoice.present? %>
+						<% if (taxinvoiceitem.taxinvoice.created_at.to_date - taxinvoiceitem.invoice.date).to_i <= offset %>
+							<% status = 'On Time' %>
+						<% else %>
+							<% status = 'Terlambat'
+							total_late += 1%>
+						<% end %>
+						<br/>
+							<span style="color: <%= status != 'On Time' ? 'red' : 'green' %>">
+							<%= status %>
+						</span>
+						<%else%>
+							Belum Inv
+							<% total_draft += 1%>
+						<%end%>
+					</td>
+					<td class="center" align="center">
+						<%= taxinvoiceitem.taxinvoice.sentdate.strftime('%d/%m') rescue nil %>
+						<% if taxinvoiceitem.taxinvoice.present? %>
+							<% if taxinvoiceitem.taxinvoice.sentdate.present? %>
+							<% if (taxinvoiceitem.taxinvoice.sentdate - taxinvoiceitem.invoice.date).to_i <= offset_sent %>
+								<% status = 'On Time' %>
+							<% else %>
+								<% status = 'Terlambat' 
+								total_late_send += 1%>
+							<% end %>
+						<% else %>
+							<% status = 'Belum Kirim' %>
+						<% end %>
+						<br/>
+							<span style="color: <%= status != 'On Time' ? 'red' : 'green' %>">
+							<%= status %>
+						</span>
+						<%else%>
+							Belum Inv
+						<%end%>
 					</td>
 					<!-- <td align="right">
 						<%=to_currency_bank(taxinvoiceitem.total) rescue '0' %>
@@ -103,7 +229,25 @@
 					<td class="total" align="right"><%= to_currency(total) %></td>
 				</tr> -->
 			</tbody>
+			<tr class="footer">
+				<td class="" colspan="15"><i><span style="font-size: 11px;"><%= total_late_upload %> SJ Terlambat Diupload, <%= total_late_receive %> SJ Terlambat Diterima, <%= total_draft %> Inv Belum Dibuat, <%= total_late %> Inv Terlambat Dibuat, <%= total_late_send %> Inv Terlambat Kirim</span></i></td>
+			</tr>
 		</table>
+
+		<br>
+		<small>
+		Acuan Tepat Waktu (on time): <br>
+
+		Truk: max upload 5 hari dari tanggal muat di SJ.<br>
+		Kereta: max upload 5 hari dari tanggal BKK kereta bongkar (BKK ke-2)<br>
+		Tanggal Terima: max 7 hari tanggal BKK
+		<br><br>
+		Penagihan <br>
+		Pembuatan max 7 hari dari tanggal BKK <br>
+		Pengiriman max 10 hari dari tanggal BKK <br>
+
+		* = Tanggal BKK Kereta Bongkar
+		</small>
 
 	</div>
 
