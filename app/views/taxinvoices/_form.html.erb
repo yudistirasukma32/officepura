@@ -129,7 +129,7 @@
 
     </form>
 
-    <% memo = Customer.find(params[:customer_id]).memo %>
+    <% memo = Customer.find(params[:customer_id]).memo rescue nil %>
     <% if memo.present? %>
     <br class="clearfix"/>
     <span style="line-height: 1.25;">
