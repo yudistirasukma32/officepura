@@ -128,6 +128,16 @@
     </div>
 
     </form>
+
+    <% memo = Customer.find(params[:customer_id]).memo %>
+    <% if memo.present? %>
+    <br class="clearfix"/>
+    <span style="line-height: 1.25;">
+    <i class="icon-question-sign"></i> Note:
+    <br class="clearfix"/>
+    <%= memo %>
+    <span>
+    <% end %>
 </div>
 
 <% if @customer %>
@@ -277,9 +287,6 @@
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
-  <% if @process != 'edit'%>
-  <% @taxinvoice.extra_cost_info = Customer.find(params[:customer_id]).memo %>
-  <% end %>
   <label for="extra_cost_info" class="half left">Memo</label>
   <input type="text" class="double left" id="taxinvoice_extra_cost_info" name="extra_cost_info" value="<%=@taxinvoice.extra_cost_info%>" /> 
 </div>
