@@ -13,7 +13,7 @@ class Customer < ActiveRecord::Base
 					:email_alt, :load_hour, :unload_hour, :phone2, :phone3, :mobile2, :mobile3,
 					:province, :gst_percentage, :price_tax, :rating,
 					:price_by, :is_weightlost, :is_showqty_loaded, :is_showqty_unloaded, :is_rounded,
-					:bank_id, :memo
+					:bank_id, :memo, :memo_attachments, :memo_info
 
 	scope :active, lambda {where(:enabled => true, :deleted => false)}
 

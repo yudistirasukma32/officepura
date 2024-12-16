@@ -70,6 +70,47 @@
 <% end %>
  
 <br/><br/>
+
+  <% memo = Customer.find(params[:customer_id]).memo rescue nil %>
+  <% memo_att = Customer.find(params[:customer_id]).memo_attachments rescue nil %>
+  <% memo_info = Customer.find(params[:customer_id]).memo_info rescue nil %>
+
+  <% if memo.present? || memo_att.present? || memo_info.present? %>
+  <div style="background: white; padding: 1rem; border-radius: 8px;">
+    
+    <% if memo.present? %>
+    <span style="line-height: 1.25;">
+    <strong><i class="icon-question-sign"></i> Ketentuan:</strong>
+    <br class="clearfix"/>
+    <%= memo %>
+    <span>
+    <% end %>
+    <br/>
+
+    <% if memo_att.present? %>
+    <br class="clearfix"/>
+    <span style="line-height: 1.25;">
+    <strong><i class="icon-question-sign"></i> Lampiran:</strong>
+    <br class="clearfix"/>
+    <%= memo_att %>
+    <span>
+    <% end %>
+    <br/>
+
+
+    <% if memo_info.present? %>
+    <br class="clearfix"/>
+    <span style="line-height: 1.25;">
+    <strong><i class="icon-question-sign"></i> Keterangan:</strong>
+    <br class="clearfix"/>
+    <%= memo_info %>
+    <span>
+    <% end %>
+  </div>
+  <% end %>
+
+  <br/><br/>
+
   <h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment</h3>
 
     <% if @taxinvoice.images.any? %>
@@ -129,15 +170,6 @@
 
     </form>
 
-    <% memo = Customer.find(params[:customer_id]).memo rescue nil %>
-    <% if memo.present? %>
-    <br class="clearfix"/>
-    <span style="line-height: 1.25;">
-    <i class="icon-question-sign"></i> Note:
-    <br class="clearfix"/>
-    <%= memo %>
-    <span>
-    <% end %>
 </div>
 
 <% if @customer %>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20241121035825) do
+ActiveRecord::Schema.define(:version => 20241216043703) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -304,6 +304,19 @@ ActiveRecord::Schema.define(:version => 20241121035825) do
     t.string    "phone3"
     t.string    "mobile2"
     t.string    "mobile3"
+    t.string    "province"
+    t.integer   "gst_percentage",                                                       :default => 0
+    t.boolean   "price_tax",                                                            :default => false
+    t.integer   "rating",                                                               :default => 0
+    t.string    "price_by"
+    t.boolean   "is_weightlost",                                                        :default => false
+    t.boolean   "is_showqty_loaded",                                                    :default => false
+    t.boolean   "is_showqty_unloaded",                                                  :default => false
+    t.boolean   "is_rounded",                                                           :default => false
+    t.integer   "bank_id"
+    t.string    "memo"
+    t.string    "memo_attachments"
+    t.string    "memo_info"
   end
 
   create_table "driverexpenses", :force => true do |t|
@@ -388,16 +401,16 @@ ActiveRecord::Schema.define(:version => 20241121035825) do
   end
 
   create_table "eventlogs", :force => true do |t|
-    t.boolean  "deleted",      :default => false
-    t.boolean  "enabled",      :default => true
-    t.string   "name"
-    t.string   "note"
-    t.integer  "event_id"
-    t.integer  "user_id"
-    t.integer  "confirmed_by"
-    t.datetime "confirmed_at"
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
+    t.boolean   "deleted",                   :default => false
+    t.boolean   "enabled",                   :default => true
+    t.string    "name"
+    t.string    "note"
+    t.integer   "event_id"
+    t.integer   "user_id"
+    t.integer   "confirmed_by"
+    t.timestamp "confirmed_at", :limit => 6
+    t.timestamp "created_at",   :limit => 6,                    :null => false
+    t.timestamp "updated_at",   :limit => 6,                    :null => false
   end
 
   create_table "eventmemos", :force => true do |t|
