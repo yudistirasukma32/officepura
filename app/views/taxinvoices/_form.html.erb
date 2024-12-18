@@ -15,6 +15,25 @@
   width: 100%;
 }
 
+#infobox2 textarea {
+  padding: 0;
+  /* width: 260px; */
+  min-width: fit-content;
+  max-width: -webkit-fill-available;
+  max-height: 150px;
+  height: 56px;
+  border: none;
+  resize: none;
+  font-family: MuseoSans, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  color: #333;
+  pointer-events: none;
+}
+
+.long {
+  height: 128px !important;
+}
+
 </style>
 
 <% if @process !='edit'%>
@@ -76,13 +95,13 @@
   <% memo_info = Customer.find(params[:customer_id]).memo_info rescue nil %>
 
   <% if memo.present? || memo_att.present? || memo_info.present? %>
-  <div style="background: white; padding: 1rem; border-radius: 8px;">
+  <div id="infobox2" style="background: white; padding: 1rem; border-radius: 8px;">
     
     <% if memo.present? %>
     <span style="line-height: 1.25;">
     <strong><i class="icon-question-sign"></i> Ketentuan:</strong>
     <br class="clearfix"/>
-    <%= memo %>
+    <textarea id="memo_att" readonly="readonly"><%=memo%></textarea>  
     <span>
     <% end %>
     <br/>
@@ -92,18 +111,17 @@
     <span style="line-height: 1.25;">
     <strong><i class="icon-question-sign"></i> Lampiran:</strong>
     <br class="clearfix"/>
-    <%= memo_att %>
+    <textarea id="memo_att" readonly="readonly"><%=memo_att%></textarea>  
     <span>
     <% end %>
     <br/>
-
 
     <% if memo_info.present? %>
     <br class="clearfix"/>
     <span style="line-height: 1.25;">
     <strong><i class="icon-question-sign"></i> Keterangan:</strong>
     <br class="clearfix"/>
-    <%= memo_info %>
+    <textarea id="memo_info" class="long" readonly="readonly"><%=memo_info%></textarea>  
     <span>
     <% end %>
   </div>
