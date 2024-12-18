@@ -481,6 +481,18 @@ function getCustomerId() {
 	});	
 }
 
+function getCustomerForQuotation(value) {
+	$.ajax({
+		type: "GET",
+		url: "/quotationgroups/getcustomer/" + value,
+		success: function(data) {
+			$('#div-customer').html(data.html);
+			$(".chzn-select").chosen();
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+}
+
 $(document).ready(function() {
 
 
