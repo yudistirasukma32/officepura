@@ -88,13 +88,14 @@
   </form>
 <% end %>
  
-<br/><br/>
+  <br/><br/>
 
   <% memo = Customer.find(params[:customer_id]).memo rescue nil %>
   <% memo_att = Customer.find(params[:customer_id]).memo_attachments rescue nil %>
   <% memo_info = Customer.find(params[:customer_id]).memo_info rescue nil %>
+  <% memo_address = Customer.find(params[:customer_id]).memo_address rescue nil %>
 
-  <% if memo.present? || memo_att.present? || memo_info.present? %>
+  <% if memo.present? || memo_att.present? || memo_info.present? || memo_address.present? %>
   <div id="infobox2" style="background: white; padding: 1rem; border-radius: 8px;">
     
     <% if memo.present? %>
@@ -116,6 +117,16 @@
     <% end %>
     <br/>
 
+    <% if memo_address.present? %>
+    <br class="clearfix"/>
+    <span style="line-height: 1.25;">
+    <strong><i class="icon-question-sign"></i> Alamat Kirim:</strong>
+    <br class="clearfix"/>
+    <textarea id="memo_address" readonly="readonly"><%=memo_address%></textarea>  
+    <span>
+    <% end %>
+    <br/>
+
     <% if memo_info.present? %>
     <br class="clearfix"/>
     <span style="line-height: 1.25;">
@@ -126,10 +137,46 @@
     <% end %>
   </div>
   <% end %>
-
+ 
   <br/><br/>
 
-  <h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment</h3>
+  <% the_customer_img = Customer.find(params[:customer_id]).images rescue nil %>
+  <% if the_customer_img.present? %>
+
+  <h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment Pelanggan</h3>
+
+  <ul style="margin-left: 0; padding-left: 0;">
+
+    <% @customer.images.each do |img| %>
+
+      <% if img.file_uid.present? %>
+
+      <li style="margin-bottom: 2.5rem; list-style: none;">
+
+        <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+
+        <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+        
+          <a href="<%= img.file.url() %>" target="_blank">
+              <%= image_tag img.file.url(:suffix => "/#{img.name}") if img.file_uid %>
+          </a>
+        
+        <% else %>
+        
+          <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid).truncate(40) %></a>
+        
+        <% end %>
+
+        </li>          
+      <% end %>
+
+    <% end %>
+  
+  </ul>
+
+  <% end %>
+
+  <h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment Invoice</h3>
 
     <% if @taxinvoice.images.any? %>
 
