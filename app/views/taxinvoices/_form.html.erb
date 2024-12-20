@@ -21,13 +21,22 @@
   min-width: fit-content;
   max-width: -webkit-fill-available;
   max-height: 150px;
-  height: 56px;
+  min-height: 70px;
+  height: 100%;
   border: none;
   resize: none;
   font-family: MuseoSans, Helvetica, Arial, sans-serif;
   font-size: 13px;
   color: #333;
   pointer-events: none;
+}
+
+#infobox2 div p {
+  font-family: MuseoSans, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #333;
+  padding-bottom: 0;
 }
 
 .long {
@@ -99,41 +108,38 @@
   <div id="infobox2" style="background: white; padding: 1rem; border-radius: 8px;">
     
     <% if memo.present? %>
-    <span style="line-height: 1.25;">
+    <div style="line-height: 1.25;">
     <strong><i class="icon-question-sign"></i> Ketentuan:</strong>
     <br class="clearfix"/>
-    <textarea id="memo_att" readonly="readonly"><%=memo%></textarea>  
-    <span>
+    <%=simple_format(memo)%>
+    </div>
     <% end %>
-    <br/>
 
     <% if memo_att.present? %>
     <br class="clearfix"/>
-    <span style="line-height: 1.25;">
+    <div style="line-height: 1.25;">
     <strong><i class="icon-question-sign"></i> Lampiran:</strong>
     <br class="clearfix"/>
-    <textarea id="memo_att" readonly="readonly"><%=memo_att%></textarea>  
-    <span>
+    <%=simple_format(memo_att)%>
+    </div>
     <% end %>
-    <br/>
 
     <% if memo_address.present? %>
     <br class="clearfix"/>
-    <span style="line-height: 1.25;">
+    <div style="line-height: 1.25;">
     <strong><i class="icon-question-sign"></i> Alamat Kirim:</strong>
     <br class="clearfix"/>
-    <textarea id="memo_address" readonly="readonly"><%=memo_address%></textarea>  
-    <span>
+    <%=simple_format(memo_address)%>  
+    </div>
     <% end %>
-    <br/>
 
     <% if memo_info.present? %>
     <br class="clearfix"/>
-    <span style="line-height: 1.25;">
+    <div style="line-height: 1.25;">
     <strong><i class="icon-question-sign"></i> Keterangan:</strong>
     <br class="clearfix"/>
-    <textarea id="memo_info" class="long" readonly="readonly"><%=memo_info%></textarea>  
-    <span>
+    <%=simple_format(memo_info)%>  
+    </div>
     <% end %>
   </div>
   <% end %>
