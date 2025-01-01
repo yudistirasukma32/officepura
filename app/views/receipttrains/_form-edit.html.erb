@@ -104,7 +104,8 @@
         <td><%= f.text_field :misc_total, :class => 'half disabled allowance-field', :value => to_currency(@receipttrain.misc_total.to_i), :readOnly => 'true' %></td>
       </tr>
       <tr>
-        <td><%= f.label :gst_tax, "PPN 11%" %></td>
+        <% gst_percentage = @receipttrain.gst_percentage rescue 0 %>
+        <td><%= f.label :gst_tax, "PPN "+gst_percentage.to_s+" %" %></td>
         <td><%= f.text_field :gst_tax, :class => 'half disabled allowance-field', :value => to_currency(@receipttrain.gst_tax.to_i), :readOnly => 'true' %></td>
       </tr>
 

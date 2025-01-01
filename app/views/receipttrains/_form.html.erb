@@ -104,7 +104,8 @@
         <td><%= f.text_field :misc_total, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.misc_total.to_i), :readOnly => 'true' %></td>
       </tr>
       <tr>
-        <td><%= f.label :gst_tax, "PPN 11%" %></td>
+        <% gst_percentage = @trainexpense.gst_percentage rescue 0 %>
+        <td><%= f.label :gst_tax, "PPN "+gst_percentage.to_s+" %" %></td>
         <td><%= f.text_field :gst_tax, :class => 'half disabled allowance-field', :value => to_currency(@trainexpense.gst_tax.to_i), :readOnly => 'true' %></td>
       </tr>
 
@@ -117,6 +118,7 @@
     <div class="field-row continue">
 
       <%= f.hidden_field :routetrain_id, :value => @trainexpense.invoice.routetrain_id %>
+      <%= f.hidden_field :gst_percentage, :value => @trainexpense.gst_percentage.to_i %>
       <%= f.hidden_field :user_id, :value => current_user.id %>
 
       <%= f.submit "Tambah Data", :class => 'submit right' %>    

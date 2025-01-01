@@ -8,7 +8,7 @@
 	
 	<div id="content-full">
 
-		<h1>Transaksi / <a href="<%=trainexpenses_path%>">Hutang Operator Kereta - Terbayar</a> / Index</h1>
+		<h1>Transaksi / <a href="<%=trainexpenses_path%>">Biaya Operator Kereta - Terbayar</a> / Index</h1>
 
 		<br class="clearfix" />
 
@@ -57,6 +57,7 @@
 					<th width="50">No. DO</th>
 					<th width="80">Type</th>
 					<th width="40">Operator</th>
+					<th>Confirmed</th>
 					<th width="90" class="right">Total</th>
 					<th width="40"></th>
 				</tr>
@@ -81,6 +82,7 @@
 							<td><%= zeropad(trainexpense.invoice.event_id) rescue nil %></td>
 							<td><%= trainexpense.invoice.routetrain.container_type rescue nil %></td>
 							<td><%= trainexpense.invoice.routetrain.operator.abbr rescue nil %></td>
+							<%= User.find(trainexpense.invoice.approval_operator_confirmed_by).username rescue nil %>
 							<td align="right" class="red"><%=to_currency(trainexpense.invoice.routetrain.total)%></td>
 							<td class="right" width="60">&nbsp;</td>
 						</tr>
@@ -104,6 +106,7 @@
 							<td><%= zeropad(trainexpense.invoice.event_id) rescue nil %></td>
 							<td><%= trainexpense.invoice.routetrain.container_type rescue nil %></td>
 							<td><%= trainexpense.invoice.routetrain.operator.abbr rescue nil %></td>
+							<td><%= User.find(trainexpense.invoice.approval_operator_confirmed_by).username rescue nil %></td>
 							<td align="right" class="red"><%=to_currency(trainexpense.total)%></td>
 							<td class="right" width="60">
 
@@ -123,7 +126,7 @@
 								
 								<% if checkrole 'Admin Operasional' %>
 
-									<% if trainexpense.receipttrain.active.count != 0 %>
+									<% if trainexpense.receipttrains.active.count != 0 %>
 
 										<span>confirmed</span>
 
@@ -143,7 +146,7 @@
 				<% end %>	
 			
 				<tr class="footer">
-					<td class="total" align="right" colspan="9">TOTAL</td>
+					<td class="total" align="right" colspan="10">TOTAL</td>
 					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
 				</tr>
 			</table>

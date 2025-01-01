@@ -140,8 +140,14 @@
         <td><%= f.text_field :misc_total, :class => 'half allowance-field', onkeyup: "count_trainexpense()", onchange: "count_trainexpense()", :value => 0 %></td>
       </tr>
       <tr>
-        <td>PPN 11% &nbsp; <input type="checkbox" id="routetrain_has_ppn" value="Yes" onchange="" />  </td>
-        <td><%= f.text_field :gst_tax, :class => 'half allowance-field disabled', :onkeypress => 'javascript:return isNumberKey(this);', readonly: true, value: 0 %></td>
+        <td>
+        PPN 11% &nbsp; <input type="checkbox" id="routetrain_has_ppn" value="Yes" onchange="" /> &nbsp;&nbsp; 
+        PPN 12% &nbsp; <input type="checkbox" id="routetrain_has_ppn_12" value="Yes" onchange="" />
+        </td>
+        <td>
+        <%= f.text_field :gst_tax, :class => 'half allowance-field disabled', :onkeypress => 'javascript:return isNumberKey(this);', readonly: true, value: 0 %>
+        <%= f.hidden_field :gst_percentage, :value => 0 %>
+        </td>
       </tr>
 
       <tr class="total-row">
@@ -198,11 +204,23 @@
       price_per = price_per == "" ? 0 : clean_currency(price_per);
       misc_total = misc_total == "" ? 0 : clean_currency(misc_total);
       ppn = 0;
+
       if ($("#routetrain_has_ppn").is(":checked")) {
         ppn = parseInt(price_per * 11 / 100);
+        gst_percentage = 11;
+        $("#routetrain_has_ppn_12").prop("checked", false);
+      } else if ($("#routetrain_has_ppn_12").is(":checked")) {
+        ppn = parseInt(price_per * 12 / 100);
+        gst_percentage = 12;
+        $("#routetrain_has_ppn").prop("checked", false);
+      } else {
+        gst_percentage = 0;
+        $("#routetrain_has_ppn").prop("checked", false);
+        $("#routetrain_has_ppn_12").prop("checked", false);
       }
 
       $("#trainexpense_gst_tax").val(formatRupiah(ppn));
+      $("#trainexpense_gst_percentage").val(gst_percentage);
       $("#trainexpense_total").val(formatRupiah(price_per + ppn + misc_total));
     }
 
@@ -211,7 +229,13 @@
     })
     .on("click","#routetrain_has_ppn",function(){
       count_trainexpense();
+    });
 
+    $(document).ready(function() {
+      
+    })
+    .on("click","#routetrain_has_ppn_12",function(){
+      count_trainexpense();
     });
 
     // $(document).ready(function() {

@@ -8,7 +8,7 @@
 	
 	<div id="content-full">
 
-		<h1>Transaksi / <a href="<%=shipexpenses_path%>">Hutang Operator Ro-Ro (Kapal)</a> / Index</h1>
+		<h1>Transaksi / <a href="<%=shipexpenses_path%>">Biaya Operator Ro-Ro (Kapal)</a> / Index</h1>
 
 		<br class="clearfix" />
 
@@ -28,9 +28,10 @@
 				<select name="operator_id" class="middle short">
 					<option value="">Semua</option>
 					<% Operator.multimode.active.order(:name).each do |ope| %>
-					<option value="<%=ope.id%>"<% if ope.id.to_s == @operator_id %> selected='selected'<% end %>><%=ope.abbr%></option>
+					<option value="<%=ope.id%>" <% if ope.id == @operator_id.to_i %> selected="selected"<% end %>><%=ope.abbr%></option>
 					<% end %>
 				</select>
+				
 				<input class="submit" type="submit" value="Filter" />
 			</div>
 			</form>
@@ -47,6 +48,7 @@
                     <th width="80">Kontainer/Iso</th>
 					<th width="50">No. DO</th>
 					<th width="40">Operator</th>
+					<th width="40">Confirmed</th>
 					<th width="90" class="right">Total</th>
 					<th width="40"></th>
 				</tr>
@@ -69,6 +71,7 @@
 							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></td>
 							<td><%= zeropad(invoice.event_id) rescue nil %></td>
 							<td><%= invoice.routeship.operator.abbr rescue nil %></td>
+							<td><%= User.find(invoice.approval_operator_confirmed_by).username rescue nil %></td>
 							<td align="right" class="red"><%=to_currency(invoice.routeship.price_per)%></td>
 							<td class="right" width="60">&nbsp;</td>
 						</tr>
@@ -90,6 +93,7 @@
 							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></td>
 							<td><%= zeropad(invoice.event_id) rescue nil %></td>
 							<td><%= invoice.routeship.operator.abbr rescue nil %></td>
+							<td><%= User.find(invoice.approval_operator_confirmed_by).username rescue nil %></td>
 							<td align="right" class="red"><%=to_currency(invoice.routeship.price_per)%></td>
 							<td class="right" width="60">
 
@@ -125,7 +129,7 @@
 				<% end %>	
 			
 				<tr class="footer">
-					<td class="total" align="right" colspan="7">TOTAL</td>
+					<td class="total" align="right" colspan="8">TOTAL</td>
 					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
 				</tr>
 			</table>

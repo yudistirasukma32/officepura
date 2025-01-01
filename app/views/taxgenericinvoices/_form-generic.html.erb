@@ -148,7 +148,12 @@
 
 <div class="field-row continue" style="padding-bottom:0px;">
   <label for="insurance_cost" class="half left">Biaya Asuransi</label>
-  <input type="text" class="half left" id="taxinvoice_insurance_cost" name="insurance_cost" value="<%=@taxinvoice.insurance_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/> 
+  <input type="text" class="half left" id="taxinvoice_insurance_cost" name="insurance_cost" value="<%=@taxinvoice.insurance_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxesGeneric();"/> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="claim_cost" class="half left">Potongan Klaim Selisih</label>
+  <input type="text" class="half left" id="taxinvoice_claim_cost" name="claim_cost" value="<%=@taxinvoice.claim_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxesGeneric();"/> 
 </div>
 
 <div class="field-row continue" style="padding-bottom:20px;">
@@ -158,12 +163,13 @@
 
     <%
         ppn = Setting.where(name: 'ppn')
-        ppn = ppn.blank? ? 10 : ppn[0].value
+        ppn = ppn.blank? ? 12 : ppn[0].value
     %>
 <div class="field-row" style="padding-bottom:0px;">
   <label style="color:#000; font-weight:700;">PPN </label>
   <input type="hidden" id="ppn" value="<%= ppn %>"/>    
   <input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax" value="<%= ppn %>" onchange="javascript:changeTaxesGeneric();"<% if (@taxinvoice.gst_tax > 0 && @taxinvoice.gst_percentage.to_f == 0) || (@taxinvoice.gst_percentage.to_f == ppn.to_f) %> checked="checked"<% end %> /> &nbsp; PPN <%= ppn %>% &nbsp; &nbsp; &nbsp;
+  <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="11" onchange="javascript:changeTaxesGeneric();"<% if @taxinvoice.gst_percentage.to_f  == 11 %> checked="checked"<% end %> /> &nbsp; PPN 11% &nbsp; &nbsp; &nbsp;
   <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1.1" onchange="javascript:changeTaxesGeneric();"<% if @taxinvoice.gst_percentage.to_f  == 1.1 %> checked="checked"<% end %> /> &nbsp; PPN 1,1% &nbsp; &nbsp; &nbsp;
   <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="0" onchange="javascript:changeTaxesGeneric();"<% if @taxinvoice.gst_percentage.to_f == 0 && @taxinvoice.gst_tax.to_i == 0 %> checked="checked"<% end %> /> &nbsp; No PPN &nbsp; &nbsp; &nbsp;
 </div>
@@ -296,6 +302,14 @@
     <td align="right">&nbsp;</td>
     <td align="right">&nbsp;</td>
     <td align="right"><span id="txt_insurance_cost" <% if @taxinvoice.insurance_cost > 0 %> class="red" <% end %>><%=to_currency_bank(0 - @taxinvoice.insurance_cost)%></span></td>
+  </tr>
+
+  <tr id="-3">
+    <td colspan="3"></td>
+    <td align="right">Potongan Klaim Selisih</td>
+    <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
+    <td align="right"><span id="txt_claim_cost" <% if @taxinvoice.claim_cost > 0 %> class="red" <% end %>><%=to_currency_bank(0 - @taxinvoice.claim_cost)%></span></td>
   </tr>
 
   <tr id="-3">

@@ -422,7 +422,7 @@
 
 <%
     ppn = Setting.where(name: 'ppn')
-    ppn = ppn.blank? ? 10 : ppn[0].value
+    ppn = ppn.blank? ? 12 : ppn[0].value
     taxinvoice_ppn = @taxinvoice.get_ppn(ppn) 
     # ppn = taxinvoice_ppn == 10 ? 10 : ppn
 %>
@@ -432,7 +432,8 @@
   <% if @process != 'edit'%>
   <% @taxinvoice.gst_percentage = Customer.find(params[:customer_id]).gst_percentage.to_f %>
   <% end %>
-  <input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax" value="11" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 11 %> checked="checked"<% end %> /> &nbsp; PPN 11 &nbsp;
+  <input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax" value="12" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 12 %> checked="checked"<% end %> /> &nbsp; PPN 12 &nbsp;
+  <input type="radio" id="chk_gst_tax2" name="gst_tax" class="gst_tax" value="11" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 11 %> checked="checked"<% end %> /> &nbsp; PPN 11 &nbsp;
   <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="10" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 10  %> checked="checked"<% end %> /> &nbsp; PPN 10 &nbsp;
   <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1.1" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 1.1   %> checked="checked"<% end %> /> &nbsp; PPN 1,1 &nbsp;
   <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1" onchange="javascript:changeTaxes();"<% if @taxinvoice.gst_percentage.to_f  == 1  %> checked="checked"<% end %> /> &nbsp; PPN 1 &nbsp;

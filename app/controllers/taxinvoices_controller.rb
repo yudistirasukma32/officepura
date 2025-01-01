@@ -157,7 +157,7 @@ class TaxinvoicesController < ApplicationController
 
         #ppn_new
         ppn = Setting.where(name: 'ppn')
-        ppn = ppn.blank? ? 10 : ppn[0].value
+        ppn = ppn.blank? ? 12 : ppn[0].value
 
       @taxinvoice.gst_tax = @taxinvoice.gst_tax.to_f > 0 ? subtotal.to_f * (ppn.to_f / 100) : 0
       @taxinvoice.price_tax = @taxinvoice.price_tax.to_f > 0 ? subtotal.to_f * 0.02 : 0
@@ -428,7 +428,7 @@ class TaxinvoicesController < ApplicationController
 
         #ppn_new
         ppn = Setting.where(name: 'ppn')
-        ppn = ppn.blank? ? 10 : ppn[0].value
+        ppn = ppn.blank? ? 12 : ppn[0].value
 
       if @taxinvoice.taxinvoiceitems.count > 0
         @taxinvoice.is_dp = false
@@ -1336,7 +1336,7 @@ class TaxinvoicesController < ApplicationController
     @taxinvoice.confirmeddate = (params[:confirmeddate] rescue nil)
     @taxinvoice.waybill = (params[:waybill] rescue nil)
     ppn = Setting.where(name: 'ppn')
-    ppn = ppn.blank? ? 10 : ppn[0].value
+    ppn = ppn.blank? ? 12 : ppn[0].value
 
     ppn_percentage = params[:gst_tax].to_f
     if ppn_percentage > 0

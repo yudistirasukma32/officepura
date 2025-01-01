@@ -100,7 +100,8 @@
         <td><%= f.text_field :misc_total, :class => 'half disabled allowance-field', :value => to_currency(@shipexpense.misc_total.to_i), :readOnly => 'true' %></td>
       </tr>
       <tr>
-        <td><%= f.label :gst_tax, "PPN 11%" %></td>
+        <% gst_percentage = @shipexpense.gst_percentage rescue 0 %>
+        <td><%= f.label :gst_tax, "PPN "+gst_percentage.to_s+" %" %></td>
         <td><%= f.text_field :gst_tax, :class => 'half disabled allowance-field', :value => to_currency(@shipexpense.gst_tax.to_i), :readOnly => 'true' %></td>
       </tr>
 
@@ -113,6 +114,7 @@
     <div class="field-row continue">
 
       <%= f.hidden_field :routeship_id, :value => @shipexpense.invoice.routeship_id %>
+      <%= f.hidden_field :gst_percentage, :value => @shipexpense.gst_percentage.to_i %>
       <%= f.hidden_field :total, :value => @shipexpense.total.to_i %>
       <%= f.hidden_field :user_id, :value => current_user.id %>
 

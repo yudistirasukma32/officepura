@@ -74,7 +74,7 @@ class ShipexpensesController < ApplicationController
     inputs = params[:shipexpense]
     inputs[:price_per] = clean_currency(inputs[:price_per])
     inputs[:gst_tax] = clean_currency(inputs[:gst_tax])
-    inputs[:gst_percentage] = clean_currency(inputs[:gst_tax]).to_i > 0 ? 11 : 0
+    inputs[:gst_percentage] = clean_currency(inputs[:gst_percentage])
     inputs[:misc_total] = clean_currency(inputs[:misc_total])
     inputs[:total] = clean_currency(inputs[:total])
     # render json: inputs

@@ -70,7 +70,7 @@
 </div>
 <%
     ppn = Setting.where(name: 'ppn')
-    ppn = ppn.blank? ? 10 : ppn[0].value
+    ppn = ppn.blank? ? 12 : ppn[0].value
 %>
   <input type="hidden" id="ppn" value="<%= ppn %>"/>    
 

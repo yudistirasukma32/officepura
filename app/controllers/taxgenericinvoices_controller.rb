@@ -117,6 +117,9 @@ class TaxgenericinvoicesController < ApplicationController
 
     @taxinvoice.extra_cost = params[:extra_cost].to_i
     @taxinvoice.extra_cost_info = params[:extra_cost_info]
+    @taxinvoice.insurance_cost = params[:insurance_cost]
+    @taxinvoice.claim_cost = params[:claim_cost]
+
     # @taxinvoice.total_in_words = params[:total_in_words]
     @taxinvoice.description = params[:description]
     @taxinvoice.price_by = params[:price_by]
@@ -200,7 +203,7 @@ class TaxgenericinvoicesController < ApplicationController
 
       #ppn_new
       ppn = Setting.where(name: 'ppn')
-      ppn = ppn.blank? ? 10 : ppn[0].value
+      ppn = ppn.blank? ? 12 : ppn[0].value
 
       # @taxinvoice.gst_tax = params[:gst_tax] == "Yes" ? subtotal.to_f * (ppn.to_f / 100) : 0
       @taxinvoice.price_tax = params[:price_tax] == "Yes" ? subtotal.to_f * 0.02 : 0
@@ -212,12 +215,10 @@ class TaxgenericinvoicesController < ApplicationController
       end
       @taxinvoice.gst_percentage = ppn_percentage
       if pembulatan
-        @taxinvoice.total = subtotal.round + @taxinvoice.gst_tax.round - @taxinvoice.price_tax.round
+        @taxinvoice.total = subtotal.round + @taxinvoice.gst_tax.round - @taxinvoice.price_tax.round - @taxinvoice.insurance_cost.round - @taxinvoice.claim_cost.round
       else
-        @taxinvoice.total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f
+        @taxinvoice.total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f - @taxinvoice.insurance_cost.to_f - @taxinvoice.claim_cost.to_f
       end
-
-
 
       @taxinvoice.total_in_words = moneytowordsrupiah(@taxinvoice.total)
 

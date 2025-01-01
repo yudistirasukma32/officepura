@@ -83,6 +83,11 @@
             <td><%= @invoice.routeship.container_type rescue nil %></td>
         </tr>
         <tr>
+          <td>Tgl Bayar</td>
+          <td><%= f.text_field :date, :class => 'half date-picker', :value => @invoice.date.strftime('%d-%m-%Y') %>
+          <span>(tgl/bln/thn)</span></td>
+        </tr>
+        <tr>
           <td>Memo</td>
           <td><%= f.text_area :description, :class => '', style: "border: 2px solid #d7d7d7; height: 50px;".html_safe, rows: 10 %></td>
         </tr>
@@ -105,8 +110,14 @@
       </tr>
 
       <tr>
-        <td>PPN 11% &nbsp; <input type="checkbox" id="routeship_has_ppn" value="Yes" onchange="" />  </td>
-        <td><%= f.text_field :gst_tax, :class => 'half allowance-field disabled', :onkeypress => 'javascript:return isNumberKey(this);', readonly: true, value: 0 %></td>
+        <td>
+        PPN 11% &nbsp; <input type="checkbox" id="routeship_has_ppn" value="Yes" onchange="" />   &nbsp;&nbsp; 
+        PPN 12% &nbsp; <input type="checkbox" id="routeship_has_ppn_12" value="Yes" onchange="" />
+        </td>
+        <td>
+        <%= f.text_field :gst_tax, :class => 'half allowance-field disabled', :onkeypress => 'javascript:return isNumberKey(this);', readonly: true, value: 0 %>
+        <%= f.hidden_field :gst_percentage, :value => 0 %>
+        </td>
       </tr>
 
       <tr class="total-row">
@@ -164,11 +175,22 @@
       price_per = price_per == "" ? 0 : clean_currency(price_per);
       misc_total = misc_total == "" ? 0 : clean_currency(misc_total);
       ppn = 0;
+      
       if ($("#routeship_has_ppn").is(":checked")) {
         ppn = parseInt(price_per * 11 / 100);
+        gst_percentage = 11;
+      } else if ($("#routeship_has_ppn_12").is(":checked")) {
+        ppn = parseInt(price_per * 12 / 100);
+        gst_percentage = 12;
+        $("#routeship_has_ppn").prop("checked", false);
+      } else {
+        gst_percentage = 0;
+        $("#routeship_has_ppn").prop("checked", false);
+        $("#routeship_has_ppn_12").prop("checked", false);
       }
 
       $("#shipexpense_gst_tax").val(formatRupiah(ppn));
+      $("#shipexpense_gst_percentage").val(gst_percentage);
       $("#shipexpense_total").val(formatRupiah(price_per + ppn + misc_total));
     }
 
@@ -179,5 +201,12 @@
       count_shipexpense();
 
     });
+    $(document).ready(function() {
+      
+    })
+    .on("click","#routeship_has_ppn_12",function(){
+      count_shipexpense();
+    });
+
   </script>
 <% end %>

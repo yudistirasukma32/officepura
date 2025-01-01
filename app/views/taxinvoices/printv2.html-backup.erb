@@ -335,7 +335,7 @@
 						<% end %>
 						<%
 							ppn = Setting.where(name: 'ppn')
-							ppn = ppn.blank? ? 10 : ppn[0].value
+							ppn = ppn.blank? ? 12 : ppn[0].value
 
 							taxinvoice_ppn = @taxinvoice.get_ppn(ppn)
 							taxinvoice_ppn = taxinvoice_ppn == 0 ? ppn : taxinvoice_ppn
