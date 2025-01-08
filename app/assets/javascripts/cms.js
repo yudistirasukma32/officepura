@@ -950,6 +950,18 @@ function getSentDateLog()
 	});
 }
 
+function getTaxinvoicesByCustomer(customer_id) {
+	$.ajax({
+		type: "GET",
+		url: "/taxinvoiceattachments/gettaxinvoicesbycustomer/" + customer_id,
+		success: function(data) {
+			$('#div_taxinvoice').html(data.html);
+			$(".chzn-select").chosen();
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});
+}
+
 function getTaxinvoiceItems()
 {
 	var taxinvoice_id = $("#taxinvoice_id").val();

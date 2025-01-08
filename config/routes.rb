@@ -537,6 +537,9 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
+  resources :taxinvoiceattachments
+  get 'taxinvoiceattachments/gettaxinvoicesbycustomer/:customer_id' => 'taxinvoiceattachments#gettaxinvoicesbycustomer'
+
   match 'bonusreceipts/index_confirmed' => 'bonusreceipts#index_confirmed'
 
   resources :bonusreceipts do

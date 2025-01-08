@@ -71,8 +71,9 @@
 		<li class="<%= @where == 'receipttaxinvitems' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Surat Jalan'), "Tanda Terima SJ", "/receipttaxinvitems" %></li>
 	<% end %>
     
-    <% if @section == 'taxinvoices' %>
+	<% if @section == 'taxinvoices' %>
 		<li class="<%= @where == 'taxinvoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan, Staff Invoice Tagihan'), "Invoice Tagihan", "/taxinvoices" %></li>
+		<li class="<%= @where == 'taxinvoiceattachments' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan, Staff Invoice Tagihan'), "Lampiran Invoice", "/taxinvoiceattachments" %></li>
 	<% end %>
 
 	<% if @section == 'transactions' or @section == 'transactions2' %>

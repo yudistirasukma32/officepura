@@ -1,0 +1,39 @@
+<table class="tablesorter row-view tablesorterFilters">
+  <thead>
+    <tr>
+      <th width="25">Tgl</th>
+      <th width="25">Kode</th>
+      <th width="25">Pelanggan</th>
+      <th width="25">Invoice</th>
+      <th width="25">Tipe</th>
+      <th width="50">Keterangan</th>
+      <th width="50">Lampiran</th>
+      <th width="25">User</th>
+      <th width="25" class="{sorter: false, filter: false} sorter-false"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if @attachments.any? %>
+      <% @attachments.includes(:taxinvoice, :customer, :user).each_with_index do |attachment, i| %>
+        <tr>
+          <td><strong><%= attachment.date.strftime('%d') rescue nil %></strong>.<%= attachment.date.strftime('%m') rescue nil %></td>
+          <td width="25"><%= zeropad(attachment.id) %></td>
+          <td><%= attachment.customer.name rescue nil %></td>
+          <td><%= attachment.taxinvoice.long_id rescue nil %></td>
+          <td width="25"><%= attachment.attachment_type rescue nil %></td>
+          <td width="50"><%= attachment.description rescue nil %></td>
+          <td width="50">
+          <% attachment.images.where("file_uid is not null and file_uid <> ''").each do |img| %>
+            <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a><br/>    
+          <% end %>
+          </td>
+          <td><%= attachment.user.username rescue nil %></td>
+          <td class="center">
+            <%= link_to '&#xf044;'.html_safe, edit_taxinvoiceattachment_path(attachment), :class => "edit tipsy", :title => 'Edit Data / Masuk Detail' %> 
+            <%= link_to '&#xf00d;'.html_safe, attachment, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>

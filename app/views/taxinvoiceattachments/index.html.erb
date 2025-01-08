@@ -1,0 +1,38 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<a class="btn-txt right" href="<%=new_taxinvoiceattachment_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+
+		<h1>Surat Jalan / <a href="<%=taxinvoiceattachments_path%>">Lampiran Invoice</a> / Index</h1>
+		
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue">
+					<label for="startdate" class="middle">Tgl Awal</label>
+					<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+					<label for="enddate" class="tiny">s/d</label>
+					<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+					<div style="display: inline-block;">
+						<input class="submit" type="submit"  class="" value="Filter" >
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<%= render "showtable" %>
+		
+		<br class="clearfix" />
+
+	</div>
+
+</div>

@@ -1,0 +1,14 @@
+<div class="field-row">
+  <% if @taxinvoices.any? %>
+    <label for="taxinvoiceattachment_taxinvoice_id">Invoice</label>
+    <select name="taxinvoiceattachment[taxinvoice_id]" id="taxinvoiceattachment_taxinvoice_id" class="double chzn-select chzn-select">
+      <option value="0">Pilih Invoice Tagihan</option>
+      <% @taxinvoices.each do |taxinvoice| %>
+        <option value="<%=taxinvoice.id%>"><%=taxinvoice.long_id%></option>
+      <% end %>
+    </select>
+
+  <% else %>
+    <small>Semua invoice untuk Pelanggan ini sudah memiliki lampiran</small>
+  <% end %>
+</div>

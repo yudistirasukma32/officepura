@@ -1,0 +1,112 @@
+<%= form_for(@attachment, :html => { :multipart => true }) do |f| %>
+<div style="float: left;">
+  <div class="field-row first">
+    <%= f.label :customer_id, "Pelanggan" %>
+
+    <select id="taxinvoiceattachment_customer_id" name="taxinvoiceattachment[customer_id]" class="double combo_route chzn-select" onchange="javascript:getTaxinvoicesByCustomer(this.value);">
+      <% @customers.each do |customer| %>
+      <option value="<%=customer.id%>"
+        <% if customer.id == @attachment.customer_id %> selected="selected"<% end %>><%=customer.name%> - <%=customer.city.upcase rescue nil%></option>
+      <% end %>
+    </select>
+
+    <small>*Pelanggan yang ditampilkan adalah yang memiliki Invoice.</small>
+  </div>
+
+  <div id="div_taxinvoice">
+    <div class="field-row">
+      <%= f.label :taxinvoice, "Invoice"  %>
+
+      <% if @attachment.taxinvoice.blank? %>
+        <% if @process == 'new' %>
+        <input type="text" class="double disabled" value="Harap memilih Pelanggan terlebih dahulu." />
+        <% else %>
+        <input type="text" class="double disabled" value="Tidak ada Invoice tagihan dipilih." />
+        <% end %>
+      <% else %>
+        <select name="taxinvoiceattachment[taxinvoice_id]" id="taxinvoiceattachment_taxinvoice_id" class="double chzn-select">
+          <option value="0">- Invoice -</option>
+          <% @taxinvoices.each do |taxinvoice| %>
+            <option value="<%=taxinvoice.id%>" <% if taxinvoice.id == @attachment.taxinvoice_id %> selected="selected"<% end %>><%=taxinvoice.long_id%></option>
+          <% end %>
+        </select>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :attachment_type, "Tipe"  %>
+    <select name="taxinvoiceattachment[attachment_type]" id="taxinvoiceattachment_attachment_type" class="half chzn-select">
+      <% @types.each do |type| %>
+        <option value="<%=type%>" <% if type == @attachment.attachment_type %> selected="selected"<% end %>><%=type%></option>
+      <% end %>
+    </select>
+  </div>
+  
+  <div class="field-row">
+    <%= f.label :date, "Tanggal" %>
+    <%= f.text_field :date, :class => 'half date-picker', :value => @attachment.date.strftime('%d-%m-%Y') %>
+    <span>(tgl/bln/thn)</span>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <% if @attachment.images.where("file_uid is not null and file_uid <> ''").any? %>
+
+    <div class="field-row">
+      <% @attachment.images.where("file_uid is not null and file_uid <> ''").each do |img| %>
+        <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+
+        <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+          <a href="<%= img.file.url() %>" target="_blank">
+            <%= image_tag img.file.thumb('480x320').url(:suffix => "/#{img.name}"), style: "width: 100%;" if img.file_uid %>
+          </a>
+        <% else %>
+          <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>    
+        <% end %>
+
+        <br />
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
+          <span style="font-size: 10px; color: #717171;">Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+
+          <% if img.enabled %>
+            <%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + img.id.to_s %>
+          <% else %>
+            <span style="font-size: 10px; color: #717171;">Dihapus</span>
+          <% end %>
+        </div>
+        <br>
+        <br>
+      <% end %>
+    </div>
+
+  <% else %>
+
+    <div class="field-row continue" style="width: 100%;">
+      <label for="file">Browse File</label>
+      <input type="file" name="attachment[file]"/>
+    </div>
+
+  <% end %>
+  
+  <div class="actions">
+    <%= f.submit "Simpan", :id => 'taxinvoiceattachment_submit', :class => 'left' %>
+
+    <a class="back left" href="<%= taxinvoiceattachments_path %>">Kembali ke Index</a>
+  </div>
+</div>
+<% end %>
+
+<%= content_for :js do %>
+  <% if @process == 'new' && params[:taxinvoice_id].blank? %>
+    <script>
+      $(document).ready(function() {
+        customer_id = $('#taxinvoiceattachment_customer_id').val();
+        getTaxinvoicesByCustomer(customer_id);
+      });
+    </script>
+  <% end %>
+<% end %>
