@@ -86,7 +86,9 @@ class AttachmentsController < ApplicationController
     when "Invoice"
 			edit_invoice_url(id)
     when "Taxinvoice"
-			edit_taxinvoice_url(id)    
+			edit_taxinvoice_url(id)  
+    when "Taxinvoiceattachment"
+      edit_taxinvoiceattachment_url(id)   
     when "Quotationgroup"
 			edit_quotationgroup_url(id)    
     end

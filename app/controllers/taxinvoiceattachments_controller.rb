@@ -50,16 +50,7 @@ class TaxinvoiceattachmentsController < ApplicationController
     taxinvoiceattachment.user_id = current_user.id
 
     if taxinvoiceattachment.save
-      if params[:attachment].present?
-        attachment = Attachment.new
-        attachment.file = params[:attachment][:file]
-        attachment.imageable_type = "Taxinvoiceattachment"
-        attachment.imageable_id = taxinvoiceattachment.id
-        attachment.enabled = true
-        attachment.media = false
-        attachment.save
-      end
-
+ 
       redirect_to edit_taxinvoiceattachment_path(taxinvoiceattachment), :notice => 'Data berhasil disimpan.'
     else
       to_flash(taxinvoiceattachment)
@@ -71,15 +62,7 @@ class TaxinvoiceattachmentsController < ApplicationController
     taxinvoiceattachment = Taxinvoiceattachment.find(params[:id])
     taxinvoiceattachment.user_id = current_user.id
     taxinvoiceattachment.update_attributes(params[:taxinvoiceattachment])
-    if params[:attachment][:file].present?
-      attachment = Attachment.new
-      attachment.file = params[:attachment][:file]
-      attachment.imageable_type = "Taxinvoiceattachment"
-      attachment.imageable_id = taxinvoiceattachment.id
-      attachment.enabled = true
-      attachment.media = false
-      attachment.save
-    end
+ 
     redirect_to edit_taxinvoiceattachment_path(taxinvoiceattachment), :notice => 'Data berhasil disimpan.'
   end
 

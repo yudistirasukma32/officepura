@@ -53,87 +53,57 @@
     <%= f.label :description, "Keterangan" %>
     <%= f.text_area :description %>
   </div>
-  
-  <div class="actions">
-    <%= f.submit "Simpan", :id => 'taxinvoiceattachment_submit', :class => 'left' %>
-    <a class="back left" href="<%= taxinvoiceattachments_path %>">Kembali ke Index</a>
-  </div>
 
-  <br/><br/>
-</div>
-<% end %>
+  <% if @attachment.images.where("file_uid is not null and file_uid <> ''").any? %>
 
-<% if @process == 'edit' %>
-
-  <div class="update-box" style="padding-top: 0; border-top: none;">
-  <h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment</h3>
-
-  <% if @attachment.images.any? %>
-
-  <ul style="margin-left: 0; padding-left: 0;">
-
-    <% @attachment.images.each do |img| %>
-
-      <% if img.file_uid.present? %>
-
-      <li style="margin-bottom: 2.5rem; list-style: none;">
-
+    <div class="field-row">
+      <% @attachment.images.where("file_uid is not null and file_uid <> ''").each do |img| %>
         <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 
-          <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
-          
-          <a href="<%= img.file.url() %>" target="_blank">
-              <%= image_tag img.file.thumb('480x320').url(:suffix => "/#{img.name}"), style: "width: 100%;" if img.file_uid %>
+        <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+        
+          <a href="<%= img.file.url if img.file_uid rescue nil  %>" target="_blank">
+            <%= (image_tag img.file.url, style: "max-width: 100%;") if img.file_uid rescue nil %>
           </a>
-          
-          <% else %>
-          
-            <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
-          
-          <% end %>
+        
+        <% else %>
+        
+          <a href="<%= img.file.url if img.file_uid rescue nil %>" target="_blank">
+            <%= img.file_uid ? File.basename(img.file_uid).truncate(40) : '' %>
+          </a>
+        
+        <% end %>
 
-          <br />
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
+        <br />
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
           <span style="font-size: 10px; color: #717171;">Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
 
           <% if img.enabled %>
-          <%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + img.id.to_s %>
+            <%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + img.id.to_s %>
           <% else %>
-          <span style="font-size: 10px; color: #717171;">Dihapus</span>
+            <span style="font-size: 10px; color: #717171;">Dihapus</span>
           <% end %>
-
-  
-
-      </li>
-              
+        </div>
+        <br>
+        <br>
       <% end %>
+    </div>
 
-    <% end %>
-  
-  </ul>
+  <% else %>
+
+    <div class="field-row continue" style="width: 100%;">
+      <label for="file">Browse File</label>
+      <input type="file" name="attachment[file]"/>
+    </div>
 
   <% end %>
-
-<br />
-
-<form action="/attachments/upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
-  <input type="hidden" name="model_name" value="Taxinvoiceattachment" />
-  <input type="hidden" name="item_id" value="<%=@attachment.id%>" />
-
-  <div class="field-row continue" style="width: 300px;">
-    <label for="file">Browse File</label>
-    <input type="file" name="attachment[file]"/>
-  </div>
-
+  
   <div class="actions">
-    <input type="submit" value="Simpan File" />
+    <%= f.submit "Simpan", :id => 'taxinvoiceattachment_submit', :class => 'left' %>
+
+    <a class="back left" href="<%= taxinvoiceattachments_path %>">Kembali ke Index</a>
   </div>
-
-
-</form>
-
 </div>
-
 <% end %>
 
 <%= content_for :js do %>

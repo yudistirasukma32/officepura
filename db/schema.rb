@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20241216043703) do
+ActiveRecord::Schema.define(:version => 20250108190619) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -317,6 +317,7 @@ ActiveRecord::Schema.define(:version => 20241216043703) do
     t.string    "memo"
     t.string    "memo_attachments"
     t.string    "memo_info"
+    t.string    "memo_address"
   end
 
   create_table "driverexpenses", :force => true do |t|
@@ -1592,6 +1593,21 @@ ActiveRecord::Schema.define(:version => 20241216043703) do
     t.decimal   "total",                      :precision => 19, :scale => 2, :default => 0.0
   end
 
+  create_table "taxinvoiceattachments", :force => true do |t|
+    t.boolean  "deleted",         :default => false
+    t.boolean  "enabled",         :default => true
+    t.integer  "taxinvoice_id"
+    t.integer  "customer_id"
+    t.date     "date"
+    t.string   "attachment_type"
+    t.string   "upload"
+    t.text     "description"
+    t.integer  "user_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+  end
+
   create_table "taxinvoiceitems", :force => true do |t|
     t.boolean   "deleted",                                                          :default => false
     t.date      "date"
@@ -1701,6 +1717,7 @@ ActiveRecord::Schema.define(:version => 20241216043703) do
     t.date      "fourthpayment_date"
     t.boolean   "is_dp",                                                           :default => false
     t.decimal   "dp_cost",                          :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "waiting",                                                         :default => false
   end
 
   create_table "tirebudgets", :force => true do |t|
