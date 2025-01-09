@@ -237,6 +237,7 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.waybill = params[:waybill]
       @taxinvoice.dp_cost = params[:dp_cost].to_i
       @taxinvoice.is_dp = params[:is_dp] == "Yes" ? true : false
+      @taxinvoice.waiting = params[:waiting] == "Yes" ? true : false
       @taxinvoice.extra_cost = params[:extra_cost].to_i
       @taxinvoice.extra_cost_info = params[:extra_cost_info]
       # @taxinvoice.total_in_words = params[:total_in_words]
