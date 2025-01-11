@@ -84,6 +84,17 @@
 								<option value="upload-invoice" <%= params[:lain] == "upload-invoice" ? "selected" : "" %>>Belum Upload SJ</option>
 							</select>
 						</div>
+
+						<div style="display: inline-block;">
+							<label for="invoice_longid" class="middle">Invoice:</label>
+							<select name="invoice_longid" class="chzn-select half">
+								<option value="">-- Semua --</option>
+								<option value="RDPI" <%= params[:invoice_longid] == "RDPI" ? "selected" : "" %>>RDPI</option>
+								<option value="PURA" <%= params[:invoice_longid] == "PURA" ? "selected" : "" %>>PURA</option>
+								<option value="RI" <%= params[:invoice_longid] == "RI" ? "selected" : "" %>>RI</option>
+							</select>
+						</div>
+
 						<div style="display: inline-block;">
 							<input class="submit" type="submit"  class="" value="Filter" >
 						</div>

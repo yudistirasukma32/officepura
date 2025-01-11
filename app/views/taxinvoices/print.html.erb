@@ -109,6 +109,13 @@
 		</div>
 		<% end %>
 
+		<% if !@taxinvoice.booking_code.blank? %>
+		<div class="field-row continue">
+			<label class="left">Kode Booking</label>
+			<textarea class="disabled left" style="background: none;border: 0;font-size: 13px;color: #000;height:60px;resize: none;line-height:1.25;">: <%=@taxinvoice.booking_code%></textarea>
+		</div>
+ 		<% end %>
+
 		<% if !@taxinvoice.spk_no.blank? %>
 		<div class="field-row continue">
 			<label class="left">SPK</label>

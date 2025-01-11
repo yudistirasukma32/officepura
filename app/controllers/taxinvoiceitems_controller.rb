@@ -60,7 +60,7 @@ class TaxinvoiceitemsController < ApplicationController
     else
       invoice_id = []
     end
-    
+
     if params[:lain] == 'belum-invoice'
       if invoice_id.length > 0
         @invoices = @invoices.where("invoices.id in (#{invoice_id.join(",")})")
@@ -73,18 +73,25 @@ class TaxinvoiceitemsController < ApplicationController
         end
     end
 
+    if params[:invoice_longid].present?
+      invoice_ids = Invoice.active.joins(:taxinvoiceitems).joins("INNER JOIN taxinvoices ON taxinvoiceitems.taxinvoice_id = taxinvoices.id").where("taxinvoices.long_id ~* ?", params[:invoice_longid]).pluck(:id)
+      Rails.logger.info "SQL: #{Invoice.active.joins(:taxinvoiceitems).joins("INNER JOIN taxinvoices ON taxinvoiceitems.taxinvoice_id = taxinvoices.id").where("taxinvoices.long_id ~* ?", params[:invoice_longid]).to_sql}"
+      invoice_ids = [0] if invoice_ids.length == 0
+      @invoices = @invoices.where("invoices.id in (#{invoice_ids.join(",")})")
+    end
+
     # bkm_invoice_id = Invoicereturn.joins(:invoice).where(deleted: false).where("invoices.deleted = false and invoices.date between ? and ?", @startdate.to_date, @enddate.to_date).pluck(:invoice_id)
     # @invoices = @invoices.where("id not in(#{bkm_invoice_id.join(",")})") if bkm_invoice_id.present?
-    
+
     # confirmed_invoice_id = Receipt.joins(:invoice).where(deleted: false).where("invoices.deleted = false and invoices.date between ? and ?", @startdate.to_date, @enddate.to_date).pluck(:invoice_id)
     # @invoices = @invoices.where("id in(#{confirmed_invoice_id.join(",")})") if confirmed_invoice_id.present?
-    
+
 
     if checkroleonly 'Vendor Supir'
 
       @vendor = Vendor.where('user_id = ?', current_user.id)
 
-      if @vendor.present? 
+      if @vendor.present?
         @invoices = @invoices.where('driver_id in (select id from drivers where vendor_id = ?)', @vendor[0].id)
       end
 
@@ -101,7 +108,7 @@ class TaxinvoiceitemsController < ApplicationController
     @where = "taxinvoiceitems"
     @errors = Hash.new
 
-    @invoice_id = params[:invoice_id] 
+    @invoice_id = params[:invoice_id]
 
     if @invoice_id.blank?
       @errors["invoice"] = "BKK harus diisi."
@@ -109,35 +116,35 @@ class TaxinvoiceitemsController < ApplicationController
       @invoice = Invoice.find(@invoice_id) rescue nil
 
       @taxinvoiceitems = Taxinvoiceitem.where("invoice_id = #{@invoice.id} AND deleted = FALSE") rescue nil
- 
+
       if @invoice.nil?
-        @errors["invoice"] = "BKK No. '#{zeropad(@invoice_id)}' tidak terdaftar." 
+        @errors["invoice"] = "BKK No. '#{zeropad(@invoice_id)}' tidak terdaftar."
       end
 
       if !@invoice.by_vendor?
 
         if Invoicereturn.where(deleted: false, invoice_id: @invoice.id).count > 0
-          redirect_to taxinvoiceitems_url(startdate: (@invoice.date.strftime("%d-%m-%Y") rescue nil), enddate: (@invoice.date.strftime("%d-%m-%Y") rescue nil)), notice: "BKK No. '#{zeropad(@invoice_id)}' sudah diBKM." 
+          redirect_to taxinvoiceitems_url(startdate: (@invoice.date.strftime("%d-%m-%Y") rescue nil), enddate: (@invoice.date.strftime("%d-%m-%Y") rescue nil)), notice: "BKK No. '#{zeropad(@invoice_id)}' sudah diBKM."
           return false
         end
-        
+
         if Receipt.where(deleted: false, invoice_id: @invoice.id).count == 0
-          redirect_to taxinvoiceitems_url(startdate: (@invoice.date.strftime("%d-%m-%Y") rescue nil), enddate: (@invoice.date.strftime("%d-%m-%Y") rescue nil)), notice: "BKK No. '#{zeropad(@invoice_id)}' Belum dikonfirmasi kasir." 
+          redirect_to taxinvoiceitems_url(startdate: (@invoice.date.strftime("%d-%m-%Y") rescue nil), enddate: (@invoice.date.strftime("%d-%m-%Y") rescue nil)), notice: "BKK No. '#{zeropad(@invoice_id)}' Belum dikonfirmasi kasir."
           return false
         end
 
       end
 
-    end 
+    end
 
     if @errors.length == 0
-      if @invoice.price_per.to_i == 0 
+      if @invoice.price_per.to_i == 0
         @invoice.price_per = @invoice.route.price_per if !@invoice.route_id.blank?
         @invoice.save
       end
 
       if params[:update] == 'true'
-        @invoice.price_per = @invoice.route.price_per if !@invoice.route_id.blank? 
+        @invoice.price_per = @invoice.route.price_per if !@invoice.route_id.blank?
         @invoice.save
 
         if @invoice.taxinvoiceitems.any?
@@ -148,7 +155,7 @@ class TaxinvoiceitemsController < ApplicationController
             elsif taxinvoiceitem.is_gross
               taxinvoiceitem.total = taxinvoiceitem.weight_gross.to_i * taxinvoiceitem.price_per.to_f
             else
-              taxinvoiceitem.total = taxinvoiceitem.weight_net.to_i * taxinvoiceitem.price_per.to_f   
+              taxinvoiceitem.total = taxinvoiceitem.weight_net.to_i * taxinvoiceitem.price_per.to_f
             end
 
             taxinvoiceitem.save
@@ -158,7 +165,7 @@ class TaxinvoiceitemsController < ApplicationController
 
       if !@invoice.taxinvoiceitems.any?
         qty = @invoice.quantity
-        
+
         if @invoice.receiptreturns.active.any?
           qty -= @invoice.receiptreturns.active.sum(:quantity)
         end
@@ -168,36 +175,36 @@ class TaxinvoiceitemsController < ApplicationController
           @invoice.taxinvoiceitems << @taxinvoiceitem
         end
       else
-           #check if invoiceitems.count = (invoice.quantity - invoice.invoicereturns.quantity), if less then add 
+           #check if invoiceitems.count = (invoice.quantity - invoice.invoicereturns.quantity), if less then add
           @invoiceitemsnull = @invoice.taxinvoiceitems.where("sku_id IS null")
           @invoiceitemsnull.each do |invoiceitemsnull|
             invoiceitemsnull.destroy
           end
-          
-          c = @invoice.taxinvoiceitems.where("sku_id IS NOT null").count 
+
+          c = @invoice.taxinvoiceitems.where("sku_id IS NOT null").count
 
           qty = @invoice.quantity
           if @invoice.receiptreturns.active.any?
-            qty -= @invoice.receiptreturns.active.sum(:quantity) 
+            qty -= @invoice.receiptreturns.active.sum(:quantity)
           end
-              
-          if c < qty   
+
+          if c < qty
             c.upto(qty-1) do |i|
               @taxinvoiceitem = Taxinvoiceitem.new
-              @invoice.taxinvoiceitems << @taxinvoiceitem 
+              @invoice.taxinvoiceitems << @taxinvoiceitem
             end
-          end 
+          end
 
-          @is_wholesale = @invoice.taxinvoiceitems.where(:is_wholesale => true).any?       
-      end    
-    end  
+          @is_wholesale = @invoice.taxinvoiceitems.where(:is_wholesale => true).any?
+      end
+    end
   end
 
   def updateitems
     inputs = params["taxinvoiceitems"]
 
     @invoice = Invoice.find(inputs[:invoice_id])
-    
+
     if @invoice.taxinvoiceitems.any?
       @invoice.taxinvoiceitems.each do |item|
         item_id = item.id.to_s
@@ -225,8 +232,8 @@ class TaxinvoiceitemsController < ApplicationController
 
       redirect_to("/taxinvoiceitems/new/" + @invoice.id.to_s, :notice => 'Data Surat Jalan sukses disimpan.')
     else
-      redirect_to("/taxinvoiceitems/new/" + @invoice.id.to_s)      
-    end    
+      redirect_to("/taxinvoiceitems/new/" + @invoice.id.to_s)
+    end
   end
 
   def vendor_detail
@@ -251,11 +258,11 @@ class TaxinvoiceitemsController < ApplicationController
     index_col = 1
     excel = Axlsx::Package.new
     excel.workbook.add_worksheet(:name => "Tagihan Invoice") do |sheet|
-  
+
     bold = sheet.styles.add_style(:b => true)
     right = sheet.styles.add_style(:alignment => {:horizontal => :right})
     right_bold = sheet.styles.add_style(:alignment => {:horizontal => :right}, :b => true)
-    
+
     index_col +1
     sheet.add_row ['Kantor '+invoice.office.name], :height => 20
     index_col +=1
@@ -281,50 +288,50 @@ class TaxinvoiceitemsController < ApplicationController
     sheet.add_row [''], :height => 20
     index_col +=1
     sheet.add_row ['No','Tanggal','Surat Jalan','Tgl Muat','Muat','Tgl Bongkar','Bongkar','Susut'], :height => 20, :widths => [:auto]
-  
+
     invoice.taxinvoiceitems.each_with_index do |item, i|
       # sheet.add_row [i+1,item.date.strftime("%d-%m-%Y"),item.sku_id,item.load_date.strftime("%d-%m-%Y"),'Muat',item.unload_date.strftime("%d-%m-%Y"),item.weight_gross,item.weight_net],:height => 20, :widths => [:auto]
       sheet.add_row [i+1,(item.date.strftime("%d-%m-%Y") rescue nil),item.sku_id,(item.load_date.strftime("%d-%m-%Y") rescue nil),'Muat',(item.unload_date.strftime("%d-%m-%Y") rescue nil),item.weight_gross,item.weight_net],:height => 20, :widths => [:auto]
     end
-  
-  
+
+
     end
     excel.use_autowidth = false
     excel.use_shared_strings = true
-    
+
     #if p.serialize("/tmp/#{filename}")
       #send_data("#{Rails.root}/tmp/#{filename}", :filename => filename, :type => :xls, :x_sendfile => true)
     #end
-  
+
     send_data(excel.to_stream.read, :filename => "Surat Jalan no #{invoice.id}.xls", :type => :xls, :x_sendfile => true)
-      
-  
+
+
   end
-  
+
   #for printOnly
   def print
-    
+
     @errors = Hash.new
 
-    @invoice_id = params[:invoice_id] 
+    @invoice_id = params[:invoice_id]
 
     if @invoice_id.blank?
       @errors["invoice"] = "BKK harus diisi."
     else
       @invoice = Invoice.find(@invoice_id) rescue nil
       if @invoice.nil?
-        @errors["invoice"] = "BKK No. '#{zeropad(@invoice_id)}' tidak terdaftar." 
+        @errors["invoice"] = "BKK No. '#{zeropad(@invoice_id)}' tidak terdaftar."
       end
-    end 
+    end
 
     if @errors.length == 0
-      if @invoice.price_per.to_i == 0 
+      if @invoice.price_per.to_i == 0
         @invoice.price_per = @invoice.route.price_per if !@invoice.route_id.blank?
         @invoice.save
       end
 
       if params[:update] == 'true'
-        @invoice.price_per = @invoice.route.price_per if !@invoice.route_id.blank? 
+        @invoice.price_per = @invoice.route.price_per if !@invoice.route_id.blank?
         @invoice.save
 
         if @invoice.taxinvoiceitems.any?
@@ -335,7 +342,7 @@ class TaxinvoiceitemsController < ApplicationController
             elsif taxinvoiceitem.is_gross
               taxinvoiceitem.total = taxinvoiceitem.weight_gross.to_i * taxinvoiceitem.price_per.to_f
             else
-              taxinvoiceitem.total = taxinvoiceitem.weight_net.to_i * taxinvoiceitem.price_per.to_f   
+              taxinvoiceitem.total = taxinvoiceitem.weight_net.to_i * taxinvoiceitem.price_per.to_f
             end
 
             taxinvoiceitem.save
@@ -345,9 +352,9 @@ class TaxinvoiceitemsController < ApplicationController
 
       if !@invoice.taxinvoiceitems.any?
         qty = @invoice.quantity
-        
+
         if !@invoice.receiptreturns.active.first.nil?
-          qty -= @invoice.receiptreturns.active.first.quantity 
+          qty -= @invoice.receiptreturns.active.first.quantity
         end
 
         1.upto(qty) do |i|
@@ -355,29 +362,29 @@ class TaxinvoiceitemsController < ApplicationController
           @invoice.taxinvoiceitems << @taxinvoiceitem
         end
       else
-            #check if invoiceitems.count = (invoice.quantity - invoice.invoicereturns.quantity), if less then add 
+            #check if invoiceitems.count = (invoice.quantity - invoice.invoicereturns.quantity), if less then add
           @invoiceitemsnull = @invoice.taxinvoiceitems.where("sku_id IS null")
           @invoiceitemsnull.each do |invoiceitemsnull|
             invoiceitemsnull.destroy
           end
-          
-          c = @invoice.taxinvoiceitems.where("sku_id IS NOT null").count 
+
+          c = @invoice.taxinvoiceitems.where("sku_id IS NOT null").count
 
           qty = @invoice.quantity
           if !@invoice.receiptreturns.active.first.nil?
-            qty -= @invoice.receiptreturns.active.first.quantity 
+            qty -= @invoice.receiptreturns.active.first.quantity
           end
-              
-          if c < qty   
+
+          if c < qty
             c.upto(qty-1) do |i|
               @taxinvoiceitem = Taxinvoiceitem.new
-              @invoice.taxinvoiceitems << @taxinvoiceitem 
+              @invoice.taxinvoiceitems << @taxinvoiceitem
             end
-          end 
+          end
 
-          @is_wholesale = @invoice.taxinvoiceitems.where(:is_wholesale => true).any?       
-      end    
-    end  
+          @is_wholesale = @invoice.taxinvoiceitems.where(:is_wholesale => true).any?
+      end
+    end
   end
 
   def create
@@ -389,21 +396,21 @@ class TaxinvoiceitemsController < ApplicationController
   def destroy
     Taxinvoiceitem.destroy(params[:id])
     redirect_to request.referer
-  end 
+  end
 
   def rejected
     inputs = params[:taxinvoiceitems]
     # render json: inputs
     @taxinvoiceitem = Taxinvoiceitem.find(params[:id])
     @taxinvoiceitem.rejected = inputs[:rejected]
-    @taxinvoiceitem.reject_reason = inputs[:reject_reason] 
+    @taxinvoiceitem.reject_reason = inputs[:reject_reason]
 
     if @taxinvoiceitem.save
       redirect_to("/taxinvoiceitems/new/" + @taxinvoiceitem.invoice_id.to_s, :notice => 'Data Surat Tagihan sukses diupdate.')
     end
 
   end
-  
+
   #testing
 
   def index2
