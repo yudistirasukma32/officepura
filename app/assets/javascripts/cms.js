@@ -3092,6 +3092,10 @@ $(document).ready(function() {
 			errors = addComma(errors, "<strong>Pelanggan</strong>");
 		}
 
+		if ($('#event_commodity_id').val() == 0) {			
+			errors = addComma(errors, "<strong>Komoditas</strong>");
+		}
+
 		if (errors == "") {
 			form.submit();
 		}
