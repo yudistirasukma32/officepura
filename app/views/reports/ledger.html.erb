@@ -20,6 +20,7 @@
 				<th width="30">No.</th>
 				<th width="80">Tanggal</th>
 				<th>Keterangan</th>
+				<th>KTR</th>
 				<th width="90">Nopol</th>
 				<th width="110" class="right">Debit</th>
 				<th width="110" class="right">Kredit</th>
@@ -41,29 +42,29 @@
 			<!-- GROUP SANGU -->
 			<% if @inputs["Kas_Sangu"] == 'Yes' %>
 				<% @receipts = Receipt.find_by_sql("SELECT *
-													FROM (
-													select r.id, r.created_at, r.invoice_id, r.quantity, r.driver_allowance, r.helper_allowance, r.misc_allowance, 
-													r.tol_fee, r.ferry_fee, r.total, '' as expensetype,'' as description, 'r' as type
-													from receipts r
-												    where (r.created_at >= '#{@startdate.to_date}' and r.created_at < '#{@enddate.to_date + 1}') AND r.deleted = false AND
-												    r.driver_allowance + r.helper_allowance + r.misc_allowance + r.tol_fee + r.ferry_fee > money(0) 
-												    union
-												    select rt.id, rt.created_at, rt.invoice_id, rt.quantity, rt.driver_allowance, rt.helper_allowance, rt.misc_allowance, 
-												    rt.tol_fee, money(0), rt.total, '' as expensetype, '' as description, 'rt' as type
-													from receiptreturns rt
-												    where (rt.created_at >= '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.deleted = false AND
-												    rt.driver_allowance + rt.helper_allowance + rt.misc_allowance + rt.tol_fee > money(0) and invoice_id not in 
-												    (select invoice_id from receipts where (created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}') AND deleted = false)
-												    union
-												    select be.id, be.date as created_at, 0, 0, money(0), money(0), money(0), money(0), money(0), be.total, 'Debit', be.description, 're' as type
-												    from bankexpenses be
-												    where be.debitgroup_id = #{id_groupbank_sangu} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date + 1}')
-												    union
-												    select be.id, be.date as created_at, 0, 0, money(0), money(0), money(0), money(0), money(0), be.total, 'Kredit', be.description, 're' as type
-												    from bankexpenses be
-												    where be.creditgroup_id = #{id_groupbank_sangu} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date + 1}')
-												    ) AS rec order by rec.created_at" ) 
-													%>
+					FROM (
+					select r.id, r.created_at, r.invoice_id, r.quantity, r.driver_allowance, r.helper_allowance, r.misc_allowance, 
+					r.tol_fee, r.ferry_fee, r.total, '' as expensetype,'' as description, 'r' as type, r.office_id
+					from receipts r
+						where (r.created_at >= '#{@startdate.to_date}' and r.created_at < '#{@enddate.to_date + 1}') AND r.deleted = false AND
+						r.driver_allowance + r.helper_allowance + r.misc_allowance + r.tol_fee + r.ferry_fee > money(0) 
+						union
+						select rt.id, rt.created_at, rt.invoice_id, rt.quantity, rt.driver_allowance, rt.helper_allowance, rt.misc_allowance, 
+						rt.tol_fee, money(0), rt.total, '' as expensetype, '' as description, 'rt' as type, rt.office_id
+					from receiptreturns rt
+						where (rt.created_at >= '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.deleted = false AND
+						rt.driver_allowance + rt.helper_allowance + rt.misc_allowance + rt.tol_fee > money(0) and invoice_id not in 
+						(select invoice_id from receipts where (created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}') AND deleted = false)
+						union
+						select be.id, be.date as created_at, 0, 0, money(0), money(0), money(0), money(0), money(0), be.total, 'Debit', be.description, 're' as type, 0 as office_id
+						from bankexpenses be
+						where be.debitgroup_id = #{id_groupbank_sangu} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date + 1}')
+						union
+						select be.id, be.date as created_at, 0, 0, money(0), money(0), money(0), money(0), money(0), be.total, 'Kredit', be.description, 're' as type, 0 as office_id
+						from bankexpenses be
+						where be.creditgroup_id = #{id_groupbank_sangu} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date + 1}')
+						) AS rec order by rec.created_at" ) 
+				%>
 
 				<% if @receipts.any? %>
 					<tr class="subheading">
@@ -85,6 +86,7 @@
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
+						<td>&nbsp;</td>
 						<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
 					</tr>
 
@@ -101,6 +103,7 @@
 								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %>
 								<%= receipt.invoice.event_id && receipt.invoice.event_id != 0 ? " DO #" + receipt.invoice.event_id.to_s : ''  %></td>
+								<td><%= receipt.office.abbr rescue nil %></td>
 								<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
 								
@@ -127,6 +130,7 @@
 								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %>
 								<%= receipt.invoice.event_id && receipt.invoice.event_id != 0 ? " DO #" + receipt.invoice.event_id.to_s : ''  %></td>
+								<td><%= receipt.office.abbr rescue nil %></td>
 								<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=to_currency_bank(0) %></td>	
 								<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
@@ -142,6 +146,7 @@
 									<td><%=i+1%>.</td>
 									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 									<td><%= receipt.description%></td>
+									<td><%= receipt.office.abbr rescue nil %></td>
 									<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 									<td align="right"><%=to_currency_bank(receipt.total) %></td>
 									<td align="right"><%=to_currency_bank(0) %></td>
@@ -155,6 +160,7 @@
 									<td><%=i+1%>.</td>
 									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 									<td><%= receipt.description%></td>
+									<td><%= receipt.office.abbr rescue nil %></td>
 									<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 									<td align="right"><%=to_currency_bank(0) %></td>
 									<td align="right"><%=to_currency_bank(receipt.total) %></td>
@@ -166,6 +172,7 @@
 					<% end %>
 					
 					<tr class="footer">
+						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
@@ -181,19 +188,21 @@
 			<!-- GROUP SOLAR -->
 			<% if @inputs["Kas_Solar"] == 'Yes' %>
 				<% @receipts = Receipt.find_by_sql("SELECT *
-													FROM (
-														select rt.id, rt.created_at, rt.invoice_id, rt.quantity, rt.gas_allowance ,rt.total, '' as expensetype, '' as description, 'rt' as type 
-														from receipts rt
-														where(rt.created_at > '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.gas_allowance > money(0) AND rt.deleted = false
-														union
-													    select be.id, be.date as created_at, 0, 0, money(0), be.total, 'Debit', be.description, 're' as type
-													    from bankexpenses be
-													    where be.debitgroup_id = #{id_groupbank_solar} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date}')
-													    union
-													    select be.id, be.date as created_at, 0, 0, money(0), be.total, 'Kredit', be.description, 're' as type
-													    from bankexpenses be
-													    where be.creditgroup_id = #{id_groupbank_solar} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date}')
-													    ) AS rec order by rec.created_at") %>
+					FROM (
+						select rt.id, rt.created_at, rt.invoice_id, rt.quantity, rt.gas_allowance ,rt.total, '' as expensetype, '' as description, 'rt' as type, rt.office_id
+						from receipts rt
+						where(rt.created_at > '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.gas_allowance > money(0) AND rt.deleted = false
+						union
+							select be.id, be.date as created_at, 0, 0, money(0), be.total, 'Debit', be.description, 're' as type, 0 as office_id
+							from bankexpenses be
+							where be.debitgroup_id = #{id_groupbank_solar} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date}')
+							union
+							select be.id, be.date as created_at, 0, 0, money(0), be.total, 'Kredit', be.description, 're' as type, 0 as office_id
+							from bankexpenses be
+							where be.creditgroup_id = #{id_groupbank_solar} and be.deleted = false and (be.date >= '#{@startdate.to_date}' and be.date < '#{@enddate.to_date}')
+							) AS rec order by rec.created_at")
+				%>
+
 				<% if @receipts.any? %>
 					<tr class="subheading">
 						<th colspan="7" style="color:#000;">Solar</th>
@@ -208,6 +217,7 @@
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>Saldo Awal</td>
+						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
@@ -226,6 +236,7 @@
 								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %>
 								<%= receipt.invoice.event_id && receipt.invoice.event_id != 0 ? " DO #" + receipt.invoice.event_id.to_s : ''  %></td>
+								<td><%= receipt.office.abbr rescue nil %></td>
 								<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=to_currency_bank(receipt.gas_allowance) %></td>
 								<td align="right"><%=to_currency_bank(0) %></td>
@@ -264,6 +275,7 @@
 					<% end %>
 
 					<tr class="footer">
+						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
@@ -317,6 +329,7 @@
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
+						<td>&nbsp;</td>
 						<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
 					</tr>
 
@@ -333,6 +346,7 @@
 								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.bonusreceipt.quantity rescue nil%><%=receipt.invoice.quantity rescue nil%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %>
 								<%= receipt.invoice.event_id && receipt.invoice.event_id != 0 ? " DO #" + receipt.invoice.event_id.to_s : ''  %></td>
+								<td><%= receipt.office.abbr rescue nil %></td>
 								<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=to_currency_bank(receipt.total) %></td>
 								<td align="right"><%=to_currency_bank(0) %></td>
@@ -347,6 +361,7 @@
 									<td><%=i+1%>.</td>
 									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 									<td><%=receipt.description%></td>
+									<td><%= receipt.office.abbr rescue nil %></td>
 									<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 									<td align="right"><%=to_currency_bank(receipt.total) %></td>
 									<td align="right"><%=to_currency_bank(0) %></td>
@@ -360,6 +375,7 @@
 									<td><%=i+1%>.</td>
 									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 									<td><%= receipt.description%></td>
+									<td><%= receipt.office.abbr rescue nil %></td>
 									<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 									<td align="right"><%=to_currency_bank(0) %></td>
 									<td align="right"><%=to_currency_bank(receipt.total) %></td>
@@ -370,6 +386,7 @@
 					<% end %>
 
 					<tr class="footer">
+						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
@@ -400,6 +417,7 @@
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
+						<td>&nbsp;</td>
 						<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
 					</tr>
 
@@ -419,6 +437,7 @@
 							<td><%=i+1%>.</td>
 							<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 							<td><%= getwords(productname, 35) %><%= " (" + receipt.productorder.productrequest.vehicle.current_id + ")" if receipt.productorder.productrequest and !receipt.productorder.productrequest.vehicle_id.nil? %></td>
+							<td><%= receipt.office.abbr rescue nil %></td>
 							<td><%= receipt.productorder.productrequest.vehicle.current_id rescue nil %></td>
 							<td align="right"><%=to_currency_bank(receipt.total) %></td>
 							<td align="right"><%=to_currency_bank(0) %></td>
@@ -427,6 +446,7 @@
 					<% end %>
 
 					<tr class="footer">
+						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
@@ -518,6 +538,7 @@
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>
+								<td>&nbsp;</td>
 								<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
 							</tr>
 
@@ -531,6 +552,7 @@
 								<td><%=i+1%>.</td>
 								<td><%=expense.created_at.to_date.strftime('%d-%m-%Y')%></td>
 								<td><%=expense.officeexpense.description%></td>
+								<td><%= receipt.office.abbr rescue nil %></td>
 								<td><%=expense.officeexpense.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=expense.expensetype == 'Kredit' ? to_currency_bank(expense.total) : '0'%></td>
 								<td align="right"><%=expense.expensetype == 'Debit' ? to_currency_bank(expense.total) : '0'%></td>
@@ -538,6 +560,7 @@
 							</tr>
 							<% end %>
 							<tr class="footer">
+								<td>&nbsp;</td>
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>
@@ -574,6 +597,7 @@
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>
+								<td>&nbsp;</td>
 								<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
 							</tr>
 							<!-- KAS BANK -->
@@ -605,6 +629,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=expense.created_at.to_date.strftime('%d-%m-%Y')%></td>
 										<td><%=expense.description%></td>
+										<td><%= receipt.office.abbr rescue nil %></td>
 										<td><%=expense.officeexpense.vehicle.current_id rescue nil %></td>
 										<td>&nbsp;</td>
 										<td align="right"><%=expense.expensetype == 'Debit' ? to_currency_bank(expense.total) : '0'%></td>
@@ -618,21 +643,22 @@
 							
 							<!-- SANGU/BKK -->
 							<% @receipts = Receipt.find_by_sql("SELECT *
-														FROM (
-														select r.id, r.created_at, r.invoice_id, r.quantity, r.driver_allowance, r.helper_allowance, r.misc_allowance, 
-														r.tol_fee, r.ferry_fee, 'r' as type
-														from receipts r
-													    where (r.created_at >= '#{@startdate.to_date}' and r.created_at < '#{@enddate.to_date + 1}') AND r.deleted = false AND
-													    r.driver_allowance + r.helper_allowance + r.misc_allowance + r.tol_fee + r.ferry_fee > money(0) 
-													    union
-													    select rt.id, rt.created_at, rt.invoice_id, rt.quantity, rt.driver_allowance, rt.helper_allowance, rt.misc_allowance, 
-													    rt.tol_fee, money(0), 'rt' as type
-														from receiptreturns rt
-													    where (rt.created_at >= '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.deleted = false AND
-													    rt.driver_allowance + rt.helper_allowance + rt.misc_allowance + rt.tol_fee > money(0) and invoice_id not in 
-													    (select invoice_id from receipts where (created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}') AND deleted = false)
-													    ) AS rec
-														order by rec.created_at" ) %>
+								FROM (
+								select r.id, r.created_at, r.invoice_id, r.quantity, r.driver_allowance, r.helper_allowance, r.misc_allowance, 
+								r.tol_fee, r.ferry_fee, 'r' as type, r.office_id
+								from receipts r
+									where (r.created_at >= '#{@startdate.to_date}' and r.created_at < '#{@enddate.to_date + 1}') AND r.deleted = false AND
+									r.driver_allowance + r.helper_allowance + r.misc_allowance + r.tol_fee + r.ferry_fee > money(0) 
+									union
+									select rt.id, rt.created_at, rt.invoice_id, rt.quantity, rt.driver_allowance, rt.helper_allowance, rt.misc_allowance, 
+									rt.tol_fee, money(0), 'rt' as type, rt.office_id
+								from receiptreturns rt
+									where (rt.created_at >= '#{@startdate.to_date}' and rt.created_at < '#{@enddate.to_date + 1}') AND rt.deleted = false AND
+									rt.driver_allowance + rt.helper_allowance + rt.misc_allowance + rt.tol_fee > money(0) and invoice_id not in 
+									(select invoice_id from receipts where (created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}') AND deleted = false)
+									) AS rec
+								order by rec.created_at" )
+							%>
 
 							<% if @receipts.any? %>
 								<tr class="subheading">
@@ -650,6 +676,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+										<td><%= receipt.office.abbr rescue nil %></td>
 										<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 
 										<% if !receipt.invoice.receiptreturns.active.where("created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}'").first.nil? %>
@@ -676,6 +703,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+										<td><%= receipt.office.abbr rescue nil %></td>
 										<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
 										<td align="right"><%=to_currency_bank(0) %></td>	
@@ -705,6 +733,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+										<td><%= receipt.office.abbr rescue nil %></td>
 										<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=to_currency_bank(0) %></td>
 										<td align="right"><%=to_currency_bank(receipt.gas_allowance) %></td>
@@ -730,6 +759,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.bonusreceipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+										<td><%= receipt.office.abbr rescue nil %></td>
 										<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=to_currency_bank(0) %></td>
 										<td align="right"><%=to_currency_bank(receipt.total) %></td>
@@ -761,6 +791,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td><%= getwords(productname, 35) %><%= " (" + receipt.productorder.productrequest.vehicle.current_id + ")" if receipt.productorder.productrequest and !receipt.productorder.productrequest.vehicle_id.nil? %></td>
+										<td><%= receipt.office.abbr rescue nil %></td>
 										<td><%=receipt.productorder.productrequest.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=to_currency_bank(0) %></td>
 										<td align="right"><%=to_currency_bank(receipt.total) %></td>
@@ -803,6 +834,7 @@
 							<% end %>
 
 							<tr class="footer">
+								<td>&nbsp;</td>
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>
@@ -914,6 +946,7 @@
 									<td>&nbsp;</td>
 									<td>&nbsp;</td>
 									<td>&nbsp;</td>
+									<td>&nbsp;</td>
 									<td align="right"<% if running < 0 %> class="red"<% end %>><%=to_currency_bank(running)%></td>
 								</tr>
 
@@ -927,6 +960,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=expense.date.to_date.strftime('%d-%m-%Y')%></td>
 										<td><%=expense.description%><% if !expense.productrequest_id.nil? %><%=" (" + expense.productrequest.vehicle.current_id + ")" if expense.productrequest and !expense.productrequest.vehicle_id.nil? %><% end %><% if !expense.productorder.nil? %><%=" (" + expense.productorder.productrequest.vehicle.current_id + ")" if expense.productorder.productrequest and !expense.productorder.productrequest.vehicle_id.nil? %><% end %></td>
+										<td><%= receipt.office.abbr rescue nil %></td>
 										<td><%=expense.productrequest.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=expense.debitgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
 										<td align="right"><%=expense.creditgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
@@ -934,6 +968,7 @@
 									</tr>
 								<% end %>
 								<tr class="footer">
+									<td>&nbsp;</td>
 									<td>&nbsp;</td>
 									<td>&nbsp;</td>
 									<td>&nbsp;</td>
