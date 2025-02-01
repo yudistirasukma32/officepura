@@ -32,12 +32,12 @@ end
 
 scheduler = Rufus::Scheduler.new
 
-scheduler.cron '0 5 * * *' do 
-	removeunuseddatayml
-	dumpdatabase
-end
+# scheduler.cron '0 5 * * *' do 
+# 	removeunuseddatayml
+# 	dumpdatabase
+# end
 
-scheduler.cron '0 11 * * *' do 
+scheduler.cron '0 22 * * *' do 
 	removeunuseddatayml
 	dumpdatabase
 end
