@@ -66,8 +66,8 @@
 				<% @insuranceexpenses.each do |insuranceexpense| %>
 
 					<% tsitotal = insuranceexpense.invoice.event.tsi_total rescue 0 %>
-					<% rate = 0.0005 %>
-					<% rate_text = 0.0005 * 100 %>
+					<% rate = 0.0008 %>
+					<% rate_text = 0.0008 * 100 %>
 					<% est_premi = rate * tsitotal %>
 					<% qty = insuranceexpense.invoice.event.qty rescue 0 %>
 					<% est_volume = insuranceexpense.invoice.event.volume rescue 0 %>
