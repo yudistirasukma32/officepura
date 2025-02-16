@@ -114,48 +114,48 @@ class MechaniclogsController < ApplicationController
 
     if @mechaniclog.save
 
-      require "uri"
-      require "json"
-      require "net/http"
+      # require "uri"
+      # require "json"
+      # require "net/http"
 
-      url = URI("https://cfqnoscorhtigmmgeqvn.supabase.co/rest/v1/requests")
+      # url = URI("https://cfqnoscorhtigmmgeqvn.supabase.co/rest/v1/requests")
 
-      https = Net::HTTP.new(url.host, url.port)
-      https.use_ssl = true
+      # https = Net::HTTP.new(url.host, url.port)
+      # https.use_ssl = true
 
-      # http = Net::HTTP.new(url.host, url.port)
-      # http.use_ssl = true
-      # request = Net::HTTP::Post.new(url)
+      # # http = Net::HTTP.new(url.host, url.port)
+      # # http.use_ssl = true
+      # # request = Net::HTTP::Post.new(url)
 
-      https.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      request = Net::HTTP::Get.new(url.request_uri)
+      # https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      # request = Net::HTTP::Get.new(url.request_uri)
 
-      request["apikey"] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmcW5vc2Nvcmh0aWdtbWdlcXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE4MTMyNTcsImV4cCI6MjAzNzM4OTI1N30.83mp7AAZGLoGC6Tx3Zo0YJy1ordtGrn6vvjs1gtAtBU"
-      request["Authorization"] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmcW5vc2Nvcmh0aWdtbWdlcXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE4MTMyNTcsImV4cCI6MjAzNzM4OTI1N30.83mp7AAZGLoGC6Tx3Zo0YJy1ordtGrn6vvjs1gtAtBU"
-      request["Content-Type"] = "application/json"
-      request["Prefer"] = "return=minimal"
-      request.body = JSON.dump({
-        "request_date": @mechaniclog.date,
-        "description": @mechaniclog.description,
-        "origin": "pura",
-        "vehicle_number": @mechaniclog.vehicle.current_id,
-        "vehicle_origin": "pura",
-        "vehicle_origin_id": @mechaniclog.vehicle_id,
-        "request_origin_id": @mechaniclog.id,
-        "request_type": @mechaniclog.request_type,
-        "request_level": @mechaniclog.request_level,
-        "request_location": @mechaniclog.request_location,
-        "driver_name": @mechaniclog.driver.name,
-        "driver_origin_id": @mechaniclog.driver_id,
-        "office_id": @mechaniclog.office_id,
-        "office_abbr": @mechaniclog.office.abbr,
-        "invoice_origin_id": @mechaniclog.invoice_id,
-        "profile_id": "b05c3a97-839e-4a8f-a93f-7ca76209b8f6",
-        "mechanic_name": @mechaniclog.mechanic.name,
-      })
+      # request["apikey"] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmcW5vc2Nvcmh0aWdtbWdlcXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE4MTMyNTcsImV4cCI6MjAzNzM4OTI1N30.83mp7AAZGLoGC6Tx3Zo0YJy1ordtGrn6vvjs1gtAtBU"
+      # request["Authorization"] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmcW5vc2Nvcmh0aWdtbWdlcXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE4MTMyNTcsImV4cCI6MjAzNzM4OTI1N30.83mp7AAZGLoGC6Tx3Zo0YJy1ordtGrn6vvjs1gtAtBU"
+      # request["Content-Type"] = "application/json"
+      # request["Prefer"] = "return=minimal"
+      # request.body = JSON.dump({
+      #   "request_date": @mechaniclog.date,
+      #   "description": @mechaniclog.description,
+      #   "origin": "pura",
+      #   "vehicle_number": @mechaniclog.vehicle.current_id,
+      #   "vehicle_origin": "pura",
+      #   "vehicle_origin_id": @mechaniclog.vehicle_id,
+      #   "request_origin_id": @mechaniclog.id,
+      #   "request_type": @mechaniclog.request_type,
+      #   "request_level": @mechaniclog.request_level,
+      #   "request_location": @mechaniclog.request_location,
+      #   "driver_name": @mechaniclog.driver.name,
+      #   "driver_origin_id": @mechaniclog.driver_id,
+      #   "office_id": @mechaniclog.office_id,
+      #   "office_abbr": @mechaniclog.office.abbr,
+      #   "invoice_origin_id": @mechaniclog.invoice_id,
+      #   "profile_id": "b05c3a97-839e-4a8f-a93f-7ca76209b8f6",
+      #   "mechanic_name": @mechaniclog.mechanic.name,
+      # })
 
-      response = https.request(request)
-      puts response.read_body
+      # response = https.request(request)
+      # puts response.read_body
 
       if @mechaniclog.request_type == 'repair'
         redirect_to('/mechaniclogs-proceed', :notice => 'Data Request Perbaikan berhasil disimpan')
