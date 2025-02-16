@@ -78,8 +78,8 @@
 <%= render "shared/header" %>
 
 <div id="nav">
-		<%= render "shared/nav" %>
-	</div>
+	<%= render "shared/nav" %>
+</div>
 
 <div id="main">
 
@@ -91,19 +91,35 @@
 
 		<div id="filter">
 			<form id="filterform" name="filterform" action="" method="get">
-			<div class="field-row continue">
+				<div class="field-row continue">
 
-				<label for="customer" class="middle">Customer</label>
-				<select name="customer" class="half left chzn-select customer_id">
-					<option value="all">All</option>
-					<% @customers.each do |customer| %>
-					<option value="<%=customer.id%>" <%= params[:customer_id].to_i == customer.id ? "selected" : "" %>><%=customer.name%></option>
-					<% end %>
-				</select>
-				<label for="query-name" class="middle">Jurusan</label>
-				<input type="text" name="search" id="query-name" class="half left" placeholder="" style="margin-left: 10px;">
-				<input class="submit left" type="submit" value="Filter" />
-			</div>
+					<label for="date" class="middle">Bulan / Thn</label>
+					<select name="month" id="month" class="half left" style="margin-right:10px;">
+						<% (1.upto(12)).each do |m| %>
+						<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+						<% end %>
+					</select>			
+					<select name="year" id="year" class="short left">
+						<%= year_to = Quotationgroup.order(:date).first.date.year rescue nil || Date.today.year %>
+						<% start_year = Date.today.month == 12 ? Date.today.year + 1 : Date.today.year %>
+						<% start_year.downto(year_to).each do |y| %>
+						<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+						<% end %>
+					</select>
+
+					<label for="customer" class="middle">Pelanggan</label>
+					<select name="customer" class="half left chzn-select customer_id">
+						<option value="all">All</option>
+						<% @customers.each do |customer| %>
+						<option value="<%=customer.id%>" <%= params[:customer_id].to_i == customer.id ? "selected" : "" %>><%=customer.name%></option>
+						<% end %>
+					</select>
+
+
+					<label for="query-name" class="middle">Jurusan</label>
+					<input type="text" name="search" id="query-name" class="half left" placeholder="" style="margin-left: 10px;">
+					<input class="submit left" type="submit" value="Filter" />
+				</div>
 			</form>
 		</div>
 
@@ -195,6 +211,8 @@
 		function show_data() {
 			query  = $("#query-name").val();
 			customer_id  = $(".customer_id").val();
+			year  = $("#year").val();
+			month  = $("#month").val();
 			if (old_customer_id != customer_id || old_query != query) {
 				global_page = 1;
 			}
@@ -205,7 +223,7 @@
 				url: "<%= index_api_quotationgroups_url %>",
 				method: "get",
 				data:{
-					query,customer_id,page: global_page
+					query, customer_id, month, year, page: global_page
 				},
 				dataType: "html",
 				success:function(data){

@@ -4,16 +4,59 @@
 	<%= render "shared/nav" %>
 </div>
 
+<style>
+	.green {
+		background-image: linear-gradient(#4CAF50, #4CAF50) !important;
+		border-color: #8BC34A #8BC34A #8BC34A !important;
+		pointer-events: none !important;
+	}
+
+	.disabled {
+		pointer-events: none !important;
+	}
+</style>
+
 <div id="main">
 	<div id="content-full">
+
+		<div style="width: 100%;display: flex;justify-content: space-between;align-items: center;">
 
 		<% if params[:operational] || params[:operational] == true %>
 			<a class="btn-txt cancel" href="<%= quotationgroups_url %>"><i class="icon-remove"></i> Kembali Ke Penawaran</a>
 			<h1>Marketing / <a href="<%=quotationgroups_path%>">Penawaran</a> / Edit</h1>
 		<% else %>
-			<a class="btn-txt cancel" href="<%=quotationgroups_url%>"><i class="icon-remove"></i> Kembali Ke Penawaran</a>
-			<h1>Edit Penawaran</h1>
+
+			<h1 style="">
+			<!-- <a class="btn-txt cancel" href="<%=quotationgroups_url%>"><i class="icon-remove"></i> Kembali Ke Penawaran</a> -->
+			Edit Penawaran
+			</h1>
+
+			<span>
+			<% if checkrole 'General Manager' %>
+				<% if @quotationgroup.reviewed && !@quotationgroup.confirmed %>
+					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_confirm'>Konfirmasi GM</a>
+				<% end %>
+
+				<% if !@quotationgroup.reviewed%>	
+					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_confirm'>Review GM</a>
+				<% end %>
+			<% elsif checkrole 'Admin Marketing' %>
+				<% if @quotationgroup.confirmed%>
+					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_confirm'>Kirim</a>
+				<% end %>
+				<% if @quotationgroup.is_sent%>
+					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_confirm'>Customer Approve</a>
+				<% end %>
+			<% end %>
+
+			<% if @quotationgroup.customer_approved%>
+				<a class="btn-txt green disabled" href="#" style="margin-bottom: 12px;"><i class="icon-check"></i> Cust Approved</a>
+			<% end %>
+
+			</span>
 		<% end %>
+
+		</div>
 
 		<% tab = 0 %>
 		<ul class="rounded" id="tabbed">
@@ -21,6 +64,9 @@
 			<% if checkrole 'Admin Jurusan, Admin Marketing, Marketing' %>
 			<li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
 			<% end %>
+			<li><a id="link_<%=tab+=1%>" href="">Preview</a></li>
+			<li><a id="link_<%=tab+=1%>" href="">Status</a></li>
+			<li><a id="link_<%=tab+=1%>" href="">Riwayat Penawaran</a></li>
 		</ul>
 
 		<br class="clearfix" />
@@ -35,27 +81,40 @@
 					<div style="float: left; width: 300px;">
 							<% if @quotationgroup %>
 
-							<h3 class="zone" style="font-weight: bold;">Upload attachment</h3>
+								<h3 class="zone" style="font-weight: bold;">Lampiran</h3>
 
-							<% if @quotationgroup.images.where("file_uid is not null and file_uid <> ''").any? %>
-							<% @quotationgroup.images.where("file_uid is not null and file_uid <> ''").each do |img| %>
-							<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
-						
-							<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
-							
-								<a href="<%= img.file.url() %>" target="_blank">
-									<%= image_tag img.file.thumb('480x320').url(:suffix => "/#{img.name}") if img.file_uid %>
-								</a>
+								<% if @quotationgroup.images.where("file_uid is not null and file_uid <> ''").any? %>
+									<% @quotationgroup.images.where("file_uid is not null and file_uid <> ''").each do |img| %>
+									<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
 								
-								<% else %>
-								
-									<a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
-								
-								<% end %>
+									<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+									
+										<a href="<%= img.file.url if img.file_uid rescue file_url(img) %>" target="_blank">
+										<%= image_tag file_url(img), style: "width: 100%;" %>
+										</a>
 
-								<br /><br /><%= link_to '&raquo; Hapus File'.html_safe, '/attachments/removeQuot/' + @quotationgroup.images.first.id.to_s %>
-								<br>
-								<br>
+									<% else %>
+									
+										<a href="<%= img.file.url if img.file_uid rescue file_url(img) %>" target="_blank">
+										<%= img.file_uid ? File.basename(img.file_uid).truncate(40) : '' %>
+										</a>
+									
+									<% end %>
+
+									<br /><br />
+									
+									<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; font-size: 10px;">
+										<span style="font-size: 10px; color: #717171;"><%= img.name rescue nil %> Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+
+										<% if img.enabled %>
+										<%= link_to '&raquo; Hapus File'.html_safe, '/attachments/removeQuot/' + @quotationgroup.images.first.id.to_s %>
+										<% else %>
+										<span style="font-size: 10px; color: #717171;">Dihapus</span>
+										<% end %>
+
+									</div>
+
+									<br /><br />
 								<% end %>
 
 							<% end %>
@@ -65,8 +124,8 @@
 							<input type="hidden" name="item_id" value="<%=@quotationgroup.id%>" />
 
 							<div class="field-row" style="width: 300px;">
-								<label for="name">Nama</label>
-								<input type="text" name="attachment[name]" style="width: 100%; max-width: 280px;"/>
+								<label for="name" style="width: 100%;">Tambah Lampiran</label>
+								<%= select_tag 'attachment[name]', options_for_select(@attachments_category), style: 'width: 300px;' %>
 							</div>
 
 							<div class="field-row continue" style="width: 100%;">
@@ -86,6 +145,18 @@
 
 			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
 					<%= render "quotationitem" %>
+			    </div>
+
+				<div class="sliding_tab" id="tab_<%=tab+=1%>">
+					<%= render "preview" %>
+			    </div>
+
+				<div class="sliding_tab" id="tab_<%=tab+=1%>">
+					<%= render "status" %>
+			    </div>
+
+				<div class="sliding_tab" id="tab_<%=tab+=1%>">
+					<%= render "quotationlog" %>
 			    </div>
 				
 			</div>

@@ -17,82 +17,93 @@
 	<div id="content-full">
 	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
 	
-	<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Estimasi BKK vs DO: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+	<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Est BKK vs DO: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
 
 	<br class="clearfix" />
 
 	<div id="filter">
 		<form id="filterform" name="filterform" action="" method="get">
-			<div class="field-row continue">
-				<div style="position: relative; width: fit-content; float: left;">
-				<label for="customer_id"  style="width: 50px;"/>Pelanggan</label>
-				<select name="customer_id" class="half left chzn-select" style="width: 150px;"/>
-					<option value="">Semua Pelanggan</option>
-					<% @customers.each do |customer| %>
-					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
-					<% end %>
-				</select>
-				</div>
-				<label for="office_id" class="middle" style="width: 50px;"/>Kantor</label>
-				<select name="office_id" class="short left office_id" style="margin-right: 5px;">	
-					<option value="all">All</option>
-					<% Office.active.each do |office| %>
-					<option value="<%=office.id%>" <%= params[:office_id].to_i == office.id ? "selected" : "" %>><%=office.name%></option>
-					<% end %>
-				</select>
-				<label for="transporttype"  class="middle" style="width: 50px; padding: 0 10px 0 5px;">Tipe DO</label>
-				<select name="transporttype" class="short left combo_route "  style="margin-right: 15px;">	
-				<option value="all">Semua Tipe</option>
-					<% ["STANDART","KERETA","RORO","LOSING"].each do |type| %>
-					<option <%= type == params[:transporttype] ? 'selected' : '' %>><%=type%></option>
-					<% end %>
-				</select>
-				<label for="tanktype" class="middle" style="width: 40px;padding: 0 10px 0 5px;">Group</label>
-				<select name="tanktype" class="short left combo_route" style="margin-right: 15px;">	
-				<option value="all">Semua Group</option>
-					<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
-					<% ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI'].each do |type| %>
-					<option <%= type == params[:tanktype] ? 'selected' : '' %>><%=type%></option>
-					<% end %>
-				</select>
-				<label for="startdate" style="width: 50px;"/>Tgl Awal</label>
-				<input type="text" name="startdate" class="left half date-picker" value="<%=@startdate%>" style="width: 80px;"/>
-				<label for="enddate" class="middle" style="width: 40px;"/>Akhir</label>
-				<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" style="width: 80px;"/>
+		<div class="field-row continue">
+			<div style="position: relative; width: fit-content; float: left;">
+			<label for="customer_id"  style="width: 50px;"/>Pelanggan</label>
+			<select name="customer_id" class="half left chzn-select" style="width: 160px;"/>
+				<option value="">Semua Pelanggan</option>
+				<% @customers.each do |customer| %>
+				<option value="<%=customer.id%>"<% if customer.id == @customer_id.to_i %> selected='selected'<% end %>><%=customer.name%></option>
+				<% end %>
+			</select>
 			</div>
-			
-			<div class="field-row continue" style="margin-top: 10px; display: flex; column-gap: 10px;">
+			<label for="office_id" class="middle" style="width: 50px;"/>Kantor</label>
+			<select name="office_id" class="short left office_id" style="margin-right: 5px;">	
+				<option value="all">All</option>
+				<% Office.active.each do |office| %>
+				<option value="<%=office.id%>" <%= params[:office_id].to_i == office.id ? "selected" : "" %>><%=office.name%></option>
+				<% end %>
+			</select>
+			<label for="transporttype"  class="middle" style="width: 50px; padding: 0 10px 0 5px;">Tipe DO</label>
+			<select name="transporttype" class="short left combo_route "  style="margin-right: 15px;">	
+			<option value="all">Semua Tipe</option>
+				<% ["STANDART","KERETA","RORO","LOSING"].each do |type| %>
+				<option <%= type == params[:transporttype] ? 'selected' : '' %>><%=type%></option>
+				<% end %>
+			</select>
+			<label for="tanktype" class="middle" style="width: 40px;padding: 0 10px 0 5px;">Group</label>
+			<select name="tanktype" class="short left combo_route" style="margin-right: 15px;">	
+			<option value="all">Semua Group</option>
+				<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
+				<% ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'DRY CONTAINER 20FT', 'DRY CONTAINER 40FT', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI'].each do |type| %>
+				<option <%= type == params[:tanktype] ? 'selected' : '' %>><%=type%></option>
+				<% end %>
+			</select>
+			<label for="startdate" style="width: 50px;"/>Tgl Awal</label>
+			<input type="text" name="startdate" class="left half date-picker" value="<%=@startdate%>" style="width: 80px;"/>
+			<label for="enddate" class="middle" style="width: 40px;"/>Akhir</label>
+			<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" style="width: 80px;"/>
+		</div>
+
+		<div class="field-row continue" style="margin-top: 10px; display: flex; column-gap: 10px;">
+			<div style="position: relative; width: fit-content; float: left;">
+				<label for="commodity_id" style="width: 64px;">Komoditas</label>
+				<select name="commodity_id" class="third left chzn-select" style="margin-right: 15px;">	
+				<option value="">Semua Komoditas</option>
+				<% Commodity.active.order(:name).each do |comodity| %>
+					<option value="<%= comodity.id %>"<% if comodity.id == @commodity_id.to_i %> selected='selected'<% end %>><%= comodity.name %></option>
+				<% end %>
+				</select>
+			</div>
+
+			<div style="position: relative; width: fit-content; float: left;">
+				<label for="operator_id"  style="width: 60px;"/>OP Kereta</label>
+				<select name="operator_id" class="half left chzn-select" style="width: 100px;" onchange="javascript:getRouteTrains(this.value);"/>
+					<option value="all">Semua Operator</option>
+					<% operators = Operator.active %>
+					<% operators.each do |operator| %>
+					<option value="<%=operator.id%>" <%= operator.id == params[:operator_id].to_i ? "selected" : '' %>><%=operator.abbr%></option>
+					<% end %>
+				</select>
+			</div>
+			<div id="route-trains">
 				<div style="position: relative; width: fit-content; float: left;">
-					<label for="operator_id"  style="width: 60px;"/>OP Kereta</label>
-					<select name="operator_id" class="half left chzn-select" style="width: 140px;" onchange="javascript:getRouteTrains(this.value);"/>
-						<option value="all">Semua Operator</option>
-						<% operators = Operator.active %>
-						<% operators.each do |operator| %>
-						<option value="<%=operator.id%>" <%= operator.id == params[:operator_id].to_i ? "selected" : '' %>><%=operator.abbr%></option>
+					<label for="routetrain_id"  style="width: 70px;  padding-right: 5px;">Jur Kereta</label>
+					<select name="routetrain_id" class="half left chzn-select" style="width: 200px;">
+						<option value="all">Semua Jurusan</option>
+						<% routetrains = Routetrain.active %>
+						<% routetrains.each do |route| %>
+							<option value="<%=route.id%>" <%= route.id == params[:routetrain_id].to_i ? "selected" : '' %>><%=route.name%> - <%= route.container_type %></option>
 						<% end %>
 					</select>
 				</div>
-				<div id="route-trains">
-					<div style="position: relative; width: fit-content; float: left;">
-						<label for="routetrain_id"  style="width: 90px;">Jur Kereta</label>
-						<select name="routetrain_id" class="half left chzn-select" style="width: 450px;">
-							<option value="all">Semua Jurusan</option>
-							<% routetrains = Routetrain.active %>
-							<% routetrains.each do |route| %>
-								<option value="<%=route.id%>" <%= route.id == params[:routetrain_id].to_i ? "selected" : '' %>><%=route.name%> - <%= route.container_type %></option>
-							<% end %>
-						</select>
-					</div>
-				</div>
-				<div style="position: relative; width: fit-content; float: left;">
-					<label for="createdat"  style="width: 50px; padding-right: 5px;">Dibuat</label>
-					<select name="createdat" class="short left combo_route" style="margin-right: 15px;">	
-					<option value="all">Semua</option>
-						<% ['08.00-12.00', '12.00-17.00'].each do |type| %>
-						<option <%= type == params[:createdat] ? 'selected' : '' %>><%=type%></option>
-						<% end %>
-					</select>
-				</div>
+			</div>
+			<div style="position: relative; width: fit-content; float: left;">
+				<label for="createdat"  style="width: 50px; padding-right: 5px;">Dibuat</label>
+				<select name="createdat" class="short left combo_route" style="margin-right: 15px;">	
+				<option value="all">Semua</option>
+					<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
+					<% ['08.00-12.00', '12.00-17.00'].each do |type| %>
+					<option <%= type == params[:createdat] ? 'selected' : '' %>><%=type%></option>
+					<% end %>
+				</select>
+			</div>
 				<input class="submit" type="submit" value="Filter" style="margin-top: -3px; margin-left: 16px;"/>
 			</div>
 		</form>
@@ -107,7 +118,6 @@
 			<th width="40">Tgl</th>
 			<th width="40">Dibuat</th>
 			<th>Keterangan</th>
-			<th>Type</th>
 			<th>KTR</th>
 			<th width="60" class="right {sorter:true, filter: false}">Supir</th>
 			<th width="60" class="right {sorter:true, filter: false}">Kernet</th>
@@ -116,8 +126,8 @@
 			<th width="60" class="right {sorter:true, filter: false}">Premi</th>
 			<th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
 			<th width="60" class="right sorter:true, filter: false">Total BKK</th>
+			<th width="60" class="right sorter:true, filter: false">PPN</th>
 			<th width="60" class="right {sorter:true, filter: false}">Total DO</th>
-			<%# <th width="50" class="right {sorter:true, filter: false}">%</th> %>
 		</tr>
 
 		<% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
@@ -136,8 +146,9 @@
 				<br>
 				<%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
 			<% end %>
+			<br>
+			<%=event[:tanktype] %>
 			</td>
-			<td><%=event[:tanktype] %></td>
 			<td><%=event[:office] %></td>
 			<td class="" align="right"><%=to_currency(event[:supir])%></td>
 			<td class="" align="right"><%=to_currency(event[:kernet])%></td>
@@ -146,6 +157,7 @@
 			<td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
 			<td class="" align="right"><%=to_currency(event[:tol_asdp])%></td>
 			<td class="red" align="right"><%=to_currency(event[:invoice_total])%></td>
+			<td class="red" align="right"><%=to_currency(event[:ppn])%></td>
 			<td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
             <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
             <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
@@ -163,6 +175,7 @@
 			<td align="right"><%=to_currency(@summary[:global_premi])%></td>
 			<td align="right"><%=to_currency(@summary[:global_tol_asdp])%></td>
 			<td class="total" align="right"><%=to_currency(@summary[:global_invoice_total])%></td>
+			<td class="total" align="right"><%=to_currency(@summary[:global_ppn_total])%></td>
 			<td class="total" align="right"><%=to_currency(@summary[:global_total_estimation])%></td>
 			<td align="right" class="total">
 				<span style="display: none">

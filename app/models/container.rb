@@ -6,7 +6,7 @@ class Container < ActiveRecord::Base
 	belongs_to :vendor
 
 	# Setup accessible (or protected) attributes for your model
-	attr_accessible :enabled, :deleted, :containernumber, :category, :vendor_id
+	attr_accessible :enabled, :deleted, :containernumber, :category, :vendor_id, :group
 
 	scope :active, lambda {where(:enabled => true, :deleted => false)}  
 	

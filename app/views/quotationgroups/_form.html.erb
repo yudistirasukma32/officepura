@@ -99,12 +99,12 @@
 
   <div class="field-row">
     <%= f.label :long_id, "Nomor" %>
-    <%= f.text_field :long_id, required: true%>
+    <%= f.text_field :long_id, required: true %>
   </div>
 
   <div class="field-row">
     <%= f.label :date, "Tanggal" %>
-    <%= f.text_field :date, :class => 'half date-picker' %>
+    <%= f.text_field :date, :class => 'half date-picker', required: true %>
   </div>
   
   <% if @process == 'edit' && @quotationgroup.customer_id.present? %>
@@ -136,12 +136,12 @@
 
   <div class="field-row">
     <%= f.label :customer_pic, "PIC Pelanggan" %>
-    <%= f.text_field :customer_pic %>
+    <%= f.text_field :customer_pic, required: true %>
   </div>
 
   <div class="field-row">
     <%= f.label :customer_number, "Nomor Telp" %>
-    <%= f.text_field :customer_number %>
+    <%= f.text_field :customer_number, required: true %>
   </div>
 
   <div class="field-row">
@@ -161,8 +161,8 @@
   </div>
 
   <div class="actions">
-    <% if !params[:confirmed] %>
-    <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Operasional, Marketing, Admin Marketing' %>
+    <% if !@quotationgroup.customer_approved %>
+    <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Marketing, Admin Marketing' %>
     <% end %>
     <a class="back left" href="<%= quotationgroups_url%>">Kembali ke Penawaran</a>
   </div>

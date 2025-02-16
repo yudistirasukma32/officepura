@@ -3133,6 +3133,7 @@ end
 
       if @customer_id.present? and @customer_id != 'all'
         @eventsa = @eventsa.where('customer_id = ?', @customer_id)
+        @customers = Customer.active.reorder(:name)
       end
 
       if @transporttype.present? and @transporttype != 'all'
@@ -3176,6 +3177,7 @@ end
       global_premi = 0
       global_invoice_total = 0
       global_total_estimation = 0
+      global_ppn_total = 0
       solar_price = Setting.find_by_name("Harga Solar").value.to_i
       customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Acidatama.*'").pluck(:id)
 
@@ -3218,6 +3220,11 @@ end
           estimation = quantity * event_tonage *  price_per
         end
 
+        ppn = 0
+        if event.customer.gst_percentage > 0
+          ppn = estimation * event.customer.gst_percentage.to_i / 100
+        end
+
         global_supir += supir
         global_kernet += kernet
         global_solar += solar
@@ -3225,10 +3232,12 @@ end
         global_tol_asdp += tol_asdp
         global_premi += premi
         global_invoice_total += invoice_total
+        global_ppn_total += ppn
         global_total_estimation += estimation
 
+        description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>"
+        description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
 
-        description = "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
         {
           route_name: (route.name rescue "Kosong"),
           route_price: (route.price_per rescue "Kosong"),
@@ -3238,12 +3247,13 @@ end
           supir: supir,
           kernet: kernet,
           solar: solar,
+          ppn: ppn,
           tambahan: tambahan,
           premi_allowance: premi,
           tol_asdp: tol_asdp,
           invoice_total: invoice_total,
           total_estimation: estimation,
-          description: description,
+          description: description.html_safe,
           start_date: event.start_date,
           created_at: event.created_at,
           route_train: (event.routetrain.name rescue "Kosong"),
@@ -3259,6 +3269,7 @@ end
         global_tol_asdp: global_tol_asdp ,
         global_premi: global_premi ,
         global_invoice_total: global_invoice_total ,
+        global_ppn_total: global_ppn_total ,
         global_total_estimation: global_total_estimation ,
       }
       @section = "estimationreport"

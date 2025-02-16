@@ -5,8 +5,13 @@
 	</div>
 
 	<div class="field-row">
-		<%= f.label :category, "Tipe Kontainer"  %>
+		<%= f.label :category, "Status Kontainer"  %>
 		<%= f.select :category, options_for_select(@categories.collect {|w| [w, w]}, (params[:category].present? ? params[:category] : @container.category)), {}, { :class => 'half chzn-select' } %>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :group, "Grup Kontainer"  %>
+		<%= f.select :group, options_for_select(@groups.collect {|w| [w, w]}, (params[:group].present? ? params[:group] : @container.group)), {}, { :class => 'half chzn-select' } %>
 	</div>
 
 	<div class="field-row">

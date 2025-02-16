@@ -1,6 +1,6 @@
 class Quotationlog < ActiveRecord::Base
 
-	belongs_to :Quotation
+	belongs_to :quotation
 
 	# Setup accessible (or protected) attributes for your model
 	attr_accessible :enabled, :name, :quotation_id, :updated_by, :old_price_per, :new_price_per

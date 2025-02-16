@@ -22,7 +22,8 @@
 			<thead>
 			<tr>
 				<th>Nama</th>
-				<th>Kategori</th>
+				<th>Grup</th>
+				<th>Status</th>
 				<th width="60" data-sorter="false" class="sorter-false">Aktif</th>
 				<th width="60" class="{sorter: false}"></th>
 			</tr>
@@ -47,6 +48,9 @@
 						<% end %>
 					</td>
 					<td>
+						<%= isotank.group rescue nil %>
+					</td>
+					<td>
 						<% if isotank.category.present? %>
 							<% if isotank.category == 'SEWA' %>
 								<span style="color: blue;"><%= isotank.category %></span>
@@ -68,7 +72,7 @@
 				</tr>
 				<% end %>
 			<% else %>
-				<% if checkrole 'Admin Kendaraan' %>
+				<% if checkrole 'Admin Kontainer' %>
 				<tr>
 					<td>
 						<% if isotank.category.present? %>
@@ -82,6 +86,9 @@
 						<% else %>
 							<%= isotank.isotanknumber %>	
 						<% end %>
+					</td>
+					<td>
+						<%= isotank.group rescue nil %>
 					</td>
 					<td>
 						<% if isotank.category.present? %>

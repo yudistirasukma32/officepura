@@ -7,8 +7,28 @@
   <div class="" style="width: 590px; float:left; margin-bottom: 1rem;">
 
   <div class="field-row first">
-    <%= f.label :date, "Tanggal Keluhan" %> 
+    <%= f.label :date, "Tanggal" %> 
     <%= f.text_field :date, :class => 'left half date-picker' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :request_type, "Tipe Request"  %>
+    <%= f.select :request_type, options_for_select(@requesttypes.collect {|w| [w, w]}, (params[:request_type].present? ? params[:request_type] : @mechaniclog.request_type)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :group, "Tipe Kerusakan"  %>
+    <%= f.select :group, options_for_select(@loggroups.collect {|w| [w, w]}, (params[:group].present? ? params[:group] : @mechaniclog.group)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :request_level, "Level"  %>
+    <%= f.select :request_level, options_for_select(@requestlevels.collect {|w| [w, w]}, (params[:request_level].present? ? params[:request_level] : @mechaniclog.request_level)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :request_location, "Lokasi"  %>
+    <%= f.select :request_location, options_for_select(@requestlocations.collect {|w| [w, w]}, (params[:request_location].present? ? params[:request_location] : @mechaniclog.request_location)), {}, { :class => 'half chzn-select' } %>
   </div>
 
   <div class="field-row ">
@@ -23,41 +43,8 @@
   </div>
 
   <div class="field-row">
-    <%= f.label :group, "Tipe Kerusakan"  %>
-    <%= f.select :group, options_for_select(@loggroups.collect {|w| [w, w]}, (params[:group].present? ? params[:group] : @mechaniclog.group)), {}, { :class => 'half chzn-select' } %>
-  </div>
-
-  <div class="field-row">
     <%= f.label :description, "Deskripsi Kerusakan" %>
     <%= f.text_area :description %>
-  </div>
-
-  <div class="field-row">
-    <%= f.label :datetime_start, "Tanggal Start" %>
-    <% if @process == "new" %>
-    <input type="datetime-local" name="mechaniclog[datetime_start]" id="datetime_start" class="left half">
-    <% else %>
-    <input type="datetime-local" name="mechaniclog[datetime_start]" id="datetime_start" class="left half" value="<%= @mechaniclog.datetime_start.to_datetime.strftime("%Y-%m-%dT%H:%M") rescue nil%>"/>
-    <% end %>
-  </div>
-
-  <div class="field-row">
-    <%= f.label :datetime_end, "Tanggal Selesai" %>
-    <% if @process == "new" %>
-      <input type="datetime-local" name="mechaniclog[datetime_end]" id="datetime_end" class="left half">
-    <% else %>
-      <input type="datetime-local" name="mechaniclog[datetime_end]" id="datetime_end" class="left half" value="<%= @mechaniclog.datetime_end.to_datetime.strftime("%Y-%m-%dT%H:%M") rescue nil%>"/>
-    <% end %>
-  </div>
-
-  <div class="field-row">
-    <%= f.label :grade, "Penilaian"  %>
-    <%= f.select :grade, options_for_select(@grades.collect {|w| [w, w]}, (params[:grade].present? ? params[:grade] : @mechaniclog.grade)), {}, { :class => 'half chzn-select' } %>
-  </div>
-
-  <div class="field-row">
-    <%= f.label :comment, "Komentar" %>
-    <%= f.text_area :comment %>
   </div>
 
   <div class="field-row continue">
@@ -68,14 +55,14 @@
   <%= f.hidden_field :user_id, :value => current_user.id %>
 
   <%= f.submit "Tambah Data", :class => 'submit right' %>    
-        <br/>
-  </div>
+      <br/>
+     </div>
 
   </div>
 
-  <div class="info-box" style="margin-bottom:30px; width:420px; float:left;">  
+  <div class="info-box" style="margin-bottom:30px; width:400px; float:right;">  
 
-    <h3>Mekanik: BKK #<%=zeropad(@invoice.id)%></h3>
+    <h3>Request Mekanik: BKK #<%=zeropad(@invoice.id)%></h3>
 
     <table class="row-view no-border">
         <tr>
@@ -93,6 +80,10 @@
         <tr>
           <td>No. DO</td>
           <td><%=@invoice.event_id rescue nil%></td>
+        </tr>
+        <tr>
+          <td>Muatan</td>
+          <td><%=@invoice.event.commodity.name rescue nil%></td>
         </tr>
         <tr>
           <td>Kendaraan</td>
@@ -136,6 +127,38 @@
         </tr>   
         <% end %>
     </table>
+
+    <br/><br/>
+    <h3>History Mekanik: <%= @invoice.vehicle.current_id %></h3>
+    <table class="row-view no-border">
+        <% logs = Mechaniclog.active.where('vehicle_id = ?', @invoice.vehicle_id).reorder('date DESC') %>
+        <% if logs.any? %>
+          <% logs.each do |log| %>
+          <tr>
+            <td width="120"><%=log.date.strftime('%d %B %Y')%></td>
+            <td>
+              <strong><%=log.request_type%></strong>: 
+              <%=log.description%> 
+              (<%=log.group%>)
+              <br>
+              <%=log.mechanic.name rescue nil%> 
+            </td>
+          </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td> Belum ada data history </td>
+          </tr>
+        <% end %>
+    </table>
+
+    <% if @process == 'edit' %>
+      <% if !@mechaniclog.user_id.nil? %>
+        <p>Dibuat oleh <strong id="strCreator">
+        <%= @mechaniclog.user.username rescue nil %></strong>
+        </p>
+      <% end %>
+    <% end %>
 
   </div>
 

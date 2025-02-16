@@ -42,8 +42,8 @@ class Invoice < ActiveRecord::Base
 		:driver_phone, :transporttype, :port_id, :ship_id, :train_fee, :container_id, :tanktype, :isotank_number, :container_number, :event_id,
 		:premi, :premi_allowance, :routetrain_id, :operator_id, :shipoperator_id, :routeship_id, :invoicemultimode, :cargo_type, :losing,
 		:vehicle_duplicate, :vehicle_duplicate_id, :weight_gross, :load_date, :is_insurance, :tsi_total, :by_vendor, :truckvendor_id,
-		:kosongan, :kosongan_type, :kosongan_confirmed, :kosongan_confirmed_by, :kosongan_previous_invoice_id, :payment_ship, :payment_train,
-		:payment_ship
+		:kosongan, :kosongan_type, :kosongan_confirmed, :kosongan_confirmed_by, :kosongan_previous_invoice_id, 
+		:payment_ship, :payment_train, :multicontainer, :second_container_id, :second_isotank_id
 
   	def sum_gasleftover
   		self.gas_leftover * self.gas_cost

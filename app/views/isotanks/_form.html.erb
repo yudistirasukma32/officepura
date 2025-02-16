@@ -5,9 +5,14 @@
 	</div>
 
   <div class="field-row">
-    <%= f.label :category, "Tipe Isotank"  %>
+    <%= f.label :category, "Status Isotank"  %>
     <%= f.select :category, options_for_select(@categories.collect {|w| [w, w]}, (params[:category].present? ? params[:category] : @isotank.category)), {}, { :class => 'half chzn-select' } %>
   </div>
+
+  <div class="field-row">
+		<%= f.label :group, "Grup Isotank"  %>
+		<%= f.select :group, options_for_select(@groups.collect {|w| [w, w]}, (params[:group].present? ? params[:group] : @isotank.group)), {}, { :class => 'half chzn-select' } %>
+	</div>
 
   <div class="actions">
     <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Kontainer' %>

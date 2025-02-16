@@ -4,29 +4,44 @@
 	<%= render "shared/nav" %>
 </div>
 
+<style>
+.chzn-container {
+	top: 0;
+}
+</style>
+
 <div id="main">
 	
 	<div id="content-full">
+
+		<a class="btn-txt right" href="<%=new_mechaniclog_path%>?maintenance=true"><i class="icon-plus-sign"></i> &nbsp;Maintenance</a>
 
 		<h1>OPS / <a href="<%=mechaniclogs_path%>">Call Mekanik</a> / Index</h1>
 
 		<br class="clearfix" />
 
 		<div id="filter">
+ 
 			<form id="filterform" name="filterform" action="" method="get">
-			<div class="field-row continue" style="display: none;">
-				<label for="date">Pilih Tanggal</label>
-				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
-			</div>
+				<div class="field-row continue">
+					<label for="startdate" class="middle">Tgl Awal</label>
+					<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+					<label for="enddate" class="tiny">s/d</label>
+					<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
 
-			<div class="field-row continue">
-				<label for="startdate" class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
-				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />&nbsp; &nbsp;
-				<label for="enddate" class="middle short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
-				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />&nbsp; &nbsp;
-				
-				<input class="submit" type="submit" value="Filter" />
-			</div>
+					<label for="invoice_id" class="tiny">#BKK:</label>
+					<input type="text" name="invoice_id" class="short left" value="<%=params[:invoice_id]%>" />
+
+					<label for="vehicle_id" class="tiny" style="width: 60px;">No Pol</label>
+					<select name="vehicle_id" class="chzn-select half combo_route" style="top: 5px;">
+						<option value="">All</option>
+						<% Vehicle.order(:current_id).all.each do |vehicle| %>
+						<option value="<%=vehicle.id%>"<% if vehicle.id == params[:vehicle_id] %> selected="selected"<% end %>><%=vehicle.current_id%></option>
+						<% end %>
+					</select>
+
+					<input class="submit" type="submit" value="Filter" style="vertical-align: bottom;">
+				</div>
 			</form>
 		</div>
 
@@ -36,80 +51,57 @@
 				<tr>
 					<th width="50">TGL</th>
 					<th width="50">No. BKK</th>
+					<th width="50">No. DO</th>
 					<th width="200">Keterangan</th>
 					<th width="60">NoPol</th>
                     <th width="80">Kontainer/Iso</th>
-					<th width="50">No. DO</th>
 					<th width="40"></th>
 				</tr>
 
-				<% @grandTotal = 0%>
 				<% @invoices.each do |invoice| %>
-					<% if invoice.deleted %>
-						<% @grandTotal += 0 %>
-						<% if current_user.adminrole %>
-						<tr class="deleted">
-							<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
-							<td><%= zeropad(invoice.id) %></td>
-							<td>
-								<%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
-								<br/>
-								<%=invoice.routeship.name rescue nil %>
-							</td>
-							<td><%=invoice.vehicle.current_id rescue nil%></td>
-							<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : '' %>
-							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></td>
-							<td><%= zeropad(invoice.event_id) rescue nil %></td>
-							<td align="right" class="red"></td>
-							<td class="right" width="60">&nbsp;</td>
-						</tr>
-						<% end %>
+					<tr>
+						<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
+						<td><%= zeropad(invoice.id) %></td>
+						<td><%= invoice.event_id.present? && invoice.event_id != 0 ? zeropad(invoice.event_id) : '' %></td>
+						<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
+						<br/>
+						<strong><%=invoice.routeship.name rescue nil %></strong>
+						</td>
+						<td><%=invoice.vehicle.current_id rescue nil%></td>
+						<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : '' %>
+						<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></td>
 
-					<% else %>
+						<td align="right" class="red"></td>
+						<td class="right" width="60">
 
-						<tr>
-							<td><strong><%=invoice.date.strftime('%d')%></strong>.<%=invoice.date.strftime('%m')%></td>
-							<td><%= zeropad(invoice.id) %></td>
-							<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%>  <% end %> 
-							<br/>
-							<strong><%=invoice.routeship.name rescue nil %></strong>
-							</td>
-							<td><%=invoice.vehicle.current_id rescue nil%></td>
-							<td><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : '' %>
-							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : '' %></td>
-							<td><%= zeropad(invoice.event_id) rescue nil %></td>
-							<td align="right" class="red"></td>
-							<td class="right" width="60">
+							<% if (current_user.adminrole || current_user.owner)%>
 
-								<% if (current_user.adminrole || current_user.owner)%>
+								<% if invoice.mechaniclogs.active.count > 1 %>
 
-									<% if invoice.mechaniclogs.active.count > 1 %>
-
-										<a class="cta" style="opacity: 1;" href="mechaniclogs/delete/<%=invoice.id%>">Batal</a>
-									
-									<% else %>
-
-										<a class="cta" style="background: #e0400d; opacity: 0.8;" href="<%=new_mechaniclog_path%>/<%=invoice.id%>">Call Mekanik</a>
+									<a class="cta" style="opacity: 1;" href="mechaniclogs/delete/<%=invoice.id%>">Batal</a>
 								
-									<% end %>
-
 								<% else %>
+
+									<a class="cta" style="background: #e0400d; opacity: 0.8;" href="<%=new_mechaniclog_path%>/<%=invoice.id%>">Call Mekanik</a>
+							
+								<% end %>
+
+							<% else %>
+							
+							<% if checkrole 'Admin Operasional' %>
+
+								<% if invoice.mechaniclogs.active.count == 0 %>
+
+									<a class="cta" style="background: #e0400d; opacity: 0.8;" href="<%=new_mechaniclog_path%>/<%=invoice.id%>">Call Mekanik</a>
 								
-								<% if checkrole 'Admin Operasional' %>
-
-									<% if invoice.mechaniclogs.active.count == 0 %>
-
-										<a class="cta" style="background: #e0400d; opacity: 0.8;" href="<%=new_mechaniclog_path%>/<%=invoice.id%>">Call Mekanik</a>
-									
-									<% end %>
- 
 								<% end %>
 
-								<% end %>
+							<% end %>
 
-							</td>
-						</tr>
-					<% end %>
+							<% end %>
+
+						</td>
+					</tr>
 				<% end %>	
 
 			</table>

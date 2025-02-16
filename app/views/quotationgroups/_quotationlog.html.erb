@@ -1,0 +1,33 @@
+<br />
+<table class="row-view">
+	<tr>
+		<th>Tanggal Revisi</th>
+		<th>Deskripsi</th>
+		<th>Harga Lama</th>
+		<th>Harga Baru</th>
+		<th>User</th>
+		<th width="60"></th>
+	</tr>
+
+	<% if @logs.any?%>
+		<% @logs.each do |log| %>
+		<tr>
+			<td><%= log.created_at.to_date.strftime('%d-%m-%Y') %></td>
+			<td>
+				<strong><%= link_to log.name, edit_quotation_path(log.quotation_id) %></strong><br>
+				<%= log.description %>
+			</td>	
+			<td>Rp <%= to_currency_bank(log.old_price_per) %></td>
+			<td>Rp <%= to_currency_bank(log.new_price_per) %></td>
+			<td><%= User.find(log.updated_by).username rescue nil %></td>
+		</tr>
+		<% end %>	
+	<% else %>	
+
+		<tr>
+			<td colspan="6" style="text-align:center; padding: 1rem; ">Belum ada revisi untuk penawaran jurusan ini.</td>
+		<tr>
+
+	<% end %>
+
+</table>

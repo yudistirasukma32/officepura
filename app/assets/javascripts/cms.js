@@ -2781,8 +2781,13 @@ function toggleSub(id)
 		}
 		else {
 			hideAllSubs();
-			submenu.show();
+			
 			submenu.addClass('on');
+			if (submenu.hasClass('two-column-list')) {
+				submenu.css("display", "grid");
+			} else {
+				submenu.show();
+			}
 		}
 	}
 }
@@ -2976,6 +2981,45 @@ function countTotalAssetOrder(){
 		var total = Number(unit_price) * Number(quantity);
 
 		$('#assetorder_total').val(total.formatMoney(2,',','.'));
+	}
+}
+
+function countTotalClaim(){
+
+	const invoicetrain = document.querySelector('.train') !== null;
+
+	var claimmemo_shrink = $('#claimmemo_shrink').val();
+	var claimmemo_weight_gross = $('#claimmemo_weight_gross').val();
+	var shrink_tolerance_percent = $('#claimmemo_shrink_tolerance_percent').val();
+	var discount_amount = $('#claimmemo_discount_amount').val();
+	// var claimmemo_tolerance_total = $('#claimmemo_shrink_tolerance_percent').val();
+
+	if(claimmemo_weight_gross != '' && shrink_tolerance_percent != ''){
+		var tolerance_total = claimmemo_weight_gross * (shrink_tolerance_percent / 100)
+		$('#claimmemo_tolerance_total').val(Math.ceil(tolerance_total));
+		console.log(tolerance_total);
+
+		var shrinkage_load = claimmemo_shrink - Math.ceil(tolerance_total)
+		$('#claimmemo_shrinkage_load').val(shrinkage_load);
+	}
+
+	var price_per = $('#claimmemo_price_per').val().split('.').join('').replace(',','.');
+	var quantity = $('#claimmemo_shrinkage_load').val();
+
+	if(price_per != '' && quantity != ''){
+
+		if (invoicetrain){
+			var total = Number(price_per) * Number(quantity) / 2;
+		} else {
+			var total = Number(price_per) * Number(quantity);
+		}
+
+		if(discount_amount != '' && discount_amount > 0){
+			total = total - Number(discount_amount);
+		}
+
+		$('#claimmemo_total').val(total);
+		$('#claimmemo_total_text').html(total.formatMoney(0,',','.'));
 	}
 }
 

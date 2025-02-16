@@ -1,0 +1,46 @@
+    <table class="row-view">
+      <tr>
+        <th>Keterangan</th>
+        <th width="160" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr>
+        <td>UM Supir</td>
+        <td class="right"><%= to_currency(@invoice.driver_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td>UM Kernet</td>
+        <td class="right"><%= to_currency(@invoice.helper_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td>Lain-lain</td>
+        <td class="right"><%= to_currency(@invoice.misc_allowance)%></td>
+      </tr>
+
+      <tr>
+        <td>Solar *</td>
+        <td class="right"><%= to_currency(@invoice.gas_allowance)%></td>
+      </tr>
+
+      <tr>
+        <td>Penyebrangan</td>
+        <td class="right"><%= to_currency(@invoice.ferry_fee)%></td>
+      </tr>
+
+      <tr>
+        <td>Tol</td>
+        <td class="right"><%= to_currency(@invoice.tol_fee)%></td>
+      </tr>
+        
+      <tr>
+        <td>Premi</td>
+        <td class="right"><%= to_currency(@invoice.premi_allowance)%></td>
+      </tr>    
+
+      <tr class="total-row">
+        <td>Total</td>
+        <td class="right"><%=to_currency(@invoice.total)%></td>
+      </tr>
+    </table>

@@ -1,0 +1,127 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="btn-txt right" href="<%=new_claimmemo_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+
+		<h1><a href="<%=claimmemos_path%>">Klaim Penagihan</a> / Index</h1>
+		
+		<br class="clearfix" />
+		
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue">
+					<label for="startdate" class="middle">Tgl Awal</label>
+					<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+					<label for="enddate" class="tiny">s/d</label>
+					<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+
+					<label for="customer_id"  class="middle">Pelanggan</label>
+					<select name="customer_id" class="third left">
+						<option value="">Semua Pelanggan</option>
+						<% Customer.active.reorder(:name).each do |customer| %>
+						<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
+						<% end %>
+					</select>
+
+					<label for="invoice_id" class="tiny">#BKK:</label>
+					<input type="text" name="invoice_id" class="short left" value="<%=params[:invoice_id]%>" />
+
+					<input class="submit" type="submit" value="Filter" style="vertical-align: bottom;">
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view">
+
+		<thead>
+
+		<tr>
+			<th>Tgl</th>
+			<th>BKK</th>
+			<th>Keterangan</th>
+			<th>Komoditas</th>
+			<th>Muat</th>
+			<th>Bongkar</th>
+			<th>Susut</th>
+			<th>Toleransi</th>
+			<th>Beban Susut</th>
+			<!-- <th>Harga</th> -->
+			<th>Beban Supir</th>
+			<th>Status</th>
+			<th></th>
+		</tr>
+
+		</thead>
+
+		<tbody>
+
+		<%
+		total = 0 
+		@claimmemos.each do |memo| 
+		%>
+			<% total += memo.total %>
+			<% 
+				status = 'Draft'
+				if memo.approved && !memo.approved_by_gm
+					status = 'Approved SPV'
+				elsif memo.approved && memo.approved_by_gm
+					status = 'Approved GM'
+				end
+			%>
+			<tr>
+				<td><strong><%=memo.date.strftime('%d')%></strong>.<%=memo.date.strftime('%m')%></td>
+				<td><%= memo.invoice_id %></td>
+				<td>
+				1 Rit <%= memo.invoice.route.name rescue nil %> (<%= memo.invoice.driver.name rescue nil %>)
+				<%= memo.invoice.invoicetrain ? '= Kereta =' : '' %> 
+				<%= (memo.invoice.isotank_id.present? && memo.invoice.isotank_id.to_i != 0) ? ("Isotank = " + memo.invoice.isotank.isotanknumber) : '' %>
+				<%= (memo.invoice.container_id.present? && memo.invoice.container_id.to_i != 0) ? ("Kontainer = " + memo.invoice.container.containernumber) : '' %>
+				<%= memo.invoice.ship_id.nil? ? '': ' | '+memo.invoice.ship.name rescue nil%>
+				<%= memo.invoice.user_id.nil? ? '': ' | '+memo.invoice.user.username%>
+				</td>
+				<td><%= memo.invoice.event.commodity.name rescue nil %></td>
+				<td class="right"><%= memo.weight_gross rescue 0 %></td>
+				<td class="right"><%= memo.weight_net rescue 0 %></td>
+				<td class="right red"><%= memo.shrink rescue 0 %></td>
+				<td class="right"><%= memo.tolerance_total rescue 0 %></td>
+				<td class="right"><%= memo.shrinkage_load rescue 0 %></td>
+				<!-- <td class="right"><%= memo.price_per rescue 0 %></td> -->
+				<td class="right"><%= to_currency(memo.total) rescue 0 %></td>
+				<td style="width:80px;">
+					<% if status == 'Approved GM' %>
+					<a class="cta" style="background: green; color: white; opacity: 1;">GM Apprv</a>
+					<% elsif status == 'Approved SPV' %>
+					<a class="cta" style="background: yellow; color: black; opacity: 1;">SPV Apprv</a>
+					<% else %>
+					<a class="cta" style="background: grey; color: white; opacity: 1;">Draft</a>
+					<% end %>
+				</td>
+				<td class="right" width="60">
+				<%= link_to '&#xf044;'.html_safe, edit_claimmemo_path(memo), :class => "edit tipsy", :title => 'Edit' %>
+				<%= link_to '&#xf00d;'.html_safe, memo, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %> 
+				</td>
+			</tr>
+			<% end %>
+		<tbody>
+
+		<tfoot>
+			<tr class="footer">
+				<td class="right" colspan="9">Total</td>
+				<td class="right"><strong><%= to_currency(total) %></strong></td>
+			</tr>
+		</tfoot>
+
+ 
+		</table>
+
+	</div>
+
+</div>

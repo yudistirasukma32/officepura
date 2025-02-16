@@ -1,0 +1,51 @@
+<table class="row-view tablesorter hasFilters">
+    <thead>
+    <tr>
+        <th>Nama</th>
+        <th>Kota</th>
+        <th>Email</th>
+        <th>PIC</th>
+        <th>No PIC</th>
+        <th>PIC Photo</th>
+        <th>DP</th>
+        <th>KTP</th>
+        <th>NPWP</th>
+        <th>No. Penawaran&nbsp;&nbsp;</th>
+        <th width="60" class="{sorter: false}"></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <% if @new_customers.any? %>
+    
+        <% @new_customers.includes(:routes).reorder('name ASC').each do |customer| %>
+            <tr>
+                <td><%= link_to customer.name, edit_customer_path(customer) %></td>
+                <td><%= customer.city %></td>
+                <td><%= customer.email %></td>
+                <td><%= customer.contact %></td>
+                <td><%= customer.phone.present? ? customer.phone : (customer.mobile.present? ? customer.mobile : '') %></td>
+                <td><%= customer.images.where("name = 'PIC' and enabled = true").any? ? 'Ya' : 'n/a' %></td>
+                <td><%= customer.dp ? 'Ya' : 'n/a' %></td>
+                <td><%= customer.images.where("name = 'KTP' and enabled = true").any? ? 'Ya' : 'n/a' %></td>
+                <td><%= customer.images.where("name = 'NPWP' and enabled = true").any? ? 'Ya' : 'n/a' %></td>
+                <td></td>
+
+                <td class="right" width="60">
+                    <%= link_to '&#xf044;'.html_safe, edit_customer_path(customer, rel: 'approval'), :class => "edit tipsy", :title => 'Edit Pelanggan' %>
+                </td>
+            </tr>
+        <% end %>	
+
+    <% else %>	
+    
+        <tr>
+            <td colspan = '11'>
+                Tidak ada data pelanggan baru
+            </td>
+        </tr>
+
+    <% end %>	
+    </tbody>
+
+</table>

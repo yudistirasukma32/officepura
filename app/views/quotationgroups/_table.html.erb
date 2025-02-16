@@ -213,56 +213,58 @@
 	
 %>
 
-
 <table class="row-view report-view tablesorter tablesorterFilters">
     <thead>
         <tr>
             <th class="{sorter:true, filter: true}" >TGL</th>
-            <th class="{sorter:true, filter: true}" >Nomor</th>
-            <th class="{sorter:true, filter: true}" >Nama Pelanggan</th>
-            <th class="{sorter:true, filter: true}" >Nama PIC</th>
+            <th width="200" class="{sorter:true, filter: true}" >Nomor</th>
+            <th class="{sorter:true, filter: true}" >Pelanggan</th>
             <th class="{sorter: false, filter: false}" align="right" style="padding-right: 1rem; text-align: right; ">Jurusan</th>
-            <th class="{sorter:true, filter: true}" >Dibuat Oleh</th>
-            <th class="{sorter: false, filter: false}">Status</th>
-            <th width="90" class="{sorter: false, filter: false}"></th>
+            <th class="{sorter:true, filter: true}" >User</th>
+            <th class="{sorter:true, filter: true}" >Status</th>
+            <th width="80" class="{sorter: false, filter: false}"></th>
         </tr>
     </thead>
 
     <tbody class="tablesorter-sort">
     <%
-    @quotationgroups.each do |group|
+    if @quotationgroups.count > 0 
+    @quotationgroups.includes(:customer, :quotations).each do |group|
     creator = User.find(group.created_by) rescue nil
     %>
     <tr>
         <td><strong><%= group.date.strftime('%d') rescue nil %>.</strong><%= group.date.strftime('%m') rescue nil %></td>
         <td><% if checkrole 'Master Jurusan, Admin Marketing' %><%= link_to group.long_id, edit_quotationgroup_path(group) %> <% else %> <%= group.long_id %> <% end %></td>
-        <td><%= group.customer_id.present? ? group.customer.name : (group.customer_name.present? ? group.customer_name : '') %></td>
-        <td><%= group.customer_pic rescue nil %></td>
+        <td>
+        <%= group.customer_id.present? ? group.customer.name : (group.customer_name.present? ? group.customer_name : '') %><br>
+        <span style="color: grey;"><%= group.customer_pic rescue nil %></span>
+        </td>
         <td align="right" style="padding-right: 1rem; "><%= group.quotations.count %></td>
         <td><%= creator.username if !creator.blank? %></td>
-
-        <% if group.status != 'confirmed' %>
-            <td><a href="#" class="btn-confirmation label label-inline label-<%= group.status=='unconfirmed' ? 'primary' : (group.status=='rejected' ? 'danger' : (group.status=='confirmed' ? 'success' : '')) %> p-4" style="padding-top: .2rem; padding-bottom: .2rem; padding-left: 1rem; padding-right: 1rem; color: white;" data-id="<%=group.id%>" data-longid="<%=group.long_id%>" data-customer="<%=group.customer.name rescue nil%>" data-date="<%=group.date.strftime('%d-%m-%Y') rescue nil%>" data-status="<%=group.status%>" data-notes="<%=group.notes rescue nil%>" data-routecount="<%=group.quotations.count%>" data-cstmname="<%=group.customer_name%>"><%= group.status %></a></td>
-        <% else %>
-            <td><div class="label label-inline label-success p-4"><%= group.status %></div></td>
-        <% end %>
+        
+        <td>
+        <%=  status = case 
+                when group.customer_approved then 'Disetujui'
+                when group.is_sent then 'Dikirim'
+                when group.confirmed then 'Terkonfirmasi'
+                when group.reviewed then 'Sudah Review'
+                else 'Draft'
+                end %>
+        </td>
 
         <td class="right">
-            <% if group.status=='confirmed' && current_user.owner %>
                 <%= link_to '&#xf044;'.html_safe, edit_quotationgroup_path(group, :confirmed => true), :class => "edit tipsy", :title => 'Edit' %>
-                <%= link_to '&#xf06e;'.html_safe, quotationgroup_path(group), :class => "edit tipsy", :title => 'Show' %>
+                <!-- <%= link_to '&#xf06e;'.html_safe, quotationgroup_path(group), :class => "edit tipsy", :title => 'Show' %> -->
                 <%= link_to '&#xf02f;' .html_safe, print_quotationgroup_path(group), :class => "delete tipsy", :title => 'Print' %>
-                <%= link_to '&#xf00d;'.html_safe, group, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
-            <% elsif group.status=='confirmed' %>
-                <%= link_to '&#xf06e;'.html_safe, quotationgroup_path(group), :class => "edit tipsy", :title => 'Show' %>
-                <%= link_to '&#xf02f;' .html_safe, print_quotationgroup_path(group), :class => "delete tipsy", :title => 'Print' %>
-            <% else %>
-                <%= link_to '&#xf044;'.html_safe, edit_quotationgroup_path(group, :operational => true), :class => "edit tipsy", :title => 'Edit' %>
+            <% if current_user.owner %>
                 <%= link_to '&#xf00d;'.html_safe, group, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
             <% end %> 
         </td>
     </tr>
     <% end %>
+    <% else %>
+    <tr><td colspan="8" style="text-align:center; padding: 1rem; ">Tidak ada data, Silahkan Filter Ulang.</td></tr>
+    <% end%>
     </tbody>	
 
 </table>

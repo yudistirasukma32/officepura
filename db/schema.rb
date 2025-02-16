@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250108190619) do
+ActiveRecord::Schema.define(:version => 20250213141833) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -195,6 +195,38 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
     t.decimal   "total",                   :precision => 19, :scale => 2, :default => 0.0
   end
 
+  create_table "claimmemos", :force => true do |t|
+    t.boolean  "deleted",                                                 :default => false
+    t.boolean  "enabled",                                                 :default => true
+    t.integer  "taxinvoiceitem_id"
+    t.integer  "invoice_id"
+    t.date     "date"
+    t.string   "vehicle_number"
+    t.integer  "weight_gross",                                            :default => 0
+    t.integer  "weight_net",                                              :default => 0
+    t.integer  "shrink",                                                  :default => 0
+    t.text     "description"
+    t.datetime "created_at",                                                                 :null => false
+    t.datetime "updated_at",                                                                 :null => false
+    t.integer  "user_id"
+    t.integer  "deleteuser_id"
+    t.boolean  "approved",                                                :default => false
+    t.boolean  "approved_by_gm",                                          :default => false
+    t.datetime "approved_at"
+    t.datetime "approved_by_gm_at"
+    t.float    "shrink_tolerance_percent",                                :default => 0.0
+    t.decimal  "shrink_tolerance_money",   :precision => 19, :scale => 2, :default => 0.0
+    t.integer  "tolerance_total",                                         :default => 0
+    t.integer  "shrinkage_load",                                          :default => 0
+    t.decimal  "price_per",                :precision => 19, :scale => 2, :default => 0.0
+    t.decimal  "total",                    :precision => 19, :scale => 2, :default => 0.0
+    t.decimal  "discount_amount",          :precision => 19, :scale => 2, :default => 0.0
+    t.boolean  "is_train",                                                :default => false
+    t.boolean  "approved_marketing",                                      :default => false
+    t.boolean  "approved_load_spv",                                       :default => false
+    t.boolean  "approved_unload_spv",                                     :default => false
+  end
+
   create_table "commodities", :force => true do |t|
     t.boolean   "deleted",                                                      :default => false
     t.boolean   "enabled",                                                      :default => true
@@ -264,6 +296,7 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
     t.timestamp "updated_at",      :limit => 6,                    :null => false
     t.string    "category"
     t.integer   "vendor_id"
+    t.string    "group"
   end
 
   create_table "contracts", :force => true do |t|
@@ -318,6 +351,12 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
     t.string    "memo_attachments"
     t.string    "memo_info"
     t.string    "memo_address"
+    t.boolean   "dp",                                                                   :default => false
+    t.string    "dp_notes"
+    t.boolean   "ktp_photo",                                                            :default => false
+    t.boolean   "npwp_photo",                                                           :default => false
+    t.boolean   "pic_photo",                                                            :default => false
+    t.boolean   "approved",                                                             :default => false
   end
 
   create_table "driverexpenses", :force => true do |t|
@@ -490,6 +529,8 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
     t.integer   "invoice_taxinv_count",                                               :default => 0
     t.integer   "routeship_id"
     t.integer   "deleteuser_id"
+    t.boolean   "multicontainer",                                                     :default => false
+    t.boolean   "unload_vendor",                                                      :default => false
   end
 
   add_index "events", ["id", "start_date", "end_date", "customer_id"], :name => "index_events_on_customer_id"
@@ -689,6 +730,9 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
     t.string    "payment_ship"
     t.boolean   "is_approval_operator",                                                       :default => false
     t.integer   "approval_operator_confirmed_by"
+    t.boolean   "multicontainer",                                                             :default => false
+    t.integer   "second_container_id"
+    t.integer   "second_isotank_id"
   end
 
   add_index "invoices", ["date", "customer_id", "event_id", "invoicetrain"], :name => "invoice_events"
@@ -737,6 +781,7 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
     t.timestamp "created_at",    :limit => 6,                    :null => false
     t.timestamp "updated_at",    :limit => 6,                    :null => false
     t.string    "category"
+    t.string    "group"
   end
 
   create_table "legalities", :force => true do |t|
@@ -751,8 +796,8 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
   end
 
   create_table "mechaniclogs", :force => true do |t|
-    t.boolean   "deleted",                     :default => false
-    t.boolean   "enabled",                     :default => true
+    t.boolean   "deleted",                       :default => false
+    t.boolean   "enabled",                       :default => true
     t.date      "date"
     t.integer   "invoice_id"
     t.integer   "vehicle_id"
@@ -762,12 +807,17 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
     t.text      "description"
     t.text      "comment"
     t.string    "grade"
-    t.timestamp "datetime_start", :limit => 6
-    t.timestamp "datetime_end",   :limit => 6
+    t.timestamp "datetime_start",   :limit => 6
+    t.timestamp "datetime_end",     :limit => 6
     t.integer   "user_id"
     t.integer   "deleteuser_id"
-    t.timestamp "created_at",     :limit => 6,                    :null => false
-    t.timestamp "updated_at",     :limit => 6,                    :null => false
+    t.timestamp "created_at",       :limit => 6,                    :null => false
+    t.timestamp "updated_at",       :limit => 6,                    :null => false
+    t.integer   "office_id"
+    t.string    "request_type"
+    t.string    "request_level"
+    t.string    "request_location"
+    t.boolean   "finished",                      :default => false
   end
 
   create_table "mechanics", :force => true do |t|
@@ -819,6 +869,14 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
     t.text      "description"
     t.timestamp "created_at",  :limit => 6,                    :null => false
     t.timestamp "updated_at",  :limit => 6,                    :null => false
+    t.string    "latitude"
+    t.string    "longitude"
+    t.string    "address"
+    t.string    "city"
+    t.string    "province"
+    t.string    "phone"
+    t.string    "mobile"
+    t.boolean   "garage",                   :default => false
   end
 
   create_table "operators", :force => true do |t|
@@ -1031,25 +1089,34 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
   end
 
   create_table "quotationgroups", :force => true do |t|
-    t.boolean   "deleted",                                                     :default => false
-    t.boolean   "enabled",                                                     :default => true
+    t.boolean   "deleted",                                                            :default => false
+    t.boolean   "enabled",                                                            :default => true
     t.string    "long_id"
     t.date      "date"
     t.date      "confirmed_date"
     t.integer   "customer_id"
-    t.timestamp "created_at",      :limit => 6,                                                   :null => false
-    t.timestamp "updated_at",      :limit => 6,                                                   :null => false
+    t.timestamp "created_at",             :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",             :limit => 6,                                                   :null => false
     t.string    "status"
     t.integer   "created_by"
     t.integer   "confirmed_by"
     t.integer   "rejected_by"
     t.text      "description"
     t.text      "notes"
-    t.decimal   "total",                        :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "total",                               :precision => 19, :scale => 2, :default => 0.0
     t.string    "customer_name"
     t.string    "customer_pic"
     t.string    "customer_number"
     t.string    "customer_email"
+    t.boolean   "reviewed",                                                           :default => false
+    t.datetime  "reviewed_at"
+    t.integer   "reviewed_by"
+    t.boolean   "confirmed",                                                          :default => false
+    t.datetime  "confirmed_at"
+    t.boolean   "is_sent",                                                            :default => false
+    t.datetime  "sent_date"
+    t.boolean   "customer_approved",                                                  :default => false
+    t.datetime  "customer_approved_date"
   end
 
   create_table "quotationlogs", :force => true do |t|
@@ -1594,18 +1661,18 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
   end
 
   create_table "taxinvoiceattachments", :force => true do |t|
-    t.boolean  "deleted",         :default => false
-    t.boolean  "enabled",         :default => true
-    t.integer  "taxinvoice_id"
-    t.integer  "customer_id"
-    t.date     "date"
-    t.string   "attachment_type"
-    t.string   "upload"
-    t.text     "description"
-    t.integer  "user_id"
-    t.integer  "deleteuser_id"
-    t.datetime "created_at",                         :null => false
-    t.datetime "updated_at",                         :null => false
+    t.boolean   "deleted",                      :default => false
+    t.boolean   "enabled",                      :default => true
+    t.integer   "taxinvoice_id"
+    t.integer   "customer_id"
+    t.date      "date"
+    t.string    "attachment_type"
+    t.string    "upload"
+    t.text      "description"
+    t.integer   "user_id"
+    t.integer   "deleteuser_id"
+    t.timestamp "created_at",      :limit => 6,                    :null => false
+    t.timestamp "updated_at",      :limit => 6,                    :null => false
   end
 
   create_table "taxinvoiceitems", :force => true do |t|
@@ -1718,6 +1785,8 @@ ActiveRecord::Schema.define(:version => 20250108190619) do
     t.boolean   "is_dp",                                                           :default => false
     t.decimal   "dp_cost",                          :precision => 19, :scale => 2, :default => 0.0
     t.boolean   "waiting",                                                         :default => false
+    t.float     "discount_percent",                                                :default => 0.0
+    t.decimal   "discount_amount",                  :precision => 19, :scale => 2, :default => 0.0
   end
 
   create_table "tirebudgets", :force => true do |t|

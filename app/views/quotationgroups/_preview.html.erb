@@ -1,0 +1,210 @@
+<style type="text/css">
+
+	
+	.paper p {
+		font-size: 1rem;
+		padding: 0;
+		margin-top: .5rem;
+		margin-bottom: .5rem;
+	}
+
+	.paper table {
+		border: 1px solid;
+	}
+
+	.paper th {
+		border: 1px solid;
+	}
+
+	.paper td {
+		border: 1px solid #888;
+		font-size: 11pt;
+	}
+
+	.paper .desc {
+		font-size: .85rem;
+	}
+
+	.paper .headsignature {margin-top:0px;margin-left: 250px;}
+
+	.paper .pleft {
+		display: inline-block;
+		width: 125px;
+	}
+
+	.paper .pright {
+		display: inline-block;
+	}
+
+	.paper .pttdleft {
+		display: inline-block;
+		width: 27%;
+	}
+
+	.paper .pttdright {
+		display: inline-block;
+		margin-left: 5rem;
+		max-width: 300px;
+		width: 100%;
+	}
+
+	.paper {
+		padding: 3rem 1.5rem;
+		background: white;
+	}
+
+	@media print{
+		@page { margin-top:80px; margin-bottom:80px; }
+
+		.d-none-print {
+			display: none;
+		}
+
+		.desc {
+			font-size: .85rem;
+			margin-left: 20px;
+		}
+
+		table {
+			margin-left: 0;
+			margin-right: 0;
+		}
+
+		.paper {
+			padding: 3.5rem 3rem 3rem;
+			background: white;
+			font-size: 10px !important;
+			line-height: 1.1 !important;
+		}
+
+		.pttdright {
+			display: inline-block;
+			margin-left: 5rem;
+			max-width: 170px;
+			width: 100%;
+		}
+	}
+
+	.paper label {
+		width: 120px;
+	}
+
+	/* #main .row-view td {
+		padding: 5px 10px;
+		margin: 0;
+		vertical-align: middle;
+	} */
+
+	.paper p {
+		font-size: 11pt;
+	}
+</style>
+
+
+	<div class="paper">
+		
+		<p class="left" style="width: 100%;margin-bottom:2rem">Nomor : <%=@quotationgroup.long_id%><span class="right">Surabaya, <%= @quotationgroup.date.strftime('%d') %> <%= @month %> <%= @quotationgroup.date.strftime('%Y') %></span></p>
+
+		<p>Kepada Yth.</p>
+		<%
+			if @quotationgroup.customer_id.present?
+				customer = @quotationgroup.customer.name
+			elsif @quotationgroup.customer_name.present?
+				customer = @quotationgroup.customer_name
+			end
+		%>
+		<p style="font-weight:700; margin-bottom:2rem;"><%= customer %></p>
+
+		<%
+			if @quotationgroup.customer_pic.present?
+				pic = @quotationgroup.customer_pic
+			else
+				pic = customer
+			end
+		%>
+		<div style="line-height: 1;">
+			<p class="pleft">u.p.</p>
+			<p class="pright">: <%= pic %></p>
+			<br>
+			<p class="pleft">Perihal</p>
+			<p class="pright">: <span style="font-weight:700;text-decoration-line: underline;text-decoration-thickness: 3px;">Penawaran Harga</span></p>
+		</div>
+
+		<p style="line-height: 20pt;">
+			Dengan hormat,<br>
+ 
+			PT. Rajawali Dwi Putra Indonesia merupakan perusahaan angkutan barang multimoda yang
+			berpengalaman menangani beragam jenis komoditas yang diangkut. Kami memiliki lebih dari
+			200 unit truk milik sendiri yang tersambung dengan fleet management system guna memenuhi
+			kebutuhan pengiriman B2B perusahaan Bapak/Ibu. Terkait dengan layanan yang kami berikan,
+			berikut kami ajukan penawaran jasa angkutan PT. Rajawali Dwi Putra. <br>
+
+			Terkait dengan layanan yang kami berikan, berikut kami ajukan penawaran jasa angkutan PT.
+			Rajawali Dwi Putra.<br>
+		</p>
+
+ 		<br class="clear" />
+ 		<br class="clear" />
+
+		<table class="row-view" style="margin-bottom: 0;">
+			<thead>
+				<tr>
+					<th colspan="2" style="text-align:center">RUTE</th>
+					<th rowspan="2" style="text-align:center" width="100">Tarif/Rit</th>
+				</tr>
+				<tr>
+					<th style="text-align:center">Tempat Muat</th>
+					<th style="text-align:center">Tempat Bongkar</th>
+				</tr>
+			</thead>
+
+			<% if @quotations.present? %>
+			<tbody>
+				<% @quotations.each do |quotation| %>
+				<tr>
+					<td><%= quotation.name rescue nil %> <%= quotation.address_start rescue nil %></td>
+					<td class="pl-5"><%= quotation.address_end rescue nil %></td>
+					<td align="right"><%= to_currency_bank(quotation.price_per) %></td>
+				</tr>
+				<% end %>
+			</tbody>
+			<% end %>
+		</table>
+
+		<% if @quotationgroup.description.present? %>
+			<p class="desc"><i>Keterangan : <%= nl2br(@quotationgroup.description).html_safe%></i></p>
+		<% end %>
+
+		<p style="line-height:20pt; margin-top:2rem;">
+			Jika Bapak/Ibu memerlukan informasi lebih lanjut, Ibu dapat menghubungi Indra Susanto
+			telepon 08113001598 / <%= @confirmation.username %> (<%= @marketing_phone %>) email <u>indra@rdpitrans.com</u> atau <u>marketing@rdpitrans.com</u>.
+			Atas perhatian
+			Bapak/Ibu, kami sampaikan terima kasih.
+		</p>
+		
+		<div style="margin-top:2rem">
+			<p class="pttdleft">Hormat kami,</p>
+			<p class="pttdleft"></p>
+			<p class="pttdright">Menerima dan Menyetujui</p>
+		</div>
+
+		<div style="margin-top:2.5rem">
+			<p class="pttdleft"></p>
+			<p class="pttdleft"></p>
+			<p class="pttdright"></p>
+		</div>
+
+		<div>
+			<p class="pttdleft"><span><%= @confirmation.username.upcase %></span></p>
+			<p class="pttdleft"><span>INDRA SUSANTO</span></p>
+			<p class="pttdright"></p>
+		</div>
+
+		<div style="display: flex; align-items: flex-start;">
+			<p class="pttdleft"><strong>Marketing</strong></p>
+			<p class="pttdleft"><strong>General Manager</strong></p>
+			<p class="pttdright"><strong><%= customer %></strong></p>
+		</div>
+
+	</div>
+ 

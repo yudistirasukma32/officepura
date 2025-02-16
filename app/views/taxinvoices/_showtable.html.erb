@@ -94,11 +94,19 @@
 			total_pph += taxinvoice.price_tax
 			grandtotal += taxinvoice.total
 		%>
+	
+	<% edit_url = taxinvoice.generic ? "/taxinvoices/generic/#{taxinvoice.id}" : edit_taxinvoice_path(taxinvoice) %>
 
 	<tr id="<%=taxinvoice.id%>">
 		<td width="20"> <% if taxinvoice.paiddate.nil? %> <input type="checkbox" id="cb_<%=taxinvoice.id%>" name="cb_<%=taxinvoice.id%>" /><% end %></td>
 		<td><%=taxinvoice.created_at.strftime('%d-%m')%></td>
-		<td><%=taxinvoice.long_id[0,4].gsub(' /', '')%> </td>
+		<td>
+			<% if taxinvoice.paiddate.nil? %>
+			<%= link_to taxinvoice.long_id[0,4].gsub(' /', ''), edit_url, :title => 'Edit Data / Masuk Detail' %>
+			<% else %>
+			<%= taxinvoice.long_id[0,4].gsub(' /', '') rescue nil %>
+			<% end %>
+		</td>
 		<td><%=taxinvoice.customer.name rescue nil%> <% if !taxinvoice.ship_name.blank? %>(<%=taxinvoice.ship_name%>) <% end %> <% if !taxinvoice.waybill.blank? %>(<%= taxinvoice.waybill %>)<% end %> <% if taxinvoice.generic %>&nbsp;<i class="icon-star grey"></i><% end %>
 			<% if taxinvoice.bank_id.to_i > 0 %><br/>(<%= taxinvoice.bank.bank_account_number %>)<% end %>
 			<% if taxinvoice.downpayment > 0 %><br />Deposit <%=to_currency_bank(taxinvoice.downpayment_date.strftime('%d-%m'))%><% end %>
@@ -171,8 +179,6 @@
 		</td>
 		<td class="right" width="120">
 			<% if taxinvoice.paiddate.nil? %>
-			<% edit_url = taxinvoice.generic ? "/taxinvoices/generic/#{taxinvoice.id}" : edit_taxinvoice_path(taxinvoice) %>
-			
 			<%= link_to '&#xf044;'.html_safe, edit_url, :class => "edit tipsy", :title => 'Edit Data / Masuk Detail' %> 
 			<% end %>
 			<a href="<%=print_taxinvoice_path(taxinvoice)%>" class="delete tipsy" title="Print Invoice"><i class="icon-print"></i></a>

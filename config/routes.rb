@@ -2,8 +2,7 @@ OfficePuraErp::Application.routes.draw do
 
   get "debug", to: "dashboards#debug"
 
-
-
+  get 'approvals' => 'approvals#index'
 
   resources :legalities do
     member do
@@ -125,9 +124,23 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
+  resources :claimmemos do
+    member do
+      get 'spv_approve'
+      get 'load_approve'
+      get 'unload_approve'
+      get 'marketing_approve'
+      get 'gm_approve'
+    end
+  end
+
   resources :quotationgroups do
     member do
-      get 'print'
+      get "print"
+      get "approve_customer"
+      get "approve_sent"
+      get "approve_confirm"
+      get "approve_review"
     end
     collection do
       get 'confirmed' => 'quotationgroups#indexconfirm'
@@ -271,6 +284,13 @@ OfficePuraErp::Application.routes.draw do
       get 'disable'
       get 'inReportEnable'
       get 'inReportDisable'
+    end
+  end
+
+  resources :offices do
+    member do
+      get 'enable'
+      get 'disable'
     end
   end
 
@@ -501,6 +521,7 @@ OfficePuraErp::Application.routes.draw do
       get 'clone'
     end
     collection do
+      get 'downloadmultiexcel'
       post "update_tax"
       get 'generic-vehicles' => 'taxgenericinvoices#generic_vehicles'
       match 'generic/updateitems' => 'taxgenericinvoices#updateitems'
@@ -871,6 +892,8 @@ OfficePuraErp::Application.routes.draw do
     match 'mechaniclogs-done' => 'mechaniclogs#done'
     match 'mechaniclogs/new/:invoice_id' => 'mechaniclogs#new'
     match 'mechaniclogs/delete/:invoice_id' => 'mechaniclogs#delete'
+    get 'mechaniclogs-proceed' => 'mechaniclogs#proceed'
+    get 'mechaniclogs-maintenance' => 'mechaniclogs#maintenance'
 
     scope "monitoring" do
       match "operational" => 'monitorings#operational'

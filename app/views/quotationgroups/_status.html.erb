@@ -1,0 +1,141 @@
+<br />
+
+<style>
+
+ul.timeline {
+    list-style-type: none;
+    position: relative;
+}
+ul.timeline:before {
+    content: ' ';
+    background: #d4d9df;
+    display: inline-block;
+    position: absolute;
+    left: 29px;
+    width: 2px;
+    height: 100%;
+    z-index: 2;
+}
+ul.timeline > li {
+    margin: 20px 0;
+    padding-left: 20px;
+}
+ul.timeline > li:before {
+    content: ' ';
+    background: white;
+    display: inline-block;
+    position: absolute;
+    border-radius: 50%;
+    border: 3px orange;
+    left: 20px;
+    width: 20px;
+    height: 20px;
+    z-index: 2;
+}
+
+a.disabled {
+	pointer-events: none;
+	background-color: grey !important;
+}
+
+.btn-txt-grey {
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: 0;
+    margin-right: 10px;
+    padding: 7px 10px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    background-color: grey !important;
+    background-repeat: repeat-x;
+    border-color: grey;
+    color: #fff !important;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.16);
+    -webkit-font-smoothing: antialiased;
+}
+
+
+</style>
+
+<div class="timeline-box">
+
+<% creator = User.find(@quotationgroup.created_by) rescue nil %>
+<% reviewer = User.find(@quotationgroup.reviewed_by) rescue nil %>
+
+<!------ Include the above in your HEAD tag ---------->
+
+<div class="container mt-5 mb-5">
+	<div class="row">
+		<div class="col-md-6 offset-md-3">
+			<h4>Proses Penawaran</h4>
+			<ul class="timeline">
+				<li>
+					<strong>Penawaran dibuat</strong>
+					<strong href="#" class="float-right"><%=@quotationgroup.created_at.strftime('%d %B %Y')%></strong>
+					<p style="padding-bottom: 0;">Penawaran dibuat oleh <%= creator.username rescue nil %></p>
+				</li>
+
+				<li>
+					<strong>Penawaran direview</strong>
+					<strong href="#" class="float-right"><%=@quotationgroup.reviewed_at.strftime('%d %B %Y') rescue nil%></strong>
+					<% if @quotationgroup.reviewed %>
+					<p style="padding-bottom: 0;">Penawaran direview oleh <%= reviewer.username rescue nil %></p>
+					<% else %>
+					<p><a class="btn-txt" style="margin-bottom: 12px;" href='approve_review'>Review</a></p>
+					<% end %>
+				</li>
+
+				<li>
+					<strong>Penawaran dikonfirmasi GM</strong>
+					<strong href="#" class="float-right"><%=@quotationgroup.confirmed_at.strftime('%d %B %Y') rescue nil%></strong>
+					<% if @quotationgroup.confirmed %>
+					<p style="padding-bottom: 0;">Penawaran dikonfirmasi oleh GM</p>
+					<% else %>
+						<% if @quotationgroup.reviewed%>
+							<% if checkrole 'General Manager' %>
+								<p><a class="btn-txt" style="margin-bottom: 12px;" href='approve_confirm'>Konfirmasi GM</a></p>
+							<% end %>
+						<% else %>
+							<p><a class="btn-txt-grey disabled" style="margin-bottom: 12px;">Menunggu Review</a></p>
+						<% end %>
+					<% end %>
+				</li>
+
+				<li>
+					<strong>Penawaran dikirim</strong>
+					<strong href="#" class="float-right"><%=@quotationgroup.sent_date.strftime('%d %B %Y') rescue nil%></strong>
+					<% if @quotationgroup.is_sent %>
+					<p style="padding-bottom: 0;">Penawaran dikirim ke <%= @quotationgroup.customer.name rescue nil %></p>
+					<% else %>
+						<% if @quotationgroup.confirmed %>
+							<p><a class="btn-txt" style="margin-bottom: 12px;" href='approve_sent'>Dikirim</a></p>
+						<% else %>
+							<p><a class="btn-txt-grey disabled" style="margin-bottom: 12px;">Menunggu Konfirmasi GM</a></p>
+						<% end %>
+					<% end %>
+				</li>
+
+				<li>
+					<strong>Penawaran disetujui customer</strong>
+					<strong href="#" class="float-right"><%=@quotationgroup.customer_approved_date.strftime('%d %B %Y') rescue nil %></strong>
+					<% if @quotationgroup.customer_approved %>
+					<p style="padding-bottom: 0;">Penawaran telah disetujui oleh <%= @quotationgroup.customer.name rescue nil %></p>
+					<% else %>
+						<% if @quotationgroup.is_sent %>
+							<p><a class="btn-txt" style="margin-bottom: 12px;" href='approve_customer'>Disetujui</a></p>
+						<% else %>
+							<p><a class="btn-txt-grey disabled" style="margin-bottom: 12px;">Menunggu dikirim</a></p>
+						<% end %>
+					<% end %>
+				</li>
+
+			</ul>
+		</div>
+	</div>
+</div>
+
+</div>

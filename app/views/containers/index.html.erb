@@ -22,7 +22,8 @@
 			<thead>
 			<tr>
 				<th>Nama</th>
-				<th>Kategori</th>
+				<th>Grup</th>
+				<th>Status</th>
 				<th>Vendor</th>
 				<th width="60" data-sorter="false" class="sorter-false">Aktif</th>
 				<th width="60" class="{sorter: false}"></th>
@@ -46,6 +47,9 @@
 						<% else %>
 							<%= container.containernumber %>	
 						<% end %>
+					</td>
+					<td>
+						<%= container.group rescue nil %>
 					</td>
 					<td>
 						<% if container.category.present? %>
@@ -86,6 +90,9 @@
 						<% else %>
 							<%= container.containernumber %>	
 						<% end %>
+					</td>
+					<td>
+						<%= container.group rescue nil %>
 					</td>
 					<td>
 					<% if container.category.present? %>

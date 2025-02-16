@@ -958,7 +958,7 @@ class InvoicesController < ApplicationController
           @invoice.driver_allowance = driver_allowance
 
           if @invoice.need_helper
-              helper_allowance = quantity * @allowances.helper_trip
+              helper_allowance = quantity * @allowances.driver_trip * 0.5
           else
               helper_allowance = 0
           end
@@ -1090,7 +1090,7 @@ class InvoicesController < ApplicationController
           @invoice.driver_allowance = driver_allowance
 
           if @invoice.need_helper
-            helper_allowance = quantity * @allowances.helper_trip
+            helper_allowance = quantity * @allowances.driver_trip * 0.5
           else
             helper_allowance = 0
           end
@@ -1185,7 +1185,7 @@ class InvoicesController < ApplicationController
           @invoice.driver_allowance = driver_allowance
 
           if @invoice.need_helper
-            helper_allowance = quantity * @allowances.helper_trip
+            helper_allowance = quantity * @allowances.driver_trip * 0.5
           else
             helper_allowance = 0
           end
@@ -1460,7 +1460,10 @@ class InvoicesController < ApplicationController
       @route = Route.find(params[:route_id])
 
       premi_allowance = params[:ispremi] == 'true' ? quantity * @route.bonus : 0
-      helper_allowance = params[:ishelper] == 'true' ? quantity * @allowances.helper_trip : 0
+      # helper_allowance = params[:ishelper] == 'true' ? quantity * @allowances.helper_trip : 0
+      #mechanic 2025 helper = driver_trip / 2
+      helper_allowance = params[:ishelper] == 'true' ? quantity * @allowances.driver_trip : 0
+      helper_allowance = helper_allowance * 0.5
 
       driver_allowance = quantity * (@allowances.driver_trip || 0)
       misc_allowance = quantity * (@allowances.misc_allowance || 0)
@@ -1930,7 +1933,7 @@ class InvoicesController < ApplicationController
         driver_allowance = quantity * @allowances.driver_trip
 
         if @invoice.need_helper == true
-          helper_allowance = quantity * @allowances.helper_trip
+          helper_allowance = quantity * @allowances.driver_trip * 0.5
         else
           helper_allowance = 0
         end
@@ -2106,7 +2109,7 @@ def fetch_excel
             @invoice.driver_allowance = driver_allowance
 
             if @invoice.need_helper
-              helper_allowance = quantity * @allowances.helper_trip
+              helper_allowance = quantity * @allowances.driver_trip * 0.5
             else
               helper_allowance = 0
             end
@@ -2195,7 +2198,7 @@ def fetch_excel
             @invoice.driver_allowance = driver_allowance
 
             if @invoice.need_helper
-              helper_allowance = quantity * @allowances.helper_trip
+              helper_allowance = quantity * @allowances.driver_trip * 0.5
             else
               helper_allowance = 0
             end

@@ -1,0 +1,67 @@
+<%= form_for(@mechaniclog) do |f| %>
+
+  <div class="" style="width: 590px; float:left; margin-bottom: 1rem;">
+
+  <div class="field-row first">
+    <%= f.label :date, "Tanggal" %> 
+    <%= f.text_field :date, :class => 'left half date-picker' %>
+  </div>
+
+  <div class="field-row" style="display: flex;">
+    <%= f.label :vehicle_id, "No. Pol" %>
+    <%= f.select :vehicle_id, options_for_select(Vehicle.active.order(:current_id).collect {|g| [g.current_id, g.id]}, @mechaniclog.vehicle_id), {:include_blank => '- Pilih -'}, :class => 'half left chzn-select',  :id => 'vehicle_id'%>
+    <%= f.label :driver_id, "Supir", :class => 'middle' %>
+    <%= f.select :driver_id, options_for_select(Driver.active.order(:name).collect {|g| [g.name, g.id]}, @mechaniclog.vehicle_id), {:include_blank => '- Pilih -'}, :class => 'half left chzn-select',  :id => 'driver_id'%>
+  </div> 
+
+  <div class="field-row">
+    <% params[:request_type] = 'maintenance'%>
+    <%= f.label :request_type, "Tipe Request"  %>
+    <%= f.select :request_type, options_for_select(@requesttypes.collect {|w| [w, w]}, (params[:request_type].present? ? params[:request_type] : @mechaniclog.request_type)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :group, "Tipe Kerusakan"  %>
+    <%= f.select :group, options_for_select(@loggroups.collect {|w| [w, w]}, (params[:group].present? ? params[:group] : @mechaniclog.group)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <% params[:request_level] = 'normal'%>
+    <%= f.label :request_level, "Level"  %>
+    <%= f.select :request_level, options_for_select(@requestlevels.collect {|w| [w, w]}, (params[:request_level].present? ? params[:request_level] : @mechaniclog.request_level)), {}, { :class => 'half chzn-select' } %>
+  </div>
+
+  <div class="field-row" style="display: flex;">
+    <%= f.label :office_id, "Kantor" %>
+    <%= f.select :office_id, options_for_select(Office.where(:deleted => false).collect {|g| [g.name, g.id]}, @mechaniclog.office_id), {}, :class => 'half left chzn-select ' %>
+    <%= f.label :request_location, "Lokasi", :class => 'middle' %>
+    <%= f.select :request_location, options_for_select(@requestlocations.collect {|w| [w, w]}, (params[:request_location].present? ? params[:request_location] : @mechaniclog.request_location)), {}, { :class => 'half left chzn-select' } %>
+  </div>
+
+  <div class="field-row ">
+    <%= f.label :mechanic_id, "Mekanik" %>
+    <select id="mechaniclog_mechanic_id" name="mechaniclog[mechanic_id]" class="half chzn-select">
+      <option value="0">- Pilih Mekanik -</option>
+      <% Mechanic.active.each do |mecha| %>
+      <option value="<%=mecha.id%>"
+        <% if mecha.id == @mechaniclog.mechanic_id %> selected="selected"<% end %>><%=mecha.name%></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :description, "Deskripsi Kerusakan" %>
+    <%= f.text_area :description %>
+  </div>
+
+  <div class="field-row continue">
+
+  <%= f.hidden_field :user_id, :value => current_user.id %>
+
+  <%= f.submit "Tambah Data", :class => 'submit right' %>    
+  <br/>
+  </div>
+
+  </div>
+
+<% end %>

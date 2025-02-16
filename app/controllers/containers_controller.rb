@@ -8,6 +8,7 @@ class ContainersController < ApplicationController
     @section = "masters"
     @where = "containers"
     @categories = ["BELI", "SEWA", "FREEUSE"]
+    @groups = ["DRY CONTAINER 20FT", "DRY CONTAINER 40FT", "SIDE DOOR CONTAINER 20FT", "SIDE DOOR CONTAINER 40FT"]
   end
 
   def set_role

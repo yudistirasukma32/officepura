@@ -16,11 +16,11 @@
 
 	td {
 		border: 1px solid #888;
-		font-size: 1rem;
+		font-size: 11pt;
 	}
 
 	.desc {
-		font-size: 11pt;
+		font-size: .85rem;
 	}
 
 	.headsignature {margin-top:0px;margin-left: 250px;}
@@ -36,16 +36,23 @@
 
 	.pttdleft {
 		display: inline-block;
-		width: 47.5%;
+		width: 30%;
 	}
 
 	.pttdright {
 		display: inline-block;
 		margin-left: 5rem;
+		max-width: 300px;
+		width: 100%;
+	}
+
+	.paper {
+		padding: 3rem 1.5rem;
+		background: white;
 	}
 
 	@media print{
-		@page { margin-top:120px;margin-bottom:120px; }
+		@page { margin-top:80px; margin-bottom:80px; }
 
 		.d-none-print {
 			display: none;
@@ -54,6 +61,25 @@
 		.desc {
 			font-size: .85rem;
 			margin-left: 20px;
+		}
+
+		table {
+			margin-left: 0;
+			margin-right: 0;
+		}
+
+		.paper {
+			padding: 3.5rem 3rem 3rem;
+			background: white;
+			font-size: 10px !important;
+			line-height: 1.1 !important;
+		}
+
+		.pttdright {
+			display: inline-block;
+			margin-left: 5rem;
+			max-width: 170px;
+			width: 100%;
 		}
 	}
 
@@ -82,7 +108,6 @@
 	<div id="content-full" class="invoice-paper">
 		<a class="btn-txt cancel hideprint" href="<%=quotationgroups_path({:customer_id => $globalCustomer_id, :month => $globalMonth, :year => $globalYear})%>"><i class="icon-remove"></i> Batal</a>
 		
-
 		<% if !@quotationgroup.nil? %>
 		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
 
@@ -91,8 +116,10 @@
 		<br />
 		<br />
 		<br />
-		<br />
-		<p class="left" style="width: 100%;margin-bottom:2rem">Nomor : <%=@quotationgroup.long_id%><span class="right">Surabaya, <%= @quotationgroup.confirmed_date.strftime('%d') %> <%= @month %> <%= @quotationgroup.confirmed_date.strftime('%Y') %></span></p>
+
+		<div class="paper">
+		
+		<p class="left" style="width: 100%;margin-bottom:2rem">Nomor : <%=@quotationgroup.long_id%><span class="right">Surabaya, <%= @quotationgroup.date.strftime('%d') %> <%= @month %> <%= @quotationgroup.date.strftime('%Y') %></span></p>
 
 		<p>Kepada Yth.</p>
 		<%
@@ -111,26 +138,27 @@
 				pic = customer
 			end
 		%>
-		<div>
+		<div style="line-height: 1;">
 			<p class="pleft">u.p.</p>
 			<p class="pright">: <%= pic %></p>
-		</div>
-
-		<div style="margin-bottom:2rem">
+			<br>
 			<p class="pleft">Perihal</p>
 			<p class="pright">: <span style="font-weight:700;text-decoration-line: underline;text-decoration-thickness: 3px;">Penawaran Harga</span></p>
 		</div>
 
 		<p style="line-height: 20pt;">
 			Dengan hormat,<br>
-			PT. Putra Rajawali Trans merupakan perusahaan angkutan barang multimoda yang
+ 
+			PT. Rajawali Dwi Putra Indonesia merupakan perusahaan angkutan barang multimoda yang
 			berpengalaman menangani beragam jenis komoditas yang diangkut. Kami memiliki lebih dari
 			200 unit truk milik sendiri yang tersambung dengan fleet management system guna memenuhi
-			kebutuhan pengiriman B2B perusahaan Bapak/Ibu.
-			<br>
+			kebutuhan pengiriman B2B perusahaan Bapak/Ibu. Terkait dengan layanan yang kami berikan,
+			berikut kami ajukan penawaran jasa angkutan PT. Rajawali Dwi Putra. <br>
+
 			Terkait dengan layanan yang kami berikan, berikut kami ajukan penawaran jasa angkutan PT.
-			Putra Rajawali Trans.
+			Rajawali Dwi Putra.<br>
 		</p>
+
  		<br class="clear" />
  		<br class="clear" />
 
@@ -165,30 +193,38 @@
 
 		<p style="line-height:20pt; margin-top:2rem;">
 			Jika Bapak/Ibu memerlukan informasi lebih lanjut, Ibu dapat menghubungi Indra Susanto
-			telepon 08113001598 / Anin (082234451234) email indra@rdpitrans.com. Atas perhatian
+			telepon 08113001598 / <%= @confirmation.username %> (<%= @marketing_phone %>) email <u>indra@rdpitrans.com</u> atau <u>marketing@rdpitrans.com</u>.
+			Atas perhatian
 			Bapak/Ibu, kami sampaikan terima kasih.
 		</p>
 		
-		<div style="margin-top:3rem">
+		<div style="margin-top:2rem">
 			<p class="pttdleft">Hormat kami,</p>
+			<p class="pttdleft"></p>
 			<p class="pttdright">Menerima dan Menyetujui</p>
 		</div>
 
-		<% if @confirmation.username == 'admin' %>
-			<%= image_tag('ttd_developer.png', size: '175x75') %>
-		<% elsif @confirmation.username == 'ariel' %>
-			<%= image_tag('ttd_pak_ariel.png', size: '175x75') %>
-		<% elsif @confirmation.username == 'indra' %>
-			<%= image_tag('ttd_pak_indra.png', size: '175x75') %>
-		<% elsif @confirmation.username == 'yonathan' %>
-			<%= image_tag('ttd_pak_yonathan.png', size: '175x75') %>
-		<% end %>
+		<div style="margin-top:2.5rem">
+			<p class="pttdleft"></p>
+			<p class="pttdleft"></p>
+			<p class="pttdright"></p>
+		</div>
 
 		<div>
-			<p class="pttdleft"><u><%= @confirmation.username.upcase %></u></p>
-			<p class="pttdright"><u><%= customer %></u></p>
+			<p class="pttdleft"><span><%= @confirmation.username.upcase %></span></p>
+			<p class="pttdleft"><span>INDRA SUSANTO</span></p>
+			<p class="pttdright"></p>
 		</div>
-		<p style="margin-top:0"><%= @confirmation_role.name rescue nil %></p>
+
+		<div style="display: flex; align-items: flex-start;">
+			<p class="pttdleft"><strong>Marketing</strong></p>
+			<p class="pttdleft"><strong>General Manager</strong></p>
+			<p class="pttdright"><strong><%= customer %></strong></p>
+		</div>
+
 	</div>
 	<% end %>
+
+	</div>
+
 </div>

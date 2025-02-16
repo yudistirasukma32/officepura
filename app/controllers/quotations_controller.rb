@@ -4,7 +4,7 @@ class QuotationsController < ApplicationController
   before_filter :authenticate_user!, :set_section
 
   def set_section
-    @section = "marketing"
+    @section = "quotation"
     @where = "quotation"
     @price_per_types = ["KG", "LITER", "BORONGAN","M3"]
     @transporttypes = ["TRUK", "ISOTANK", "KERETA", "KAPAL (TOL LAUT)"]

@@ -1,0 +1,202 @@
+<div id="filter">
+<form action="/claimmemos/new/" method="get">
+  <div class="field-row continue">
+    <label for="invoice_id">No. BKK</label>
+    <input type="text" name="invoice_id" class="half left" value="<%=@invoice_id%>" style="margin-right:10px;" />
+    <input type="submit" class="submit" value="Cari BKK" />    
+  </div>
+</form>
+</div>
+
+<br class="clearfix" /><br />
+
+<% if @invoice %>
+
+<%= form_for(@claimmemo) do |f| %>
+
+	<% if @claimmemo.errors.any? %>
+	<div id="error_explanation">
+	<h2><%= pluralize(@claimmemo.errors.count, "error") %> prohibited this ship from being saved:</h2>
+		<ul>
+			<% @claimmemo.errors.full_messages.each do |msg| %>
+			<li><%= msg %></li>
+			<% end %>
+		</ul>
+	</div>
+	<% end %>
+
+  <div class="info-box <%= @invoice.invoicetrain ? 'train' : ''%>" style="margin-bottom:30px;">  
+
+    <h3>Bukti Kas Keluar <%= @invoice.invoicetrain ? 'Kereta' : ''%> #<%=zeropad(@invoice.id)%></h3>
+
+    <table class="row-view no-border">
+      <tr>
+          <td width="100">Tanggal</td>
+          <td><%=@invoice.date.strftime('%d %B %Y')%> &nbsp;(KTR: <%=@invoice.office.name%>)</td>
+        </tr>
+        <tr>
+          <td>Pelanggan</td>
+          <td><%=@invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td>
+          <strong><%=@invoice.quantity%></strong> Rit: <%=@invoice.route.name%>
+          (<%=@invoice.route.routegroup.name%>)
+          </td>
+        </tr>
+        <tr>
+          <td>Komoditas</td>
+          <td><%=@invoice.event.commodity.name rescue nil%></td>
+        </tr>
+
+        <% if @invoice.vehicle_duplicate_id.present? && @invoice.vehicle_duplicate_id != 0 %>
+        <tr>
+          <td>Kendaraan Asli</td>
+          <td>
+            <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <tr>
+          <td>Kendaraan Jalan/Pinjam</td>
+          <td>
+            <strong><%=@invoice.vehicle_duplicate.current_id%></strong> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle_duplicate.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <% else %>
+        <tr>
+          <td>Kendaraan</td>
+          <td>
+            <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <% end %>
+
+        <tr>
+          <td>Supir</td>
+          <td>
+          <%=@invoice.driver.name%> (<%=zeropad(@invoice.driver.id)%>)
+          <% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %>
+          </td>
+        </tr>
+        <td>No. Telp.</td>
+          <td><%=@invoice.driver.mobile rescue nil%></td>
+        </tr>
+        <% if !@invoice.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td><%= @invoice.description %></td>
+        </tr>   
+        <% end %>       
+    </table>
+
+    <h3>Invoice Tagihan</h3>
+
+    <table class="row-view no-border">
+      <tr>
+          <td width="100">Nomor</td>
+          <td>
+          <% if !@taxinvoiceitems.nil? %>
+            <% @taxinvoiceitems.each_with_index do |taxinvoiceitem,i| %>
+              <% @taxinvoice = Taxinvoice.find(taxinvoiceitem.taxinvoice_id) rescue nil  %>
+                <% if @taxinvoice.nil? %>
+                -
+                <% else %>
+                  <% if current_user.adminrole || current_user.owner  %>
+                    <%= link_to(@taxinvoice.long_id, edit_taxinvoice_path(@taxinvoice.id), target: :_blank) %>
+                  <% else %>
+                    <%= @taxinvoice.long_id %>
+                  <% end %>
+                  <br/>
+                <% end %>
+            <% end %>
+          <% end %>
+          </td>
+        </tr>  
+    </table>
+
+    <h3>Klaim</h3>
+
+    <!-- Calculate -->
+
+    <%= render "calc" %>
+
+    <!-- end of Calculate -->
+
+    <br>
+
+    <p>Dibuat oleh <strong id="strCreator"><%= @claimmemo.user.username rescue nil %></strong></p>
+ 
+  </div>
+
+  <div class="field-row first">
+		<%= f.label :date, "Tanggal" %>
+		<%= f.text_field :date, :class => 'half date-picker', :value => @claimmemo.date.strftime('%d-%m-%Y') %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :weight_gross, "Muat" %>
+		<%= f.text_field :weight_gross, :class => 'half left',:onkeypress => 'javascript: return isNumberKey(this);' %> 
+		<%= f.label :weight_net, "Bongkar", :class => 'middle' %>
+		<%= f.text_field :weight_net, :class => 'half left',:onkeypress => 'javascript: return isNumberKey(this);' %> 
+	</div>
+	
+	<div class="field-row">
+		<%= f.label :shrink, "Susut" %>
+		<%= f.text_field :shrink, :class => 'half left',:onkeypress => 'javascript: return isNumberKey(this);' %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :shrink_tolerance_percent, "Toleransi %" %>
+		<%= f.text_field :shrink_tolerance_percent, :class => 'half left', 
+		:onchange => 'javascript: countTotalClaim();' %> 
+		<!-- <%= f.label :shrink_tolerance_money, "Toleransi (kg)", :class => 'middle' %>
+		<%= f.text_field :shrink_tolerance_money, :class => 'half left',:onkeypress => 'javascript: return isNumberKey(this);' %> 
+		-->
+	</div>
+
+	<div class="field-row">
+		<%= f.label :tolerance_total, "Total Toleransi" %>
+		<%= f.text_field :tolerance_total, :class => 'half left'%> 
+		<small>Muat * toleransi</small>
+	</div>
+
+	<div class="field-row">
+		<%= f.label :shrinkage_load, "Beban Susut" %>
+		<%= f.text_field :shrinkage_load, :class => 'half left',:onkeypress => 'javascript: return isNumberKey(this);' %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :price_per, "Harga / kg" %>
+		<%= f.text_field :price_per, :class => 'half left',:onkeypress => 'javascript: return isNumberKey(this);', 
+		:onchange => 'javascript: countTotalClaim();' %> 
+	</div>
+
+  <div class="field-row">
+		<%= f.label :discount_amount, "Discount" %>
+		<%= f.text_field :discount_amount, :class => 'half left',:onkeypress => 'javascript: return isNumberKey(this);', 
+		:onchange => 'javascript: countTotalClaim();' %> 
+	</div>
+
+	<div class="field-row">
+		<%= f.label :description, "Deskripsi" %>
+		<%= f.text_area :description, :class => 'half' %>
+	</div>
+
+	<div class="actions">
+	<%= f.hidden_field :total, :value => @claimmemo.total %>
+	<%= f.hidden_field :invoice_id, :value => @invoice.id %>
+  <%= f.hidden_field :is_train, :value => @invoice.invoicetrain %>
+	<%= f.hidden_field :taxinvoiceitem_id, :value => @taxinvoiceitems.first.id %>
+
+  <% if !params['rel'].present?%>
+	<%= f.submit "Tambah Data", :class => 'left' %>
+  <% end %>
+	</div>
+
+<% end %>
+
+<% end %>

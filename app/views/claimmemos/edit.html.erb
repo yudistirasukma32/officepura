@@ -1,0 +1,102 @@
+<style>
+.green {
+	background-image: linear-gradient(#4CAF50, #4CAF50) !important;
+    border-color: #8BC34A #8BC34A #8BC34A !important;
+	pointer-events: none !important;
+}
+
+.w72 {
+	width: 76px;
+	font-size: 11px !important; 
+}
+
+.flx {
+	display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.flx i {
+	margin-right: 3px;
+}
+
+</style>
+
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+ 
+		<div style="position: relative;display: flex;justify-content: space-between;flex-direction: row;align-items: center;">
+			<h1><a href="<%=claimmemos_path%>">Klaim Penagihan</a> / Edit</h1>
+			
+			<div style="position: relative; display: flex;">
+
+				<% if !@claimmemo.approved_load_spv %>
+					<% if params[:rel].present? %>
+						<% if checkrole 'Admin Approval Klaim' %>
+							<a class="btn-txt w72" href="load_approve"><i class="icon-check"></i> Muat Approve</a>
+						<% end %>
+					<% end %>
+				<% else %>
+				<a class="btn-txt green disabled w72" href="#"><i class="icon-check"></i> Muat Approved</a>
+				<% end %>
+
+				<% if !@claimmemo.approved_unload_spv %>
+					<% if params[:rel].present? %>
+						<% if checkrole 'Admin Approval Klaim' %>
+							<a class="btn-txt w72" href="unload_approve"><i class="icon-check"></i> Bongkar Approve</a>
+						<% end %>
+					<% end %>
+				<% else %>
+				<a class="btn-txt green disabled w72" href="#"><i class="icon-check"></i> Bongkar Approved</a>
+				<% end %>
+
+				<% if !@claimmemo.approved %>
+					<% if params[:rel].present? %>
+						<% if checkrole 'Admin Approval Klaim' %>
+							<a class="btn-txt w72" href="spv_approve"><i class="icon-check"></i> SPV Approve</a>
+						<% end %>
+					<% end %>
+				<% else %>
+				<a class="btn-txt green disabled w72" href="#"><i class="icon-check"></i> SPV Approved</a>
+				<% end %>
+
+				<% if !@claimmemo.approved_marketing %>
+					<% if params[:rel].present? %>
+						<% if checkrole 'Marketing' %>
+							<a class="btn-txt w72" href="marketing_approve"><i class="icon-check"></i> Marketing Approve</a>
+						<% end %>
+					<% end %>
+				<% else %>
+				<a class="btn-txt green disabled w72" href="#"><i class="icon-check"></i> Marketing Approved</a>
+				<% end %>
+
+				<% if !@claimmemo.approved_by_gm %>
+					<% if params[:rel].present? %>
+						<% if checkrole 'General Manager' %>
+							<a class="btn-txt w72" href="gm_approve"><i class="icon-check"></i> GM Approve</a>
+						<% end %>
+					<% end %>
+				<% else %>
+				<a class="btn-txt green disabled w72" href="#"><i class="icon-check"></i> GM Approved</a>
+				<% end %>
+
+				<a class="btn-txt cancel flx" href="<%=claimmemos_path%>"><i class="icon-remove"></i> Batal</a>
+			</div>
+		</div>
+
+		<br class="clearfix" />
+
+		<%= render "form-edit" %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

@@ -1,0 +1,15 @@
+    <table class="row-view">
+      <tr>
+        <th>Keterangan</th>
+        <th width="160" class="right" style="padding-right:5px;">Total</th>
+      </tr>
+
+      <tr class="total-row">
+        <td>Total Beban Supir</td>
+        <td class="right" id="claimmemo_total_text"><%=to_currency(@claimmemo.total)%></td>
+      </tr>
+      
+    </table>
+
+    <small><%= @invoice.invoicetrain ? '*BKK Kereta dibagi 2' : ''%></small>
+    <br>

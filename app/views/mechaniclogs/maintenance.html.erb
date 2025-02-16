@@ -1,0 +1,103 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<style>
+.chzn-container {
+	top: 7px;
+}
+
+#main #filter {
+	height: 50px;
+}
+</style>
+
+<div id="main">
+	
+	<div id="content-full">
+
+		<h1>OPS / <a href="<%=mechaniclogs_path%>">Call Mekanik - Maintenance</a> / Index</h1>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue" style="display: none;">
+				<label for="date">Pilih Tanggal</label>
+				<input type="text" name="date" class="half date-picker" value="<%=@date%>" onchange="javascript: submitFormFilter();" />
+			</div>
+
+			<div class="field-row continue">
+				<label for="startdate" class="" style="float:none">Tgl Awal</label> &nbsp; &nbsp;
+				<input type="text" name="startdate" class="thalf date-picker" value="<%=@startdate%>" />&nbsp; &nbsp;
+				<label for="enddate" class="middle short" style='width:50p;float:none;'>Akhir</label> &nbsp; &nbsp;
+				<input type="text" name="enddate" class="thalf date-picker" value="<%=@enddate%>" />&nbsp; &nbsp;
+
+				<label for="vehicle_id" style="float:none">No Pol</label>
+				<select name="vehicle_id" class="chzn-select half combo_route" style="top: 5px;">
+					<% Vehicle.order(:current_id).all.each do |vehicle| %>
+					<option value="<%=vehicle.id%>"<% if @vehicle and vehicle.id == @vehicle.id %> selected="selected"<% end %>><%=vehicle.current_id%></option>
+					<% end %>
+		    	</select>
+
+				<label for="mechanic_id" class="middle short" style='width:50px;float:none;'>Mekanik</label> &nbsp; &nbsp;
+ 
+				<select name="mechanic_id" class="middle half chzn-select" style="top: 5px;">
+					<option value="">Semua</option>
+					<% Mechanic.active.order(:name).each do |mecha| %>
+					<option value="<%=mecha.id%>"<% if mecha.id == @mecha %> selected='selected'<% end %>><%=mecha.name%></option>
+					<% end %>
+				</select>
+ 
+				<input class="submit" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+			<table class="row-view">
+				<tr>
+					<th width="50">TGL</th>
+					<th width="50">No.</th>
+					<th width="60">No. Pol</th>
+					<th width="70">Maintenance</th>
+					<th width="70">Lokasi</th>
+					<th width="50">Mekanik</th>
+					<th width="50">Status</th>
+					<th width="90"></th>
+				</tr>
+
+				<% @grandTotal = 0%>
+				<% @mechaniclogs.each do |log| %>
+					<tr>
+						<td><strong><%=log.date.strftime('%d')%></strong>.<%=log.date.strftime('%m')%></td>
+						<td><%= zeropad(log.id) %></td>
+						<td><%=log.vehicle.current_id rescue nil%></td>
+						<td><%= log.group rescue nil %></td>
+						<td><%= log.request_location rescue nil %></td>
+						<td><%= log.mechanic.name rescue nil %></td>
+						<td><%= log.finished ? 'selesai' : 'proses' %></td>
+						<td class="right" width="90" style="display: flex; justify-content: space-evenly;">
+
+						<%= link_to '&#xf044;'.html_safe, edit_mechaniclog_path(log.id), :class => "edit tipsy", :title => 'Edit' %> 
+
+						<% if (current_user.adminrole || current_user.owner)%>
+
+							<a class="cta" style="opacity: 1;" href="mechaniclogs/destroy/<%=log.id%>">Batal</a>
+
+						<% end %>
+
+						</td>
+					</tr>
+				<% end %>	
+
+			</table>
+
+		<br class="clearfi" />
+
+	</div>
+
+</div>

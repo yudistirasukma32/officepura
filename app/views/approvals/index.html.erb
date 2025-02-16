@@ -1,0 +1,58 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+
+		<h1>Approval / Index</h1>
+
+		<br class="clearfix" />
+		<br class="clearfix" />
+
+		<% if checkrole 'Admin Approval, Admin Marketing, General Manager' %>
+
+		<h2 style="font-weight: bold;">Pelanggan Baru</h2>
+
+		<%= render "customers" %>
+ 
+		<br class="clearfix" />
+
+		<% end %>
+
+		<% if checkrole 'Admin Approval, Admin Marketing, General Manager' %>
+
+		<h2 style="font-weight: bold;">Penawaran Baru</h2>
+
+		<%= render "quotations" %>
+ 
+		<br class="clearfix" />
+
+		<% end %>
+
+		<% if checkrole 'Admin Approval Klaim, Admin Marketing, Marketing, General Manager' %>
+
+		<h2 style="font-weight: bold;">Klaim Penagihan</h2>
+
+		<%= render "claims" %>
+ 
+		<br class="clearfix" />
+
+		<% end %>
+
+		<% if checkrole 'Admin Operasional, Admin Sangu, Admin Marketing, Marketing, Operasional BKK, General Manager' %>
+
+		<h2 style="font-weight: bold;">Jurusan Baru (Belum ada sangu)</h2>
+
+		<%= render "routes" %>
+ 
+		<br class="clearfix" />
+
+		<% end %>
+
+	</div>
+
+</div>

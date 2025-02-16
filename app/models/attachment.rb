@@ -16,6 +16,8 @@ class Attachment < ActiveRecord::Base
       Staff.find(self.imageable_id) rescue nil
     when "Vehicle"
       Vehicle.find(self.imageable_id) rescue nil
+    when "Office"
+      Office.find(self.imageable_id) rescue nil
     when "Legality"
       Legality.find(self.imageable_id) rescue nil
     when "Invoice"

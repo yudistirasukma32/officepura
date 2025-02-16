@@ -25,12 +25,25 @@ class TaxinvoicesController < ApplicationController
   def index
     @section = "taxinvoices"
     @where = "taxinvoices"
+    @startdate = params[:startdate] || Date.today.beginning_of_month.strftime('%d-%m-%Y')
+    @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
+    @filterbydates = params[:filterbydates]
+    # @month = @enddate.to_date.month.to_s
+    # @year = @enddate.to_date.year.to_s
+
     @month = params[:month]
     @month = "%02d" % Date.today.month.to_s if @month.nil?
     @year = params[:year]
     @year = Date.today.year if @year.nil?
 
-    @customers = Customer.where("id in (select customer_id from events where deleted = false and to_char(start_date, 'MM-YYYY') = ?)", "#{@month}-#{@year}").order(:name)
+    if @filterbydates.present?
+      @customers = Customer.where("id in (select customer_id from events where deleted = false and start_date BETWEEN ? AND ?)", @startdate.to_date, @enddate.to_date).order(:name)
+    else
+      @customers = Customer.where("id in (select customer_id from events where deleted = false and to_char(start_date, 'MM-YYYY') = ?)", "#{@month}-#{@year}").order(:name)
+    end
+
+    # @customers = Customer.where("id in (select customer_id from events where deleted = false and to_char(start_date, 'MM-YYYY') = ?)", "#{@month}-#{@year}").order(:name)
+    # @customers = Customer.where("id in (select customer_id from events where deleted = false and start_date BETWEEN ? AND ?)", @startdate.to_date, @enddate.to_date).order(:name)
 
     @customer = Customer.find(params[:customer_id]) rescue nil
     @customer_id = @customer.id if @customer
@@ -39,9 +52,15 @@ class TaxinvoicesController < ApplicationController
     $globalYear = @year
     $globalCustomer_id = @customer_id
 
-    @taxinvoices = Taxinvoice.active
+    @taxinvoices = Taxinvoice.where('customer_id is not null').active
     @taxinvoices = @customer.taxinvoices.active if @customer
-    @taxinvoices = @taxinvoices.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}").order(:long_id)
+    # @taxinvoices = @taxinvoices.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}").order(:long_id)
+
+    if @filterbydates.present?
+      @taxinvoices = @taxinvoices.where("date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date).order(:long_id)
+    else
+      @taxinvoices = @taxinvoices.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}").order(:long_id)
+    end
 
     if params[:process] == 'payment'
       @taxinvoices.each do |taxinvoice|
@@ -1204,6 +1223,204 @@ class TaxinvoicesController < ApplicationController
       end
 
     end
+    p.use_autowidth = false
+    p.use_shared_strings = true
+
+    #if p.serialize("/tmp/#{filename}")
+      #send_data("#{Rails.root}/tmp/#{filename}", :filename => filename, :type => :xls, :x_sendfile => true)
+    #end
+
+    send_data(p.to_stream.read, :filename => filename, :type => :xls, :x_sendfile => true)
+
+  end
+
+  def downloadmultiexcel
+    # @startdate = params[:startdate] || Date.today.beginning_of_month.strftime('%d-%m-%Y')
+    # @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
+
+    @month = params[:month]
+    @month = "%02d" % Date.today.month.to_s if @month.nil?
+    @year = params[:year]
+    @year = Date.today.year if @year.nil?
+
+    # pluck_taxinvoices = Taxinvoice.active.where("date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
+    # pluck_taxinvoices = pluck_taxinvoices.where(customer_id: params[:customer_id]) if params[:customer_id].present?
+    # customer_ids = pluck_taxinvoices.pluck(:customer_id)
+    # customers = Customer.active.where(id: customer_ids)
+    # taxinvoices = Taxinvoice.active.where("date BETWEEN ? AND ? AND customer_id = ?", @startdate.to_date, @enddate.to_date, params[:customer_id]).order(:long_id)
+    taxinvoices = Taxinvoice.active
+    # taxinvoices = customer.taxinvoices.active if customer
+    # taxinvoices = taxinvoices.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}").order(:long_id)
+
+    taxinvoices = Taxinvoice.active.where("long_id is not null AND to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}")
+
+    if params[:customer_id].present?
+      customer = Customer.find(params[:customer_id])
+      taxinvoices = taxinvoices.where(customer_id: params[:customer_id])
+    end
+
+    # render json: taxinvoices.to_sql
+    # return false
+
+    if params[:customer_id].present?
+      filename = "invoices_" + customer.name + "_" + "#{@month}-#{@year}" + "_" + Time.current.strftime('%H%M%S').to_s+".xlsx"
+    else
+      filename = "invoices_" + "#{@month}-#{@year}" + "_" + Time.current.strftime('%H%M%S').to_s+".xlsx"
+    end
+
+    index_col = 1
+
+    p = Axlsx::Package.new
+    taxinvoices.each do |taxinvoice|
+      # Sheet
+      index_col = 1
+      # p.workbook.add_worksheet(:name => taxinvoice.long_id.delete("/")) do |sheet|
+      p.workbook.add_worksheet(:name => "#{taxinvoice.long_id.delete('/')}-#{taxinvoice.id}") do |sheet|
+        # taxinvoices = Taxinvoice.active.where("customer_id = ? AND date BETWEEN ? AND ?", customer.id, @startdate.to_date, @enddate.to_date).order(:long_id)
+
+        # Style
+        bold = sheet.styles.add_style(:b => true)
+        right = sheet.styles.add_style(:alignment => {:horizontal => :right})
+        right_currency = sheet.styles.add_style(:alignment => {:horizontal => :right}, :format_code => "#,##0.00;[Red]-#,##0.00")
+        right_bold = sheet.styles.add_style(:alignment => {:horizontal => :right}, :b => true)
+        right_bold_currency = sheet.styles.add_style(:alignment => {:horizontal => :right}, :b => true, :format_code => "#,##0.00;[Red]-#,##0.00")
+        border_b = sheet.styles.add_style(:border => {:style => :thick, :color => '000000', :edges => [:bottom]})
+
+        # Excel content
+        sheet.add_row [''], :height => 20
+        index_col +=1
+        sheet.add_row ['','No. Invoice', taxinvoice.long_id], :height => 20, :widths => [:auto, :auto, :ignore]
+        index_col +=1
+        sheet.add_row ['','Tanggal', taxinvoice.date.strftime('%d-%m-%Y')], :height => 20, :widths => [:auto, :auto, :ignore]
+        index_col +=1
+        sheet.add_row ['','Periode', (taxinvoice.period_start.strftime('%d-%m-%Y') rescue '') + " - " + (taxinvoice.period_end.strftime('%d-%m-%Y') rescue '')], :height => 20, :widths => [:auto, :auto, :ignore]
+        index_col +=1
+        sheet.add_row ['','Nama', taxinvoice.customer.name], :height => 20, :widths => [:auto, :auto, :ignore]
+        index_col +=1
+        sheet.add_row ['','Alamat', taxinvoice.customer.address], :height => 20, :widths => [:auto, :auto, :ignore]
+        index_col +=1
+
+        if !taxinvoice.customer.npwp.blank?
+          sheet.add_row ['','NPWP', taxinvoice.customer.npwp], :height => 20, :widths => [:auto, :auto, :ignore]
+          index_col +=1
+        end
+        if !taxinvoice.product_name.blank?
+          sheet.add_row ['','Barang', taxinvoice.product_name], :height => 20, :widths => [:auto, :auto, :ignore]
+          index_col +=1
+        end
+        if !taxinvoice.spk_no.blank?
+          sheet.add_row ['','SPK', taxinvoice.spk_no], :height => 20, :widths => [:auto, :auto, :ignore]
+          index_col +=1
+        end
+        if !taxinvoice.po_no.blank?
+          sheet.add_row ['','PO', taxinvoice.po_no], :height => 20, :widths => [:auto, :auto, :ignore]
+          index_col +=1
+        end
+        if !taxinvoice.ship_name.blank?
+          sheet.add_row ['','Nama Kapal', taxinvoice.ship_name], :height => 20, :widths => [:auto, :auto, :ignore]
+          index_col +=1
+        end
+        if !taxinvoice.tank_name.blank?
+          sheet.add_row ['','Jenis Tangki', taxinvoice.tank_name], :height => 20, :widths => [:auto, :auto, :ignore]
+          index_col +=1
+        end
+
+        sheet.add_row [''], :height => 20
+        sheet.add_row [''], :height => 20
+        index_col +=2
+
+        sheet.add_row ['','NO.', 'TGL KIRIM', 'NO POL', 'SURAT JALAN', 'QTY MUAT(KG)', 'QTY BONGKAR(KG)', 'TARIF', 'JURUSAN', 'TOTAL'], :height => 20, :style => [bold,bold,bold,bold,bold,right_bold,right_bold,right_bold,bold,right_bold]
+        index_col +=1
+        if taxinvoice.taxinvoiceitems.any?
+
+          taxinvoice.taxinvoiceitems.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i|
+            if taxinvoiceitem.invoice.invoicetrain
+              if taxinvoiceitem.invoice.invoices.first
+                invoice_train = ", "+taxinvoiceitem.invoice.invoices.first.vehicle.current_id
+                # invoice_train = "dshfhsdefhas"
+              else
+                invoice_train = ""
+              end
+            else
+              invoice_train = ""
+            end
+            sheet.add_row ['',i+1, taxinvoiceitem.date.strftime('%d/%m/%Y'), taxinvoiceitem.invoice.vehicle.current_id + '' + invoice_train, taxinvoiceitem.sku_id, taxinvoiceitem.weight_gross, taxinvoiceitem.weight_net, taxinvoiceitem.price_per.to_f, (taxinvoiceitem.invoice.route.name rescue nil), taxinvoiceitem.total.to_f], :height => 20, :style => [nil,nil,nil,nil,nil,right_currency,right_currency,right_currency,nil,right_currency]
+            index_col +=1
+          end
+
+        else
+          taxinvoice.taxgenericitems.order(:date, :sku_id).each_with_index do |taxgenericitem, i|
+            sheet.add_row ['',i+1, taxgenericitem.date.strftime('%d/%m/%Y'), taxgenericitem.vehicle.current_id, taxgenericitem.sku_id, taxgenericitem.weight_gross, taxgenericitem.weight_net, taxgenericitem.price_per.to_f, taxgenericitem.description, taxgenericitem.total.to_f], :height => 20, :style => [nil,nil,nil,nil,nil,right_currency,right_currency,right_currency,nil,right_currency]
+            index_col +=1
+          end
+
+        end
+
+        subtotal_row = index_col
+        if taxinvoice.taxinvoiceitems.any?
+          sheet.add_row ['','', 'SUBTOTAL', '','', taxinvoice.taxinvoiceitems.sum(:weight_gross), taxinvoice.taxinvoiceitems.sum(:weight_net), '', '', taxinvoice.taxinvoiceitems.sum(:total).to_f], :height => 20, :style => [nil,nil,nil,nil,nil,right_currency,right_currency,right_currency,nil,right_bold_currency]
+          index_col +=1
+        else
+          sheet.add_row ['','', 'SUBTOTAL', '','', taxinvoice.taxgenericitems.sum(:weight_gross), taxinvoice.taxgenericitems.sum(:weight_net), '', '', taxinvoice.taxgenericitems.sum(:total).to_f], :height => 20, :style => [nil,nil,nil,nil,nil,right_currency,right_currency,right_currency,nil,right_bold_currency]
+          index_col +=1
+        end
+
+        if taxinvoice.extra_cost > 0
+          extra_row = index_col
+          sheet.merge_cells 'B' + index_col.to_s + ':I'+ index_col.to_s
+          sheet.add_row [nil,"Biaya Tambahan : " + taxinvoice.extra_cost_info,nil,nil,nil,nil,nil,nil,nil, taxinvoice.extra_cost.to_f], :height => 20, :style => right_bold_currency, :widths => [:ignore,:ignore,:ignore,:auto]
+          index_col +=1
+        end
+
+        #PPN 11%
+        sheet.merge_cells 'B' + index_col.to_s + ':I'+ index_col.to_s
+        sheet.add_row [nil,"PPN 11%",nil,nil,nil,nil,nil,nil,nil, taxinvoice.gst_tax.to_f], :height => 20, :style => right_currency
+        # if taxinvoice.extra_cost > 0
+        #   sheet.add_row [nil,"PPN 11%",nil,nil,nil,nil,nil,nil,nil, "=(J" + subtotal_row.to_s + "+J" + extra_row.to_s + ")*0,11"], :height => 20, :style => right_currency
+        # else
+        #   sheet.add_row [nil,"PPN 11%",nil,nil,nil,nil,nil,nil,nil, "=J" + subtotal_row.to_s + "*0.11"], :height => 20, :style => right_currency
+        # end
+        index_col +=1
+        # @taxinvoice.insurance_cost = params[:insurance_cost] rescue nil
+        # @taxinvoice.claim_cost = params[:claim_cost] rescue nil
+        #PPh
+        pph_row = index_col
+        sheet.merge_cells 'B' + index_col.to_s + ':I'+ index_col.to_s
+        sheet.add_row [nil,"PPh Pasal 23 2%",nil,nil,nil,nil,nil,nil,nil, (0 - taxinvoice.price_tax).to_f], :height => 20, :style => right_currency
+        # if taxinvoice.extra_cost > 0
+        #   sheet.add_row [nil,"PPh Pasal 23 2%",nil,nil,nil,nil,nil,nil,nil, "=(J" + subtotal_row.to_s + "+J" + extra_row.to_s + ")*0,02*-1"], :height => 20, :style => right_currency
+        # else
+        #   sheet.add_row [nil,"PPh Pasal 23 2%",nil,nil,nil,nil,nil,nil,nil, "=J" + subtotal_row.to_s + "*0.02*-1"], :height => 20, :style => right_currency
+        # end
+
+        index_col +=1
+
+        #total
+        grandtotal = taxinvoice.total - taxinvoice.total.to_i
+        @is_pembulatan = ((grandtotal == 0))
+        taxinvoice_total = @is_pembulatan ? to_currency(taxinvoice.total) : to_currency_bank(taxinvoice.total)
+        in_word_row = sheet.rows.last.index + 2
+        sheet.merge_cells 'B' + index_col.to_s + ':H'+ index_col.to_s
+        totalinwords =  "Terbilang:" + taxinvoice.total_in_words if !taxinvoice.total_in_words.blank?
+
+        # Money to indonesian word formula
+        # in_word_formula = "=\"Terbiang : \" & PROPER(IF(J" + in_word_row.to_s + "=0;\"nol\";IF(J" + in_word_row.to_s + "<0;\"minus \";\"\")&SUBSTITUTE(TRIM(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(IF(--MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");1;3)=0;\"\";MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");1;1)&\" ratus \"&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");2;1)&\" puluh \"&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");3;1)&\" trilyun \")&IF(--MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");4;3)=0;\"\";MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");4;1)&\" ratus \"&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");5;1)&\" puluh \"&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");6;1)&\" milyar \")&IF(--MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");7;3)=0;\"\";MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");7;1)&\" ratus \"&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");8;1)&\" puluh \"&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");9;1)&\" juta \")&IF(--MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");10;3)=0;\"\";IF(--MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");10;3)=1;\"*\";MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");10;1)&\" ratus \"&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");11;1)&\" puluh \")&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");12;1)&\" ribu \")&IF(--MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");13;3)=0;\"\";MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");13;1)&\" ratus \"&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");14;1)&\" puluh \"&MID(TEXT(ABS(J" + in_word_row.to_s + ");\"000000000000000\");15;1));1;\"satu\");2;\"dua\");3;\"tiga\");4;\"empat\");5;\"lima\");6;\"enam\");7;\"tujuh\");8;\"delapan\");9;\"sembilan\");\"0 ratus\";\"\");\"0 puluh\";\"\");\"satu puluh 0\";\"sepuluh\");\"satu puluh satu\";\"sebelas\");\"satu puluh dua\";\"duabelas\");\"satu puluh tiga\";\"tigabelas\");\"satu puluh empat\";\"empatbelas\");\"satu puluh lima\";\"limabelas\");\"satu puluh enam\";\"enambelas\");\"satu puluh tujuh\";\"tujuhbelas\");\"satu puluh delapan\";\"delapanbelas\");\"satu puluh sembilan\";\"sembilanbelas\");\"satu ratus\";\"seratus\");\"*satu ribu\";\"seribu\");0;\"\"));\"  \";\" \"))&\" Rupiah\")"
+        # render json: in_word_formula
+        # return false
+
+        # sheet.add_row [nil, "=\"Terbilang : \" & terbilang(J" + index_col.to_s + ") & \" rupiah\"",nil,nil,nil,nil,nil,nil, 'TOTAL', taxinvoice.total.to_f], :height => 20, :widths => [:ignore,:ignore], :style => [nil,nil,nil,nil,nil,nil,nil,nil,right_bold_currency,right_bold_currency]
+        sheet.add_row [nil, "=\"Terbilang : \" & terbilang(J" + index_col.to_s + ") & \" rupiah\"",nil,nil,nil,nil,nil,nil, 'TOTAL', "=SUM(J" + subtotal_row.to_s + ":J" + pph_row.to_s + ")"], :height => 20, :widths => [:ignore,:ignore], :style => [nil,nil,nil,nil,nil,nil,nil,nil,right_bold_currency,right_bold_currency]
+
+        index_col +=1
+
+        sheet.add_row [''], :height => 20
+
+        if !taxinvoice.description.blank?
+          sheet.add_row ['',taxinvoice.description], :height => 20, :style => bold, :widths => [:auto, :ignore]
+        end
+      end
+    end
+
     p.use_autowidth = false
     p.use_shared_strings = true
 

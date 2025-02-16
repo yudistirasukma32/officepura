@@ -19,7 +19,8 @@
 				<label for="customer_id">Pelanggan</label>
 				<select name="customer_id" class="third left">
 					<option value="">Semua Pelanggan</option>
-					<% @customers.order(:name).each do |customer| %>
+					<%# @customers.order(:name).each do |customer| %>
+					<% Customer.active.order(:name).each do |customer| %>
 					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
 					<% end %>
 				</select>
@@ -28,17 +29,41 @@
 					<% (1.upto(12)).each do |m| %>
 					<option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
 					<% end %>
-				</select>
-				
-				<% start_year = Date.today.month == 12 ? Date.today.year + 1 : Date.today.year %>
-				<% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+				</select>			
 				<select name="year" class="short left">
+					<% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+					<% start_year = Date.today.month == 12 ? Date.today.year + 1 : Date.today.year %>
 					<% start_year.downto(year_to).each do |y| %>
 					<option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
 					<% end %>
 				</select> 
 				<input class="submit left" type="submit" value="Filter" />
-				<a class="print btn d-none" href="javascript:print();"><i class="icon-print"></i> Print</a>
+				
+				<% if params[:customer_id].present? %>
+					<a class="left btn-txt btn-green" href="<%= downloadmultiexcel_taxinvoices_url(month: @month, year: @year, customer_id: @customer_id) %>"><i class="icon-file"></i> Excel</a>
+				<% else %>
+					<a class="left btn-txt btn-green" href="<%= downloadmultiexcel_taxinvoices_url(month: @month, year: @year) %>"><i class="icon-file"></i> Excel</a>
+				<% end %>
+			 
+			</div>
+			</form>
+		</div>
+
+		<% if params[:customer_id].present? %>
+		<p style="padding-bottom: 0; margin-bottom: 0;">Mohon download & install Add Ins <a href="/terbilang.xla">ini</a> sebelum membuka file excel invoice</p>
+		<% end %>
+
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+			<div class="field-row continue">
+				<label for="startdate" class="">Tanggal Awal</label>
+				<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+				<label for="enddate" class="tiny">s/d</label>
+				<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+				<input type="hidden" name="filterbydates" value="1">
+				<input class="submit left" type="submit" value="Filter" />
 			</div>
 			</form>
 		</div>
@@ -134,8 +159,9 @@
 				<label style="color:#000; font-weight:700;">PPN</label>
 			</div>
 			<div style="width: 50%;">
+				<input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax ppn12" value="12" onchange="javascript:changeTaxes();"> &nbsp;  12% &nbsp;
 				<input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax ppn11" value="11" onchange="javascript:changeTaxes();" checked="checked"> &nbsp;  11% &nbsp;
-				<input type="radio" id="chk_gst_tax2" class="gst_tax ppn10" name="gst_tax" value="10" onchange="javascript:changeTaxes();"> &nbsp; 10 %&nbsp;
+				<input type="radio" id="chk_gst_tax2" class="gst_tax ppn1-2" name="gst_tax" value="1.2" onchange="javascript:changeTaxes();"> &nbsp; 1,2 %&nbsp;
 				<input type="radio" id="chk_gst_tax2" class="gst_tax ppn1-1" name="gst_tax" value="1.1" onchange="javascript:changeTaxes();"> &nbsp; 1,1 %&nbsp;
 				<input type="radio" id="chk_gst_tax2" class="gst_tax ppn1" name="gst_tax" value="1" onchange="javascript:changeTaxes();"> &nbsp; 1 %&nbsp;
 				<input type="radio" id="chk_gst_tax2" class="gst_tax no-ppn" name="gst_tax" value="0" onchange="javascript:changeTaxes();"> &nbsp; No PPN &nbsp;
@@ -170,11 +196,11 @@
 		</div>
 
 		<div class="" style="padding-bottom:0px; display: flex;">
-			<div style="width: 20%; margin-top: 5px; margin-bottom: 20px;">
-				<label style="color:#000; font-weight:700;">Keterangan</label>
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Diskon</label>
 			</div>
 			<div style="width: 50%;">
-				<textarea cols="40" id="taxinvoice_description" name="description" rows="3" style="height: 25px;"></textarea>
+				<input type="text" id="taxinvoice_discount_amount" name="discount_amount" value="0" onchange="javascript:changeTaxes();" />
 			</div>
 		</div>
 
@@ -213,6 +239,13 @@
 					<td align="right"></td>
 					<td align="right"><span id="lbl_subtotal">0</span></td>
 					<input type="hidden" id="taxinvoice_subtotal" name="subtotal" value="0">
+				</tr>
+
+				<tr id="-2" style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">
+					<td colspan="5"></td>
+					<td align="right" colspan="2">Diskon</td>
+					<td align="right">&nbsp;</td>
+					<td align="right"><span id="txt_discount_amount" class="red">0</span></td>
 				</tr>
 
 				<tr id="-2" style="border-bottom: 1px dotted #bbb; margin-bottom: 15px;">

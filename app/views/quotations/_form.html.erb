@@ -90,7 +90,7 @@
 
   <div class="field-row">
     <%= f.label :name, "Nama Jurusan" %>
-    <%= f.text_field :name %>
+    <%= f.text_field :name, :required => true%>
   </div>
 
   <%if @quotation.office_id %>
@@ -117,15 +117,17 @@
 
   <div class="field-row">
     <%= f.label :commodity_id, "Komoditas" %>
-    <select id="quotation_commodity_id" name="quotation[commodity_id]" class="half left">
-      <option value="0">- Pilih Komoditas -</option>
+    <select id="quotation_commodity_id" name="quotation[commodity_id]" class="half left" required>
+
+      <option value="">- Pilih Komoditas -</option>
       <% Commodity.active.order(:name).each do |commodity| %>
       <option value="<%=commodity.id%>"
         <% if commodity.id == @quotation.commodity_id %> selected="selected"<% end %>><%=commodity.name%></option>
       <% end %>
     </select>
-    <%= f.label :distance, "Jarak", :class => 'middle' %>
-    <%= f.text_field :distance, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+
+    <%= f.label :distance, "Jarak", class: 'middle' %>
+    <%= f.text_field :distance, class: 'half', onkeypress: 'javascript:return isNumberKey(this);', required: true, min: 1 %>
   </div>
 
   <div class="field-row">
@@ -429,7 +431,6 @@ end%>
 			infowindowContent.children["place-address"].textContent = place.formatted_address;
 			infowindow.open(map, marker);
 		  });
-		
 		
 		}
 </script>

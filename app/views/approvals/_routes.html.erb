@@ -1,0 +1,45 @@
+<table class="row-view">
+	<tr>
+		<th>Nama Jurusan</th>
+		<th>Pelanggan</th>
+		<th width="200">Alamat Muat</th>
+		<th width="200">Alamat Bongkar</th>
+		<th>Komoditas</th>
+		<th>Jarak (KM)</th>
+		<th width="60"></th>
+	</tr>
+
+    <% if @new_routes.any? %>
+
+	<% @new_routes.includes(:commodity, :customer).each do |quotation| %>
+
+	<%
+	routelocation = Routelocation.where("route_id = ?", quotation.id).order("id DESC").first rescue nil
+	%>
+
+	<tr>
+		<td><strong><%= link_to quotation.name, edit_route_path(quotation) %></strong></td>
+		<td><%= quotation.customer.name rescue nil %></td>
+		<td><%= routelocation.address_start rescue nil %></td>
+		<td><%= routelocation.address_end rescue nil %></td>
+		<td><%= quotation.commodity.name rescue nil %></td>
+		<td class="text-right"><%= quotation.distance rescue nil %></td>
+		<td class="right" width="60">
+			<%= link_to '&#xf044;'.html_safe, edit_route_path(quotation), :class => "edit tipsy", :title => 'Edit' if checkrole 'Admin Operasional, Marketing, Admin Jurusan' %> 
+		</td>
+	</tr>
+	<% end %>	
+
+	    <% else %>	
+    
+        <tr>
+			<td colspan = '6'>
+				Tidak ada data jurusan baru
+			</td>
+        </tr>
+
+    <% end %>
+
+</table>
+
+<small>*jurusan dari penawaran baru</small>

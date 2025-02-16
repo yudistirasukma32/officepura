@@ -81,6 +81,8 @@ class AttachmentsController < ApplicationController
       edit_staff_url(id)
     when "Vehicle"
       edit_vehicle_url(id)
+    when "Office"
+      edit_office_url(id)
     when "Legality"
       edit_legality_url(id)
     when "Invoice"

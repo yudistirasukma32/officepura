@@ -12,7 +12,26 @@
 		<h1>OPS / <a href="<%=mechaniclogs_path%>">Call Mekanik</a> / Tambah</h1>
 
 		<br class="clearfix" />
+
+		<div style="background: #fff; padding: 1rem 1rem 0;">
+			<strong>Perhatian.</strong>
+
+			<% if params[:maintenance].present?%>
+			<p>Anda akan membuat request maintenance untuk Kendaran <strong><%= @invoice.vehicle.current_id rescue nil %></strong>
+			dan akan diteruskan ke Sistem Rajawali Inti.</p>
+			
+			<%= render "form_maintenance" %>
+
+			<% else %>
+
+			<p>Anda akan membuat request perbaikan untuk Kendaran <strong><%= @invoice.vehicle.current_id rescue nil %></strong> dari BKK <strong><%= @invoice.id rescue nil %></strong> 
+			dan akan diteruskan ke Sistem Rajawali Inti.</p>
+
 			<%= render "form" %>
+			<% end %>
+
+		</div>
+
 		<br class="clearfix" />
 
 	</div>
