@@ -158,4 +158,20 @@ class VehiclesController < ApplicationController
     @vehicle.update_attributes(:enabled => false)
     redirect_to(vehicles_url)
   end
+
+  def history
+    @vehicle = Vehicle.find(params[:vehicle_id])
+    # @invoices = Invoice.active.where('driver_id = ?', @driver.id).reorder('id DESC').limit(20)
+    @invoices = Invoice.active
+                   .where('vehicle_id = ? AND date >= ?', @vehicle.id, 2.weeks.ago)
+                   .reorder('id DESC')
+    @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
+    # render json: @invoices
+
+    render :json => {:success => true, 
+		:html => render_to_string(:partial => "vehicles/invoice_history"), 
+		:layout => false}.to_json;
+
+  end
+  
 end

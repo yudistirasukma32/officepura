@@ -1,0 +1,97 @@
+<style>
+  tbody td, tr.footer td {
+      padding-right: 6px;
+  }
+
+  .footer {
+    margin-top: 1rem;
+  }
+
+</style>
+
+	<% if @invoices.any? %>
+		<table class="tablesorter row-view tablesorterFilters">
+    <thead>
+    <tr>
+      <th width="30">Tgl</th>
+      <th width="20">BKK</th>
+			<th >Keterangan</th>
+      <th width="60">Supir</th>
+			<th width="60">Kernet</th>
+			<th width="60">Solar</th>
+			<th width="60">Tol</th>
+			<th width="60">ASDP</th>
+			<th width="60">Lain2</th>
+      <th width="60">Premi</th>
+			<th width="100">Total (Rp.)</th>
+    </tr>
+    </thead>
+    <tbody>
+
+		<% total_header, driver_allowance_total, helper_allowance_total, gas_allowance_total, misc_allowance_total, tol_fee_total, ferry_fee_total, premi_allowance_total = 0, 0, 0, 0, 0, 0, 0, 0 %>
+		<% @invoices.includes(:vehicle, :customer, :route, :driver, :event, :isotank, :container).each_with_index do |invoice, i|
+
+        driver_allowance = invoice.driver_allowance
+        helper_allowance = invoice.helper_allowance
+        gas_allowance = invoice.gas_allowance
+        misc_allowance = invoice.misc_allowance
+        tol_fee = invoice.tol_fee
+        ferry_fee = invoice.ferry_fee
+        premi_allowance = invoice.premi_allowance
+        total = driver_allowance + helper_allowance + gas_allowance + misc_allowance + tol_fee + ferry_fee + premi_allowance
+
+        driver_allowance_total += driver_allowance
+        helper_allowance_total += helper_allowance
+        gas_allowance_total += gas_allowance
+        misc_allowance_total += misc_allowance
+        tol_fee_total += tol_fee
+        ferry_fee_total += ferry_fee
+        premi_allowance_total += premi_allowance
+        total_header += total
+      %>
+    <tr>
+      <td><%=invoice.date.strftime('%d/%m')%></td>
+      <td>#<%= invoice.id %></td>
+			<td>
+      <br><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)
+      <br>DO <%=invoice.event.id rescue nil%> <%=invoice.event.summary rescue nil%> (<%=invoice.office.abbr rescue nil %>)
+      <br>
+      <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %>
+			<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %>
+      <%=invoice.vehicle.current_id rescue nil%>
+      <br>
+      </td>
+      <td class="<%= driver_allowance > 1000000 ? "red" : ""%>" align="right"><%=to_currency(driver_allowance)%></td>
+      <td class="<%= helper_allowance > 1000000 ? "red" : ""%>" align="right"><%=to_currency(helper_allowance)%></td>
+      <td class="<%= gas_allowance > 1000000 ? "red" : ""%>" align="right"><%=to_currency(gas_allowance)%></td>
+      <td class="<%= tol_fee > 1000000 ? "red" : ""%>" align="right"><%=to_currency(tol_fee)%></td>
+      <td class="<%= ferry_fee > 1000000 ? "red" : ""%>" align="right"><%=to_currency(ferry_fee)%></td>
+      <td class="<%= misc_allowance > 1000000 ? "red" : ""%>" align="right"><%=to_currency(misc_allowance)%></td>
+      <td class="<%= premi_allowance > 1000000 ? "red" : ""%>" align="right"><%=to_currency(premi_allowance)%></td>
+      <td align="right"><%=to_currency(total)%></td>
+		</tr>
+			
+		<% end %>	
+    </tbody>
+
+    <tr><td colspan="11"><br/><br/></td><tr>
+		<tr class="footer">
+			<td class="total" colspan="3">TOTAL</td>
+			<td align="right"><%=to_currency(driver_allowance_total)%></td>
+			<td align="right"><%=to_currency(helper_allowance_total)%></td>
+			<td align="right"><%=to_currency(gas_allowance_total)%></td>
+			<td align="right"><%=to_currency(tol_fee_total)%></td>
+			<td align="right"><%=to_currency(ferry_fee_total)%></td>
+			<td align="right"><%=to_currency(misc_allowance_total)%></td>
+			<td align="right"><%=to_currency(premi_allowance_total)%></td>
+			<td class="total" align="right"><strong><%=to_currency(total_header)%></strong></td>
+		</tr>
+
+    <tr>
+      <td colspan="11">
+        <br>
+        <i><span style="font-size: 11px;"><%= @invoices.count %> BKK Ditemukan. BKK dalam periode 2 minggu terakhir.</span></i>
+      </td>
+    <tr>
+		</table>
+	<% end %>

@@ -189,4 +189,49 @@ class DriversController < ApplicationController
     @driver.update_attributes(:enabled => false)
     redirect_to(drivers_url)
   end
+
+  def blacklist
+    role = cek_roles @user_role
+    if role
+
+      @origin = params[:origin]
+      @is_resign = params[:is_resign]
+      @vendor_id = params[:vendor_id]
+
+      @drivers = Driver.blacklisted.order('name')
+
+      if @origin.present? and @origin != ''
+          @drivers = @drivers.where("origin = ?", @origin)
+      end
+
+      if @is_resign.present? and @is_resign != 'No'
+          @drivers = @drivers.where("is_resign = true")
+      end
+
+      if @is_resign.present? and @is_resign == 'No'
+        @drivers = @drivers.where("is_resign = false")
+      end
+
+      respond_to :html
+    else
+      redirect_to root_path()
+    end
+    
+  end
+
+  def history
+    @driver = Driver.find(params[:driver_id])
+    # @invoices = Invoice.active.where('driver_id = ?', @driver.id).reorder('id DESC').limit(20)
+    @invoices = Invoice.active
+                   .where('driver_id = ? AND date >= ?', @driver.id, 2.weeks.ago)
+                   .reorder('id DESC')
+    @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
+    # render json: @invoices
+
+    render :json => {:success => true, 
+		:html => render_to_string(:partial => "drivers/history"), 
+		:layout => false}.to_json;
+
+  end
+  
 end

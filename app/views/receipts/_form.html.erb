@@ -66,6 +66,16 @@
             <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
           </td>
         </tr>
+        <tr>
+          <td>Kendaraan</td>
+          <td>
+            <a style="cursor: pointer;" onclick="getVehicleRecords(<%=@invoice.vehicle_id%>)">
+            <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            &nbsp;<i class="icon-search" style="color: #6d6d6d;"></i>
+            </a>
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
         <% end %>
 
 
@@ -105,16 +115,26 @@
       <% end %>
         <tr>
           <td>Supir</td>
-          <td><%=@invoice.driver.name%> (<%=zeropad(@invoice.driver.id)%>)<% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %></td>
+          <td>
+          <a style="cursor: pointer;" onclick="getDriverRecords(<%=@invoice.driver_id%>)">
+          <%=@invoice.driver.name%> (<%=zeropad(@invoice.driver.id)%>)&nbsp;<i class="icon-search" style="color: #6d6d6d;"></i>
+          </a>
+          <br/>
+          <% if !@invoice.driver.helpers.first.nil? %> &nbsp;
+          (Kernet: <%=@invoice.driver.helpers.first.name%>)<% end %>
+          
+          </td>
+        </tr>
+        
+        <tr>
+        <td>Telp. Supir</td>
+          <td><%= @invoice.driver&.phone.presence || @invoice.driver&.mobile.presence || '-' %></td>
         </tr>
         <tr>
-        <td>No. Telp. Supir</td>
-          <td><%=@invoice.driver.mobile rescue nil%></td>
+          <td>No Rek. Supir</td>
+          <td><%=@invoice.driver.bank_account rescue nil%> <%=@invoice.driver.bank_name rescue nil%></td>
         </tr>
-        <tr>
-          <td>No. Rek. Supir</td>
-          <td><%=@invoice.driver.bank_account rescue nil%></td>
-        </tr>
+        
         <% if !@invoice.description.blank? %>
         <tr>
           <td>Keterangan</td>

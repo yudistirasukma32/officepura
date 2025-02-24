@@ -18,3 +18,60 @@
 	</div>
 
 </div>
+
+
+
+<div id="reportModal" class="modal" style="display: none;">
+
+  <!-- Modal content -->
+  <div class="modal-content" style="background-color: #FFFFFF; width: 70%; padding: 1rem;">
+	<div class="closex" style="cursor: pointer; text-align: right; font-size: 1.5rem; font-weight: bold;" onclick="closePopUp();">&times;</div>
+ 
+	<h3 class="text-center" 
+	style="text-align: center; margin-top: unset; font-weight: bold;">
+	Riwayat BKK
+	</h3>
+	<br/>
+
+	<div id="divHistory" style="display: flex;justify-content: center;"></div>
+
+  </div>
+
+</div>
+
+<script>
+	function getDriverRecords(driver_id) {
+		
+		$("#reportModal").show();
+		console.log(driver_id);
+
+		$.ajax({
+			type: "GET",
+			url: "/drivers/history?driver_id=" + driver_id,
+			success: function(data) {
+				$('#divHistory').html(data.html);
+			},
+			failure: function() {alert("Error. Mohon refresh browser Anda.");}
+		});
+	}
+
+	function getVehicleRecords(vehicle_id) {
+		
+		$("#reportModal").show();
+		console.log(vehicle_id);
+
+		$.ajax({
+			type: "GET",
+			url: "/vehicles/history?vehicle_id=" + vehicle_id,
+			success: function(data) {
+				$('#divHistory').html(data.html);
+			},
+			failure: function() {alert("Error. Mohon refresh browser Anda.");}
+		});
+	}
+
+	function closePopUp(){
+		// $("#reportModal").hide();
+		$(".modal").css("display", "none");
+	}
+</script>

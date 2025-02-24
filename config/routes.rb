@@ -56,6 +56,9 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
+  get 'drivers/blacklist' => 'drivers#blacklist'
+  get 'drivers/history' => 'drivers#history'
+
   resources :drivers do
     member do
       get 'enable'
@@ -68,7 +71,19 @@ OfficePuraErp::Application.routes.draw do
       get "save_clone"
     end
   end
-  resources :helpers
+  
+  get 'helpers/blacklist' => 'helpers#blacklist'
+  resources :helpers do
+    member do
+      get 'enable'
+      get 'disable'
+    end
+
+    collection do
+      get "create_bank_expense_group"
+    end
+  end
+
   resources :isotanks do
     member do
       get 'enable'
@@ -165,9 +180,10 @@ OfficePuraErp::Application.routes.draw do
       post "confirmation"
     end
   end
-
+ 
   match 'vehicles/index_asset' => 'vehicles#index_asset'
   post 'vehicles/update_asset' => 'vehicles#update_asset'
+  get 'vehicles/history' => 'vehicles#history'
 
   resources :vehicles do
     member do
