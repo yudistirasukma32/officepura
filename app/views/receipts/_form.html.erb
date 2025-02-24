@@ -128,13 +128,13 @@
         
         <tr>
         <td>Telp. Supir</td>
-          <td><%= @invoice.driver&.phone.presence || @invoice.driver&.mobile.presence || '-' %></td>
+          <td><%=@invoice.driver.phone rescue nil%> <%=@invoice.driver.mobile rescue nil%></td>
         </tr>
         <tr>
           <td>No Rek. Supir</td>
           <td><%=@invoice.driver.bank_account rescue nil%> <%=@invoice.driver.bank_name rescue nil%></td>
         </tr>
-        
+
         <% if !@invoice.description.blank? %>
         <tr>
           <td>Keterangan</td>
