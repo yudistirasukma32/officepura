@@ -60,7 +60,7 @@
 		@page { margin-top: 16px; margin-bottom: 16px;  }
 
 		@page {
-			background-image: url('/assets/pura-kop.png') no-repeat;
+			background-image: url('/assets/rdpi-kop.png') no-repeat;
 		}
 
 		/* All subsequent pages */
@@ -76,8 +76,9 @@
 		}
 
 		.desc {
-			font-size: .85rem;
+			font-size: .8rem;
 			margin-left: 20px;
+			line-height: 1;
 		}
 
 		table {
@@ -89,7 +90,7 @@
 			padding: .5rem 1rem 3rem;
 			/* background: white; */
 			font-size: 10px !important;
-			line-height: 1.1 !important;
+			line-height: 1 !important;
 		}
 
 		.pttdright {
@@ -138,7 +139,7 @@
 		}
 
 		.papercontainer:first-child {
-			margin-top: 200px;
+			margin-top: 180px;
 			padding-bottom: 3rem;
 		}
 
@@ -147,8 +148,8 @@
 		}
 
 		.second-table {
-			padding-top: 200px !important;
-			margin-top: 200px !important;
+			padding-top: 180px !important;
+			margin-top: 180px !important;
 		}
 
 		#pfooter::after {
@@ -179,6 +180,7 @@
 
 		tr, td, th {
 			page-break-inside: avoid; /* Prevents row breaks */
+			font-size: 12px !important;
 		}
 
 		thead:nth-child(2) {
@@ -257,7 +259,7 @@
 				customer = @quotationgroup.customer_name
 			end
 		%>
-		<p style="font-weight:700; margin-bottom:2rem;"><%= customer %></p>
+		<p style="font-weight:700; margin-bottom:1.5rem;"><%= customer %></p>
 
 		<%
 			if @quotationgroup.customer_pic.present?
@@ -274,7 +276,7 @@
 			<p class="pright">: <span style="font-weight:700;text-decoration-line: underline;text-decoration-thickness: 3px;">Penawaran Harga</span></p>
 		</div>
 
-		<p style="line-height: 20pt;">
+		<p style="line-height: 15pt;">
 			Dengan hormat,<br>
  
 			PT. Putra Rajawali Trans, Tbk merupakan perusahaan angkutan barang multimoda yang
@@ -290,8 +292,8 @@
  		<br class="clear" />
 
 		<% if @quotations.present? %>
-			<% first_half = @quotations.first(12) %>  <!-- First 12 records -->
-			<% second_half = @quotations.drop(12) %>  <!-- The rest of the records -->
+			<% first_half = @quotations.first(14) %>  <!-- First 12 records -->
+			<% second_half = @quotations.drop(14) %>  <!-- The rest of the records -->
 
 			<!-- First Table (First 12 records) -->
 			<table class="row-view first-table">
@@ -343,13 +345,11 @@
 			<% end %>
 			<% end %>
 
-
-
 		<% if @quotationgroup.description.present? %>
 			<p class="desc"><i>Keterangan : <%= nl2br(@quotationgroup.description).html_safe%></i></p>
 		<% end %>
 
-		<p style="line-height:20pt; margin-top:2rem;">
+		<p style="line-height:15pt; margin-top:2rem;">
 			Jika Bapak/Ibu memerlukan informasi lebih lanjut, Ibu dapat menghubungi Indra Susanto
 			telepon 08113001598 / <%= @confirmation.username %> (<%= @marketing_phone %>) email <u>indra@rdpitrans.com</u> atau <u>marketing@rdpitrans.com</u>.
 			Atas perhatian
@@ -405,8 +405,6 @@
 
 	</div>
 
-
-	
 	<% end %>
 
 	</div>

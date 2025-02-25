@@ -83,15 +83,13 @@
 								
 									<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
 									
-										<a href="<%= img.file.url if img.file_uid rescue file_url(img) %>" target="_blank">
-										<%= image_tag file_url(img), style: "width: 100%;" %>
-										</a>
-
+									<a href="<%= img.file.url() %>" target="_blank">
+										<%= image_tag img.file.thumb('480x320').url(:suffix => "/#{img.name}"), style: "width: 100%;" if img.file_uid %>
+									</a>
+									
 									<% else %>
 									
-										<a href="<%= img.file.url if img.file_uid rescue file_url(img) %>" target="_blank">
-										<%= img.file_uid ? File.basename(img.file_uid).truncate(40) : '' %>
-										</a>
+										<a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
 									
 									<% end %>
 
