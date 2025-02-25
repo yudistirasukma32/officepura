@@ -118,6 +118,7 @@
 			<li class="<%= @section == 'marketing' ? 'on' : '' %>">
 				<a class="finger" onclick="javascript:toggleSub('marketing');">Marketing</a>
 				<ul id="sub-marketing" class="submenu" style="width:220px;">
+					<li><%= link_to_if (checkrole 'Admin Marketing, Marketing, General Manager'), "Dashboard", "/marketings" %></li>
 					<li><%= link_to_if (checkrole 'Admin Marketing, Marketing, Admin Penagihan'), "Penawaran", "/quotationgroups" %><% if checkrole 'Admin Marketing, Marketing, Admin Approval, General Manager' %><div class="bell-2"><%= quot = Quotationgroup.active.unapproved.where('date >= ?', Date.new(2024, 1, 1)).count rescue 0 %></div><%end%></li>
 					<!-- <li><%= link_to_if (checkrole 'Admin Marketing, Marketing, Admin Penagihan'), "Penawaran Terkonfirmasi", "/quotationgroups/confirmed" %></li> -->
 					<li class="divider"></li>

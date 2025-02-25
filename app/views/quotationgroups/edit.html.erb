@@ -32,21 +32,16 @@
 			</h1>
 
 			<span>
-			<% if checkrole 'General Manager' %>
-				<% if @quotationgroup.reviewed && !@quotationgroup.confirmed %>
-					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_confirm'>Konfirmasi GM</a>
+			<% if checkrole 'Admin Marketing' %>
+
+				<% if @quotationgroup.confirmed && !@quotationgroup.is_sent %>
+					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_sent'>Kirim</a>
 				<% end %>
 
-				<% if !@quotationgroup.reviewed%>	
-					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_confirm'>Review GM</a>
+				<% if @quotationgroup.is_sent && ! @quotationgroup.customer_approved %>
+					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_customer'>Customer Approve</a>
 				<% end %>
-			<% elsif checkrole 'Admin Marketing' %>
-				<% if @quotationgroup.confirmed%>
-					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_confirm'>Kirim</a>
-				<% end %>
-				<% if @quotationgroup.is_sent%>
-					<a class="btn-txt" style="margin-bottom: 12px;" href='approve_confirm'>Customer Approve</a>
-				<% end %>
+
 			<% end %>
 
 			<% if @quotationgroup.customer_approved%>
@@ -77,7 +72,6 @@
 
 			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
 					<%= render "form" %>
-
 					<div style="float: left; width: 300px;">
 							<% if @quotationgroup %>
 
@@ -140,7 +134,6 @@
 							</form>
 						<% end %>	
 					</div>
-				
 				</div>
 
 			    <div class="sliding_tab" id="tab_<%=tab+=1%>">

@@ -21,8 +21,10 @@
 		<td class="text-right"><%= quotation.price_per ? to_currency_bank(quotation.price_per) : 0 %></td>
 		<td><%= quotation.price_per_type rescue nil %></td>
 		<td class="right" width="60">
-			<%= link_to '&#xf044;'.html_safe, edit_quotation_path(quotation), :class => "edit tipsy", :title => 'Edit' if checkrole 'Admin Operasional, Marketing, Admin Jurusan' %> 
-			<%= link_to '&#xf00d;'.html_safe, quotation, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+			<%= link_to '&#xf044;'.html_safe, edit_quotation_path(quotation), :class => "edit tipsy", :title => 'Edit' if checkrole 'Admin Operasional, Marketing, Admin Jurusan' %>
+			<% if !@quotationgroup.customer_approved %>
+				<%= link_to '&#xf00d;'.html_safe, quotation, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if checkrole 'Admin Marketing, Marketing, General Manager' %>
+			<% end %> 
 		</td>
 	</tr>
 	<% end %>	

@@ -1,0 +1,182 @@
+<%= render "shared/header" %>
+
+<%= content_for :css do %>	 
+	<style>
+		#main #filter {
+			height: 44px;
+		}
+
+        .flex {
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+		.mb-0 {
+			margin-bottom: 0;
+		}
+
+        .widget-cardo {
+            width: 200px; 
+            padding: 0.8rem;
+            background: #f0f0f0;
+            text-align: center;
+        }
+
+		.widget-carda {
+            width: 320px; 
+            padding: 0.8rem;
+            background: #f0f0f0;
+            text-align: center;
+        }
+
+        .widget-cardo p, .widget-carda p {
+            margin-top: 0;
+            padding-bottom: 0;
+        }
+
+        .widget-cardo strong, .widget-carda strong {
+            font-size: 1.25rem;
+            color: #1e1e1e;
+        }
+
+		.widget-carda span {
+            font-size: 12px;
+            color: #4a4a4a;
+        }
+
+		#chart-omzet {
+			width: 60%;
+            padding: 0.8rem;
+            background: #f0f0f0;
+		}
+
+		#side-chart {
+			width: 40%;
+            padding: 0.8rem;
+            background: #f0f0f0;
+		}
+	</style>
+<% end %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+	<a href="<%= new_quotationgroup_url %>" class="btn print">Buat Penawaran</a>
+	
+	<h1>Marketing Dashboard:</h1>
+
+	<br class="clearfix" />
+
+ 
+	<br class="clearfix" />
+
+	<div class="flex mb-0">
+		<h2 style="font-weight: 700;">Stats Penawaran <span><%= @default_month.strftime("%b %Y") %></span></h2>
+	</div>
+
+	<div class="flex">
+		<div class="widget-cardo">
+			<p>Pelanggan Baru</p>
+			<strong><%= @new_customers.count %></strong>
+		</div>
+		<div class="widget-cardo">
+			<p>Draft Penawaran</p>
+			<strong><%= @quotationgroups_draft.count %></strong>
+		</div>
+		<div class="widget-cardo">
+			<p>Direview</p>
+			<strong><%= @quotationgroups_reviewed.count %></strong>
+		</div>
+		<div class="widget-cardo">
+			<p>Konfirmasi</p>
+			<strong><%= @quotationgroups_confirmed.count %></strong>
+		</div>
+		<div class="widget-cardo">
+			<p>Dikirim</p>
+			<strong><%= @quotationgroups_sent.count %></strong>
+		</div>
+		<div class="widget-cardo">
+			<p>Disetujui</p>
+			<strong><%= @quotationgroups_approved.count %></strong>
+		</div>
+	</div>
+
+	<div class="flex mb-0">
+		<h2 style="font-weight: 700;">Stats Marketing <span><%= @default_month.strftime("%b %Y") %></span></h2>
+	</div>
+
+	<div class="flex">
+		<div class="widget-carda">
+			<p>Indra<br>
+			<span>General<span>
+			</p>
+			<strong><%= @stat_indra.count %></strong>
+			<br/>
+			<small>DO</small>
+			<br/><br/>
+			<strong><%= to_currency(@events_by_user['omzet_14']) %></strong>
+			<br/>
+			<small>Est. Omzet</small>
+		</div>
+		<div class="widget-carda">
+			<p>Lilis<br>
+			<span>Barat<span>
+			</p>
+			<strong><%= @stat_lilis.count %></strong>
+			<br/>
+			<small>DO</small>
+			<br/><br/>
+			<strong><%= to_currency(@events_by_user['omzet_69']) %></strong>
+			<br/>
+			<small>Est. Omzet</small>
+		</div>
+		<div class="widget-carda">
+			<p>Finca<br>
+			<span>Tengah<span>
+			</p>
+			<strong><%= @stat_finca.count %></strong>
+			<br/>
+			<small>DO</small>
+			<br/><br/>
+			<strong><%= to_currency(@events_by_user['omzet_93']) %></strong>
+			<br/>
+			<small>Est. Omzet</small>
+		</div>
+		<div class="widget-carda">
+			<p>Anindya<br>
+			<span>Timur<span>
+			</p>
+			<strong><%= @stat_anin.count %></strong>
+			<br/>
+			<small>DO</small>
+			<br/><br/>
+			<strong><%= to_currency(@events_by_user['omzet_112']) %></strong>
+			<br/>
+			<small>Est. Omzet</small>
+		</div>
+	</div>
+
+
+	<div class="flex mb-0">
+		<h2 style="font-weight: 700;">Summary Estimasi Omzet vs Jumlah DO</h2>
+	</div>
+
+	<div class="flex">
+		<div id="chart-omzet">
+		<div class="loader marketing d-block" style="margin:3rem auto 3rem auto;"></div>
+		</div>
+		<div id="side-chart">
+		<div class="loader marketing d-block" style="margin:3rem auto 3rem auto;"></div>
+		</div>
+	</div>
+
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+

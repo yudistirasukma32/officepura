@@ -694,6 +694,10 @@ OfficePuraErp::Application.routes.draw do
   match "dashboard" => 'dashboards#dashboard_layout'
 
   resources :dashboards
+  
+  get "marketings" => 'marketings#index'
+  get "marketings/getomzetdata" => 'marketings#getomzetdata'
+  get "marketings/getomzetdatamarketing" => 'marketings#getomzetdatamarketing'
 
   scope "reports" do
     match "taxinvoices_report" => 'reports#taxinvoices_report'

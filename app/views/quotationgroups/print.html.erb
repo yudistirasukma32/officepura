@@ -51,8 +51,25 @@
 		background: white;
 	}
 
+	.img-kop {
+		width: 100%;
+		margin-top: -2rem;
+	}
+
 	@media print{
-		@page { margin-top:80px; margin-bottom:80px; }
+		@page { margin-top: 16px; margin-bottom: 16px;  }
+
+		@page {
+			background-image: url('/assets/pura-kop.png') no-repeat;
+		}
+
+		/* All subsequent pages */
+		@page:first {
+			margin-top: 16px; /* Adjust space on second and later pages */
+			margin-bottom: 16px;
+			padding-top: 0px !important;
+			/* padding-top: 100px; */
+		}
 
 		.d-none-print {
 			display: none;
@@ -69,8 +86,8 @@
 		}
 
 		.paper {
-			padding: 3.5rem 3rem 3rem;
-			background: white;
+			padding: .5rem 1rem 3rem;
+			/* background: white; */
 			font-size: 10px !important;
 			line-height: 1.1 !important;
 		}
@@ -80,6 +97,93 @@
 			margin-left: 5rem;
 			max-width: 170px;
 			width: 100%;
+		}
+
+		.paper p {
+			font-size: 0.85rem;
+			padding: 0;
+			margin-top: .5rem;
+			margin-bottom: .5rem;
+		}
+
+		.img-kop {
+			position: fixed;
+			top: 2rem;
+			left: 0;
+			width: 100%;
+			height: auto;
+			background-color: transparent; 
+			z-index: 1000;
+		}
+
+		.paper {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh; /* Ensures full-page height */
+			justify-content: space-between; /* Pushes footer to bottom */
+		}
+
+		#pfooter {
+			position: relative;
+			bottom: 0;
+			margin-bottom: 32px;
+			margin-top: auto; /* Pushes footer to bottom */
+			page-break-before: avoid; /* Prevents footer from being alone on a new page */
+			/* border-bottom: 8px solid #eaa929; */
+		}
+
+		.papercontainer {
+			margin-top: 300px;
+			padding-bottom: 3rem;
+		}
+
+		.papercontainer:first-child {
+			margin-top: 200px;
+			padding-bottom: 3rem;
+		}
+
+		.first-table {
+			margin-bottom: 320px;
+		}
+
+		.second-table {
+			padding-top: 200px !important;
+			margin-top: 200px !important;
+		}
+
+		#pfooter::after {
+			content: '';
+			height: 8px;
+			background: black;
+			width: 100%;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			page-break-inside: auto;
+		}
+
+		table:nth-of-type(2) {
+			margin-top: 80px;
+		}
+
+		/* Ensure table headers repeat */
+		thead {
+			display: table-header-group;
+		}
+
+		tbody {
+			display: table-row-group;
+		}
+
+		tr, td, th {
+			page-break-inside: avoid; /* Prevents row breaks */
+		}
+
+		thead:nth-child(2) {
+			page-break-before: always;
+			margin-top: 200px; /* Adjust this value */
 		}
 	}
 
@@ -96,13 +200,35 @@
 	p {
 		font-size: 11pt;
 	}
+
+	.paper-foot {
+		margin-top: 3rem;
+		justify-content: space-between;
+	}
+
+	.logo-f {
+		height: 72px;
+		padding: 4px;
+	}
+
+	.paper-foot p {
+		text-align: center;
+		font-size: 10px;
+	}
+
+	#pfooter {
+		position: relative;
+		bottom: 0;
+		margin-top: auto; /* Pushes footer to bottom */
+		page-break-before: avoid; /* Prevents footer from being alone on a new page */
+		/* border-bottom: 8px solid #eaa929; */
+	}
 </style>
 <%= render "shared/header" %>
 
 <div id="nav">
 	<%= render "shared/nav" %>
 </div>
-
 
 <div id="main">
 	<div id="content-full" class="invoice-paper">
@@ -112,12 +238,14 @@
 		<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
 
 		<h1 class="hideprint"><%=Setting.find_by_name("Client Name").value%> / Penawaran</h1>
-		<br />
-		<br />
-		<br />
-		<br />
-
+ 
 		<div class="paper">
+
+		<div class="papercontainer">
+
+		<img src="/assets/pura-kop.png" class="img-kop">
+
+		<br/><br/>
 		
 		<p class="left" style="width: 100%;margin-bottom:2rem">Nomor : <%=@quotationgroup.long_id%><span class="right">Surabaya, <%= @quotationgroup.date.strftime('%d') %> <%= @month %> <%= @quotationgroup.date.strftime('%Y') %></span></p>
 
@@ -162,8 +290,13 @@
  		<br class="clear" />
  		<br class="clear" />
 
-		<table class="row-view" style="margin-bottom: 0;">
-			<thead>
+		<% if @quotations.present? %>
+			<% first_half = @quotations.first(12) %>  <!-- First 12 records -->
+			<% second_half = @quotations.drop(12) %>  <!-- The rest of the records -->
+
+			<!-- First Table (First 12 records) -->
+			<table class="row-view first-table">
+				<thead>
 				<tr>
 					<th colspan="2" style="text-align:center">RUTE</th>
 					<th rowspan="2" style="text-align:center" width="100">Tarif/Rit</th>
@@ -172,20 +305,46 @@
 					<th style="text-align:center">Tempat Muat</th>
 					<th style="text-align:center">Tempat Bongkar</th>
 				</tr>
-			</thead>
-
-			<% if @quotations.present? %>
-			<tbody>
-				<% @quotations.each do |quotation| %>
-				<tr>
+				</thead>
+				<tbody>
+				<% first_half.each do |quotation| %>
+					<tr>
 					<td><%= quotation.name rescue nil %> <%= quotation.address_start rescue nil %></td>
 					<td class="pl-5"><%= quotation.address_end rescue nil %></td>
 					<td align="right"><%= to_currency_bank(quotation.price_per) %></td>
-				</tr>
+					</tr>
 				<% end %>
-			</tbody>
+				</tbody>
+			</table>
+			
+			<!-- Second Table (Remaining records) -->
+			<% if second_half.any? %>
+				<span class="showprint"><br/><br/><br/><br/><br/><br/><br/><br/></span>
+				<table class="row-view second-table" style="margin-bottom: 0;">
+				<thead>
+					<tr>
+					<th colspan="2" style="text-align:center">RUTE</th>
+					<th rowspan="2" style="text-align:center" width="100">Tarif/Rit</th>
+					</tr>
+					<tr>
+					<th style="text-align:center">Tempat Muat</th>
+					<th style="text-align:center">Tempat Bongkar</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% second_half.each do |quotation| %>
+					<tr>
+						<td><%= quotation.name rescue nil %> <%= quotation.address_start rescue nil %></td>
+						<td class="pl-5"><%= quotation.address_end rescue nil %></td>
+						<td align="right"><%= to_currency_bank(quotation.price_per) %></td>
+					</tr>
+					<% end %>
+				</tbody>
+				</table>
 			<% end %>
-		</table>
+			<% end %>
+
+
 
 		<% if @quotationgroup.description.present? %>
 			<p class="desc"><i>Keterangan : <%= nl2br(@quotationgroup.description).html_safe%></i></p>
@@ -221,8 +380,34 @@
 			<p class="pttdleft"><strong>General Manager</strong></p>
 			<p class="pttdright"><strong><%= customer %></strong></p>
 		</div>
+		
+		</div>
+
+		<div id="pfooter">
+			<div class="flex paper-foot">
+				<div class="flex">
+					<img src="/assets/f-logo-iso.jpg" class="logo-f">
+					<img src="/assets/f-logo-jaz.jpg" class="logo-f">
+					<img src="/assets/f-logo-iaf.png" class="logo-f">
+				</div>
+				<div class="flex">
+					<p>
+					PT. PUTRA RAJAWALI KENCANA Tbk<br/>
+					Ruko Section One Blok F 7-11 Jl. Rungkut Industri I<br/>
+					Kendangsari – Tenggilis Mejoyo – Surabaya <br/>
+					Jawa Timur – Indonesia<br/>
+					www.puratrans.com <br/>
+					email: info@puratrans.com <br/>
+					Telp. 031 99013573 Fax. 031 99850898
+					</p>
+				</div>
+			</div>
+		</div>
 
 	</div>
+
+
+	
 	<% end %>
 
 	</div>

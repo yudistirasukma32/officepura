@@ -118,6 +118,39 @@ class QuotationgroupsController < ApplicationController
     @marketing_phone = '082234451234'
     end
 
+    if @quotationgroup.confirmed_date.present?
+      month = @quotationgroup.confirmed_date.strftime('%m')
+    else
+      month = @quotationgroup.date.strftime('%m')
+    end
+
+    case month
+    when '01'
+      @month = 'Januari'
+    when '02'
+      @month = 'Februari'
+    when '03'
+      @month = 'Maret'
+    when '04'
+      @month = 'April'
+    when '05'
+      @month = 'Mei'
+    when '06'
+      @month = 'Juni'
+    when '07'
+      @month = 'Juli'
+    when '08'
+      @month = 'Agustus'
+    when '09'
+      @month = 'September'
+    when '10'
+      @month = 'Oktober'
+    when '11'
+      @month = 'November'
+    when '12'
+      @month = 'Desember'
+    end
+
   end
 
   def show
