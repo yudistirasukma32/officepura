@@ -3657,49 +3657,6 @@ $(document).ready(function() {
 
 	});
 
-	//calculate distance on master jurusan
-	$(document).on('click', '#calculateDistanceOnRoute', function(e) {
-		e.preventDefault();
-
-		alert('Melakukan kalkulasi jarak (km).');
-
-		var longitudeStart = $("#routelocation_longitude_start").val();
-		var latitudeStart = $("#routelocation_latitude_start").val();
-		var longitudeEnd = $("#routelocation_longitude_end").val();
-		var latitudeEnd = $("#routelocation_latitude_end").val();
-
-		var distanceKm = $("route_distance").val();
-
-		if (!longitudeStart || !latitudeStart || !longitudeEnd || !latitudeEnd) {
-
-			alert("Data Longitude dan Latitude peta harus terisi.");
-
-			e.preventDefault(); // Stop form submission
-
-		} else {
-
-			// Construct dynamic URL
-			var url = `/routelocations/checkDistance?latitude_start=${latitudeStart}&longitude_start=${longitudeStart}&latitude_end=${latitudeEnd}&longitude_end=${longitudeEnd}`;
-
-			$.ajax({
-				type: "GET",
-				url: url,
-				success: function(data) {
-					alert('Estimasi jarak: ' + data.distance_km + ' km');
-					console.log(data.distance_km + ' km');
-					// $("#tabbed li").removeClass("current").first().addClass("current");
-					// $(".sliding_container").css("left", "0");
-
-					// $("#route_distance").val(data.distance_km).focus();
-					$("#route_distance_field").val(data.distance_km);
-				},
-				failure: function() {alert("Error. Mohon refresh browser Anda.");}
-			});
-
-		}
-
-	});
-
 	if ($('.vehicle_autocomplete').length > 0){
 		// $( ".vehicle_autocomplete" ).autocomplete({
   //     source: '/taxinvoices/generic-vehicles'});
