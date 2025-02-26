@@ -3120,10 +3120,10 @@ function countTotalClaim(){
 
 	if(claimmemo_weight_gross != '' && shrink_tolerance_percent != ''){
 		var tolerance_total = claimmemo_weight_gross * (shrink_tolerance_percent / 100)
-		$('#claimmemo_tolerance_total').val(Math.ceil(tolerance_total));
+		$('#claimmemo_tolerance_total').val(Math.floor(tolerance_total));
 		console.log(tolerance_total);
 
-		var shrinkage_load = claimmemo_shrink - Math.ceil(tolerance_total)
+		var shrinkage_load = claimmemo_shrink - Math.floor(tolerance_total)
 		$('#claimmemo_shrinkage_load').val(shrinkage_load);
 	}
 

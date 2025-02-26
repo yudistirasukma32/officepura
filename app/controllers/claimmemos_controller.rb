@@ -55,9 +55,9 @@ class ClaimmemosController < ApplicationController
         @claimmemo.weight_net = @taxinvoiceitems.first.weight_net rescue 0
         @claimmemo.shrink = @claimmemo.weight_gross - @claimmemo.weight_net
         @claimmemo.shrink_tolerance_percent = 0.3
-        tolerance_total = (@claimmemo.weight_gross * @claimmemo.shrink_tolerance_percent / 100).ceil
+        tolerance_total = (@claimmemo.weight_gross * @claimmemo.shrink_tolerance_percent / 100).floor
         @claimmemo.tolerance_total = tolerance_total
-        shrinkage_load = (@claimmemo.shrink - tolerance_total).ceil
+        shrinkage_load = (@claimmemo.shrink - tolerance_total).floor
         @claimmemo.shrinkage_load = shrinkage_load
       end
 
