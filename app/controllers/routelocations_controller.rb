@@ -96,13 +96,15 @@ class RoutelocationsController < ApplicationController
 		url = URI("https://maps.googleapis.com/maps/api/distancematrix/json?origins=#{lat_start},#{lng_start}&destinations=#{lat_end},#{lng_end}&mode=driving&units=metric&key=#{api_key}")
 	
 		https = Net::HTTP.new(url.host, url.port)
+		https.read_timeout = 3600
 		https.use_ssl = true
-	
+		https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
 		request = Net::HTTP::Get.new(url)
 		response = https.request(request)
 		# puts response.read_body
 		data = JSON.parse(response.read_body)
-		
+
 		if data["status"] == "OK"
 		  distance_value = data["rows"][0]["elements"][0]["distance"]["value"] # Distance in meters
 		  distance_km = distance_value / 1000.0  # Convert meters to kilometers
