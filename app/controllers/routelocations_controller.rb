@@ -93,8 +93,9 @@ class RoutelocationsController < ApplicationController
 		
 		api_key = "AIzaSyDwuoQZDV6IQ7fpPGvmgBqnueUSu6uB4qU"
 	 
-		url = URI("https://maps.googleapis.com/maps/api/distancematrix/json?origins=#{lat_start},#{lng_start}&destinations=#{lat_end},#{lng_end}&mode=driving&units=metric&key=#{api_key}")
-	
+		url_string = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=#{lat_start},#{lng_start}&destinations=#{lat_end},#{lng_end}&mode=driving&units=metric&key=#{api_key}"
+		url = URI.parse(url_string) # Use `URI.parse` instead of `URI()`
+		
 		https = Net::HTTP.new(url.host, url.port)
 		https.read_timeout = 3600
 		https.use_ssl = true
