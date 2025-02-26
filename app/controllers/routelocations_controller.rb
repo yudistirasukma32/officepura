@@ -101,10 +101,12 @@ class RoutelocationsController < ApplicationController
 		https.use_ssl = true
 		https.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-		request = Net::HTTP::Get.new(url)
+		# request = Net::HTTP::Get.new(url)
+		request = Net::HTTP::Get.new(url.request_uri) # Use `request_uri` instead of `url`
 		response = https.request(request)
 		# puts response.read_body
-		data = JSON.parse(response.read_body)
+		# data = JSON.parse(response.read_body)
+		data = JSON.parse(response.body) # Use `.body` instead of `.read_body` for compatibility
 
 		if data["status"] == "OK"
 		  distance_value = data["rows"][0]["elements"][0]["distance"]["value"] # Distance in meters
