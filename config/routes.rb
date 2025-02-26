@@ -63,6 +63,8 @@ OfficePuraErp::Application.routes.draw do
     member do
       get 'enable'
       get 'disable'
+      get 'blacklisted'
+      get 'whitelisted'
     end
 
     collection do

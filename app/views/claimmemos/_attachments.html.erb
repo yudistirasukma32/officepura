@@ -1,0 +1,83 @@
+<% if @process == 'edit' %>
+
+<div class="" style="padding-top: 0; border-top: none; width: 100%; max-width: 420px;">
+<h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment</h3>
+
+<% if @claimmemo.images.any? %>
+
+<ul style="margin-left: 0; padding-left: 0;">
+
+  <% @claimmemo.images.each do |img| %>
+
+    <% if img.file_uid.present? %>
+
+    <li style="margin-bottom: 2.5rem; list-style: none;">
+
+      <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+
+        <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+
+          <a href="<%= img.file.url() %>" target="_blank">
+              <%= image_tag img.file.url(:suffix => "/#{img.name}") , style: "width: 100%;" if img.file_uid %>
+          </a>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; font-size: 10px;">
+            <span style="font-size: 10px; color: #717171;"><%= img.name rescue nil %> Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+
+            <% if img.enabled %>
+            <%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + img.id.to_s %>
+            <% else %>
+            <span style="font-size: 10px; color: #717171;">Dihapus</span>
+            <% end %>
+
+          </div>
+
+        <% else %>
+
+          <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid).truncate(40) %></a>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; font-size: 10px; ">
+            <span style="font-size: 10px; color: #717171;"><%= img.name rescue nil %> Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+
+            <% if img.enabled %>
+            <%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + img.id.to_s %>
+            <% else %>
+            <span style="font-size: 10px; color: #717171;">Dihapus</span>
+            <% end %>
+
+          </div>
+
+        <% end %>
+        
+    </li>
+            
+    <% end %>
+
+  <% end %>
+ 
+</ul>
+
+<% end %>
+
+<br />
+
+<form action="/attachments/upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+  <input type="hidden" name="model_name" value="claimmemo" />
+  <input type="hidden" name="item_id" value="<%=@claimmemo.id%>" />
+
+
+<div class="field-row continue" style="width: 300px;">
+  <label for="file">Browse File</label>
+  <input type="file" name="attachment[file]"/>
+</div>
+
+<div class="actions">
+  <input type="submit" value="Simpan File" />
+</div>
+
+</form>
+
+ 
+
+</div>
+
+<% end %>

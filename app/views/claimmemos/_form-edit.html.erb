@@ -131,7 +131,8 @@
     <p>Dibuat oleh <strong id="strCreator"><%= @claimmemo.user.username rescue nil %></strong></p>
  
   </div>
-
+  
+  <div>
   <div class="field-row first">
 		<%= f.label :date, "Tanggal" %>
 		<%= f.text_field :date, :class => 'half date-picker', :value => @claimmemo.date.strftime('%d-%m-%Y') %> 
@@ -196,6 +197,7 @@
 	<%= f.submit "Tambah Data", :class => 'left' %>
   <% end %>
 	</div>
+  </div>
 
 <% end %>
 

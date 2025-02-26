@@ -10,6 +10,8 @@ class Attachment < ActiveRecord::Base
       Product.find(self.imageable_id) rescue nil
     when "Driver"
       Driver.find(self.imageable_id) rescue nil
+    when "Helper"
+      Helper.find(self.imageable_id) rescue nil
     when "Supplier"
       Supplier.find(self.imageable_id) rescue nil
     when "Staff"
@@ -26,6 +28,8 @@ class Attachment < ActiveRecord::Base
 			Taxinvoice.find(self.imageable_id) rescue nil
     when "Taxinvoiceattachment"
       Taxinvoiceattachment.find(self.imageable_id) rescue nil
+    when "Claimmemo"
+      Claimmemo.find(self.imageable_id) rescue nil
     when "Quotationgroup"
 			Quotationgroup.find(self.imageable_id) rescue nil
     default

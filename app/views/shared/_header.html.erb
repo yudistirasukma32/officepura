@@ -79,15 +79,15 @@
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Marketing, Admin Marketing, Admin Pelanggan, Lihat Pelanggan, Admin Penagihan'), "Pelanggan", "/customers" %></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Master Jurusan, User Jurusan'), "Jurusan", "/routes" %></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Operasional BKK, Vendor Supir, Admin Supir'), "Supir", "/drivers" %></li>
+					<li><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Operasional BKK, Vendor Supir, Admin Supir'), "Kernet", "/helpers" %></li>
                     <li><%= link_to_if (checkrole 'Admin HRD'), "Staf", "/staffs" %></li>
 					<li><%= link_to_if (checkrole 'Admin HRD, Admin Operasional'), "Mekanik", "/mechanics" %></li>
-					<li><%= link_to_if (checkrole 'Admin Marketing'), "Komoditas", "/commodities" %></li>
 					<li class="divider"></li>
 					<li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin HRD, Admin Keuangan, Admin Kendaraan, Operasional BKK'), "Kendaraan", "/vehicles" %></li>
 					<li><%= link_to_if (checkrole 'Admin Kontainer'), "Isotank", "/isotanks" %></li>
 					<li><%= link_to_if (checkrole 'Admin Kontainer'), "Kontainer", "/containers" %></li>
-                    <li></li>
+					<li><%= link_to_if (checkrole 'Admin Marketing'), "Komoditas", "/commodities" %></li>
 					<li class="divider"></li>
 					<li class="divider"></li>
                     <li><%= link_to_if (checkrole 'Admin Gudang, Staf Gudang'), "Supplier", "/suppliers" %></li>

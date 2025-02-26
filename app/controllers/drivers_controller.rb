@@ -12,6 +12,7 @@ class DriversController < ApplicationController
     @section = "masters"
     @where = "drivers"
     @statuses = ["Tetap", "Warnen"]
+    @attachments_category = ["KTP", "FOTO", "BPJS", "SIM", "NPWP", "Lainnya"]
   end
 
   def set_role
@@ -54,7 +55,6 @@ class DriversController < ApplicationController
           @drivers = @drivers.where("is_resign = false")
         end
   
-          
       end
 
       respond_to :html
@@ -65,6 +65,8 @@ class DriversController < ApplicationController
   end
 
   def new
+    @process = 'new'
+
     @driver = Driver.new
     @driver.enabled = true
     @driver.weight_loss = @driver.weight_loss.to_i
@@ -76,6 +78,9 @@ class DriversController < ApplicationController
   end
 
   def edit
+
+    @process = 'edit'
+
     @driver = Driver.find(params[:id])
     @helper = @driver.helpers.first
     @helper = Helper.new if !@helper
@@ -121,6 +126,7 @@ class DriversController < ApplicationController
     @driver = Driver.new(inputs)
 
     @driver.is_resign = inputs[:is_resign] == "1" ? true : false
+    @driver.blacklist = inputs[:blacklist] == "1" ? true : false
 
     if @driver.save
       inputs[:origin_id] = @driver.id
@@ -136,7 +142,15 @@ class DriversController < ApplicationController
       response = http.request(request)
       @response = response.read_body
 
-      redirect_to(edit_driver_url(@driver), :notice => 'Data Supir sukses ditambah.')
+      if @driver.blacklist
+        redirect_to(edit_driver_url(@driver, blacklist: 1), :notice => 'Data Supir Daftar Hitam sukses ditambah.')
+      
+      else
+      
+        redirect_to(edit_driver_url(@driver), :notice => 'Data Supir sukses ditambah.')
+      
+      end
+
     else
       to_flash(@driver)
       render :action => "new"
@@ -188,6 +202,18 @@ class DriversController < ApplicationController
     @driver = Driver.find(params[:id])
     @driver.update_attributes(:enabled => false)
     redirect_to(drivers_url)
+  end
+
+  def blacklisted
+    @driver = Driver.find(params[:id])
+    @driver.update_attributes(:blacklist => true)
+    redirect_to(edit_driver_url(@driver, blacklist: 1), :notice => 'Data Supir Daftar Hitam sukses ditambah.')
+  end
+
+  def whitelisted
+    @driver = Driver.find(params[:id])
+    @driver.update_attributes(:blacklist => false)
+    redirect_to(edit_driver_url(@driver), :notice => 'Data Supir sukses diupdate.')
   end
 
   def blacklist

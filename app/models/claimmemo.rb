@@ -16,4 +16,10 @@ class Claimmemo < ActiveRecord::Base
 
   scope :active, lambda {where(:deleted => false)}
 
+  has_many :attachments, :as => :imageable
+
+  def images
+	  attachments.where(:media => false).order('id DESC')
+  end
+
 end

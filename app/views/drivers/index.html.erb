@@ -9,7 +9,9 @@
 	<div id="content-full">
 		<% if checkrole 'Admin HRD, Vendor Supir, Admin Supir' %>
 		<a class="btn print" href="<%=new_driver_path%>"><i class="icon-plus-sign"></i> &nbsp;Tambah</a>
+		<a class="btn print red" style="background-color: #9d0000 !important; background-image: none !important;" href="/drivers/blacklist"><i class="icon-flag"></i> &nbsp;Daftar Hitam</a>
 		<% end %>
+
 		<h1>Master / <a href="<%=drivers_path%>">Supir</a> / Index</h1>
 
 		<%= render 'default/toggle_deleted_checkbox' %>
@@ -72,7 +74,7 @@
 			</thead>
 
 			<tbody>
-			<% @drivers.each do |driver| %>
+			<% @drivers.order(:name).each do |driver| %>
 			<% if driver.deleted %>
 				<% if current_user.adminrole %>
 				<tr class="deleted">
@@ -108,7 +110,7 @@
 					<% end %>
 					<td class="right" width="60">
 						<%= link_to '&#xf044;'.html_safe, edit_driver_path(driver), :class => "edit tipsy", :title => 'Edit' %> 
-						<%= link_to '&#xf00d;'.html_safe, driver, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner || (checkrole 'Admin Operasional, Admin Supir') %>
+						<%= link_to '&#xf00d;'.html_safe, driver, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner || (checkrole 'Admin Operasional') || (checkrole 'Admin HRD') || (checkrole 'Admin Supir') %>
 					</td>
 				</tr>
 				<% else %>

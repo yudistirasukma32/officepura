@@ -75,6 +75,8 @@ class AttachmentsController < ApplicationController
       edit_product_url(id)
     when "Driver"
       edit_driver_url(id)
+    when "Helper"
+      edit_helper_url(id)
     when "Supplier"
       edit_supplier_url(id)
     when "Staff"
@@ -91,6 +93,8 @@ class AttachmentsController < ApplicationController
 			edit_taxinvoice_url(id)  
     when "Taxinvoiceattachment"
       edit_taxinvoiceattachment_url(id)   
+    when "Claimmemo"
+      edit_claimmemo_url(id)   
     when "Quotationgroup"
 			edit_quotationgroup_url(id)    
     end

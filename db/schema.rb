@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250213141833) do
+ActiveRecord::Schema.define(:version => 20250222094209) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -196,35 +196,35 @@ ActiveRecord::Schema.define(:version => 20250213141833) do
   end
 
   create_table "claimmemos", :force => true do |t|
-    t.boolean  "deleted",                                                 :default => false
-    t.boolean  "enabled",                                                 :default => true
-    t.integer  "taxinvoiceitem_id"
-    t.integer  "invoice_id"
-    t.date     "date"
-    t.string   "vehicle_number"
-    t.integer  "weight_gross",                                            :default => 0
-    t.integer  "weight_net",                                              :default => 0
-    t.integer  "shrink",                                                  :default => 0
-    t.text     "description"
-    t.datetime "created_at",                                                                 :null => false
-    t.datetime "updated_at",                                                                 :null => false
-    t.integer  "user_id"
-    t.integer  "deleteuser_id"
-    t.boolean  "approved",                                                :default => false
-    t.boolean  "approved_by_gm",                                          :default => false
-    t.datetime "approved_at"
-    t.datetime "approved_by_gm_at"
-    t.float    "shrink_tolerance_percent",                                :default => 0.0
-    t.decimal  "shrink_tolerance_money",   :precision => 19, :scale => 2, :default => 0.0
-    t.integer  "tolerance_total",                                         :default => 0
-    t.integer  "shrinkage_load",                                          :default => 0
-    t.decimal  "price_per",                :precision => 19, :scale => 2, :default => 0.0
-    t.decimal  "total",                    :precision => 19, :scale => 2, :default => 0.0
-    t.decimal  "discount_amount",          :precision => 19, :scale => 2, :default => 0.0
-    t.boolean  "is_train",                                                :default => false
-    t.boolean  "approved_marketing",                                      :default => false
-    t.boolean  "approved_load_spv",                                       :default => false
-    t.boolean  "approved_unload_spv",                                     :default => false
+    t.boolean   "deleted",                                                              :default => false
+    t.boolean   "enabled",                                                              :default => true
+    t.integer   "taxinvoiceitem_id"
+    t.integer   "invoice_id"
+    t.date      "date"
+    t.string    "vehicle_number"
+    t.integer   "weight_gross",                                                         :default => 0
+    t.integer   "weight_net",                                                           :default => 0
+    t.integer   "shrink",                                                               :default => 0
+    t.text      "description"
+    t.timestamp "created_at",               :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",               :limit => 6,                                                   :null => false
+    t.integer   "user_id"
+    t.integer   "deleteuser_id"
+    t.boolean   "approved",                                                             :default => false
+    t.boolean   "approved_by_gm",                                                       :default => false
+    t.timestamp "approved_at",              :limit => 6
+    t.timestamp "approved_by_gm_at",        :limit => 6
+    t.float     "shrink_tolerance_percent",                                             :default => 0.0
+    t.decimal   "shrink_tolerance_money",                :precision => 19, :scale => 2, :default => 0.0
+    t.integer   "tolerance_total",                                                      :default => 0
+    t.integer   "shrinkage_load",                                                       :default => 0
+    t.decimal   "price_per",                             :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "total",                                 :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "discount_amount",                       :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "is_train",                                                             :default => false
+    t.boolean   "approved_marketing",                                                   :default => false
+    t.boolean   "approved_load_spv",                                                    :default => false
+    t.boolean   "approved_unload_spv",                                                  :default => false
   end
 
   create_table "commodities", :force => true do |t|
@@ -423,6 +423,10 @@ ActiveRecord::Schema.define(:version => 20250213141833) do
     t.integer   "vendor_id"
     t.date      "datein"
     t.date      "dateout"
+    t.boolean   "blacklist",                                                            :default => false
+    t.integer   "blacklist_customer_id"
+    t.string    "blacklist_note"
+    t.integer   "office_id"
   end
 
   create_table "eventcleaningmemos", :force => true do |t|
@@ -580,6 +584,17 @@ ActiveRecord::Schema.define(:version => 20250213141833) do
     t.decimal   "sparepart",                          :precision => 19, :scale => 2, :default => 0.0
     t.decimal   "bon",                                :precision => 19, :scale => 2, :default => 0.0
     t.decimal   "saving",                             :precision => 19, :scale => 2, :default => 0.0
+    t.string    "bank_account"
+    t.string    "bank_name"
+    t.integer   "bankexpensegroup_id"
+    t.string    "origin"
+    t.boolean   "is_resign",                                                         :default => false
+    t.date      "datein"
+    t.date      "dateout"
+    t.boolean   "blacklist",                                                         :default => false
+    t.integer   "blacklist_customer_id"
+    t.string    "blacklist_note"
+    t.integer   "office_id"
   end
 
   create_table "incentives", :force => true do |t|
@@ -1109,14 +1124,14 @@ ActiveRecord::Schema.define(:version => 20250213141833) do
     t.string    "customer_number"
     t.string    "customer_email"
     t.boolean   "reviewed",                                                           :default => false
-    t.datetime  "reviewed_at"
+    t.timestamp "reviewed_at",            :limit => 6
     t.integer   "reviewed_by"
     t.boolean   "confirmed",                                                          :default => false
-    t.datetime  "confirmed_at"
+    t.timestamp "confirmed_at",           :limit => 6
     t.boolean   "is_sent",                                                            :default => false
-    t.datetime  "sent_date"
+    t.timestamp "sent_date",              :limit => 6
     t.boolean   "customer_approved",                                                  :default => false
-    t.datetime  "customer_approved_date"
+    t.timestamp "customer_approved_date", :limit => 6
   end
 
   create_table "quotationlogs", :force => true do |t|

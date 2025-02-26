@@ -12,7 +12,8 @@ class ClaimmemosController < ApplicationController
   end
 
   def index
-    @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
+    # @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
+    @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
     @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
 
     @invoice_id = params[:invoice_id] || ''
@@ -33,6 +34,9 @@ class ClaimmemosController < ApplicationController
   end
 
   def new
+
+    @process = 'new'
+
     @invoice_id = params[:invoice_id]
 
     if @invoice_id.blank?
@@ -68,6 +72,8 @@ class ClaimmemosController < ApplicationController
 
   def edit
 
+    @process = 'edit'
+
     @claimmemo = Claimmemo.find(params[:id])
     @invoice_id = @claimmemo.invoice_id
 
@@ -97,7 +103,8 @@ class ClaimmemosController < ApplicationController
 
     if @claimmemo.update_attributes(params[:claimmemo])
       @claimmemo.save
-      redirect_to(claimmemos_path, :notice => 'Data sukses diupdate')
+      # redirect_to(claimmemos_path, :notice => 'Data sukses diupdate')
+      redirect_to(edit_claimmemo_url(@claimmemo), :notice => 'Data sukses diupdate.')
     else
       to_flash(@claimmemo, :notice => 'Data gagal diupdate')
       render :action => "edit"

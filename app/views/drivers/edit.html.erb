@@ -9,9 +9,17 @@
 	<div id="content-full">
 		<a class="btn-txt cancel" href="<%=drivers_path%>"><i class="icon-remove"></i> Batal</a>
 
-		<h1>Master / <a href="<%=drivers_path%>">Supir</a> / Edit <strong title="<%=@driver.name%>"><%= @driver.name %> <%= zeropad(@driver.id)%></strong></h1>
+		<h1>Master / <a href="<%=drivers_path%>">Supir</a> <%= params[:blacklisted] == '1' ? '/ Daftar Hitam' : '' %> / Edit <strong title="<%=@driver.name%>"><%= @driver.name %> <%= zeropad(@driver.id)%></strong></h1>
+
+		<% if @driver.blacklist %>
+		
+		<%= render "form_blacklist" %>
+
+		<% else %>
 
 		<%= render "form" %>
+
+		<% end %>
 
 		<br class="clearfix" />
 

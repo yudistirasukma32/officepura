@@ -1,0 +1,28 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+		<a class="btn-txt cancel" href="<%=helpers_path%>"><i class="icon-remove"></i> Batal</a>
+
+		<h1>Master / <a href="<%=helpers_path%>">Kernet</a> <%= params[:blacklisted] == '1' ? '/ Daftar Hitam' : '' %> / Edit <strong title="<%=@helper.name%>"><%= @helper.name %> <%= zeropad(@helper.id)%></strong></h1>
+
+		<% if @helper.blacklist %>
+		
+		<%= render "form_blacklist" %>
+
+		<% else %>
+
+		<%= render "form" %>
+
+		<% end %>
+
+		<br class="clearfix" />
+
+	</div>
+
+</div>

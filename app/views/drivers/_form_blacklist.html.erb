@@ -1,0 +1,175 @@
+<% tab = 0 %>
+
+  <ul class="rounded" id="tabbed">
+    <li><a id="link_<%=tab+=1%>" href="">Data Supir</a></li>
+  </ul>
+
+  <br class="clearfix" />
+
+<% tab = 0 %>
+  <div id="sliding_window">
+    <div class="sliding_container">
+
+    <div class="sliding_tab" id="tab_<%=tab+=1%>">
+    <div style="float: left; width: 600px;">
+        <%= form_for(@driver) do |f| %>
+          <% if params[:id].present? %>
+              <%= f.hidden_field :old_name, value: @driver.name %>
+          <% end %>
+
+          <div class="field-row first">
+            <%= f.label :name, "Nama" %>
+            <%= f.text_field :name, required: true %>
+          </div>
+
+          <div class="field-row">
+            <%= f.label :address, "Alamat" %>
+            <%= f.text_field :address %>
+          </div>
+
+          <div class="field-row">
+            <%= f.label :city, "Kota" %>
+            <%= f.text_field :city, required: true %>
+          </div>
+
+          <div class="field-row">
+            <%= f.label :mobile, "No. HP" %>
+            <%= f.text_field :mobile, :class => 'half left', required: true %>
+          </div>
+
+          <div class="field-row">
+            <%= f.label :driver_licence, "SIM" %>
+            <%= f.text_field :driver_licence, :class => 'half left' %>
+            <%= f.label :driver_licence_expiry, "Expired", :class => 'middle' %>
+            <%= f.text_field :driver_licence_expiry, :class => 'half left date-picker' %>
+          </div>
+
+          <div class="field-row">
+            <%= f.label :id_card, "KTP" %>
+            <%= f.text_field :id_card, :class => 'half left', required: true %>
+            <%= f.label :id_card_expiry, "Expired", :class => 'middle' %>
+            <%= f.text_field :id_card_expiry, :class => 'half left date-picker' %>
+          </div>
+
+          <div class="field-row">
+            <%= f.label :blacklist_customer_id, "Referensi" %>
+
+            <select id="blacklist_customer_id" name="driver[blacklist_customer_id]" class="double chzn-select">
+            <option value="0">- Pilih Perusahaan -</option>
+            <% Customer.active.order(:name).each do |customer| %>
+            <option value="<%=customer.id%>"
+              <% if customer.id == @driver.blacklist_customer_id %> selected="selected"<% end %>><%=customer.name%></option>
+            <% end %>
+            </select>
+
+            <small>*Pilih Perusahan yang melapor / referensi dari</small>
+          </div>
+    
+          <div class="field-row" >
+            <%= f.label :blacklist_note, "Keterangan" %>
+            <%= f.text_area :blacklist_note %>
+          </div>
+
+          <input type="hidden" name="driver[blacklist]" value="1">
+
+          <div class="actions">
+            <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin HRD, Vendor Supir, Admin Supir' %>
+            <a class="back left" href="<%='/drivers/blacklist'%>">Kembali ke Index</a>
+          </div>
+
+          <br/>
+          <a class="back left" href="/drivers/<%=@driver.id%>/whitelisted">Kembalikan ke Daftar Putih</a>
+
+        <% end %>
+    </div>
+
+    <% if @process == 'edit' %>
+
+    <div class="update-box" style="padding-top: 0; border-top: none;">
+    <h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment</h3>
+
+    <% if @driver.images.any? %>
+
+    <ul style="margin-left: 0; padding-left: 0;">
+
+      <% @driver.images.each do |img| %>
+
+        <% if img.file_uid.present? %>
+
+        <li style="margin-bottom: 2.5rem; list-style: none;">
+
+          <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+
+            <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+
+              <a href="<%= img.file.url() %>" target="_blank">
+                  <%= image_tag img.file.url(:suffix => "/#{img.name}") , style: "width: 100%;" if img.file_uid %>
+              </a>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; font-size: 10px;">
+                <span style="font-size: 10px; color: #717171;"><%= img.name rescue nil %> Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+
+                <% if img.enabled %>
+                <%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + img.id.to_s %>
+                <% else %>
+                <span style="font-size: 10px; color: #717171;">Dihapus</span>
+                <% end %>
+
+              </div>
+
+            <% else %>
+
+              <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid).truncate(40) %></a>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; font-size: 10px; ">
+                <span style="font-size: 10px; color: #717171;"><%= img.name rescue nil %> Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+
+                <% if img.enabled %>
+                <%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + img.id.to_s %>
+                <% else %>
+                <span style="font-size: 10px; color: #717171;">Dihapus</span>
+                <% end %>
+
+              </div>
+
+            <% end %>
+
+        </li>
+                
+        <% end %>
+
+      <% end %>
+    
+    </ul>
+
+    <% end %>
+
+    <br />
+
+    <form action="/attachments/upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+      <input type="hidden" name="model_name" value="Driver" />
+      <input type="hidden" name="item_id" value="<%=@driver.id%>" />
+
+    <div class="field-row" style="width: 300px;">
+      <label for="name" style="width: 100%;">Tambah Lampiran</label>
+      <%= select_tag 'attachment[name]', options_for_select(@attachments_category), style: 'width: 300px;' %>
+    </div>
+
+    <div class="field-row continue" style="width: 300px;">
+      <label for="file">Browse File</label>
+      <input type="file" name="attachment[file]"/>
+    </div>
+
+    <div class="actions">
+      <input type="submit" value="Simpan File" />
+    </div>
+
+    </form>
+
+    </div>
+
+    <% end %>
+
+    </div>
+
+  </div>
+</div>
