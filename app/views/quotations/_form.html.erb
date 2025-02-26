@@ -132,7 +132,7 @@
 
   <div class="field-row">
     <%= f.label :price_per, "Tarif Muatan" %>
-    <%= f.text_field :price_per, :class => 'half left', :onkeypress => 'javascript:return isMoneyKey(this);', :value => to_currency_bank(@quotation.price_per)  %>
+    <%= f.text_field :price_per, :class => 'half left', :onkeypress => 'javascript:return isMoneyKey(this);', :value => to_currency(@quotation.price_per.to_i)  %>
     <%= f.label :price_per_type, "per", :class => 'middle' %>
     <%= f.select :price_per_type, options_for_select(@price_per_types.collect {|w| [w, w]}, @quotation.price_per_type), {}, { :class => 'half chzn-select' } %>
   </div>
@@ -161,11 +161,11 @@
 
   <div class="field-row" style="background: none;">
     <h2 style="font-weight: bold;">Data Lokasi Penawaran</h2>
-    <p>*Pengisian Longitude & Latitude harap menggunakan format Longitude/Latitude bukan GPS. <br/>Format Longitude dan latitude yg benar seperti : -7.329603 atau 112.752704</p>
+    <p style="font-size: 12px; color: #8e8e8e;">*Pengisian Longitude & Latitude harap menggunakan format Longitude/Latitude bukan GPS. <br/>Format Longitude dan latitude yg benar seperti : -7.329603 atau 112.752704</p>
     <p style="padding-bottom: 0;"><b>Peta Titik Start / Muat</b></p>
   </div>
 
-  <div id="map2" style="height: 420px; width: 100%;"></div>
+  <div id="map2" style="height: 360px; width: 100%;"></div>
     <div id="infowindow-content">
       <span id="place-name" class="title"></span><br />
       <span id="place-address"></span>
@@ -188,9 +188,7 @@
 
   <div class="field-row">
     <p><b>Peta Titik Finish / Bongkar</b></p>
-  </div>
-
-  <div class="field-row">
+ 
     <div class="pac-card" id="pac-card">
       <div>
       <div id="title">Address Search</div>
@@ -205,7 +203,7 @@
     </div>
   </div>
 
-  <div id="map" style="height: 420px; width: 100%;"></div>
+  <div id="map" style="height: 360px; width: 100%;"></div>
     <div id="infowindow-content">
       <span id="place-name" class="title"></span><br />
       <span id="place-address"></span>
@@ -225,7 +223,23 @@
     <%= f.text_field :address_end %>
   </div>
 
-  <div class="actions">
+  <div class="actions" style="display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 520px;
+    background: white;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1.5rem;">
+    <small style="flex-grow: 1;">*Hitung Jarak otomatis berdasarkan titik muat dan bongkar pada peta.</small>
+    <a id="calculateDistance" class="btn-txt" 
+      style="padding: 5px 10px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+      Hitung Jarak
+    </a>
+  </div>
+
+  <div class="actions" style="margin-bottom: 3rem;">
     <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Operasional, Marketing, Admin Marketing' %>
     <a class="back left" href="<%= quotations_url%>">Kembali ke Penawaran</a>
   </div>
@@ -431,6 +445,7 @@ end%>
 			infowindowContent.children["place-address"].textContent = place.formatted_address;
 			infowindow.open(map, marker);
 		  });
+		
 		
 		}
 </script>

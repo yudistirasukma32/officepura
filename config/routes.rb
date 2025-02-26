@@ -933,6 +933,7 @@ OfficePuraErp::Application.routes.draw do
     get 'api/routelocations/:route_id' => 'routelocations#getDataApi'
     match 'routelocations/new/:route_id' => 'routelocations#new'
     match 'routelocations/edit/:route_id' => 'routelocations#edit'
+    get 'routelocations/checkDistance' => 'routelocations#checkDistance'
 
     resources :routelocations do
       member do

@@ -79,5 +79,43 @@ class RoutelocationsController < ApplicationController
 		end
 		
 	end
+
+	def checkDistance
+
+		require "uri"
+		require "net/http"
+	
+		lng_start = params[:longitude_start]
+		lat_start = params[:latitude_start]
+	
+		lng_end = params[:longitude_end]
+		lat_end = params[:latitude_end]
+		
+		api_key = "AIzaSyDwuoQZDV6IQ7fpPGvmgBqnueUSu6uB4qU"
+	 
+		url = URI("https://maps.googleapis.com/maps/api/distancematrix/json?origins=#{lat_start},#{lng_start}&destinations=#{lat_end},#{lng_end}&mode=driving&units=metric&key=#{api_key}")
+	
+		https = Net::HTTP.new(url.host, url.port)
+		https.use_ssl = true
+	
+		request = Net::HTTP::Get.new(url)
+		response = https.request(request)
+		# puts response.read_body
+		data = JSON.parse(response.read_body)
+		
+		if data["status"] == "OK"
+		  distance_value = data["rows"][0]["elements"][0]["distance"]["value"] # Distance in meters
+		  distance_km = distance_value / 1000.0  # Convert meters to kilometers
+		  destination_addresses = data["destination_addresses"][0]
+		  origin_addresses = data["origin_addresses"][0]
+	
+		#   puts "Distance: #{distance_km} km"
+			render json: {status: 200, success: true, origin_addresses: origin_addresses, destination_addresses: destination_addresses, distance_km: distance_km.ceil, distance_value: distance_value}
+		else
+		#   puts "Error: #{data['status']}"
+			  render json: {success: true, distance_km: 0, distance_value: 0}
+		end
+	
+	  end
 	
 end

@@ -1,8 +1,8 @@
 class ClaimmemosController < ApplicationController
 	include ApplicationHelper
 	layout "application"
-  before_filter :authenticate_user!, :set_section, :set_claimmemo
-	before_filter :set_claimmemo, only: [:edit, :update, :destroy]
+  before_filter :authenticate_user!, :set_section
+	# before_filter :set_claimmemo, only: [:edit, :update, :destroy]
 
   respond_to :html
 	
@@ -93,7 +93,9 @@ class ClaimmemosController < ApplicationController
   end
 
   def update
-    if @claimmemo.update(params[:claimmemo])
+    @claimmemo = Claimmemo.find(params[:id])
+
+    if @claimmemo.update_attributes(params[:claimmemo])
       @claimmemo.save
       redirect_to(claimmemos_path, :notice => 'Data sukses diupdate')
     else
@@ -113,7 +115,7 @@ class ClaimmemosController < ApplicationController
     inputs = params[:claimmemo]
     @claimmemo = Claimmemo.find(params[:id])
 
-    if @claimmemo.update(inputs)
+    if @claimmemo.update_attributes(inputs)
  
       @claimmemo.approved = true
       @claimmemo.approved_at = Time.now
@@ -130,7 +132,7 @@ class ClaimmemosController < ApplicationController
     inputs = params[:claimmemo]
     @claimmemo = Claimmemo.find(params[:id])
 
-    if @claimmemo.update(inputs)
+    if @claimmemo.update_attributes(inputs)
  
       @claimmemo.approved_marketing = true
 
@@ -146,7 +148,7 @@ class ClaimmemosController < ApplicationController
     inputs = params[:claimmemo]
     @claimmemo = Claimmemo.find(params[:id])
 
-    if @claimmemo.update(inputs)
+    if @claimmemo.update_attributes(inputs)
  
       @claimmemo.approved_load_spv = true
 
@@ -162,7 +164,7 @@ class ClaimmemosController < ApplicationController
     inputs = params[:claimmemo]
     @claimmemo = Claimmemo.find(params[:id])
 
-    if @claimmemo.update(inputs)
+    if @claimmemo.update_attributes(inputs)
  
       @claimmemo.approved_unload_spv = true
 
@@ -178,7 +180,7 @@ class ClaimmemosController < ApplicationController
     inputs = params[:claimmemo]
     @claimmemo = Claimmemo.find(params[:id])
 
-    if @claimmemo.update(inputs)
+    if @claimmemo.update_attributes(inputs)
  
       @claimmemo.approved_by_gm = true
       @claimmemo.approved_by_gm_at = Time.now
