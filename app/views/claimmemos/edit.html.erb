@@ -39,7 +39,7 @@
 
 				<% if !@claimmemo.approved_load_spv %>
 					<% if params[:rel].present? %>
-						<% if checkrole 'Admin Approval Klaim' %>
+						<% if checkrole 'Admin Approval Klaim, Admin Penagihan' %>
 							<a class="btn-txt w72" href="load_approve"><i class="icon-check"></i> Muat Approve</a>
 						<% end %>
 					<% end %>
@@ -49,7 +49,7 @@
 
 				<% if !@claimmemo.approved_unload_spv %>
 					<% if params[:rel].present? %>
-						<% if checkrole 'Admin Approval Klaim' %>
+						<% if checkrole 'Admin Approval Klaim, Admin Penagihan' %>
 							<a class="btn-txt w72" href="unload_approve"><i class="icon-check"></i> Bongkar Approve</a>
 						<% end %>
 					<% end %>
@@ -59,7 +59,7 @@
 
 				<% if !@claimmemo.approved %>
 					<% if params[:rel].present? %>
-						<% if checkrole 'Admin Approval Klaim' %>
+						<% if checkrole 'Admin Approval Klaim, Admin Penagihan' %>
 							<a class="btn-txt w72" href="spv_approve"><i class="icon-check"></i> SPV Approve</a>
 						<% end %>
 					<% end %>
@@ -69,7 +69,7 @@
 
 				<% if !@claimmemo.approved_marketing %>
 					<% if params[:rel].present? %>
-						<% if checkrole 'Marketing' %>
+						<% if checkrole 'Marketing, Admin Penagihan' %>
 							<a class="btn-txt w72" href="marketing_approve"><i class="icon-check"></i> Marketing Approve</a>
 						<% end %>
 					<% end %>
@@ -79,7 +79,7 @@
 
 				<% if !@claimmemo.approved_by_gm %>
 					<% if params[:rel].present? %>
-						<% if checkrole 'General Manager' %>
+						<% if checkrole 'General Manager, Admin Penagihan' %>
 							<a class="btn-txt w72" href="gm_approve"><i class="icon-check"></i> GM Approve</a>
 						<% end %>
 					<% end %>
