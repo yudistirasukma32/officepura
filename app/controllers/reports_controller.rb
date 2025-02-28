@@ -251,7 +251,7 @@ class ReportsController < ApplicationController
   end
 
   def customers
-    role = cek_roles 'Admin Keuangan, Admin Auditor'
+    role = cek_roles 'Admin Keuangan, Admin Auditor, Admin Penagihan'
     if role
       @year = params[:year]
       @year = Date.today.year if @year.nil?
@@ -268,7 +268,7 @@ class ReportsController < ApplicationController
   end
 
   def customercredits
-    role = cek_roles 'Admin Keuangan, Admin Auditor'
+    role = cek_roles 'Admin Keuangan, Admin Auditor, Admin Penagihan'
     if role
       @year = params[:year]
       @year = Date.today.year if @year.nil?
@@ -748,7 +748,7 @@ class ReportsController < ApplicationController
   end
 
 def confirmed_invoices
-    role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
+    role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir, Admin Penagihan'
     if role
       @offices = Office.active
       @startdate = params[:startdate]
@@ -833,7 +833,7 @@ def confirmed_invoices
 end
 
 def collectible_invoices
-  role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'
+  role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir, Admin Penagihan'
   if role
 
     @offices = Office.active
@@ -2808,7 +2808,7 @@ end
   end
 
   def shrinkreport
-    role = cek_roles 'Admin Keuangan'
+    role = cek_roles 'Admin Keuangan, Admin Auditor, Admin Penagihan'
 
     @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
     @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
@@ -2903,7 +2903,7 @@ end
 
   def unpaid_invoice
 
-    role = cek_roles 'Admin Keuangan, Auditor'
+    role = cek_roles 'Admin Keuangan, Auditor, Admin Penagihan'
 
     if role
 
@@ -2953,7 +2953,7 @@ end
 
   def paid_invoice
 
-    role = cek_roles 'Admin Keuangan, Auditor'
+    role = cek_roles 'Admin Keuangan, Auditor, Admin Penagihan'
 
     if role
 

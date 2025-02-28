@@ -304,7 +304,7 @@
 							<li><%= link_to "Laporan Upload SJ", "/reports/taxinvoiceitems_upload_report" %></li>
 							<!-- <li><%= link_to "Laporan BKK ", "/reports/invoices" %></li> -->
 
-							<% if checkrole 'Admin Keuangan, Admin Operasional, Vendor Supir' %>
+							<% if checkrole 'Admin Keuangan, Admin Operasional, Vendor Supir, Admin Penagihan' %>
 								<li><%= link_to "Laporan BKK Terkonfirmasi", "/reports/confirmed-invoices" %></li>
 								<li><%= link_to "Laporan BKK Tertagih", "/reports/collectible-invoices" %></li>
 								<li><%= link_to "Laporan Pemakaian Nopol ", "/reports/drivervehicles" %></li> 
