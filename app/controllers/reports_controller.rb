@@ -3098,7 +3098,7 @@ end
   end
 
   def estimation_event_expense
-    role = cek_roles 'Admin Keuangan, Estimasi'
+    role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan'
     if role
       offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
 
