@@ -254,12 +254,15 @@ label {
   <input type="hidden" id ="process" name="process" value="<%=@process%>" />
   <input type="hidden" id="customer_id" value="<%=@taxinvoice.customer_id%>"/>
 
- <% if @process =='edit'%>
-  <div class="field-row" style="padding-bottom:0px;">
+  <% if @process =='edit'%>
+  <div class="field-row" style="padding-bottom:0px; display: flex; padding-right: 1rem; align-items: center;">
     <label>Pelanggan</label>
     <input type="text" class="disabled" value="<%=@customer.name%>"/>
+    <% if checkrole 'Admin Invoice Tagihan, Admin Penagihan' %>
+    <a href="updatecustomer" style="margin-left: -1.5rem; color: grey; font-size: 0.7rem;">Edit</a>
+    <% end %>
   </div>
-<% end %>
+  <% end %>
 
 <div class="field-row continue" style="padding-bottom:0px;">
   <label for="long_id" class="left">No. Invoice</label>

@@ -1,12 +1,12 @@
 <%= render "shared/header" %>
 
-<%= content_for :css do %>	 
-	<style>
-		#main #filter {
-			height: 96px;
-		}
-	</style>
-<% end %>
+
+<style>
+#main #filter {
+	height: 96px;
+}
+</style>
+ 
 
 <div id="nav">
 	<%= render "shared/nav" %>
@@ -19,10 +19,20 @@
 	
 	<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Est BKK vs DO: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
 
-	<br class="clearfix" />
+	<% if params[:marketingname].present? %>
+		<strong style="font-size: 1rem; margin-bottom: 1.5rem;">Marketing: <%= params[:marketingname] %> </strong>
+		<br class="clearfix" />
+		<br class="clearfix" />
+	<% else %>
+		<br class="clearfix" />
+	<% end %>
 
 	<div id="filter">
 		<form id="filterform" name="filterform" action="" method="get">
+
+		<input type="hidden" name="marketingname" value="<%= params[:marketingname] %>">
+		<input type="hidden" name="user_id" value="<%= params[:user_id] %>">
+
 		<div class="field-row continue">
 			<div style="position: relative; width: fit-content; float: left;">
 			<label for="customer_id"  style="width: 50px;"/>Pelanggan</label>
@@ -75,7 +85,7 @@
 			<div style="position: relative; width: fit-content; float: left;">
 				<label for="operator_id"  style="width: 60px;"/>OP Kereta</label>
 				<select name="operator_id" class="half left chzn-select" style="width: 100px;" onchange="javascript:getRouteTrains(this.value);"/>
-					<option value="all">Semua Operator</option>
+					<option value="all">Semua</option>
 					<% operators = Operator.active %>
 					<% operators.each do |operator| %>
 					<option value="<%=operator.id%>" <%= operator.id == params[:operator_id].to_i ? "selected" : '' %>><%=operator.abbr%></option>

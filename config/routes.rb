@@ -151,6 +151,8 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
+  get 'quotationgroups/reports' => 'quotationgroups#reports'
+
   resources :quotationgroups do
     member do
       get "print"
@@ -537,6 +539,7 @@ OfficePuraErp::Application.routes.draw do
       get 'cancelpayment'
       get 'printreceipt'
       get 'clone'
+      get 'updatecustomer'
     end
     collection do
       get 'downloadmultiexcel'
@@ -546,6 +549,7 @@ OfficePuraErp::Application.routes.draw do
       match 'generic(/:id)' => 'taxgenericinvoices#new'
       match 'dp_only(/:id)' => 'taxinvoices#newdp'
 
+      post 'updatecustomerinfo' => 'taxinvoices#updatecustomerinfo'
       post 'updatepayment' => 'taxinvoices#updatepayment'
       post 'downpayment' => 'taxinvoices#downpayment'
       post 'canceldownpayment' => 'taxinvoices#canceldownpayment'
@@ -698,6 +702,8 @@ OfficePuraErp::Application.routes.draw do
   resources :dashboards
   
   get "marketings" => 'marketings#index'
+  get "marketings/filtered" => 'marketings#filtered'
+  get "marketings/estimations" => 'marketings#estimations'
   get "marketings/getomzetdata" => 'marketings#getomzetdata'
   get "marketings/getomzetdatamarketing" => 'marketings#getomzetdatamarketing'
 

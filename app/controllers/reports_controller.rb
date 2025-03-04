@@ -3102,6 +3102,9 @@ end
     if role
       offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
 
+      #marketings
+      @user_id = params[:user_id]
+
       @startdate = params[:startdate]
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
@@ -3152,18 +3155,27 @@ end
 
       if @tanktype.present? and @tanktype != 'all'
         @eventsa = @eventsa.where('tanktype = ?', @tanktype)
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
       end
-
+      
       if params[:office_id].present? && params[:office_id] != 'all'
-        @eventsa = @eventsa.where(office_id: params[:office_id])
+        @eventsa = @eventsa.where('office_id = ?', params[:office_id])
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
       end
 
       if params[:operator_id].present? && params[:operator_id] != 'all'
         @eventsa = @eventsa.where(operator_id: params[:operator_id])
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
       end
 
       if params[:routetrain_id].present? && params[:routetrain_id] != 'all'
         @eventsa = @eventsa.where(routetrain_id: params[:routetrain_id])
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+      end
+
+      if @user_id.present?
+        @eventsa = @eventsa.where(user_id: params[:user_id])
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
       end
 
       # render json: params

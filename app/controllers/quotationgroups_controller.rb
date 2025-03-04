@@ -402,4 +402,36 @@ class QuotationgroupsController < ApplicationController
     redirect_to(edit_quotationgroup_path(params['id']), :notice => 'Data Penawaran sukses disetujui customer.')
   end
 
+  def reports
+    @month = params.fetch(:month, Date.today.strftime('%m'))
+    @year = params.fetch(:year, Date.today.year.to_s)
+  
+    @quotationgroups = Quotationgroup.where(deleted: false).order(date: :desc, long_id: :asc)
+  
+    # Filter by month & year
+    @quotationgroups = @quotationgroups.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}")
+  
+    # Filter by customer_id (if not "all")
+    if params[:customer_id].present? && params[:customer_id] != "all"
+      @quotationgroups = @quotationgroups.where(customer_id: params[:customer_id])
+    end
+  
+    # Apply status filtering
+    if params[:status].present?
+      status_filter = case params[:status]
+                      when 'Disetujui' then { customer_approved: true }
+                      when 'Dikirim' then { is_sent: true, customer_approved: false }
+                      when 'Terkonfirmasi' then { confirmed: true, is_sent: false }
+                      when 'Sudah Review' then { reviewed: true, confirmed: false }
+                      when 'Draft' then { customer_approved: false, is_sent: false, confirmed: false, reviewed: false }
+                      else nil
+                      end
+  
+      @quotationgroups = @quotationgroups.where(status_filter) if status_filter
+    end
+  
+    # Count total records after filtering
+    @all_data = @quotationgroups.count
+  end  
+  
 end

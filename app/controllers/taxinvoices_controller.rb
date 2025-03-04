@@ -3,7 +3,7 @@ class TaxinvoicesController < ApplicationController
 	include ApplicationHelper
   include ActionView::Helpers::NumberHelper
 	layout "application", :except => [:gettaxinvoiceitems]
-  protect_from_forgery :except => [:updateitems, :updatepayment, :downpayment, :canceldownpayment, :secondpayment, :cancelsecondpayment, :thirdpayment, :cancelthirdpayment, :fourthpayment, :cancelfourthpayment, :transfer]
+  protect_from_forgery :except => [:updatecustomerinfo, :updateitems, :updatepayment, :downpayment, :canceldownpayment, :secondpayment, :cancelsecondpayment, :thirdpayment, :cancelthirdpayment, :fourthpayment, :cancelfourthpayment, :transfer]
   before_filter :authenticate_user!, :set_section
 
   ID_GROUP_PPH = 11
@@ -206,6 +206,90 @@ class TaxinvoicesController < ApplicationController
 
 
   end
+
+  def updatecustomer
+ 
+    @section = "taxinvoices"
+    @where = "taxinvoices"
+    @errors = Hash.new
+    @taxinvoice = Taxinvoice.find(params[:id])
+    # render json: @taxinvoice
+    # return false
+    @customerlist = Customer.find_by_sql("Select distinct c.* from customers c inner join invoices iv on c.id = iv.customer_id " +
+                                     "where iv.id in (Select t.invoice_id from taxinvoiceitems t where t.total > '0.00') order by c.name")
+
+    @customer = @taxinvoice.customer
+    @taxinvoiceitems = @taxinvoice.taxinvoiceitems.order(:date, :sku_id)
+    @taxinvoiceitemvs = @taxinvoice.taxinvoiceitemvs.order(:date, :sku_id)
+    @long_id = @taxinvoice.long_id
+    @process = "edit"
+    @needupdate = false
+    @taxinvoice.sentdate = params[:sentdate] if params[:sentdate].present?
+
+    if params[:update] == 'true'
+      @taxinvoiceitems.each do |item|
+        item.price_per = item.invoice.route.price_per.to_f
+        if item.is_gross
+          item.total = item.weight_gross.to_i * item.price_per.to_f
+        elsif item.is_wholesale
+          item.total = item.wholesale_price.to_f
+        else
+          item.total = item.weight_net.to_i * item.price_per.to_f
+        end
+        item.save
+      end
+      subtotal = @taxinvoice.taxinvoiceitems.sum(:total)
+      extra_cost = @taxinvoice.extra_cost.to_f
+      subtotal += extra_cost
+
+      insurance_cost = 0
+      insurance_cost += @taxinvoice.insurance_cost.to_i
+      subtotal -=insurance_cost
+
+        #ppn_new
+        ppn = Setting.where(name: 'ppn')
+        ppn = ppn.blank? ? 12 : ppn[0].value
+
+      @taxinvoice.gst_tax = @taxinvoice.gst_tax.to_f > 0 ? subtotal.to_f * (ppn.to_f / 100) : 0
+      @taxinvoice.price_tax = @taxinvoice.price_tax.to_f > 0 ? subtotal.to_f * 0.02 : 0
+
+      @taxinvoice.total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f
+
+      @taxinvoice.user_id = current_user.id
+      @taxinvoice.save
+
+    end
+
+    @taxinvoiceitems.each do |item|
+      if item.price_per.to_f != item.invoice.route.price_per.to_f
+        @needupdate = true
+        break
+      end
+    end
+
+    @strPeriod = ""
+    if !@taxinvoice.period_start.nil? and !@taxinvoice.period_end.nil?
+      if @taxinvoice.period_start == @taxinvoice.period_end
+        @strPeriod = @taxinvoice.period_start.strftime('%d-%m-%Y')
+      else
+        @strPeriod = @taxinvoice.period_start.strftime('%d-%m-%Y') + " s/d " + @taxinvoice.period_end.strftime('%d-%m-%Y')
+      end
+    end
+
+
+  end
+
+  def updatecustomerinfo
+    @taxinvoice = Taxinvoice.find(params[:id])
+    @oldcustomer = Customer.find(@taxinvoice.customer_id) rescue nil
+
+    @customer = Customer.find(params[:customer_id]) rescue nil
+    @taxinvoice.customer_id = @customer.id
+
+    @taxinvoice.save
+    redirect_to(edit_taxinvoice_url(@taxinvoice), :notice => "Data Invoice untuk pelanggan<br /><strong class='yellow'>#{@oldcustomer.name}</strong><br />sukses diupdate menjadi pelanggan <strong class='yellow'>#{@customer.name}</strong>.".html_safe)
+  end
+
 
   def updateitems
     # render json: params
