@@ -76,6 +76,7 @@ class RoutesController < ApplicationController
     end
     @route.ferry_fee = @route.ferry_fee.to_i
     @route.tol_fee = @route.tol_fee.to_i
+    @route.tol_fee_trailer = @route.tol_fee_trailer.to_i
     @route.bonus = @route.bonus.to_i
     @route.enabled = true
     # respond_to :html
@@ -86,6 +87,7 @@ class RoutesController < ApplicationController
     @customer = Customer.find(@route.customer_id)
     @route.ferry_fee = @route.ferry_fee.to_i
     @route.tol_fee = @route.tol_fee.to_i
+    @route.tol_fee_trailer = @route.tol_fee_trailer.to_i
     @route.bonus = @route.bonus.to_i
 
     @routeloc = Routelocation.where("route_id = ?", params[:id]).order("id DESC").limit(1)

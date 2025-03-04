@@ -1004,6 +1004,18 @@ class InvoicesController < ApplicationController
           @invoice.ferry_fee = ferry_fee
 
           tol_fee = quantity * (@route.tol_fee || 0)
+          
+          # TOLL tambahan untuk SIL8
+          if vehiclegroup_id == 5
+            # tol_fee = quantity * (@route.tol_fee || 0)
+            if @route.tol_fee_trailer.nil?
+              # tol_fee = quantity * (@route.tol_fee || 0) * 1.1
+              tol_fee = quantity * (@route.tol_fee || 0)
+            else
+              tol_fee = quantity * (@route.tol_fee_trailer || 0)
+            end
+          end
+
           @invoice.tol_fee = tol_fee
 
           total = gas_allowance + driver_allowance + misc_allowance + helper_allowance + ferry_fee + tol_fee + premi_allowance
@@ -1213,7 +1225,7 @@ class InvoicesController < ApplicationController
           ferry_fee = @route.ferry_fee || 0
           @invoice.ferry_fee = ferry_fee
 
-          tol_fee = quantity * (@route.tol_fee || 0)
+          tol_fee = quantity * (@route.tol_fee || 0) 
           @invoice.tol_fee = tol_fee
 
           total = gas_allowance + driver_allowance + helper_allowance + misc_allowance + ferry_fee + tol_fee + premi_allowance
@@ -1487,7 +1499,21 @@ class InvoicesController < ApplicationController
 
       gas_allowance = gas_litre * @gascost
       ferry_fee = @route.ferry_fee || 0
+
       tol_fee = quantity * (@route.tol_fee || 0)
+
+      # TOLL tambahan untuk SIL8
+      if vehiclegroup_id == 5
+        # tol_fee = quantity * (@route.tol_fee || 0)
+        if @route.tol_fee_trailer.nil?
+          # tol_fee = quantity * (@route.tol_fee || 0) * 1.1
+          tol_fee = quantity * (@route.tol_fee || 0)
+        else
+          tol_fee = quantity * (@route.tol_fee_trailer || 0)
+        end
+      end
+
+      additional_tol_fee = tol_fee - @route.tol_fee
 
       train_trip = @allowances.train_trip || 0
 
@@ -1508,6 +1534,7 @@ class InvoicesController < ApplicationController
         :misc_allowance => to_currency(misc_allowance) || 0,
         :ferry_fee => to_currency(ferry_fee),
         :tol_fee => to_currency(tol_fee),
+        :additional_tol_fee => to_currency(additional_tol_fee),
         :gas_detail => '(' + gas_litre.to_s + ' liter @ ' + @gascost.to_s + ')',
         :additional_gas_detail => '(' + additional_gas_detail.to_s + ' liter)',
         :additional_gas_allowance => to_currency(additional_gas_allowance),

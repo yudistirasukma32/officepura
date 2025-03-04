@@ -836,6 +836,7 @@ function getAllowances() {
 			$('#invoice_gas_detail').html(data.gas_detail);
 			$('#invoice_additional_gas_allowance').html(data.additional_gas_allowance);
 			$('#invoice_additional_gas_detail').html(data.additional_gas_detail);
+			$('#invoice_additional_tol_fee').html(data.additional_tol_fee);
 			$('#invoice_train_fee').html(data.train_trip);
             $('#invoice_premi_allowance').html('(@ ' + data.premi_allowance + ')');	
 			$('#invoice_total').val(data.total);
@@ -3569,6 +3570,18 @@ $(document).ready(function() {
 
 		if ($('#invoice_driver_id').val() == 0)  {			
 			errors = addComma(errors, "<strong>Supir</strong>");
+		}
+
+		var tanktype_name = $('#invoice_tanktype').val()
+
+		if (tanktype_name == 'ISOTANK') {
+			if ($('#invoice_isotank_id').val() == 0)  {			
+				errors = addComma(errors, "<strong>Isotank</strong>");
+			}
+		} else if (tanktype_name == 'DRY CONTAINER 20FT' || tanktype_name == 'DRY CONTAINER 40FT' || tanktype_name == 'SIDE DOOR CONTAINER 20FT' || tanktype_name == 'SIDE DOOR CONTAINER 40FT' || tanktype_name == 'KONTAINER STANDART' || tanktype_name == 'KONTAINER 20FT' || tanktype_name == 'KONTAINER 40FT' || tanktype_name == 'KONTAINER SIDE DOOR') {
+			if ($('#invoice_container_id').val() == 0)  {			
+				errors = addComma(errors, "<strong>Kontainer</strong>");
+			}
 		}
 
 		if (errors == "") {

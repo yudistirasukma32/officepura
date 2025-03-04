@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250222094209) do
+ActiveRecord::Schema.define(:version => 20250304053750) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -1488,6 +1488,7 @@ ActiveRecord::Schema.define(:version => 20250222094209) do
     t.integer   "quotation_id"
     t.string    "load_province"
     t.string    "unload_province"
+    t.decimal   "tol_fee_trailer",              :precision => 19, :scale => 2, :default => 0.0
   end
 
   add_index "routes", ["name", "customer_id", "office_id"], :name => "route_office"

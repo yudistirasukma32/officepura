@@ -120,21 +120,23 @@
 
       <% end %>
 
-      <div class="field-row" style="margin-bottom:16px;">
-        <%= f.label :description, "Keterangan" %>
-        <%= f.text_field :description %>
+      <div class="field-row">
+        <%= f.label :tol_fee, "Tol"%>
+        <%= f.text_field :tol_fee, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
+        <%= f.label :tol_fee_trailer, "Tol (Trailer)", :class => 'middle' %>
+        <%= f.text_field :tol_fee_trailer, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
       </div>
 
       <div class="field-row">
         <%= f.label :ferry_fee, "ASDP" %>
         <%= f.text_field :ferry_fee, :class => 'half left', :onkeypress => 'javascript:return isNumberKey(this);' %>
-        <%= f.label :tol_fee, "Tol", :class => 'middle' %>
-        <%= f.text_field :tol_fee, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+        <%= f.label :bonus, "Premi", :class => 'middle' %>
+        <%= f.text_field :bonus, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
       </div>
 
-      <div class="field-row">
-        <%= f.label :bonus, "Premi" %>
-        <%= f.text_field :bonus, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);' %>
+      <div class="field-row" style="margin-bottom:16px;">
+        <%= f.label :description, "Keterangan" %>
+        <%= f.text_area :description %>
       </div>
 
       <div class="actions">
