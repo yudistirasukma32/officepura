@@ -1008,7 +1008,7 @@ class InvoicesController < ApplicationController
           # TOLL tambahan untuk SIL8
           if vehiclegroup_id == 5
             # tol_fee = quantity * (@route.tol_fee || 0)
-            if @route.tol_fee_trailer.nil?
+            if @route.tol_fee_trailer == 0
               # tol_fee = quantity * (@route.tol_fee || 0) * 1.1
               tol_fee = quantity * (@route.tol_fee || 0)
             else
@@ -1505,7 +1505,7 @@ class InvoicesController < ApplicationController
       # TOLL tambahan untuk SIL8
       if vehiclegroup_id == 5
         # tol_fee = quantity * (@route.tol_fee || 0)
-        if @route.tol_fee_trailer.nil?
+        if @route.tol_fee_trailer == 0
           # tol_fee = quantity * (@route.tol_fee || 0) * 1.1
           tol_fee = quantity * (@route.tol_fee || 0)
         else
