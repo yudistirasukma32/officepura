@@ -2922,7 +2922,7 @@ end
       @taxinvoices = Taxinvoice.active.joins(:customer)
 
       # @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'DD-MM-YYYY') BETWEEN ? AND ?", "#{@day}-#{@month}-#{@year}","#{@dayEnd}-#{@monthEnd}-#{@yearEnd}")
-      @taxinvoices = @taxinvoices.where("paiddate is null AND sentdate BETWEEN ? AND ?", "#{@year}-#{@month}-#{@day}-","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
+      @taxinvoices = @taxinvoices.where("paiddate is null AND date BETWEEN ? AND ?", "#{@year}-#{@month}-#{@day}-","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
       # @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}")
 
       @customers = Customer.active.where("id in (?)", @taxinvoices.pluck('customer_id')).order(:name)
@@ -3157,7 +3157,7 @@ end
         @eventsa = @eventsa.where('tanktype = ?', @tanktype)
         @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
       end
-      
+
       if params[:office_id].present? && params[:office_id] != 'all'
         @eventsa = @eventsa.where('office_id = ?', params[:office_id])
         @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
