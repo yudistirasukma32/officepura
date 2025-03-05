@@ -1733,7 +1733,7 @@ function getDataEvents2(cl)
 				if (object.completed) obj.className = 'completed';
 				if (object.completed_by_vendor) obj.className = 'completed_by_vendor';
 				if (object.invoiced) obj.className = 'invoiced'; 
-				if (object.taxinvoiced) obj.className = 'taxinvoiced'; 
+				// if (object.taxinvoiced) obj.className = 'taxinvoiced'; 
 
 				if (object.downpayment_amount > 0) {
 					obj.className += " dp";
@@ -1745,6 +1745,10 @@ function getDataEvents2(cl)
 				}
 				if (object.is_insurance) {
 					obj.title += " (*INS)";
+				}
+				if (object.taxinvoiced) {
+					obj.className += " taxinvoiced";
+					obj.title += " (*INV)";
 				}
 				if (object.customer_id > 0) obj.title += " (*P)";
 				

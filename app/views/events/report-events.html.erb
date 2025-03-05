@@ -63,7 +63,8 @@
 			<th class="{sorter:true, filter: true}">ST</th>
 			<th class="{sorter:true, filter: false}">EST. BKK</th>
 			<th class="{sorter:false, filter: false}">Progress</th>
-			<th class="{sorter:true, filter: true}">Status</th>
+			<th class="{sorter:true, filter: true}" width="100px">Status</th>
+			<th class="{sorter:true, filter: true}">User</th>
 			<!-- <th class="{sorter:true, filter: true}" data-value="<%= @status %>">Status</th> -->
 			<th class="{sorter:false, filter: false}"></th>
 		</tr>
@@ -209,6 +210,11 @@
 				color = "009688"
 			end
 
+			if event.cancelled
+				status = "Cancel"
+				color = "FF0000"
+			end
+
 			if @status.present? && @status != 'Blm Muat' && status == 'Blm Muat'
 				next
 			end
@@ -256,9 +262,15 @@
 				</td> 
 				<td style="text-align:center;">
 					<%= bkk.count rescue 0 %> / <%= event.invoicetrain ? event.qty.to_i*2 : event.qty.to_i %>
-					<% event.invoicetrain ? allbkk += event.qty.to_i*2 :  allbkk += event.qty.to_i %>
+					<% event.invoicetrain ? allbkk += event.qty.to_i*2 : allbkk += event.qty.to_i %>
 				</td>
-				<td><span style="background-color: #<%= color %>; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;"><%= status %></span></td>
+				<td>
+					<span style="background-color: #<%= color %>; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500; line-height: 2;"><%= status %></span>
+					<% if event.invoice_taxinv_count > 0 && event.invoice_taxinv_count == event.invoice_taxitems_count %>
+					<br><span style="background-color: #ecb100; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Sudah Invoice</span>
+					<% end %>
+				</td>
+				<td><%= event.user.username rescue nil %></td>
 				<td class="right" width="60">
 					<%= link_to '&#xf044;'.html_safe, edit_event_path(event, origin: 'report'), :class => "edit tipsy", :title => 'Edit' %> 
 					<%= link_to '&#xf00d;'.html_safe, event, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
@@ -271,6 +283,7 @@
 			<td class="red right">(<%= to_currency(alltotalbkk - progressbkk)%>)</td>
 			<td class="red right"><%= to_currency(progressbkk) %> / <%= to_currency(alltotalbkk) %> <span style="opacity: 0;">/</span></td>
 			<td style="text-align:center;"><%= qtybkk %> / <%= allbkk %></td>
+			<td></td>
 			<td></td>
 			<td></td>
 		</tr>

@@ -627,7 +627,7 @@ class EventsController < ApplicationController
             invoiced = true
           end
 
-          if invoice_taxinv_count.to_i > 0
+          if invoice_taxinv_count.to_i > 0 && invoice_taxinv_count.to_i == invoice_taxitems_count.to_i
             taxinvoiced = true
           end
 
@@ -643,7 +643,7 @@ class EventsController < ApplicationController
             invoiced = true
           end
 
-          if invoice_taxinv_count.to_i > 0
+          if invoice_taxinv_count.to_i > 0 && invoice_taxinv_count.to_i == invoice_taxitems_count.to_i
             taxinvoiced = true
           end
 

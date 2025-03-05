@@ -305,14 +305,14 @@ html .fc,
 	background-color: #b38e1d; /* default BACKGROUND color */	
 }
 
-.fc-event.taxinvoiced {
-	border: 1px solid #FFC107; /* default BORDER color */
-	background-color: #FFC107; /* default BACKGROUND color */	
-}
+/* .fc-event.taxinvoiced {
+	border: 1px solid #FFC107;
+	background-color: #FFC107;
+} */
 
-.fc-event.dp {
+.fc-event.dp, .fc-event.stapel, .fc-event.taxinvoiced {
 	position: relative;
-  padding-left: 1rem;
+	padding-left: 1rem;
 }
 
 .fc-event.dp::before {
@@ -323,6 +323,28 @@ html .fc,
 	height: 100%;
 	width: 1rem;
 	background: pink;
+}
+
+.fc-event.stapel::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 1rem;
+	background: #e600ff;
+	color: #fff;
+}
+
+.fc-event.taxinvoiced::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 1rem;
+	background: #FFC107;
+	color: #fff;
 }
 
 a.fc-event {
