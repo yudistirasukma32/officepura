@@ -13,17 +13,25 @@ class ClaimmemosController < ApplicationController
 
   def index
     # @startdate = params[:startdate] || Date.today.strftime('%d-%m-%Y')
+    @startdate = params[:startdate]
     @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
-    @enddate = params[:enddate] || Date.today.strftime('%d-%m-%Y')
+    @enddate = params[:enddate]
+    @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil? 
 
     @invoice_id = params[:invoice_id] || ''
 
     @customer_id = params[:customer_id] || ''
 
-    @claimmemos = Claimmemo.active.where('date between ? and ?', @startdate.to_date, @enddate.to_date)
+    @office_id = params[:office_id] || ''
+
+    @claimmemos = Claimmemo.active.where('claimmemos.date between ? and ?', @startdate.to_date, @enddate.to_date).order(:date)
 
     if !@customer_id.blank?
       @claimmemos = @claimmemos.joins(:invoice).where('invoices.customer_id = ? ', params[:customer_id])
+    end
+
+    if !@office_id.blank?
+      @claimmemos = @claimmemos.joins(:invoice).where('invoices.office_id = ? ', params[:office_id])
     end
 
     if !@invoice_id.blank?

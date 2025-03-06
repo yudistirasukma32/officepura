@@ -29,6 +29,14 @@
 						<% end %>
 					</select>
 
+					<label for="office_id" class="middle" style="width: 50px;">Kantor</label>
+					<select name="office_id" class="short left ">
+						<option value="">All</option>
+						<% Office.active.each do |office| %>
+						<option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.abbr%></option>
+						<% end %>
+					</select> 
+
 					<label for="invoice_id" class="tiny">#BKK:</label>
 					<input type="text" name="invoice_id" class="short left" value="<%=params[:invoice_id]%>" />
 
@@ -39,24 +47,27 @@
 
 		<br class="clearfix" />
 
-		<table class="row-view">
+		<table class="tablesorter row-view tablesorterFilters">
 
 		<thead>
 
 		<tr>
-			<th>Tgl</th>
-			<th>BKK</th>
-			<th>Keterangan</th>
-			<th>Komoditas</th>
-			<th>Muat</th>
-			<th>Bongkar</th>
-			<th>Susut</th>
-			<th>Toleransi</th>
-			<th>Beban Susut</th>
+			<th class="{sorter:true, filter: false}">Tgl</th>
+			<th class="{sorter:true, filter: true}">BKK</th>
+			<th class="{sorter:true, filter: true}">Keterangan</th>
+			<th class="{sorter:true, filter: true}">KTR</th>
+			<th class="{sorter:true, filter: true}">Nopol</th>
+			<th class="{sorter:true, filter: true}">Komoditas</th>
+			<th class="{sorter:true, filter: false}">Muat</th>
+			<th class="{sorter:true, filter: false}">Bongkar</th>
+			<th class="{sorter:true, filter: false}">Susut</th>
+			<th class="{sorter:true, filter: false}">Toleransi</th>
+			<th class="{sorter:true, filter: false}">Beban Susut</th>
 			<!-- <th>Harga</th> -->
-			<th>Beban Supir</th>
-			<th>Status</th>
-			<th></th>
+			<th class="{sorter:true, filter: false}">Beban Supir</th>
+			<th class="{sorter:true, filter: true}">User</th>
+			<th class="{sorter:true, filter: true}">Status</th>
+			<th class="{sorter:false, filter: false}"></th>
 		</tr>
 
 		</thead>
@@ -68,13 +79,13 @@
 		@claimmemos.each do |memo| 
 		%>
 			<% total += memo.total %>
-            <% 
+			<% 
 				status = case 
-						when memo.approved_load_spv then 'Approved Load'
-						when memo.approved_unload_spv then 'Approved Unload'
-						when memo.approved then 'Approved SPV'
-						when memo.approved_marketing then 'Approved Marketing'
 						when memo.approved_by_gm then 'Approved GM'
+						when memo.approved then 'Approved Manager'
+						when memo.approved_marketing then 'Approved Marketing'
+						when memo.approved_unload_spv then 'Approved Unload'
+						when memo.approved_load_spv then 'Approved Load'
 						else 'Draft'
 						end
 			%>
@@ -82,6 +93,7 @@
 				<td><strong><%=memo.date.strftime('%d')%></strong>.<%=memo.date.strftime('%m')%></td>
 				<td><%= memo.invoice_id %></td>
 				<td>
+				<strong><%= memo.invoice.customer.name rescue nil %></strong><br/>
 				1 Rit <%= memo.invoice.route.name rescue nil %> (<%= memo.invoice.driver.name rescue nil %>)
 				<%= memo.invoice.invoicetrain ? '= Kereta =' : '' %> 
 				<%= (memo.invoice.isotank_id.present? && memo.invoice.isotank_id.to_i != 0) ? ("Isotank = " + memo.invoice.isotank.isotanknumber) : '' %>
@@ -89,6 +101,8 @@
 				<%= memo.invoice.ship_id.nil? ? '': ' | '+memo.invoice.ship.name rescue nil%>
 				<%= memo.invoice.user_id.nil? ? '': ' | '+memo.invoice.user.username%>
 				</td>
+				<td><%= memo.invoice.office.abbr rescue nil %></td>
+				<td><%= memo.invoice.vehicle.current_id rescue nil %></td>
 				<td><%= memo.invoice.event.commodity.name rescue nil %></td>
 				<td class="right"><%= memo.weight_gross rescue 0 %></td>
 				<td class="right"><%= memo.weight_net rescue 0 %></td>
@@ -97,6 +111,7 @@
 				<td class="right"><%= memo.shrinkage_load rescue 0 %></td>
 				<!-- <td class="right"><%= memo.price_per rescue 0 %></td> -->
 				<td class="right"><%= to_currency(memo.total) rescue 0 %></td>
+				<td><%= memo.user.username rescue nil %></td>
 				<td style="width:80px;">
 					<% if status == 'Approved GM' %>
 					<a class="cta" style="background: green; color: white; opacity: 1;">GM Apprv</a>
@@ -122,8 +137,9 @@
 
 		<tfoot>
 			<tr class="footer">
-				<td class="right" colspan="9">Total</td>
+				<td class="right" colspan="11">Total</td>
 				<td class="right"><strong><%= to_currency(total) %></strong></td>
+				<td class="right" colspan="3"></td>
 			</tr>
 		</tfoot>
 

@@ -248,10 +248,19 @@ class DriversController < ApplicationController
   def history
     @driver = Driver.find(params[:driver_id])
     # @invoices = Invoice.active.where('driver_id = ?', @driver.id).reorder('id DESC').limit(20)
+    # @invoices = Invoice.active
+    #                .where('driver_id = ? AND date >= ?', @driver.id, 2.weeks.ago)
+    #                .reorder('id DESC')
+    # @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
+    
+
     @invoices = Invoice.active
                    .where('driver_id = ? AND date >= ?', @driver.id, 2.weeks.ago)
-                   .reorder('id DESC')
-    @invoices = @invoices.where("id in (select invoice_id from receipts where deleted = false) AND id not in(select invoice_id from receiptreturns where deleted = false)")
+                   .where("invoices.id IN (SELECT invoice_id FROM receipts WHERE deleted = false)")
+                   .where("invoices.id NOT IN (SELECT invoice_id FROM receiptreturns WHERE deleted = false)")
+                   .joins("JOIN receipts ON receipts.invoice_id = invoices.id AND receipts.deleted = false")
+                   .order("receipts.created_at DESC")
+
     # render json: @invoices
 
     render :json => {:success => true, 

@@ -70,9 +70,9 @@
       <% end %>
 
       <div class="field-row flex">
-        <%= f.label :load_province, "Provinsi Muat" %>
+        <%= f.label :load_province, "Provinsi Muat*" %>
         <%= f.select :load_province, options_for_select(@provinces.collect {|w| [w, w]}, @route.load_province), {}, :class => 'half chzn-select', :required => true %>
-        <%= f.label :unload_province, "Bongkar", :class => 'middle' %>
+        <%= f.label :unload_province, "Bongkar*", :class => 'middle' %>
         <%= f.select :unload_province, options_for_select(@provinces.collect {|w| [w, w]}, @route.unload_province), {}, :class => 'half chzn-select', :required => true %>
       </div>
 
@@ -140,7 +140,7 @@
       </div>
 
       <div class="actions">
-        <%= f.submit "Simpan Data", :class => 'left' if checkrole 'Admin Operasional, Marketing, Admin Marketing' %>
+        <%= f.submit "Simpan Data", :class => 'left', id: 'submit-button' if checkrole 'Admin Operasional, Marketing, Admin Marketing' %>
         <a class="back left" href="<%= @customer.present? ? edit_customer_path(@customer)+"/#2" : routes_url%>">Kembali ke <%= @customer.present? ? "Pelanggan" : "Jurusan" %></a>
       </div>
 <!--       
@@ -403,3 +403,25 @@
   padding: 6px 12px;
 }
 </style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("submit-button")?.addEventListener("click", function(event) {
+
+        let loadProvince = document.querySelector("select[name='route[load_province]']");
+        let unloadProvince = document.querySelector("select[name='route[unload_province]']");
+
+        if (!loadProvince.value) {
+            alert("Provinsi Muat harus diisi!");
+            event.preventDefault();
+            return;
+        }
+
+        if (!unloadProvince.value) {
+            alert("Provinsi Bongkar harus diisi!");
+            event.preventDefault();
+            return;
+        }
+    });
+});
+</script>
