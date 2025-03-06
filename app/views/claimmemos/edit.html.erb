@@ -60,16 +60,16 @@
 				<% if !@claimmemo.approved %>
 					<% if params[:rel].present? %>
 						<% if checkrole 'Admin Approval Klaim, Admin Penagihan' %>
-							<a class="btn-txt w72" href="spv_approve"><i class="icon-check"></i> SPV Approve</a>
+							<a class="btn-txt w72" href="spv_approve"><i class="icon-check"></i> Manager Approve</a>
 						<% end %>
 					<% end %>
 				<% else %>
-				<a class="btn-txt green disabled w72" href="#"><i class="icon-check"></i> SPV Approved</a>
+				<a class="btn-txt green disabled w72" href="#"><i class="icon-check"></i> Manager Approved</a>
 				<% end %>
 
 				<% if !@claimmemo.approved_marketing %>
 					<% if params[:rel].present? %>
-						<% if checkrole 'Marketing, Admin Penagihan' %>
+						<% if checkrole 'Admin Marketing, Marketing, Admin Penagihan' %>
 							<a class="btn-txt w72" href="marketing_approve"><i class="icon-check"></i> Marketing Approve</a>
 						<% end %>
 					<% end %>
