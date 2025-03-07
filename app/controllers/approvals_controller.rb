@@ -26,7 +26,7 @@ class ApprovalsController < ApplicationController
       @new_routes = Route.active.where('quotation_id in (?) and id in (?)', @quotation, @allowances)
 
       @quotationgroups = Quotationgroup.active.where('date >= ?', Date.new(2025, 1, 1)).reorder('date DESC')
-      @quotationgroups = @quotationgroups.where('reviewed = false OR confirmed = false')
+      @quotationgroups = @quotationgroups.where('customer_approved = false')
       
       respond_to :html
     else

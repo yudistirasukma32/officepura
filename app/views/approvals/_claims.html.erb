@@ -22,13 +22,13 @@
     
         <% @claimmemos.includes(invoice: [:vehicle, :customer, :route, :driver, :isotank, :container, :ship, :user, :event]).each do |memo|  %>
 
-            <% 
+			<% 
 				status = case 
-						when memo.approved_load_spv then 'Approved Load'
-						when memo.approved_unload_spv then 'Approved Unload'
-						when memo.approved then 'Approved SPV'
-						when memo.approved_marketing then 'Approved Marketing'
 						when memo.approved_by_gm then 'Approved GM'
+						when memo.approved then 'Approved Manager'
+						when memo.approved_marketing then 'Approved Marketing'
+						when memo.approved_unload_spv then 'Approved Unload'
+						when memo.approved_load_spv then 'Approved Load'
 						else 'Draft'
 						end
 			%>
