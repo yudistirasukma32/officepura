@@ -103,7 +103,7 @@
 								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %>
 								<%= receipt.invoice.event_id && receipt.invoice.event_id != 0 ? " DO #" + receipt.invoice.event_id.to_s : ''  %></td>
-								<td><%= receipt.office.abbr rescue nil %></td>
+								<td><%= receipt.invoice.office.abbr rescue nil %></td>
 								<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
 								
@@ -130,7 +130,7 @@
 								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %>
 								<%= receipt.invoice.event_id && receipt.invoice.event_id != 0 ? " DO #" + receipt.invoice.event_id.to_s : ''  %></td>
-								<td><%= receipt.office.abbr rescue nil %></td>
+								<td><%= receipt.invoice.office.abbr rescue nil %></td>
 								<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=to_currency_bank(0) %></td>	
 								<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
@@ -146,7 +146,7 @@
 									<td><%=i+1%>.</td>
 									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 									<td><%= receipt.description%></td>
-									<td><%= receipt.office.abbr rescue nil %></td>
+									<td><%= receipt.invoice.office.abbr rescue nil %></td>
 									<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 									<td align="right"><%=to_currency_bank(receipt.total) %></td>
 									<td align="right"><%=to_currency_bank(0) %></td>
@@ -160,7 +160,7 @@
 									<td><%=i+1%>.</td>
 									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 									<td><%= receipt.description%></td>
-									<td><%= receipt.office.abbr rescue nil %></td>
+									<td><%= receipt.invoice.office.abbr rescue nil %></td>
 									<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 									<td align="right"><%=to_currency_bank(0) %></td>
 									<td align="right"><%=to_currency_bank(receipt.total) %></td>
@@ -236,7 +236,7 @@
 								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %>
 								<%= receipt.invoice.event_id && receipt.invoice.event_id != 0 ? " DO #" + receipt.invoice.event_id.to_s : ''  %></td>
-								<td><%= receipt.office.abbr rescue nil %></td>
+								<td><%= receipt.invoice.office.abbr rescue nil %></td>
 								<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=to_currency_bank(receipt.gas_allowance) %></td>
 								<td align="right"><%=to_currency_bank(0) %></td>
@@ -346,7 +346,7 @@
 								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 								<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.bonusreceipt.quantity rescue nil%><%=receipt.invoice.quantity rescue nil%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %>
 								<%= receipt.invoice.event_id && receipt.invoice.event_id != 0 ? " DO #" + receipt.invoice.event_id.to_s : ''  %></td>
-								<td><%= receipt.office.abbr rescue nil %></td>
+								<td><%= receipt.invoice.office.abbr rescue nil %></td>
 								<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=to_currency_bank(receipt.total) %></td>
 								<td align="right"><%=to_currency_bank(0) %></td>
@@ -361,7 +361,7 @@
 									<td><%=i+1%>.</td>
 									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 									<td><%=receipt.description%></td>
-									<td><%= receipt.office.abbr rescue nil %></td>
+									<td><%= receipt.invoice.office.abbr rescue nil %></td>
 									<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 									<td align="right"><%=to_currency_bank(receipt.total) %></td>
 									<td align="right"><%=to_currency_bank(0) %></td>
@@ -375,7 +375,7 @@
 									<td><%=i+1%>.</td>
 									<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 									<td><%= receipt.description%></td>
-									<td><%= receipt.office.abbr rescue nil %></td>
+									<td><%= receipt.invoice.office.abbr rescue nil %></td>
 									<td><%= receipt.invoice.vehicle.current_id rescue nil %></td>
 									<td align="right"><%=to_currency_bank(0) %></td>
 									<td align="right"><%=to_currency_bank(receipt.total) %></td>
@@ -437,7 +437,7 @@
 							<td><%=i+1%>.</td>
 							<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 							<td><%= getwords(productname, 35) %><%= " (" + receipt.productorder.productrequest.vehicle.current_id + ")" if receipt.productorder.productrequest and !receipt.productorder.productrequest.vehicle_id.nil? %></td>
-							<td><%= receipt.office.abbr rescue nil %></td>
+							<td><%= receipt.invoice.office.abbr rescue nil %></td>
 							<td><%= receipt.productorder.productrequest.vehicle.current_id rescue nil %></td>
 							<td align="right"><%=to_currency_bank(receipt.total) %></td>
 							<td align="right"><%=to_currency_bank(0) %></td>
@@ -552,7 +552,7 @@
 								<td><%=i+1%>.</td>
 								<td><%=expense.created_at.to_date.strftime('%d-%m-%Y')%></td>
 								<td><%=expense.officeexpense.description%></td>
-								<td><%= receipt.office.abbr rescue nil %></td>
+								<td><%=expense.officeexpense.office.abbr rescue nil%></td>
 								<td><%=expense.officeexpense.vehicle.current_id rescue nil %></td>
 								<td align="right"><%=expense.expensetype == 'Kredit' ? to_currency_bank(expense.total) : '0'%></td>
 								<td align="right"><%=expense.expensetype == 'Debit' ? to_currency_bank(expense.total) : '0'%></td>
@@ -629,7 +629,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=expense.created_at.to_date.strftime('%d-%m-%Y')%></td>
 										<td><%=expense.description%></td>
-										<td><%= receipt.office.abbr rescue nil %></td>
+										<td><%=expense.officeexpense.office.abbr rescue nil%></td>
 										<td><%=expense.officeexpense.vehicle.current_id rescue nil %></td>
 										<td>&nbsp;</td>
 										<td align="right"><%=expense.expensetype == 'Debit' ? to_currency_bank(expense.total) : '0'%></td>
@@ -676,7 +676,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
-										<td><%= receipt.office.abbr rescue nil %></td>
+										<td><%= receipt.invoice.office.abbr rescue nil %></td>
 										<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 
 										<% if !receipt.invoice.receiptreturns.active.where("created_at >= '#{@startdate.to_date}' and created_at < '#{@enddate.to_date + 1}'").first.nil? %>
@@ -703,7 +703,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
-										<td><%= receipt.office.abbr rescue nil %></td>
+										<td><%= receipt.invoice.office.abbr rescue nil %></td>
 										<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=to_currency_bank(receipt.driver_allowance + receipt.helper_allowance + receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee) %></td>
 										<td align="right"><%=to_currency_bank(0) %></td>	
@@ -733,7 +733,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
-										<td><%= receipt.office.abbr rescue nil %></td>
+										<td><%=receipt.invoice.office.abbr rescue nil %></td>
 										<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=to_currency_bank(0) %></td>
 										<td align="right"><%=to_currency_bank(receipt.gas_allowance) %></td>
@@ -759,7 +759,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td>#<%=zeropad(receipt.invoice.id)%>: <%=receipt.invoice.date.to_date.strftime('%d/%m/%Y')%>, <%=receipt.bonusreceipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
-										<td><%= receipt.office.abbr rescue nil %></td>
+										<td><%=receipt.invoice.office.abbr rescue nil %></td>
 										<td><%=receipt.invoice.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=to_currency_bank(0) %></td>
 										<td align="right"><%=to_currency_bank(receipt.total) %></td>
@@ -791,7 +791,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
 										<td><%= getwords(productname, 35) %><%= " (" + receipt.productorder.productrequest.vehicle.current_id + ")" if receipt.productorder.productrequest and !receipt.productorder.productrequest.vehicle_id.nil? %></td>
-										<td><%= receipt.office.abbr rescue nil %></td>
+										<td><%= receipt.invoice.office.abbr rescue nil %></td>
 										<td><%=receipt.productorder.productrequest.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=to_currency_bank(0) %></td>
 										<td align="right"><%=to_currency_bank(receipt.total) %></td>
@@ -960,7 +960,7 @@
 										<td><%=i+1%>.</td>
 										<td><%=expense.date.to_date.strftime('%d-%m-%Y')%></td>
 										<td><%=expense.description%><% if !expense.productrequest_id.nil? %><%=" (" + expense.productrequest.vehicle.current_id + ")" if expense.productrequest and !expense.productrequest.vehicle_id.nil? %><% end %><% if !expense.productorder.nil? %><%=" (" + expense.productorder.productrequest.vehicle.current_id + ")" if expense.productorder.productrequest and !expense.productorder.productrequest.vehicle_id.nil? %><% end %></td>
-										<td><%= receipt.office.abbr rescue nil %></td>
+										<td><%= receipt.invoice.office.abbr rescue nil %></td>
 										<td><%=expense.productrequest.vehicle.current_id rescue nil %></td>
 										<td align="right"><%=expense.debitgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
 										<td align="right"><%=expense.creditgroup_id == group.id ? to_currency_bank(expense.total) : '0'%></td>
