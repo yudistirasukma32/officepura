@@ -3190,6 +3190,7 @@ end
       global_invoice_total = 0
       global_total_estimation = 0
       global_ppn_total = 0
+      global_total_real = 0 
       solar_price = Setting.find_by_name("Harga Solar").value.to_i
       customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Acidatama.*'").pluck(:id)
 
@@ -3237,6 +3238,24 @@ end
           ppn = estimation * event.customer.gst_percentage.to_i / 100
         end
 
+        realization = 0
+        invoices = Invoice.active.where('event_id = ? AND invoice_id is null AND id not in(select invoice_id from invoicereturns where deleted = false)', event.id).map do |bkk|
+
+          bkk_route = bkk.route
+          bkk_price_per = bkk_route.price_per.to_i rescue 0
+          est_bkk = 0
+
+          offset_bkk = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
+          if bkk_price_per >= offset_bkk
+            est_bkk = bkk_price_per
+          else
+            est_bkk = bkk.event.estimated_tonage.to_i * bkk_price_per
+          end
+
+          realization += est_bkk
+
+        end
+
         global_supir += supir
         global_kernet += kernet
         global_solar += solar
@@ -3246,6 +3265,7 @@ end
         global_invoice_total += invoice_total
         global_ppn_total += ppn
         global_total_estimation += estimation
+        global_total_real += realization
 
         description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>"
         description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
@@ -3270,7 +3290,8 @@ end
           created_at: event.created_at,
           route_train: (event.routetrain.name rescue "Kosong"),
           route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
-          route_train_id: event.routetrain_id
+          route_train_id: event.routetrain_id,
+          realization: realization
         }
       end
       @summary = {
@@ -3283,6 +3304,7 @@ end
         global_invoice_total: global_invoice_total ,
         global_ppn_total: global_ppn_total ,
         global_total_estimation: global_total_estimation ,
+        global_total_real: global_total_real ,
       }
       @section = "estimationreport"
       @where = "estimation_event_invoice"
