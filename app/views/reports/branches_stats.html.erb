@@ -117,10 +117,319 @@
             <strong>BKK Roro</strong>
             <div id="bkk-roro-stats"></div>
         </div>
+    </div>
+
+    <div class="flex">
         <div class="card-3">
             <strong>BKK Losing</strong>
             <div id="bkk-losing-stats"></div>
         </div>
+        <div class="card-3">
+            <strong>Kecelakaan</strong>
+            <div id="incidents-stats"></div>
+        </div>
+        <div class="card-3">
+            <strong>Tilangan</strong>
+            <div id="tickets-stats"></div>
+        </div>
     </div>
-    
+
+<!-- >
+    <ul class="rounded" id="tabbed">
+        <li><a id="link_1" class="finger">Sidoarjo</a></li>
+        <li><a id="link_2" class="finger">Surabaya</a></li>
+        <li><a id="link_3" class="finger">Probolinggo</a></li>
+        <li><a id="link_4" class="finger">Semarang</a></li>
+        <li><a id="link_5" class="finger">Jakarta</a></li>
+        <li><a id="link_6" class="finger">Sumatera</a></li>
+    </ul>
+
+    <div id="sliding_window" style="margin-top:10px; width: 100%; max-width: 1080px;">
+        <div class="sliding_container">
+            <div class="sliding_tab" id="tab_1" style="width: 1080px;">
+                <br class="clearfix" />
+
+                <% if @events.any? %>
+                <div class="flex">
+                    <div class="widget-cardo">
+                        <p>Pelanggan</p>
+                        <strong><%= @summary[:count_customers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kereta</p>
+                        <strong><%= @summary[:count_train] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Industri</p>
+                        <strong><%= @summary[:count_industry] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Roro</p>
+                        <strong><%= @summary[:count_roro] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Losing</p>
+                        <strong><%= @summary[:count_losing] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Nopol</p>
+                        <strong><%= @summary[:count_vehicles] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Supir</p>
+                        <strong><%= @summary[:count_drivers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Muat</p>
+                        <strong><%= @summary[:count_muat] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kosongan</p>
+                        <strong><%= @summary[:count_kosongan] %></strong>
+                    </div>
+                </div>
+                <% end %>
+                
+                <div id="office_1">
+                </div>
+            </div>
+            <div class="sliding_tab" id="tab_2" style="width: 1080px;">
+                <br class="clearfix" />
+
+                <% if @events.any? %>
+                <div class="flex">
+                    <div class="widget-cardo">
+                        <p>Pelanggan</p>
+                        <strong><%= @summary[:count_customers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kereta</p>
+                        <strong><%= @summary[:count_train] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Industri</p>
+                        <strong><%= @summary[:count_industry] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Roro</p>
+                        <strong><%= @summary[:count_roro] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Losing</p>
+                        <strong><%= @summary[:count_losing] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Nopol</p>
+                        <strong><%= @summary[:count_vehicles] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Supir</p>
+                        <strong><%= @summary[:count_drivers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Muat</p>
+                        <strong><%= @summary[:count_muat] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kosongan</p>
+                        <strong><%= @summary[:count_kosongan] %></strong>
+                    </div>
+                </div>
+                <% end %>
+
+                <div id="office_2"> 
+                </div>
+            </div>
+            <div class="sliding_tab" id="tab_3" style="width: 1080px;">
+                <br class="clearfix" />
+
+                <% if @events.any? %>
+                <div class="flex">
+                    <div class="widget-cardo">
+                        <p>Pelanggan</p>
+                        <strong><%= @summary[:count_customers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kereta</p>
+                        <strong><%= @summary[:count_train] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Industri</p>
+                        <strong><%= @summary[:count_industry] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Roro</p>
+                        <strong><%= @summary[:count_roro] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Losing</p>
+                        <strong><%= @summary[:count_losing] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Nopol</p>
+                        <strong><%= @summary[:count_vehicles] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Supir</p>
+                        <strong><%= @summary[:count_drivers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Muat</p>
+                        <strong><%= @summary[:count_muat] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kosongan</p>
+                        <strong><%= @summary[:count_kosongan] %></strong>
+                    </div>
+                </div>
+                <% end %>
+
+                <div id="office_3"> 
+                </div>
+            </div>
+            <div class="sliding_tab" id="tab_4" style="width: 1080px;">
+                <br class="clearfix" />
+
+                <% if @events.any? %>
+                <div class="flex">
+                    <div class="widget-cardo">
+                        <p>Pelanggan</p>
+                        <strong><%= @summary[:count_customers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kereta</p>
+                        <strong><%= @summary[:count_train] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Industri</p>
+                        <strong><%= @summary[:count_industry] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Roro</p>
+                        <strong><%= @summary[:count_roro] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Losing</p>
+                        <strong><%= @summary[:count_losing] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Nopol</p>
+                        <strong><%= @summary[:count_vehicles] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Supir</p>
+                        <strong><%= @summary[:count_drivers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Muat</p>
+                        <strong><%= @summary[:count_muat] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kosongan</p>
+                        <strong><%= @summary[:count_kosongan] %></strong>
+                    </div>
+                </div>
+                <% end %>
+
+                <div id="office_4">
+                </div>
+            </div>
+            <div class="sliding_tab" id="tab_5" style="width: 1080px;">
+                <br class="clearfix" />
+
+                <% if @events.any? %>
+                <div class="flex">
+                    <div class="widget-cardo">
+                        <p>Pelanggan</p>
+                        <strong><%= @summary[:count_customers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kereta</p>
+                        <strong><%= @summary[:count_train] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Industri</p>
+                        <strong><%= @summary[:count_industry] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Roro</p>
+                        <strong><%= @summary[:count_roro] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Losing</p>
+                        <strong><%= @summary[:count_losing] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Nopol</p>
+                        <strong><%= @summary[:count_vehicles] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Supir</p>
+                        <strong><%= @summary[:count_drivers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Muat</p>
+                        <strong><%= @summary[:count_muat] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kosongan</p>
+                        <strong><%= @summary[:count_kosongan] %></strong>
+                    </div>
+                </div>
+                <% end %>
+
+                <div id="office_5">
+                </div>
+            </div>
+            <div class="sliding_tab" id="tab_6" style="width: 1080px;">
+                <br class="clearfix" />
+
+                <% if @events.any? %>
+                <div class="flex">
+                    <div class="widget-cardo">
+                        <p>Pelanggan</p>
+                        <strong><%= @summary[:count_customers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kereta</p>
+                        <strong><%= @summary[:count_train] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Industri</p>
+                        <strong><%= @summary[:count_industry] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Roro</p>
+                        <strong><%= @summary[:count_roro] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Losing</p>
+                        <strong><%= @summary[:count_losing] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Nopol</p>
+                        <strong><%= @summary[:count_vehicles] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Supir</p>
+                        <strong><%= @summary[:count_drivers] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Muat</p>
+                        <strong><%= @summary[:count_muat] %></strong>
+                    </div>
+                    <div class="widget-cardo">
+                        <p>Kosongan</p>
+                        <strong><%= @summary[:count_kosongan] %></strong>
+                    </div>
+                </div>
+                <% end %>
+
+                <div id="office_6">
+                </div>
+            </div>
+        </div>
+    </div>
+-->
+
 </div>

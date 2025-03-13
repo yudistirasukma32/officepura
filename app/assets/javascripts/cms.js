@@ -2462,6 +2462,90 @@ function getBranchStats(){
 		},
 		failure: function() {alert("Error. Mohon refresh browser Anda.");}
 	});	
+
+	//incidents
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstatsincidents?startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.incidents;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'Kecelakaan',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
+					},
+					colors:['#ff9800']
+				};
+		
+				var chart = new ApexCharts($("#incidents-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+
+	//tickets
+	$.ajax({
+		type: "GET",
+		url: "/reports/getbranchstatsincidents?startdate=" + startdate + "&enddate=" + enddate,
+		success: function(data) {
+
+			var thestats = data.tickets;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					series: [{
+						name: 'Tilangan',
+						data: thestats
+					}],
+					chart: {
+						type: 'bar',
+						height: 320
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							borderRadiusApplication: 'end',
+							horizontal: false
+						}
+					},
+					dataLabels: {
+						enabled: true
+					},
+					xaxis: {
+						categories: ['Sidoarjo', 'Jakarta', 'Probolinggo', 'Semarang', 'Surabaya']
+					},
+					colors:['#ed143d']
+				};
+		
+				var chart = new ApexCharts($("#tickets-stats")[0], options);
+				chart.render();
+			}
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
 }
 
 function getOmzetStats(){

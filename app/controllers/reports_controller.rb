@@ -4163,7 +4163,8 @@ end
         count_losing: 0,
         count_customers: 0,
         count_muat: 0,
-        count_kosongan: 0
+        count_kosongan: 0,
+        count_incident: 0
       }
 
       @section = "estimationreport"
@@ -4291,6 +4292,30 @@ end
     end
   
     render :json => { :success => true, :bkktruk => bkk, :bkkkereta => bkkkereta, :bkk_roro => bkk_roro, :bkk_losing => bkk_losing }
+  end
+
+  def apibranchstatsincidents
+    @startdate = params[:startdate]
+    @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+    @enddate = params[:enddate]
+    @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+
+    # laka
+    incidents = []
+    # tilang
+    tickets = []
+
+    @offices = Office.active.order(:id).each_with_index.map do |office, index|
+
+      @expenses = Officeexpense.active.where("date BETWEEN ? AND ? AND office_id = ? ", @startdate.to_date, @enddate.to_date, office.id).order(:date)
+      @incidents = @expenses.where('officeexpensegroup_id = ?', 110)
+      @tickets = @expenses.where('officeexpensegroup_id = ?', 128)
+
+      incidents[index] = @incidents.count()
+      tickets[index] = @tickets.count()
+    end
+  
+    render :json => { :success => true, :incidents => incidents, :tickets => tickets, }
   end
 
   def get_routetrains
