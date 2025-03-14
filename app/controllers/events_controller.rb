@@ -5,7 +5,7 @@ class EventsController < ApplicationController
   require 'json'
 	include ApplicationHelper
   include ActionView::Helpers::NumberHelper
-	layout "application", :except => [:getevents, :getestimatedtonage, :resync, :get_unpaid_inv]
+	layout "application", :except => [:getevents, :getestimatedtonage, :resync, :get_unpaid_inv, :remove]
   before_filter :authenticate_user!, :set_section
 
   def set_section
@@ -295,6 +295,26 @@ class EventsController < ApplicationController
     add_eventlog @event.id, 'DO dihapus'
     
     redirect_to(events_path)
+  end
+
+  def remove
+    @event = Event.find(params[:id])
+  
+    unless @event
+      redirect_to events_path, alert: 'Event tidak ditemukan'
+      return
+    end
+  
+    @event.deleted = true
+    @event.deleteuser_id = current_user.id
+    @event.reject_reason = params[:reject_reason]
+  
+    if @event.save
+      add_eventlog @event.id, 'DO dihapus'
+    end
+
+    render :json => { :success => true }
+    
   end
 
   def get_event_by_customer

@@ -29,7 +29,7 @@ class Event < ActiveRecord::Base
     :invoice_count, :invoiceconfirmed_count, :invoice_taxitems_count, :invoice_taxinv_count,
     :is_insurance, :tsi_total,
     :load_province, :unload_province,
-    :deleteuser_id, :multicontainer, :unload_vendor
+    :deleteuser_id, :multicontainer, :unload_vendor, :reject_reason
 
     scope :active, lambda {where(:deleted => false)}
 

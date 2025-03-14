@@ -630,6 +630,8 @@ OfficePuraErp::Application.routes.draw do
   get 'events/cancelled' => 'events#cancelled'
   get 'events/get_unpaid_inv' => 'events#get_unpaid_inv'
 
+  match 'events/remove' => 'events#remove'
+
   resources :events do
     collection do
       get 'getdovendor' => 'events#getdovendor'

@@ -418,52 +418,50 @@
 
 	<% end %>
 
-
-<!-- Event SO -->
-
-
-<!-- Event end SO -->
-
-<!-- Event Vendor -->
-
-
-
-<!-- Event end Vendor -->
-  
 	<% query = @event.cancelled ? "cancelled" : "" %>
 
   <% if @event.deleted %>
+
+  <div class="field-row">
+    <%= f.label :reject_reason, "Alasan dihapus / ditolak" %>
+    <%= f.text_area :reject_reason, rows: 2, class: 'half', id: 'reject_reason', disabled: true %>
+  </div>
 
   <div class="actions">
 
     <span class="flex">
     <a class="btn-txt cancel" style="pointer-events: none !important;">DO sudah Dihapus</a>
-    <a class="back left" href="<%= events_path + '?type=' + query %>">Kembali ke Index</a>
+    <a class="back left" href="/events/cancelled" style="background: grey; background-color: grey !important;">Kembali ke Index</a>
     </span>
   
   </div>
 
   <% else %>
 
-	<div class="actions">
-
-  	<% if @isdelete %>
-  	<%= link_to ' Hapus Event', @event, :method => :delete, :confirm => "Are you sure?", :class => 'left btn-txt cancel icon-remove', :style => 'margin-top:0; float:left;' if current_user.owner or checkroleonly 'Admin Marketing' %>
-  	<% end %>
-
+  <div class="field-row">
+    <%= f.label :reject_reason, "Alasan dihapus / ditolak" %>
+    <%= f.text_area :reject_reason, rows: 2, class: 'half', id: 'reject_reason' %>
+    <small>Harus diisi jika akan hapus / tolak DO</small>
   </div>
 
-	<div class="actions">
+  <div class="actions">
+    <% if @isdelete && (current_user.owner || checkroleonly('Admin Marketing')) %>
+      <%= link_to 'Hapus Event', "#", class: 'left btn-txt cancel', id: 'delete-event-btn',
+        style: 'margin-top:0; float:left; font-family: "MuseoSans";"',
+        data: { event_id: @event.id } %>
+    <% end %>
+  </div>
+
+	<div class="actions" style="margin-top: 1.5rem;">
 
   	<%= f.submit "Tambah Data", :id => 'event_submit', :class => 'left' if current_user.owner or checkroleonly 'Admin Marketing' %>
   	
-  	<a class="back left" href="<%= events_path + '?type=' + query %>">Kembali ke Index</a>
+  	<a class="back left" href="<%= events_path + '?type=' + query %>" style="background: grey; background-color: grey !important;">Kembali ke Index</a>
 	</div>
 
   <% end %>
 
 <% end %>
-
 
 
 <%= content_for :js do %>
@@ -517,5 +515,59 @@
     }
   })    
   ;
+
+//delete
+$(document).ready(function() {
+  $("#delete-event-btn").off("click").on("click", function(event) { // Unbind first
+    event.preventDefault(); // Prevent default link behavior
+
+    var reasonField = $("#reject_reason");
+    var reason = reasonField.val().trim();
+
+    if (reason === "") {
+      alert("Alasan dihapus / ditolak harus diisi.");
+      reasonField.focus(); // Set focus on the textarea
+      return false;
+    }
+
+    var eventId = $(this).data("event-id");
+
+    if (!confirm("Apakah Anda yakin ingin menghapus DO ini?")) {
+      return false; // Stop if user cancels
+    }
+
+    $.ajax({
+      type: "GET",
+      url: "/events/remove?reject_reason=" + encodeURIComponent(reason) + "&id=" + eventId,
+      success: function(response) {
+        alert("Berhasil menghapus event.");
+        window.location.reload(); // Reload the page after successful deletion
+      },
+      error: function(xhr) {
+        alert("Terjadi kesalahan. Mohon refresh browser Anda.");
+      }
+    });
+
+  });
+});
+
+//cancel
+$(document).ready(function () {
+  $(".edit_event").off("submit").on("submit", function(event) { // Unbind first
+
+    var cancelledCheckbox = $("#event_cancelled");
+    var reasonField = $("#reject_reason");
+    var reason = reasonField.val().trim();
+
+    if (cancelledCheckbox.is(":checked") && reason === "") {
+      alert("Alasan dihapus / ditolak harus diisi karena DO ditolak.");
+      reasonField.focus(); // Set focus on the textarea
+      event.preventDefault(); // Prevent form submission
+      return false; // Ensure it doesn't continue
+    }
+  });
+});
+
 </script>
+
 <% end %>

@@ -3115,7 +3115,7 @@ end
 
       @customers = Customer.where('id in (select customer_id from events where deleted = false and start_date between ? and ?)', @startdate.to_date, @enddate.to_date).order(:name)
 
-      @eventsa = Event.active.where("start_date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date).order(:start_date)
+      @eventsa = Event.active.where("cancelled = false AND start_date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date).order(:start_date)
 
       @transporttype = params[:transporttype]
       @tanktype = params[:tanktype]

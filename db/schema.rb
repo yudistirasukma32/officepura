@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250304053750) do
+ActiveRecord::Schema.define(:version => 20250314083940) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -535,6 +535,7 @@ ActiveRecord::Schema.define(:version => 20250304053750) do
     t.integer   "deleteuser_id"
     t.boolean   "multicontainer",                                                     :default => false
     t.boolean   "unload_vendor",                                                      :default => false
+    t.string    "reject_reason"
   end
 
   add_index "events", ["id", "start_date", "end_date", "customer_id"], :name => "index_events_on_customer_id"

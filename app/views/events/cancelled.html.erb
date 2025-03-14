@@ -58,8 +58,8 @@
 			<th class="{sorter:true, filter: true}">Kargo</th>
 			<th class="{sorter:true, filter: true}">Tangki</th>
 			<th class="{sorter:true, filter: true}">Est. Tonase</th>
-			<th class="{sorter:true, filter: false}">Rit&nbsp;&nbsp;&nbsp;</th>
 			<th class="{sorter:false, filter: false}">Keterangan</th>
+			<th class="{sorter:true, filter: true}">Status</th>
 			<th class="{sorter:false, filter: false}"></th>
 		</tr>
 		</thead>
@@ -72,18 +72,24 @@
 				<td><strong><%=event.start_date.strftime('%d')%></strong>.<%=event.start_date.strftime('%m')%></td>
 				<td><%= event.office.abbr rescue nil %></td>
 				<td><%= event.customer.name rescue nil %></td>
-				<td><%= event.summary %></td>
+				<td><%= event.qty %> Rit. <%= event.summary %></td>
 				<td><%= event.commodity.name rescue nil %></td>
 				<td><strong><%=event.load_date.strftime('%d')%></strong>.<%=event.load_date.strftime('%m')%></td>
 				<td><strong><%=event.unload_date.strftime('%d')%></strong>.<%=event.unload_date.strftime('%m')%></td>
 				<td><%= event.invoicetrain ? 'Kereta' : 'Industri' %></td>
 				<td><%= event.cargo_type %></td>
 				<td><%= event.tanktype %></td>
-				<td class="right"><%= event.estimated_tonage %> <%= event.price_per_type %></td>
-				<td class="right"><%= event.qty %></td>
+				<td class="right">
+					<%= event.price_per_type != 'BORONGAN' ? event.estimated_tonage : '' %> 
+					<%= event.price_per_type %>
+				</td>
+				<td><%= event.reject_reason %></td>
 				<td>
-					<%= event.description %>
-					<%= event.deleted ? '[dihapus]' : ''%>
+					<% if event.deleted %>
+					<a class="cta" style="background: grey; color: white; opacity: 1;">dihapus</a>
+					<% else %>
+					<a class="cta" style="background: #d50000; color: white; opacity: 1;">ditolak</a>
+					<% end %>
 				</td>
 				<td class="right" width="60">
 					<%= link_to '&#xf044;'.html_safe, edit_event_path(event, origin: 'report'), :class => "edit tipsy", :title => 'Edit' %>
