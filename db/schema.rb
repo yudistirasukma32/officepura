@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250314083940) do
+ActiveRecord::Schema.define(:version => 20250317042116) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -338,7 +338,7 @@ ActiveRecord::Schema.define(:version => 20250314083940) do
     t.string    "mobile2"
     t.string    "mobile3"
     t.string    "province"
-    t.integer   "gst_percentage",                                                       :default => 0
+    t.float     "gst_percentage",                                                       :default => 0.0
     t.boolean   "price_tax",                                                            :default => false
     t.integer   "rating",                                                               :default => 0
     t.string    "price_by"
