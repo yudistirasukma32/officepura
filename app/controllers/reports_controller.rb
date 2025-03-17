@@ -3192,7 +3192,7 @@ end
       global_ppn_total = 0
       global_total_real = 0 
       solar_price = Setting.find_by_name("Harga Solar").value.to_i
-      customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Acidatama.*'").pluck(:id)
+      customer_35 = Customer.active.where("name ~* '.*Acidatama.*'").pluck(:id)
 
       # render json: @eventsa
 
