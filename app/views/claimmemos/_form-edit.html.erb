@@ -107,6 +107,7 @@
                 <% else %>
                   <% if current_user.adminrole || current_user.owner  %>
                     <%= link_to(@taxinvoice.long_id, edit_taxinvoice_path(@taxinvoice.id), target: :_blank) %>
+                    <%= f.hidden_field :taxinvoiceitem_id, :value => @taxinvoiceitems.first.id rescue nil %>
                   <% else %>
                     <%= @taxinvoice.long_id %>
                   <% end %>
@@ -191,7 +192,6 @@
 	<%= f.hidden_field :total, :value => @claimmemo.total %>
 	<%= f.hidden_field :invoice_id, :value => @invoice.id %>
   <%= f.hidden_field :is_train, :value => @invoice.invoicetrain %>
-	<%= f.hidden_field :taxinvoiceitem_id, :value => @taxinvoiceitems.first.id %>
 
   <% if !params['rel'].present?%>
 	<%= f.submit "Tambah Data", :class => 'left' %>
