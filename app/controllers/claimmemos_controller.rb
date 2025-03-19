@@ -89,7 +89,7 @@ class ClaimmemosController < ApplicationController
       @errors["invoice"] = "BKK harus diisi."
     else
       @invoice = Invoice.find(@invoice_id) rescue nil
-      @taxinvoiceitems = Taxinvoiceitem.where("invoice_id = #{@invoice.id} AND deleted = FALSE") rescue ni;
+      @taxinvoiceitems = Taxinvoiceitem.where("invoice_id = #{@invoice.id} AND deleted = FALSE") rescue nil;
     end
 
   	respond_with(@claimmemo)
