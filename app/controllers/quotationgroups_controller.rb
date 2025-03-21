@@ -406,7 +406,7 @@ class QuotationgroupsController < ApplicationController
     @month = params.fetch(:month, Date.today.strftime('%m'))
     @year = params.fetch(:year, Date.today.year.to_s)
   
-    @quotationgroups = Quotationgroup.where(deleted: false).order(date: :desc, long_id: :asc)
+    @quotationgroups = Quotationgroup.where(deleted: false).order('date ASC')
   
     # Filter by month & year
     @quotationgroups = @quotationgroups.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}")
