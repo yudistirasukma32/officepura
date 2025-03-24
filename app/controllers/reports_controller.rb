@@ -3256,6 +3256,17 @@ end
 
         end
 
+        # check target
+        @target = params[:target]
+        if @target.present? && @target != 'all'
+          case @target
+          when "Proses"
+            next if estimation == realization # Skip if estimation equals realization
+          when "Tercapai"
+            next if estimation != realization # Skip if estimation is not equal to realization
+          end
+        end
+
         global_supir += supir
         global_kernet += kernet
         global_solar += solar
@@ -3294,7 +3305,8 @@ end
           route_train_id: event.routetrain_id,
           realization: realization
         }
-      end
+      end.compact
+      
       @summary = {
         global_supir: global_supir ,
         global_kernet: global_kernet ,

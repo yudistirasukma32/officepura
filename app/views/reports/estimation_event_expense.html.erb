@@ -1,10 +1,26 @@
 <%= render "shared/header" %>
 
-
 <style>
-#main #filter {
-	height: 96px;
-}
+	#main #filter {
+		height: 128px;
+	}
+
+	.orange.underline {
+		color: #FF9800;
+		text-decoration: underline;
+	}
+
+	.orange::after {
+		content: '•';
+		width: 12px;
+		height: 12px;
+		z-index: 1;
+		margin-left: 0;
+		margin-top: -5px;
+		font-size: 18px;
+		position: absolute;
+		text-align: center;
+	}
 </style>
  
 
@@ -32,7 +48,7 @@
 
 		<input type="hidden" name="marketingname" value="<%= params[:marketingname] %>">
 		<input type="hidden" name="user_id" value="<%= params[:user_id] %>">
-
+		
 		<div class="field-row continue">
 			<div style="position: relative; width: fit-content; float: left;">
 			<label for="customer_id"  style="width: 50px;"/>Pelanggan</label>
@@ -44,7 +60,7 @@
 			</select>
 			</div>
 			<label for="office_id" class="middle" style="width: 50px;"/>Kantor</label>
-			<select name="office_id" class="short left office_id" style="margin-right: 5px;">	
+			<select name="office_id" class="short left office_id" style="margin-right: 15px;">	
 				<option value="all">All</option>
 				<% Office.active.each do |office| %>
 				<option value="<%=office.id%>" <%= params[:office_id].to_i == office.id ? "selected" : "" %>><%=office.name%></option>
@@ -71,7 +87,7 @@
 			<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" style="width: 80px;"/>
 		</div>
 
-		<div class="field-row continue" style="margin-top: 10px; display: flex; column-gap: 10px;">
+		<div class="field-row continue" style="margin-top: 6px; display: flex; column-gap: 10px;">
 			<div style="position: relative; width: fit-content; float: left;">
 				<label for="commodity_id" style="width: 64px;">Komoditas</label>
 				<select name="commodity_id" class="third left chzn-select" style="margin-right: 15px;">	
@@ -84,7 +100,7 @@
 
 			<div style="position: relative; width: fit-content; float: left;">
 				<label for="operator_id"  style="width: 60px;"/>OP Kereta</label>
-				<select name="operator_id" class="half left chzn-select" style="width: 100px;" onchange="javascript:getRouteTrains(this.value);"/>
+				<select name="operator_id" class="half left chzn-select" style="width: 90px;" onchange="javascript:getRouteTrains(this.value);"/>
 					<option value="all">Semua</option>
 					<% operators = Operator.active %>
 					<% operators.each do |operator| %>
@@ -94,8 +110,8 @@
 			</div>
 			<div id="route-trains">
 				<div style="position: relative; width: fit-content; float: left;">
-					<label for="routetrain_id"  style="width: 70px;  padding-right: 5px;">Jur Kereta</label>
-					<select name="routetrain_id" class="half left chzn-select" style="width: 200px;">
+					<label for="routetrain_id"  style="width: 70px;  padding-right: 15px;">Jur Kereta</label>
+					<select name="routetrain_id" class="half left chzn-select" style="width: 180px;">
 						<option value="all">Semua Jurusan</option>
 						<% routetrains = Routetrain.active %>
 						<% routetrains.each do |route| %>
@@ -104,8 +120,12 @@
 					</select>
 				</div>
 			</div>
+	
+		</div>
+		<div class="field-row continue" style="margin-top: 6px; display: flex; column-gap: 10px; justify-content: space-between;">
+		<div style="position: relative; width: fit-content; float: left;">
 			<div style="position: relative; width: fit-content; float: left;">
-				<label for="createdat"  style="width: 50px; padding-right: 5px;">Dibuat</label>
+				<label for="createdat"  style="width: 40px; padding-right: 15px;">Dibuat</label>
 				<select name="createdat" class="short left combo_route" style="margin-right: 15px;">	
 				<option value="all">Semua</option>
 					<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
@@ -114,8 +134,21 @@
 					<% end %>
 				</select>
 			</div>
-				<input class="submit" type="submit" value="Filter" style="margin-top: -3px; margin-left: 16px;"/>
+
+			<div style="position: relative; width: fit-content; float: left;">
+				<label for="target"  style="width: 45px; padding-right: 15px;">Realisasi</label>
+				<select name="target" class="short left combo_route" style="margin-right: 15px;">	
+				<option value="all">Semua</option>
+					<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
+					<% ['Tercapai', 'Proses'].each do |type| %>
+					<option <%= type == params[:target] ? 'selected' : '' %>><%=type%></option>
+					<% end %>
+				</select>
 			</div>
+			</div>
+
+			<input class="submit" type="submit" value="Filter" style="margin-top: -3px; margin-left: 16px;"/>
+		</div>
 		</form>
 	</div>
 
@@ -174,7 +207,7 @@
 			<td class="red" align="right"><%=to_currency(event[:ppn])%></td>
 			<td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
             <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
-			<td class="green" align="right"><%=to_currency(event[:realization])%></td>
+			<td class="<%= to_currency(event[:total_estimation]) == to_currency(event[:realization]) ? 'green' : 'orange underline' %>" align="right"><%=to_currency(event[:realization])%></td>
             <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
 			<!-- <td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td> -->
 		</tr>
