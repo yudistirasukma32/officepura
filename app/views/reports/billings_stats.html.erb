@@ -126,7 +126,7 @@
 	<div class="flex">
 		<div class="widget-cardo">
 			<p class="text-dark">Pelanggan Tertagih</p>
-			<strong><%= @this_month_taxinvoices.select(:customer_id).distinct.count %></strong>
+			<strong><%= @this_month_taxinvoices.pluck(:customer_id).uniq.count %></strong>
 		</div>
 		<div class="widget-cardo">
 			<a href="#">
