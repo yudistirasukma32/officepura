@@ -5,10 +5,6 @@
 		height: 128px;
 	}
 
-	table {
-		font-size: 12px;
-	}
-
 	.orange.underline {
 		color: #FF9800;
 		text-decoration: underline;
@@ -26,6 +22,7 @@
 		text-align: center;
 	}
 </style>
+ 
 
 <div id="nav">
 	<%= render "shared/nav" %>
@@ -37,7 +34,7 @@
 	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
 	
 	<h1>Laporan Estimasi BKK vs DO: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
-	
+
 	<% if params[:marketingname].present? %>
 		<strong style="font-size: 1rem; margin-bottom: 1.5rem;">Marketing: <%= params[:marketingname] %> </strong>
 		<br class="clearfix" />
@@ -173,7 +170,7 @@
 			<th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
 			<th width="60" class="right sorter:true, filter: false">Total BKK</th>
 			<th width="60" class="right sorter:true, filter: false">PPN</th>
-			<th width="60" class="right {sorter:true, filter: false}">Est DO</th>
+			<th width="60" class="right {sorter:true, filter: false}">Total DO</th>
 			<th width="60" class="right {sorter:true, filter: false}">Realisasi</th>
 		</tr>
 
@@ -188,7 +185,7 @@
 				<%=event[:start_date].strftime('%d.%m')%> 
 			</td>
 			<td>
-			<%=event[:created_at].strftime('%d.%m %H:%M')%><br>
+			<%=event[:created_at].strftime('%d.%m %H:%M')%>
 			<strong><%=event[:username] %></strong>
 			</td>
 			<td><%=event[:description] %>
@@ -197,7 +194,7 @@
 				<%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
 			<% end %>
 			<br>
-			<%= event[:tanktype] %>
+			<%=event[:tanktype] %>
 			</td>
 			<td><%=event[:office] %></td>
 			<td class="" align="right"><%=to_currency(event[:supir])%></td>
@@ -229,125 +226,11 @@
 			<td class="total" align="right"><%=to_currency(@summary[:global_ppn_total])%></td>
 			<td class="total" align="right"><%=to_currency(@summary[:global_total_estimation])%></td>
 			<td class="total" align="right"><%=to_currency(@summary[:global_total_real])%></td>
-		</tr>
-		<% end %>
-
-		<% if @contract_events.blank? %>
-		<tr class="footer">
-			<td class="total" colspan="5">GRAND TOTAL</td>
-			<td align="right"><%=to_currency(@grandtotal_supir)%></td>
-			<td align="right"><%=to_currency(@grandtotal_kernet)%></td>
-			<td align="right"><%=to_currency(@grandtotal_solar)%></td>
-			<td align="right"><%=to_currency(@grandtotal_tambahan)%></td>
-			<td align="right"><%=to_currency(@grandtotal_premi)%></td>
-			<td align="right"><%=to_currency(@grandtotal_tol_asdp)%></td>
-			<td class="total" align="right"><%=to_currency(@grandtotal_invoice_total)%></td>
-			<td class="total" align="right"><%=to_currency(@grandtotal_ppn_total)%></td>
-			<td class="total" align="right"><%=to_currency(@grandtotal_total_estimation)%></td>
-			<td class="total" align="right"><%=to_currency(@grandtotal_total_real)%></td>
+            <!-- <td></td> -->
 		</tr>
 		<% end %>
 		</table>
 	<% end %>
-
-	<small>*Realisasi diambil dari kalkulasi BKK daro DO yang sudah dibuat dan tidak di BKM</small>
-
-	<br class="clearfix" />
-	<br class="clearfix" />
-
-	<!-- Contract::begin -->
-	<% if @contract_events.any? %>
-		<hr>
-		<h2 class="title" style="font-weight: bold;">DO Kontrak</h2>
-		<hr>
-		<table class="tablesorter row-view tablesorterFilters">
-		<tr>
-			<th width="30">No.</th>
-			<th width="40">Tgl</th>
-			<th>Dibuat</th>
-			<th>Keterangan</th>
-			<th>KTR</th>
-			<th width="60" class="right {sorter:true, filter: false}">Supir</th>
-			<th width="60" class="right {sorter:true, filter: false}">Kernet</th>
-			<th width="60" class="right {sorter:true, filter: false}">Solar</th>
-			<th width="60" class="right {sorter:true, filter: false}">Lain2</th>
-			<th width="60" class="right {sorter:true, filter: false}">Premi</th>
-			<th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
-			<th width="60" class="right sorter:true, filter: false">Total BKK</th>
-			<th width="60" class="right sorter:true, filter: false">PPN</th>
-			<th width="60" class="right {sorter:true, filter: false}">Total DO</th>
-			<th width="60" class="right {sorter:true, filter: false}">Realisasi</th>
-			<%# <th width="50" class="right {sorter:true, filter: false}">%</th> %>
-		</tr>
-
-		<% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
-		<% total_estimasi = 0 %>
-		<% total_invoice = 0 %>
-		<% @contract_events.each_with_index do |event, i| %>
-        
-		<tr<% if i % 2 == 0 %> class="even"<% end %>>
-			<td><%=i+1%>.</td>
-			<td>
-				<%=event[:start_date].strftime('%d.%m')%> 
-			</td>
-			<td><%=event[:created_at].strftime('%d.%m %H:%M')%><br>
-			<strong><%=event[:username] %></strong>
-			</td>
-			<td><%=event[:description] %>
-			<% if event[:route_train].present? && event[:route_train] != "Kosong" %>
-				<br>
-				<%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
-			<% end %>
-			<%=event[:tanktype] %>
-			</td>
- 
-			<td><%=event[:office] %></td>
-			<td class="" align="right"><%=to_currency(event[:supir])%></td>
-			<td class="" align="right"><%=to_currency(event[:kernet])%></td>
-			<td class="" align="right"><%=to_currency(event[:solar])%></td>
-			<td class="" align="right"><%=to_currency(event[:tambahan])%></td>
-			<td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
-			<td class="" align="right"><%=to_currency(event[:tol_asdp])%></td>
-			<td class="red" align="right"><%=to_currency(event[:invoice_total])%></td>
-			<td class="red" align="right"><%=to_currency(event[:ppn])%></td>
-			<td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
-            <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
-			<td class="green" align="right"><%=to_currency(event[:realization])%></td>
-            <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
-			<!-- <td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td> -->
-		</tr>
-		<% end %>	
-
-		<% if @contract_events %>
-		<tr class="footer">
-			<td class="total" colspan="5">TOTAL</td>
-			<td align="right"><%=to_currency(@contract_summary[:global_supir])%></td>
-			<td align="right"><%=to_currency(@contract_summary[:global_kernet])%></td>
-			<td align="right"><%=to_currency(@contract_summary[:global_solar])%></td>
-			<td align="right"><%=to_currency(@contract_summary[:global_tambahan])%></td>
-			<td align="right"><%=to_currency(@contract_summary[:global_premi])%></td>
-			<td align="right"><%=to_currency(@contract_summary[:global_tol_asdp])%></td>
-			<td class="total" align="right"><%=to_currency(@contract_summary[:global_invoice_total])%></td>
-			<td class="total" align="right"><%=to_currency(@contract_summary[:global_ppn_total])%></td>
-			<td class="total" align="right"><%=to_currency(@contract_summary[:global_total_estimation])%></td>
-			<td class="total" align="right"><%=to_currency(@contract_summary[:global_total_real])%></td>
-		</tr>
-		<% end %>
-
-		<tr class="footer">
-			<td class="total" colspan="5">GRAND TOTAL</td>
-			<td align="right"><%=to_currency(@grandtotal_supir)%></td>
-			<td align="right"><%=to_currency(@grandtotal_kernet)%></td>
-			<td align="right"><%=to_currency(@grandtotal_solar)%></td>
-			<td align="right"><%=to_currency(@grandtotal_tambahan)%></td>
-			<td align="right"><%=to_currency(@grandtotal_premi)%></td>
-			<td align="right"><%=to_currency(@grandtotal_tol_asdp)%></td>
-			<td class="total" align="right"><%=to_currency(@grandtotal_invoice_total)%></td>
-			<td class="total" align="right"><%=to_currency(@grandtotal_ppn_total)%></td>
-			<td class="total" align="right"><%=to_currency(@grandtotal_total_estimation)%></td>
-			<td class="total" align="right"><%=to_currency(@grandtotal_total_real)%></td>
-		</tr>
-		</table>
-	<% end %>
-	<!-- Contract::end -->
 </div>
+
+

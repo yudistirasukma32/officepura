@@ -26,7 +26,110 @@ class RoutesController < ApplicationController
       "NTB",
       "NTT",
       "Riau"
+    ];
+
+    @cities = [
+      # Aceh
+      "Banda Aceh", "Lhokseumawe", "Langsa", "Meulaboh", "Sigli", "Bireuen",
+      # Sumatera Utara
+      "Medan", "Binjai", "Pematangsiantar", "Tebing Tinggi", "Sibolga", "Padangsidimpuan",
+      # Sumatera Barat
+      "Padang", "Bukittinggi", "Payakumbuh", "Pariaman", "Solok", "Sawahlunto",
+      # Jambi
+      "Jambi", "Sungai Penuh", "Muara Bulian", "Kuala Tungkal",
+      # Bengkulu
+      "Bengkulu", "Curup", "Manna", "Mukomuko",
+      # Sumatera Selatan
+      "Palembang", "Lubuklinggau", "Prabumulih", "Pagar Alam", "Lahat",
+      # Lampung
+      "Bandar Lampung", "Metro", "Kalianda", "Kotabumi", "Liwa",
+      # Banten
+      "Tangerang", "Serang", "Cilegon", "Rangkasbitung",
+      # DKI Jakarta
+      "Jakarta Pusat", "Jakarta Selatan", "Jakarta Utara", "Jakarta Barat", "Jakarta Timur",
+      # Jawa Barat (Expanded)
+      "Bandung", "Bekasi", "Bogor", "Depok", "Cirebon", "Sukabumi", "Tasikmalaya", "Cimahi",
+      "Garut", "Purwakarta", "Sumedang", "Indramayu", "Cianjur", "Majalengka", "Subang", "Pangandaran",
+      # Jawa Tengah (Expanded)
+      "Semarang", "Solo", "Tegal", "Pekalongan", "Magelang", "Salatiga", "Purwokerto", "Cilacap",
+      "Kudus", "Jepara", "Pemalang", "Brebes", "Boyolali", "Kebumen", "Blora", "Purwodadi", "Wonosobo","Pati",
+      # DIY (Yogyakarta)
+      "Yogyakarta", "Sleman", "Bantul", "Wates", "Gunungkidul",
+      # Jawa Timur (Expanded)
+      "Surabaya", "Malang", "Kediri", "Madiun", "Blitar", "Pasuruan", "Probolinggo", "Banyuwangi", "Jember",
+      "Sidoarjo", "Gresik", "Lamongan", "Mojokerto", "Tuban", "Bojonegoro", "Ngawi", "Magetan", "Lumajang",
+      "Bondowoso", "Situbondo", "Pacitan", "Trenggalek", "Tulungagung", "Nganjuk", "Ponorogo",
+      # Bali
+      "Denpasar", "Singaraja", "Tabanan", "Gianyar", "Klungkung",
+      # NTB
+      "Mataram", "Bima", "Sumbawa Besar", "Praya",
+      # NTT
+      "Kupang", "Ende", "Maumere", "Waingapu", "Ruteng", "Atambua",
+      # Riau
+      "Pekanbaru", "Dumai", "Bengkalis", "Tembilahan"
     ]
+
+    @province_cities = {
+      "Aceh" => ["Banda Aceh", "Lhokseumawe", "Langsa", "Meulaboh", "Sigli", "Bireuen"],
+      "Sumatera Utara" => ["Medan", "Binjai", "Pematangsiantar", "Tebing Tinggi", "Sibolga", "Padangsidimpuan"],
+      "Sumatera Barat" => ["Padang", "Bukittinggi", "Payakumbuh", "Pariaman", "Solok", "Sawahlunto"],
+      "Jambi" => ["Jambi", "Sungai Penuh", "Muara Bulian", "Kuala Tungkal"],
+      "Bengkulu" => ["Bengkulu", "Curup", "Manna", "Mukomuko"],
+      "Sumatera Selatan" => ["Palembang", "Lubuklinggau", "Prabumulih", "Pagar Alam", "Lahat"],
+      "Lampung" => ["Bandar Lampung", "Metro", "Kalianda", "Kotabumi", "Liwa"],
+      "Banten" => ["Tangerang", "Serang", "Cilegon", "Rangkasbitung"],
+      "DKI Jakarta" => ["Jakarta Pusat", "Jakarta Selatan", "Jakarta Utara", "Jakarta Barat", "Jakarta Timur"],
+      "Jawa Barat" => ["Bandung", "Bekasi", "Bogor", "Depok", "Cirebon", "Sukabumi", "Tasikmalaya", "Cimahi",
+      "Garut", "Purwakarta", "Sumedang", "Indramayu", "Cianjur", "Majalengka", "Subang", "Pangandaran"],
+      "Jawa Tengah" => ["Semarang", "Solo", "Tegal", "Pekalongan", "Magelang", "Salatiga", "Purwokerto", "Cilacap","Pati"],
+      "DIY (Yogyakarta)" => ["Yogyakarta", "Sleman", "Bantul", "Wates", "Gunungkidul"],
+      "Jawa Timur" => ["Surabaya", "Malang", "Kediri", "Madiun", "Blitar", "Pasuruan", "Probolinggo", "Banyuwangi", "Jember",
+      "Sidoarjo", "Gresik", "Lamongan", "Mojokerto", "Tuban", "Bojonegoro", "Ngawi", "Magetan", "Lumajang",
+      "Bondowoso", "Situbondo", "Pacitan", "Trenggalek", "Tulungagung", "Nganjuk", "Ponorogo"],
+      "Bali" => ["Denpasar", "Singaraja", "Tabanan", "Gianyar", "Klungkung"],
+      "NTB" => ["Mataram", "Bima", "Sumbawa Besar", "Praya"],
+      "NTT" => ["Kupang", "Ende", "Maumere", "Waingapu", "Ruteng", "Atambua"],
+      "Riau" => ["Pekanbaru", "Dumai", "Bengkalis", "Tembilahan"]
+    }
+  end
+
+  def managements
+    @offices = Office.active.order('id asc')
+    # @routes = Route.active.order('name asc')
+  end
+
+  def index_api_detailed
+    batas = 40
+    halaman = params[:page].present? ? params[:page].to_i : 1
+    halaman_awal = (halaman > 1) ? (halaman * batas) - batas : 0
+    # halaman_awal = halaman_awal + 1
+    additional_query = ""
+    if params[:query].present?
+      additional_query += " and name ~* '.*#{params[:query]}.*'"
+    end
+    if params[:customer_id].present? && params[:customer_id] != "all"
+      additional_query += " and customer_id = '#{params[:customer_id]}"
+    end
+    if params[:load_province].present? && params[:load_province] != "all"
+      additional_query += " and load_province = '#{params[:load_province]}'"
+    end
+    if params[:unload_province].present? && params[:unload_province] != "all"
+      additional_query += " and unload_province = '#{params[:unload_province]}'"
+    end
+
+    @office_id = params[:office_id]
+    if @office_id.present? and @office_id != "all"
+      all_data = Route.active.where("office_id = ?#{additional_query}", @office_id).select(:id).count()
+      @routes = Route.active.where("office_id = ?#{additional_query}", @office_id).limit(batas).offset(halaman_awal).order("name asc")
+    else
+      all_data = Route.where("deleted = false#{additional_query}").select(:id).count()
+      @routes = Route.where("deleted = false#{additional_query}").limit(batas).offset(halaman_awal).order("name asc")
+    end
+
+    @total_page = (all_data.to_f / batas.to_f).ceil
+
+    render partial: "table_detailed"
+    # render json: @routes.to_sql
   end
 
   def index

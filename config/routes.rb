@@ -38,7 +38,17 @@ OfficePuraErp::Application.routes.draw do
       get 'enable'
       get 'disable'
       get 'addroute'
+      get 'addcontract'
       get 'clone'
+      get 'gm_approve'
+    end
+  end
+
+  get 'contracts/addnew' => 'contracts#addnew'
+  resources :contracts do
+    member do
+      get 'enable'
+      get 'disable'
     end
   end
 
@@ -138,6 +148,8 @@ OfficePuraErp::Application.routes.draw do
     end
     collection do
       get "index_api"
+      get "index_api_detailed"
+      get "managements"
     end
   end
 
@@ -709,6 +721,8 @@ OfficePuraErp::Application.routes.draw do
   get "marketings/getomzetdata" => 'marketings#getomzetdata'
   get "marketings/getomzetdatamarketing" => 'marketings#getomzetdatamarketing'
 
+  get "reports/getomzetbillings" => 'reports#getomzetbillings'
+
   scope "reports" do
     match "taxinvoices_report" => 'reports#taxinvoices_report'
     match "taxinvoiceitems_report" => 'reports#taxinvoiceitems_report'
@@ -773,6 +787,8 @@ OfficePuraErp::Application.routes.draw do
     match 'getbranchstatsbkkbreakdown' => 'reports#apibranchstatsbkkbreakdown'
 
     match 'getbranchstatsincidents' => 'reports#apibranchstatsincidents'
+
+    get 'billings-stats' => 'reports#billings_stats'
 
     match 'shrinkreport' => 'reports#shrinkreport'
     get "driver-rit" => 'reports#driver_rit'

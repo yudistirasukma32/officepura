@@ -1,0 +1,422 @@
+<%= render "shared/header" %>
+
+<%= content_for :css do %>	 
+	<style>
+		#main #filter {
+			height: 44px;
+		}
+
+        .flex {
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+		.mb-0 {
+			margin-bottom: 0;
+		}
+
+        .widget-cardo {
+            width: 200px; 
+            padding: 0.8rem;
+            background: #f0f0f0;
+            text-align: center;
+        }
+
+		.widget-carda {
+            width: 320px; 
+            padding: 0.8rem;
+            background: #f0f0f0;
+            text-align: center;
+			position: relative;
+        }
+
+        .widget-cardo p, .widget-carda p {
+            margin-top: 0;
+            padding-bottom: 0;
+        }
+
+        .widget-cardo strong, .widget-carda strong {
+            font-size: 1.25rem;
+            color: #1e1e1e;
+        }
+
+		.widget-carda span {
+            font-size: 12px;
+            color: #4a4a4a;
+        }
+
+		#chart-omzet {
+			width: 60%;
+            padding: 0.8rem;
+            background: #f0f0f0;
+		}
+
+		#side-chart {
+			width: 40%;
+            padding: 0.8rem;
+            background: #f0f0f0;
+		}
+
+		#pie-chart, #pie-chart-2 {
+			width: 50%;
+            padding: 0.8rem;
+            background: #f0f0f0;
+		}
+
+		.space {
+			justify-content: space-between;
+		}
+
+		 .text-dark {
+			color: #010101;
+		 }
+
+		 .check {
+			position: absolute;
+			right: 0;
+			top: 0;
+			margin-right: 8px;
+			margin-top: 8px;
+			padding: 5px;
+			border: 1px dotted grey;
+			border-radius: 50%;
+		 }
+
+         .medium-widget {
+            float: none !important;
+            width: 100% !important;
+            margin: 0 !important;
+         }
+
+         .separate {
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            line-height: 1.25;
+         }
+
+         .mt-1 {
+            margin-top: 1rem;
+         }
+
+	</style>
+<% end %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+	<div id="content-full">
+	<a href="<%= new_taxinvoice_url %>" target="_blank" class="btn print">Buat Invoice</a>
+	
+	<h1>Dashboard Penagihan:</h1>
+
+	<br class="clearfix" />
+
+ 
+	<br class="clearfix" />
+
+	<div class="flex mb-0">
+		<h2 style="font-weight: 700;">Stats Penagihan <span><%= @default_month.strftime("%b %Y") %></span></h2>
+	</div>
+
+	<div class="flex">
+		<div class="widget-cardo">
+			<p class="text-dark">Pelanggan Tertagih</p>
+			<strong><%= @this_month_taxinvoices.select(:customer_id).distinct.count %></strong>
+		</div>
+		<div class="widget-cardo">
+			<a href="#">
+				<p class="text-dark">Pembuatan Invoice</p>
+				<strong><%= @this_month_taxinvoices.count %></strong>
+			</a>
+		</div>
+		<div class="widget-cardo">
+			<a href="#">
+				<p class="text-dark">Pengiriman Invoice</p>
+				<strong><%= @this_month_taxinvoices.where('sentdate is not null').count %></strong>
+			</a>
+		</div>
+		<div class="widget-cardo">
+			<a href="#">
+				<p class="text-dark">Jumlah Piutang</p>
+				<strong><%= to_currency(@this_month_taxinvoices.where('paiddate is null').sum(:total)) %></strong>
+			</a>
+		</div>
+        <div class="widget-cardo">
+			<a href="#">
+				<p class="text-dark">Cash In</p>
+				<strong><%= to_currency(@this_month_taxinvoices.where('paiddate is not null').sum(:total)) %></strong>
+			</a>
+		</div>
+	</div>
+
+	<div class="flex space mb-0">
+		<h2 style="font-weight: 700;">Stats Penagihan 
+		<% if @startdate.nil? && @enddate.nil? %>
+		<span>
+			<%= @default_month.strftime("%b %Y") %>
+		</span>
+		<% else %>
+
+		<span class="red">
+			<%= @startdate.to_date.strftime("%d %b %Y") %> - <%= @enddate.to_date.strftime("%d %b %Y") %>
+		</span>
+
+		<% end %>
+		</h2>
+
+		<div class="field-row continue" style="width: 395px;">
+			<form id="filterform" name="filterform" action="/reports/billings-stats" method="get">
+				<label for="startdate" style="width: 50px;"/>Tgl Awal</label>
+				<input type="text" name="startdate" class="left half date-picker" value="<%=@startdate%>" style="width: 80px;"/>
+				<label for="enddate" class="middle" style="width: 40px;"/>Akhir</label>
+				<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" style="width: 80px;"/>
+				<input class="submit" type="submit" value="Filter" style="margin-left: 16px; margin-right: 0;"/>
+			</form>
+		</div>
+	</div>
+
+	<div class="flex">
+		<div class="widget-carda">
+			<a class="check" target="_blank" href="/taxinvoices?user_id=46&username=tutik&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
+				<i class="icon-search" style="color: #6d6d6d;"></i>
+			</a>
+			<p>Tuti<br>
+			<span>Surabaya<span>
+			</p>
+
+			<strong><%= to_currency(@stats_tuti.sum(:total)) %></strong>
+			<br/>
+			<small>Est. Omzet</small>
+            <br/><br/>
+
+            <strong style="color: #12a812;"><%= to_currency(@stats_tuti.where('paiddate is not null').sum(:total)) %></strong>
+			<br/>
+			<small>Cash In</small>
+            <br/><br/>
+
+			<strong><%= @stats_tuti.count %></strong>
+			<br/>
+			<small>Invoice Tagihan</small>
+
+            <br/>
+            <div class="separate mt-1">
+                <span><small>Draft</small></span><span><small>Terkirim</small></span>
+            </div>
+            <div class="separate">
+                <span><strong><%= @stats_tuti.where('sentdate is null').count %></strong></span>
+                <span><strong><%= @stats_tuti.where('sentdate is not null').count %></strong></span>
+            </div>
+
+		</div>
+		<div class="widget-carda">
+			<a class="check" target="_blank" href="/taxinvoices?user_id=138&username=alfi&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
+				<i class="icon-search" style="color: #6d6d6d;"></i>
+			</a>
+			<p>Alfi<br>
+			<span>Sidoarjo<span>
+			</p>
+ 
+			<strong><%= to_currency(@stats_alfi.sum(:total)) %></strong>
+			<br/>
+			<small>Est. Omzet</small>
+            <br/><br/>
+
+            <strong style="color: #12a812;"><%= to_currency(@stats_alfi.where('paiddate is not null').sum(:total)) %></strong>
+			<br/>
+			<small>Cash In</small>
+            <br/><br/>
+            
+			<strong><%= @stats_alfi.count %></strong>
+			<br/>
+			<small>Invoice Tagihan</small>
+
+            <br/>
+            <div class="separate mt-1">
+               <span><small>Draft</small></span><span><small>Terkirim</small></span>
+            </div>
+            <div class="separate">
+                <span><strong><%= @stats_alfi.where('sentdate is null').count %></strong></span>
+                <span><strong><%= @stats_alfi.where('sentdate is not null').count %></strong></span>
+            </div>
+		</div>
+		<div class="widget-carda">
+			<a class="check" target="_blank" href="/taxinvoices?user_id=134&username=sarah&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
+				<i class="icon-search" style="color: #6d6d6d;"></i>
+			</a>
+			<p>Sarah<br>
+			<span>Semarang<span>
+			</p>
+
+			<strong><%= to_currency(@stats_sarah.sum(:total)) %></strong>
+			<br/>
+			<small>Est. Omzet</small>
+            <br/><br/>
+
+            <strong style="color: #12a812;"><%= to_currency(@stats_sarah.where('paiddate is not null').sum(:total)) %></strong>
+			<br/>
+			<small>Cash In</small>
+            <br/><br/>
+
+			<strong><%= @stats_sarah.count %></strong>
+			<br/>
+			<small>Invoice Tagihan</small>
+
+            <br/>
+            <div class="separate mt-1">
+                <span><small>Draft</small></span><span><small>Terkirim</small></span>
+            </div>
+            <div class="separate">
+                <span><strong><%= @stats_sarah.where('sentdate is null').count %></strong></span>
+                <span><strong><%= @stats_sarah.where('sentdate is not null').count %></strong></span>
+            </div>
+		</div>
+		<div class="widget-carda">
+			<a class="check" target="_blank" href="/taxinvoices?user_id=139&username=sucy&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
+				<i class="icon-search" style="color: #6d6d6d;"></i>
+			</a>
+			<p>Suci<br>
+			<span>Jakarta<span>
+			</p>
+
+			<strong><%= to_currency(@stats_suci.sum(:total)) %></strong>
+			<br/>
+			<small>Est. Omzet</small>
+            <br/><br/>
+
+            <strong style="color: #12a812;"><%= to_currency(@stats_suci.where('paiddate is not null').sum(:total)) %></strong>
+			<br/>
+			<small>Cash In</small>
+            <br/><br/>
+
+			<strong><%= @stats_suci.count %></strong>
+			<br/>
+			<small>Invoice Tagihan</small>
+
+            <br/>
+            <div class="separate mt-1">
+                <span><small>Draft</small></span><span><small>Terkirim</small></span>
+            </div>
+            <div class="separate">
+                <span><strong><%= @stats_suci.where('sentdate is null').count %></strong></span>
+                <span><strong><%= @stats_suci.where('sentdate is not null').count %></strong></span>
+            </div>
+		</div>
+	</div>
+
+	<div class="flex" id="chart-omzet-penagihan">
+		<div id="chart-omzet-46" class="widget-carda">
+		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
+		<small>Total omzet 3 bulan terakhir dalam juta</small>
+		</div>
+		<div id="chart-omzet-138" class="widget-carda">
+		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
+		<small>Total omzet 3 bulan terakhir dalam juta</small>
+		</div>
+		<div id="chart-omzet-134" class="widget-carda">
+		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
+		<small>Total omzet 3 bulan terakhir dalam juta</small>
+		</div>
+		<div id="chart-omzet-139" class="widget-carda">
+		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
+		<small>Total omzet 3 bulan terakhir dalam juta</small>
+		</div>
+	</div>
+
+    <div class="flex">
+		<div id="pie-chart">
+			<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
+			<strong>Omzet per Penagihan</strong>
+		</div>
+		<div id="pie-chart-2">
+			<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
+			<strong>Draft vs Terkirim</strong>
+		</div>
+	</div>
+
+ 	<% if @taxinvoices.any? %>
+		<div class="dashboard">
+			<div id="content-full">
+				<div class="row flex">
+					<div class="widget medium-widget">
+						<ul>
+							<li class="head"><h3 style="color: #010101; font-weight: bold;">Non Generic</h3></li>
+                            <% 	
+                                total = @taxinvoices.where("generic = false").sum(:total) 
+							 	paid = @taxinvoices.where("generic = false AND paiddate is not null").sum(:total) 
+								if total > 0
+								  persentase = (paid.to_f / total.to_f) * 100
+								else
+								  persentase = 0
+								end
+							%>
+							<li>
+								Omset
+								<strong><%=to_currency_bank(total)%></strong>
+							</li>
+							<li>
+								Piutang
+								<strong><span class="red"><%=to_currency_bank(total-paid) %></span></strong>
+							</li>
+							<li>
+								Lunas
+								<strong><span class="green"><%= to_currency_bank(paid) %></span></strong>
+							</li>
+							<li  <% if persentase > 50 %> class="footer green" <%else%> class="footer red" <%end%> >
+								<% if (persentase - persentase.to_i) == 0 %>
+									<%=persentase.to_i %>
+								<% else %>
+									<%=number_with_precision(persentase, :precision => 2)%>
+								<% end %>
+								%
+							</li>
+						</ul>
+					</div>
+
+					<div class="widget medium-widget">
+						<ul>
+							<li class="head"><h3 style="color: #010101; font-weight: bold;">Generic</h3></li>
+							<% 	
+                                totalGeneric = @taxinvoices.where("generic = true").sum(:total) 
+                                paid = @taxinvoices.where("generic = true AND paiddate is not null").sum(:total) 
+								if totalGeneric > 0
+								  persentase = (paid.to_f / totalGeneric.to_f) * 100
+								else
+								  persentase = 0
+								end
+							%>
+							<li>
+								Omset
+								<strong><%=to_currency_bank(totalGeneric)%></strong>
+							</li>
+							<li>
+								Piutang
+								<strong><span class="red"><%=to_currency_bank(totalGeneric-paid)%></span></strong>
+							</li>
+							<li>
+								Lunas
+								<strong><span class="green"><%=to_currency_bank(paid)%></span></strong>
+							</li>
+							<li  <% if persentase >50 %> class="footer green" <%else%> class="footer red" <%end%> >
+								<% if (persentase - persentase.to_i) == 0 %>
+									<%=persentase.to_i %>
+								<% else %>
+									<%=number_with_precision(persentase, :precision => 2)%>
+								<% end %>
+								%
+							</li>
+						</ul>
+					</div>
+
+				</div>
+			</div>	
+		</div>
+	<% end %>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>

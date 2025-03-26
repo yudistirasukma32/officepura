@@ -1,0 +1,106 @@
+<%= form_for(@contract) do |f| %>
+  <% if @contract.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@contract.errors.count, "error") %> prohibited this contract from being saved:</h2>
+      <ul>
+      <% @contract.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field-row first">
+    <%= f.label :customer_id, "Pelanggan" %>
+    <%= f.select :customer_id, options_for_select(Customer.active.order(:name).collect {|g| [g.name, g.id]}, @contract.customer_id), {}, :class => 'double chzn-select', :disabled => (['edit', 'update'].include?active_node and !current_user.owner) %>
+    <%= f.hidden_field :customer_id, :value => @contract.customer_id%>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :code, "Code" %>
+    <%= f.text_field :code, :class => 'half' %>
+  </div>
+
+	<div class="field-row">
+		<%= f.label :date_start, "Tanggal" %> 
+		<%= f.text_field :date_start, :class => 'left half date-picker' %>
+		<%= f.label :date_end, "s/d", :class => 'middle' %> 
+		<%= f.text_field :date_end, :class => 'left half date-picker' %>
+	</div>
+
+  <div class="field-row">
+    <%= f.label :contract_type, "Tipe Kontrak" %>
+    <%= f.select :contract_type, options_for_select([["Pilih Tipe",nil],["Periode Waktu", "period"],["Jurusan", "route"]], @contract.contract_type), {}, { :class => 'half left chzn-select' } %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :total, "Nilai Kontrak" %>
+    <%= f.text_field :total, :class => 'half left', onkeypress: 'javascript: return isMoneyKey(this);', value: @contract.total.to_i %>
+  </div>
+  
+  <div class="field-row" >
+    <%= f.label :description, "Keterangan" %>
+    <%= f.text_area :description %>
+  </div>
+  
+  <div class="actions">
+    <%= f.submit "Tambah Data", :class => 'left' if checkrole 'Admin Marketing' %>
+  </div>
+
+<% end %>
+
+
+<% if @contract && @process == 'edit' %>
+
+	<h3 class="zone">Upload File</h3>
+
+	<% if @contract.images.any? %>
+
+    <% img = @contract.images.first %>
+    
+    <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+	
+    <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+    
+      <a href="<%= img.file.url if img.file_uid rescue file_url(img) %>" target="_blank">
+        <%= image_tag file_url(img), style: "width: 100%;" %>
+      </a>
+
+    <% else %>
+    
+      <a href="<%= img.file.url if img.file_uid rescue file_url(img) %>" target="_blank">
+        <%= img.file_uid ? File.basename(img.file_uid).truncate(40) : '' %>
+      </a>
+    
+    <% end %>
+	
+	<br /><br /><%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + @contract.images.first.id.to_s %>
+
+	<% else %>
+
+    <form action="/attachments/upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+      <input type="hidden" name="model_name" value="Contract" />
+      <input type="hidden" name="item_id" value="<%=@contract.id%>" />
+
+    <div class="field-row">
+      <label for="name">Nama</label>
+      <input type="text" name="attachment[name]" />
+    </div>
+
+    <div class="field-row continue">
+      <label for="file">Browse File</label>
+      <input type="file" name="attachment[file]" />
+    </div>
+
+    <div class="actions">
+      <input type="submit" value="Simpan File" />
+    </div>
+
+    </form>
+  
+  <% end %> 
+	
+<% end %>  
+
+
+

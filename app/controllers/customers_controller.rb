@@ -34,7 +34,8 @@ class CustomersController < ApplicationController
   def edit
     @process = 'edit'
     @customer = Customer.find(params[:id])
-    @routes = @customer.routes.active.order(:name)
+    @routes = @customer.routes.where('deleted = false').order(:name)
+    @contracts = @customer.contracts.where('deleted = false').order(:date_start)
     @customer.wholesale_price = @customer.wholesale_price.to_i
   end
 
@@ -102,6 +103,10 @@ class CustomersController < ApplicationController
 
   def addroute
     redirect_to new_route_path(params[:id])
+  end
+
+  def addcontract
+    redirect_to new_contract_path(params[:id])
   end
 
   def destroy

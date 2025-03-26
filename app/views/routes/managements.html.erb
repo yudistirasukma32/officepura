@@ -19,7 +19,6 @@
 
 	.pagination a:hover:not(.active) {background-color: #ddd;}
 </style>
-
 <%= render "shared/header" %>
 
 <div id="nav">
@@ -29,52 +28,69 @@
 <div id="main">
 
 	<div id="content-full">
-
-		<% if checkrole 'Management Jurusan' %>
-		<a href="<%= managements_routes_url %>" class="btn print">Management Jurusan</a>
-		<% end %>
-
+		
 		<a href="<%= new_route_url %>" class="btn print">Tambah Jurusan</a>
-		<h1>Master / <a href="<%=routes_path%>">Jurusan</a> / Index</h1>
+		<h1>Master / <a href="<%=routes_path%>">Jurusan</a> / Management Jurusan</h1>
 
 		<br class="clearfix" />
 
 		<div id="filter">
 			<form id="filterform" name="filterform" action="" method="get">
-			<div class="field-row continue">
+			<div class="field-row continue" style="display: flex; align-items: center;">
 
-				<label for="office_id" class="middle">Pilih Kantor</label>
-				<select name="office_id" class="half left office_id">
+				<label for="office_id" class="middle">Kantor</label>
+				<select name="office_id" class="short left office_id">
 					<option value="all">All</option>
 					<% @offices.each do |office| %>
-					<option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
+					<option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.abbr%></option>
 					<% end %>
-				</select> 
+				</select>
+
 				<label for="customer" class="middle">Customer</label>
-				<select name="customer" class="half left chzn-select customer_id">
+				<select name="customer" class="half left chzn-select customer_id"  style="width: 120px;">
 					<option value="all">All</option>
 					<% Customer.active.select("id,name").each do |customer| %>
 					<option value="<%=customer.id%>" <%= params[:custoemr_id].to_i == customer.id ? "selected" : "" %>><%=customer.name%></option>
 					<% end %>
 				</select>
+
+				<div>
+				<label for="load_province" class="middle">Prov Muat</label>
+				<select name="load_province" class="short left chzn-select load_province"   style="width: 100px;">
+					<option value="all">All</option>
+					<% @provinces.each do |province| %>
+					<option value="<%=province%>" <%= params[:load_province].to_s == province ? "selected" : "" %>><%=province%></option>
+					<% end %>
+				</select>
+				</div>
+
+				<div>
+				<label for="unload_province" class="middle">Bongkar</label>
+				<select name="unload_province" class="short left chzn-select unload_province"   style="width: 100px;">
+					<option value="all">All</option>
+					<% @provinces.each do |province| %>
+					<option value="<%=province%>" <%= params[:unload_province].to_s == province ? "selected" : "" %>><%=province%></option>
+					<% end %>
+				</select>
+				</div>
+
 				<label for="query-name" class="middle">Jurusan</label>
-				<input type="text" name="search" id="query-name" class="half left" placeholder="" style="margin-left: 10px;">
-				<input class="submit" type="submit" value="Filter" />
+				<input type="text" name="search" id="query-name" class="half left" placeholder="" style="width: 100px;">
+
+				<input class="submit left" type="submit" value="Filter" />
 			</div>
 			</form>
 		</div>
-		<br class="clearfix">
+
+		<br class="clearfix" />
 		<div id="content-table">
 
 		</div>
-		<br class="clearfix" />
-		
 		<br class="clearfix"/>
 
 	</div>
 
 </div>
-
 
 <%= content_for :js do %>
 	<script>
@@ -87,6 +103,9 @@
 			query  = $("#query-name").val();
 			office_id  = $(".office_id").val();
 			customer_id  = $(".customer_id").val();
+			load_province  = $(".load_province").val();
+			unload_province  = $(".unload_province").val();
+
 			if (old_customer_id != customer_id || old_office_id != office_id || old_query != query) {
 				global_page = 1;
 			}
@@ -95,10 +114,10 @@
 			old_query = query;
 
 			$.ajax({
-				url: "<%= index_api_routes_url %>",
+				url: "<%= index_api_detailed_routes_url %>",
 				method: "get",
 				data:{
-					query,office_id,customer_id,page: global_page
+					query,office_id,customer_id,load_province,unload_province,page: global_page
 				},
 				dataType: "html",
 				success:function(data){

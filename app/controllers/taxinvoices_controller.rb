@@ -62,6 +62,11 @@ class TaxinvoicesController < ApplicationController
       @taxinvoices = @taxinvoices.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}").order(:long_id)
     end
 
+    @user_id = params[:user_id]
+    if @user_id.present?
+      @taxinvoices = @taxinvoices.where("user_id = ?", @user_id)
+    end
+
     if params[:process] == 'payment'
       @taxinvoices.each do |taxinvoice|
         if params["cb_" + taxinvoice.id.to_s] == 'on'

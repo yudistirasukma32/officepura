@@ -4,20 +4,47 @@
 	<%= render "shared/nav" %>
 </div>
 
+<style>
+	.green {
+		background-image: linear-gradient(#4CAF50, #4CAF50) !important;
+		border-color: #8BC34A #8BC34A #8BC34A !important;
+		pointer-events: none !important;
+	}
+
+	.disabled {
+		pointer-events: none !important;
+	}
+</style>
+
 <div id="main">
 
 	<div id="content-full">
-		<a class="btn-txt cancel" href="<%=customers_path%>"><i class="icon-remove"></i> Batal</a>
-
-		<h1>Master / <a href="<%=customers_path%>">Pelanggan</a> / Edit <strong title="<%=@customer.name%>"><%= @customer.name %></strong></h1>
+		
+		<div style="position: relative;display: flex;justify-content: space-between;flex-direction: row;align-items: center;">
+			<h1>Master / <a href="<%=customers_path%>">Pelanggan</a> / Edit <strong title="<%=@customer.name%>"><%= @customer.name %></strong></h1>
+			
+			<div style="position: relative; display: flex;">
+				<% if !@customer.approved %>
+					<% if checkrole 'General Manager' %>
+						<a class="btn-txt" href="gm_approve"><i class="icon-check"></i> GM Approve</a>
+					<% end %>
+				<% else %>
+				<a class="btn-txt green disabled" href="#"><i class="icon-check"></i> GM Approved</a>
+				<% end %>
+				<a class="btn-txt cancel" href="<%=customers_path%>"><i class="icon-remove"></i> Batal</a>
+			</div>
+		</div>
 
 		<% tab = 0 %>
 		<ul class="rounded" id="tabbed">
 			<li><a id="link_<%=tab+=1%>" href="">Data Pelanggan</a></li>
-			<% if checkrole 'Admin Jurusan, Admin Marketing, Marketing' %>
+			<% if checkrole 'Admin Jurusan, Admin Marketing, Marketing, Admin Penagihan' %>
 			<li><a id="link_<%=tab+=1%>" href="">Data Jurusan</a></li>
 			<% end %>
-			<% if checkrole 'Admin Invoice Tagihan' %>
+			<% if checkrole 'Admin Marketing, Marketing, Admin Penagihan, Admin Kontrak' %>
+			<li><a id="link_<%=tab+=1%>" href="">Data Kontrak</a></li>
+			<% end %>
+			<% if checkrole 'Admin Invoice Tagihan, Admin Penagihan' %>
 			<li><a id="link_<%=tab+=1%>" href="">Data Tagihan</a></li>
 			<% end %>
 		</ul>
@@ -34,6 +61,10 @@
 
 			    <div class="sliding_tab" id="tab_<%=tab+=1%>">
 						<%= render "routes" %>
+			    </div>
+
+				<div class="sliding_tab" id="tab_<%=tab+=1%>">
+						<%= render "contracts" %>
 			    </div>
 
 				<div class="sliding_tab" id="tab_<%=tab+=1%>">

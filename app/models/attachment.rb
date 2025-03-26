@@ -22,6 +22,8 @@ class Attachment < ActiveRecord::Base
       Office.find(self.imageable_id) rescue nil
     when "Legality"
       Legality.find(self.imageable_id) rescue nil
+    when "Contract"
+      Contract.find(self.imageable_id) rescue nil
     when "Invoice"
 			Invoice.find(self.imageable_id) rescue nil
     when "Taxinvoice"

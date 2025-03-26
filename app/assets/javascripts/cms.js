@@ -2928,6 +2928,281 @@ function getOmzetMarketing(){
 	});	
 }
 
+function getOmzetPenagihan(){
+ 
+	$.ajax({
+		type: "GET",
+		url: "/reports/getomzetbillings",
+		success: function(data) {
+
+			$(".loader.marketing-u").removeClass('d-block').addClass('d-none');
+
+			var thestats = data;
+
+			console.log(thestats);
+			if (window.ApexCharts) {
+				var options = {
+					chart: {
+						type: "line",
+						fontFamily: 'inherit',
+						height: 240,
+						width: 230,
+						animations: {
+							enabled: true
+						},
+					},
+					stroke: {
+						width: 4,
+						curve: 'smooth' // Makes the line smooth
+					},
+					dataLabels: {
+						enabled: false,
+					},
+					series: [{
+						name: "Omzet",
+						data: data.users.omzet_46 // Data for each month
+					}],
+					tooltip: {
+						theme: 'light',
+						x: {
+							formatter: function(value) {
+								return value; // Keeps the month-year format in tooltip
+							}
+						}
+					},
+					grid: {
+						strokeDashArray: 4,
+					},
+					xaxis: {
+						categories: data.month_text,
+						labels: {
+							rotate: -45 // Rotates labels for better readability
+						},
+						type: 'category'
+					},
+					yaxis: {
+						labels: {
+							padding: 2
+						},
+					},
+					colors: ['#14a714'],
+					legend: {
+						show: false,
+					},
+				};
+		
+				var chart = new ApexCharts($("#chart-omzet-46")[0], options);
+				chart.render();
+			}
+
+			if (window.ApexCharts) {
+				var options = {
+					chart: {
+						type: "line",
+						fontFamily: 'inherit',
+						height: 240,
+						width: 230,
+						animations: {
+							enabled: true
+						},
+					},
+					stroke: {
+						width: 4,
+						curve: 'smooth' // Makes the line smooth
+					},
+					dataLabels: {
+						enabled: false,
+					},
+					series: [{
+						name: "Omzet",
+						data: data.users.omzet_138 // Data for each month
+					}],
+					tooltip: {
+						theme: 'light',
+						x: {
+							formatter: function(value) {
+								return value; // Keeps the month-year format in tooltip
+							}
+						}
+					},
+					grid: {
+						strokeDashArray: 4,
+					},
+					xaxis: {
+						categories: data.month_text,
+						labels: {
+							rotate: -45 // Rotates labels for better readability
+						},
+						type: 'category'
+					},
+					yaxis: {
+						labels: {
+							padding: 2
+						},
+					},
+					colors: ['#14a714'],
+					legend: {
+						show: false,
+					},
+				};
+		46, 138, 134, 139
+				var chart = new ApexCharts($("#chart-omzet-138")[0], options);
+				chart.render();
+			}
+
+			if (window.ApexCharts) {
+				var options = {
+					chart: {
+						type: "line",
+						fontFamily: 'inherit',
+						height: 240,
+						width: 230,
+						animations: {
+							enabled: true
+						},
+					},
+					stroke: {
+						width: 4,
+						curve: 'smooth' // Makes the line smooth
+					},
+					dataLabels: {
+						enabled: false,
+					},
+					series: [{
+						name: "Omzet",
+						data: data.users.omzet_134 // Data for each month
+					}],
+					tooltip: {
+						theme: 'light',
+						x: {
+							formatter: function(value) {
+								return value; // Keeps the month-year format in tooltip
+							}
+						}
+					},
+					grid: {
+						strokeDashArray: 4,
+					},
+					xaxis: {
+						categories: data.month_text,
+						labels: {
+							rotate: -45 // Rotates labels for better readability
+						},
+						type: 'category'
+					},
+					yaxis: {
+						labels: {
+							padding: 2
+						},
+					},
+					colors: ['#14a714'],
+					legend: {
+						show: false,
+					},
+				};
+		
+				var chart = new ApexCharts($("#chart-omzet-134")[0], options);
+				chart.render();
+			}
+
+			if (window.ApexCharts) {
+				var options = {
+					chart: {
+						type: "line",
+						fontFamily: 'inherit',
+						height: 240,
+						width: 230,
+						animations: {
+							enabled: true
+						},
+					},
+					stroke: {
+						width: 4,
+						curve: 'smooth' // Makes the line smooth
+					},
+					dataLabels: {
+						enabled: false,
+					},
+					series: [{
+						name: "Omzet",
+						data: data.users.omzet_139 // Data for each month
+					}],
+					tooltip: {
+						theme: 'light',
+						x: {
+							formatter: function(value) {
+								return value; // Keeps the month-year format in tooltip
+							}
+						}
+					},
+					grid: {
+						strokeDashArray: 4,
+					},
+					xaxis: {
+						categories: data.month_text,
+						labels: {
+							rotate: -45 // Rotates labels for better readability
+						},
+						type: 'category'
+					},
+					yaxis: {
+						labels: {
+							padding: 2
+						},
+					},
+					colors: ['#14a714'],
+					legend: {
+						show: false,
+					},
+				};
+		
+				var chart = new ApexCharts($("#chart-omzet-139")[0], options);
+				chart.render();
+			}
+ 
+			if (window.ApexCharts) {
+				var options = {
+					series: data.this_month,
+					chart: {
+					width: 480,
+					type: 'pie',
+					
+				  },
+				  labels: ['Tutik', 'Alfi', 'Sarah', 'Sucy'],
+				  legend: {
+					position: 'bottom'
+				  }
+	 
+				};
+		
+				var chart = new ApexCharts($("#pie-chart")[0], options);
+				chart.render();
+			}
+
+			if (window.ApexCharts) {
+				var options = {
+					series: data.draft_vs_sent,
+					chart: {
+					width: 480,
+					type: 'pie',
+					
+				  },
+				  labels: ['Draft', 'Terkirim'],
+				  legend: {
+					position: 'bottom'
+				  }
+	 
+				};
+		
+				var chart = new ApexCharts($("#pie-chart-2")[0], options);
+				chart.render();
+			}
+
+		},
+		failure: function() {alert("Error. Mohon refresh browser Anda.");}
+	});	
+}
+
 function getproductgroupnames(group_id){
 	var groupname = "";
 	$.ajax({
@@ -3970,6 +4245,10 @@ $(document).ready(function() {
 	if($('#chart-omzet').length > 0){
 		getOmzetStats();
 		getOmzetMarketing();
+	}
+
+	if($('#chart-omzet-penagihan').length > 0){
+		getOmzetPenagihan();
 	}
 
 	if($('#div_annualvehiclegraph').length > 0){

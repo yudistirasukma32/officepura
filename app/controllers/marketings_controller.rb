@@ -41,7 +41,8 @@ class MarketingsController < ApplicationController
 		customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
 	
 		# exclude contract cust
-		contract_customer_id = 112
+		# contract_customer_id = 112
+		contract_customer_id = 379 #mayora
 
 		# @stat_indra = Event.active.where("customer_id != ? AND DATE_TRUNC('month', start_date) = ? AND user_id = ?", contract_customer_id, @default_month.beginning_of_month, 14)
 		# @stat_lilis = Event.active.where("customer_id != ? AND DATE_TRUNC('month', start_date) = ? AND user_id = ?", contract_customer_id, @default_month.beginning_of_month, 69)
@@ -121,7 +122,8 @@ class MarketingsController < ApplicationController
 		customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
 	
 		# exclude contract cust
-		contract_customer_id = 112
+		#contract_customer_id = 112
+		contract_customer_id = 379 #mayora
 
 		if @startdate.nil? && @enddate.nil?
 			@stat_indra = Event.active.where("customer_id != ? AND DATE_TRUNC('month', start_date) = ? AND user_id = ?", contract_customer_id, @default_month.beginning_of_month, 14)
@@ -192,7 +194,8 @@ class MarketingsController < ApplicationController
 		customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
 	
 		# exclude contract cust
-		contract_customer_id = 112
+		#contract_customer_id = 112
+		contract_customer_id = 379 #mayora
 
 		@months = (0..5).map { |i| Date.today << i }.reverse.each do |mo|
 
@@ -236,7 +239,8 @@ class MarketingsController < ApplicationController
 		customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
 	
 		# exclude contract cust
-		contract_customer_id = 112
+		# contract_customer_id = 112
+		contract_customer_id = 379 #mayora
 
 		#marketings
 		user_ids = [14, 69, 93, 112]

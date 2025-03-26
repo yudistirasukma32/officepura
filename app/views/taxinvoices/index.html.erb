@@ -63,6 +63,15 @@
 				<label for="enddate" class="tiny">s/d</label>
 				<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
 				<input type="hidden" name="filterbydates" value="1">
+
+				<label for="user_id" class="middle thalf">User</label>
+				<select name="user_id" class="short left" style="margin-right:10px;">
+					<option value="">All</option>
+					<% User.where('id in (46,138,134,139)').each do |m| %>
+					<option value="<%= m.id %>"<% if m.id.to_i == @user_id.to_i %> selected='selected'<% end %>><%=m.username%></option>
+					<% end %>
+				</select>
+
 				<input class="submit left" type="submit" value="Filter" />
 			</div>
 			</form>

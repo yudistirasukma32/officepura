@@ -6,6 +6,7 @@ class Customer < ActiveRecord::Base
 	has_many :taxinvoiceitems
 	has_many :taxinvoiceitemvs
 	has_many :events
+	has_many :contracts
 
 	# Setup accessible (or protected) attributes for your model
 	attr_accessible :enabled, :name, :address, :city, :contact, :phone, :mobile, :fax, :email,

@@ -1,0 +1,21 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	<div id="content-full">
+
+		<a class="btn-txt cancel" href="<%=@customer.present? ? edit_customer_path(@customer)+"/#3" : contracts_url %>" ><i class="icon-remove"></i> Kembali Ke <%= @customer.present? ? "Pelanggan" : "Contacts" %></a>
+		
+		<% if @customer.present? %>
+			<h1>Pelanggan / Tambah Data Kontrak</h1>
+		<% else %>
+			<h1>Tambah Data Kontrak</h1>
+		<% end %>
+
+		<%= render "form" %>
+		<br class="clearfix" />
+	</div>
+</div>

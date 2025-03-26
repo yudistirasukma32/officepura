@@ -71,9 +71,22 @@
 
       <div class="field-row flex">
         <%= f.label :load_province, "Provinsi Muat*" %>
-        <%= f.select :load_province, options_for_select(@provinces.collect {|w| [w, w]}, @route.load_province), {}, :class => 'half chzn-select', :required => true %>
-        <%= f.label :unload_province, "Bongkar*", :class => 'middle' %>
-        <%= f.select :unload_province, options_for_select(@provinces.collect {|w| [w, w]}, @route.unload_province), {}, :class => 'half chzn-select', :required => true %>
+        <%= f.select :load_province, options_for_select(@provinces, @route.load_province), {}, 
+          class: 'half chzn-select province-select', required: true, data: { target: "load_city" } %>
+
+        <%= f.label :unload_province, "Bongkar*", class: 'middle' %>
+        <%= f.select :unload_province, options_for_select(@provinces, @route.unload_province), {}, 
+          class: 'half chzn-select province-select', required: true, data: { target: "unload_city" } %>
+      </div>
+
+      <div class="field-row flex">
+        <%= f.label :load_city, "Kota Muat" %>
+        <%= f.select :load_city, [], {}, class: 'half chzn-select city-select', id: "load_city", 
+          data: { selected: @route.load_city } %>
+
+        <%= f.label :unload_city, "Bongkar", class: 'middle' %>
+        <%= f.select :unload_city, [], {}, class: 'half chzn-select city-select', id: "unload_city", 
+          data: { selected: @route.unload_city } %>
       </div>
 
       <div class="field-row">
@@ -423,5 +436,51 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
     });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const provinceCities = <%= @province_cities.to_json.html_safe %>;
+
+  function updateCities(provinceSelect, isInitialLoad = false) {
+    let province = provinceSelect.value; 
+    let targetCityId = provinceSelect.dataset.target; 
+    let citySelect = document.getElementById(targetCityId);
+
+    console.log("Province changed:", province, "Target City ID:", targetCityId);
+
+    // Get the selected value from data attribute (if exists) or current value
+    let selectedValue = isInitialLoad ? citySelect.dataset.selected : citySelect.value;
+
+    // Clear previous options
+    citySelect.innerHTML = "";
+
+    // Add new options if the province exists
+    if (province && provinceCities[province]) {
+      provinceCities[province].forEach(city => {
+        let option = new Option(city, city);
+        citySelect.add(option);
+
+        // Restore selected city
+        if (selectedValue === city) {
+          option.selected = true;
+        }
+      });
+    }
+
+    console.log("Selected city restored:", citySelect.value);
+
+    // Refresh Chosen dropdown
+    setTimeout(() => {
+      $(citySelect).trigger("chosen:updated");
+    }, 100);
+  }
+
+  document.body.addEventListener("change", function (event) {
+    if (event.target.classList.contains("province-select")) {
+      updateCities(event.target);
+    }
+  });
+
+  document.querySelectorAll(".province-select").forEach(select => updateCities(select, true));
 });
 </script>
