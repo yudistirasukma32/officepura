@@ -361,6 +361,7 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.user_id = current_user.id
       @taxinvoice.bank_id = params[:bank_id]
       @taxinvoice.booking_code = params[:booking_code]
+      @taxinvoice.discount_amount = params[:discount_amount]
       @taxinvoice.save
 
       if @taxinvoiceitems && @taxinvoiceitems.any?
@@ -570,7 +571,7 @@ class TaxinvoicesController < ApplicationController
 
       total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f
 
-      total = total - @taxinvoice.insurance_cost - @taxinvoice.claim_cost
+      total = total - @taxinvoice.insurance_cost - @taxinvoice.claim_cost  - @taxinvoice.discount_amount
 
       if params[:pembulatan].present?
         total = total.round()

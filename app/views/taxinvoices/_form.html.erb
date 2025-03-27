@@ -431,6 +431,11 @@ label {
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
+  <label for="discount_amount" class="half left">Diskon</label>
+  <input type="text" class="half left" id="taxinvoice_discount_amount" name="discount_amount" value="<%=@taxinvoice.discount_amount.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
   <label for="extra_cost" class="half left">Biaya Tambahan</label>
   <input type="text" class="half left" id="taxinvoice_extra_cost" name="extra_cost" value="<%=@taxinvoice.extra_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxes();"/> 
 </div>
@@ -699,6 +704,14 @@ label {
     <td align="right">&nbsp;</td>
      <td align="right">&nbsp;</td>
     <td align="right"><span id="txt_dp_cost" class="red"><%= to_currency_bank(0 - @taxinvoice.dp_cost)%></span></td>
+  </tr>
+
+  <tr id="-2">
+    <td colspan="7"></td>
+    <td align="right">Discount</td>
+    <td align="right">&nbsp;</td>
+     <td align="right">&nbsp;</td>
+    <td align="right"><span id="txt_discount_amount" class="red"><%= to_currency_bank(0 - @taxinvoice.discount_amount)%></span></td>
   </tr>
 
   <tr id="-3">
