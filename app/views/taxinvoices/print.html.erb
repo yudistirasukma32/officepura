@@ -425,6 +425,14 @@
 				<td align="right"><span id="txt_insurance_cost"><%= to_currency_bank(@taxinvoice.insurance_cost.to_i)%></span></td>
 			</tr>
 		  <% end %>
+
+		<% if @taxinvoice.discount_amount > 0 %>
+			<tr>
+				<td colspan="<%= colspan %>" align="right">Diskon</td>
+				<td align="right"><span id="txt_gst_tax" class="red"><%= to_currency(0 - @taxinvoice.discount_amount.to_i)%></span></td>
+			</tr>
+		<% end %>
+
 		  <tr class="footer">
 		    <td colspan="<%= colspan - 1%>" class="footer2"><span style="display: none;">&nbsp;<% if !@taxinvoice.total_in_words.blank? %> Terbilang: <%= @taxinvoice.total_in_words%><% end %></span></td>
 		    <td align="right" width="40"><strong>TOTAL</strong></td>
