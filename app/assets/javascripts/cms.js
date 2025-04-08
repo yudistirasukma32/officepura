@@ -1475,6 +1475,13 @@ function changeTaxesGeneric() {
 	var extra_cost = Number($('#taxinvoice_extra_cost').val().split('.').join('').replace(',','.'));
 	var insurance_cost = Number($('#taxinvoice_insurance_cost').val().split('.').join('').replace(',','.'));
 	var claim_cost = Number($('#taxinvoice_claim_cost').val().split('.').join('').replace(',','.'));
+	var discount_amount = Number($('#taxinvoice_discount_amount').val().split('.').join('').replace(',','.'));
+
+	if ($("#taxinvoice_dp_cost").length > 0) {
+		var dp_cost = Number($('#taxinvoice_dp_cost').val().split('.').join('').replace(',','.'));
+	} else {
+		var dp_cost = 0;
+	}
 
 	if ($(".gst_tax:checked").length > 0) {
 		ppn = $(".gst_tax:checked").first().val();
@@ -1486,8 +1493,9 @@ function changeTaxesGeneric() {
 	}
 
 	var is_pembulatan = $("#is_rounded").is(":checked");
-	total += extra_cost + gst_tax - price_tax - insurance_cost - claim_cost;
+	total += extra_cost + gst_tax - price_tax - insurance_cost - claim_cost - dp_cost - discount_amount;
 
+	// $('#txt_dp_cost').html(dp_cost.formatMoney(2,',','.'));
 	$('#txt_extra_cost').html(extra_cost.formatMoney(2,',','.'));
 	$('#txt_gst_tax').html(gst_tax.formatMoney(2,',','.'));
 
@@ -1514,6 +1522,22 @@ function changeTaxesGeneric() {
 	}
 	claim_cost = 0 - claim_cost
 	$('#txt_claim_cost').html(claim_cost.formatMoney(2,',','.'));
+
+	if(discount_amount > 0){
+		$('#txt_discount_amount').attr('class','red');
+	}else{
+		$('#txt_discount_amount').removeAttr('class');
+	}
+	discount_amount = 0 - discount_amount
+	$('#txt_discount_amount').html(discount_amount.formatMoney(2,',','.'));
+
+	if(dp_cost > 0){
+		$('#txt_dp_cost').attr('class','red');
+	}else{
+		$('#txt_dp_cost').removeAttr('class');
+	}
+	dp_cost = 0 - dp_cost
+	$('#txt_dp_cost').html(dp_cost.formatMoney(2,',','.'));
 
 	if (is_pembulatan) {
 		$('#txt_total').html(total.formatMoney(0,',','.'));

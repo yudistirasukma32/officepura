@@ -120,16 +120,20 @@ class TaxgenericinvoicesController < ApplicationController
     @taxinvoice.insurance_cost = params[:insurance_cost]
     @taxinvoice.claim_cost = params[:claim_cost]
 
+    @taxinvoice.dp_cost = params[:dp_cost].to_i
+    @taxinvoice.discount_amount = params[:discount_amount]
+
     # @taxinvoice.total_in_words = params[:total_in_words]
     @taxinvoice.description = params[:description]
     @taxinvoice.price_by = params[:price_by]
+    @taxinvoice.is_dp = params[:is_dp] == "Yes" ? true : false
     @taxinvoice.is_weightlost = params[:is_weightlost] == "Yes" ? true : false
     @taxinvoice.is_showqty_loaded = params[:is_showqty_loaded] == "Yes" ? true : false
     @taxinvoice.is_showqty_unloaded = params[:is_showqty_unloaded] == "Yes" ? true : false
     @taxinvoice.generic = true
     @taxinvoice.sentdate = params[:sentdate]
     @taxinvoice.user_id = current_user.id
-
+ 
     if @taxinvoice.save
 
       # ----- update values ----- #
@@ -196,10 +200,29 @@ class TaxgenericinvoicesController < ApplicationController
 
       end
 
+      
       @taxinvoice.period_start = @taxinvoice.taxgenericitems.active.minimum("date")
       @taxinvoice.period_end = @taxinvoice.taxgenericitems.active.maximum("date")
+      
+      dp_cost = @taxinvoice.dp_cost.to_f
+      extra_cost = @taxinvoice.extra_cost.to_f
 
       subtotal = @taxinvoice.taxgenericitems.active.sum(:total) + @taxinvoice.extra_cost.to_f
+
+
+      if @taxinvoice.taxinvoiceitems.count > 0
+        @taxinvoice.is_dp = false
+      end
+
+      if !@taxinvoice.is_dp
+
+        subtotal += extra_cost - dp_cost
+
+      else
+
+        subtotal += extra_cost + dp_cost
+
+      end
 
       #ppn_new
       ppn = Setting.where(name: 'ppn')
@@ -215,9 +238,9 @@ class TaxgenericinvoicesController < ApplicationController
       end
       @taxinvoice.gst_percentage = ppn_percentage
       if pembulatan
-        @taxinvoice.total = subtotal.round + @taxinvoice.gst_tax.round - @taxinvoice.price_tax.round - @taxinvoice.insurance_cost.round - @taxinvoice.claim_cost.round
+        @taxinvoice.total = subtotal.round + @taxinvoice.gst_tax.round - @taxinvoice.price_tax.round - @taxinvoice.insurance_cost.round - @taxinvoice.claim_cost.round - @taxinvoice.discount_amount
       else
-        @taxinvoice.total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f - @taxinvoice.insurance_cost.to_f - @taxinvoice.claim_cost.to_f
+        @taxinvoice.total = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f - @taxinvoice.insurance_cost.to_f - @taxinvoice.claim_cost.to_f - @taxinvoice.discount_amount
       end
 
       @taxinvoice.total_in_words = moneytowordsrupiah(@taxinvoice.total)

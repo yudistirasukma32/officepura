@@ -142,6 +142,17 @@
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
+  <label for="dp_cost" class="half left">Down Payment</label>
+  <input type="text" class="half left" id="taxinvoice_dp_cost" name="dp_cost" value="<%=@taxinvoice.dp_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxesGeneric();"/>
+  <input type="hidden" name="is_dp" value="<%=@taxinvoice.is_dp ? 'true' : '' %>"> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
+  <label for="discount_amount" class="half left">Diskon</label>
+  <input type="text" class="half left" id="taxinvoice_discount_amount" name="discount_amount" value="<%=@taxinvoice.discount_amount.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxesGeneric();"/> 
+</div>
+
+<div class="field-row continue" style="padding-bottom:0px;">
   <label for="extra_cost" class="half left">Biaya Tambahan</label>
   <input type="text" class="half left" id="taxinvoice_extra_cost" name="extra_cost" value="<%=@taxinvoice.extra_cost.to_i%>" onkeypress="javascript:return isMoneyKey(this);" onchange="javascript: changeTaxesGeneric();"/> 
 </div>
@@ -276,10 +287,9 @@
   <tfoot>
   <tr id="-1">
     <td colspan="3"></td>
+    <td></td>
+    <td></td>
     <td align="right">SUBTOTAL</td>
-    
-    <td></td>
-    <td></td>
     <td align="right"><span id="lbl_subtotal"><%=to_currency_bank(@taxgenericitems.sum(:total)) rescue 0%></span></td>
     <input type="hidden" id="taxinvoice_subtotal" name="subtotal" value="<%=@taxgenericitems.sum(:total) rescue 0%>" />
     
@@ -290,49 +300,65 @@
 
   <tr id="-2">
     <td colspan="3"></td>
-    <td align="right">Biaya Tambahan</td>
     <td align="right">&nbsp;</td>
-     <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
+    <td align="right">Biaya Tambahan</td>
     <td align="right"><span id="txt_extra_cost"><%=to_currency_bank(@taxinvoice.extra_cost)%></span></td>
+  </tr>
+
+  <tr id="-2">
+    <td colspan="3"></td>
+    <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
+    <td align="right">Down Payment</td>
+    <td align="right"><span id="txt_dp_cost" class="red"><%= to_currency_bank(0 - @taxinvoice.dp_cost)%></span></td>
+  </tr>
+
+  <tr id="-2">
+    <td colspan="3"></td>
+    <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
+    <td align="right">Discount</td>
+    <td align="right"><span id="txt_discount_amount" class="red"><%= to_currency_bank(0 - @taxinvoice.discount_amount)%></span></td>
   </tr>
 
   <tr id="-3">
     <td colspan="3"></td>
+    <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
     <td align="right">Biaya Asuransi</td>
-    <td align="right">&nbsp;</td>
-    <td align="right">&nbsp;</td>
     <td align="right"><span id="txt_insurance_cost" <% if @taxinvoice.insurance_cost > 0 %> class="red" <% end %>><%=to_currency_bank(0 - @taxinvoice.insurance_cost)%></span></td>
   </tr>
 
   <tr id="-3">
     <td colspan="3"></td>
+    <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
     <td align="right">Potongan Klaim Selisih</td>
-    <td align="right">&nbsp;</td>
-    <td align="right">&nbsp;</td>
     <td align="right"><span id="txt_claim_cost" <% if @taxinvoice.claim_cost > 0 %> class="red" <% end %>><%=to_currency_bank(0 - @taxinvoice.claim_cost)%></span></td>
   </tr>
 
   <tr id="-3">
     <td colspan="3"></td>
-    <td align="right">PPN <span id="ppn_amount"><%= @taxinvoice.get_ppn(ppn) %></span>%</td>
     <td align="right">&nbsp;</td>
-     <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
+    <td align="right">PPN <span id="ppn_amount"><%= @taxinvoice.get_ppn(ppn) %></span>%</td>
     <td align="right"><span id="txt_gst_tax"><%=to_currency_bank(@taxinvoice.gst_tax)%></span></td>
   </tr>
 
   <tr id="-4">
     <td colspan="3"></td>
-    <td align="right">PPH 2%</td>
     <td align="right">&nbsp;</td>
-     <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
+    <td align="right">PPH 2%</td>
     <td align="right"><span id="txt_price_tax" <% if @taxinvoice.price_tax > 0 %> class="red" <% end %> ><%=to_currency_bank(0 - @taxinvoice.price_tax)%></span></td>
   </tr>
 
   <tr id="-5" class="footer">
     <td colspan="3"></td>
+    <td align="right">&nbsp;</td>
+    <td align="right">&nbsp;</td>
     <td align="right" class="total">TOTAL</td>
-    <td align="right">&nbsp;</td>
-    <td align="right">&nbsp;</td>
     <td align="right" class="total"><span id="txt_total"><%=to_currency_bank(@taxinvoice.total)%></span></td>
   </tr>
   </tfoot>  
