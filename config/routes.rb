@@ -779,6 +779,7 @@ OfficePuraErp::Application.routes.draw do
     match 'estimationdashboard' => 'reports#estimationdashboard'
     match 'revenue-breakdown' => 'reports#revenuebreakdown'
     match 'estimation-event-expense' => 'reports#estimation_event_expense'
+    match 'estimation-event-expense-cancelled' => 'reports#estimation_event_expense_cancelled'
 
     match 'branches' => 'reports#branches'
     match 'branches-stats' => 'reports#branches_stats'

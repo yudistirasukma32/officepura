@@ -376,6 +376,7 @@
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi'), "Estimasi Pendapatan BKK", "/reports/estimation" %></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi'), "Perbandingan BKK & Estimasi", "/reports/estimation-income-expense" %></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi, Admin Penagihan'), "Perbandingan BKK & DO", "/reports/estimation-event-expense" %></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi, Admin Penagihan'), "Perbandingan BKK & DO ditolak", "/reports/estimation-event-expense-cancelled" %></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi'), "Laporan Cabang", "/reports/branches" %></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Estimasi'), "Stats Cabang", "/reports/branches-stats" %></li>
 				</ul>

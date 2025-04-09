@@ -3831,6 +3831,506 @@ end
 
   end
 
+  def estimation_event_expense_cancelled
+    @pagetitle = 'Estimasi BKK vs DO'
+    role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan'
+    if role
+      offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
+
+      #marketings
+      @user_id = params[:user_id]
+
+      @startdate = params[:startdate]
+      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+
+      # Get contracts
+      contracts = Contract.active.where("date_start BETWEEN ? AND ? OR date_end BETWEEN ? AND ? OR ? BETWEEN date_start AND date_end OR ? BETWEEN date_start AND date_end", @startdate.to_date, @enddate.to_date, @startdate.to_date, @enddate.to_date, @startdate.to_date, @enddate.to_date)
+
+      exevents = []
+      contracts.each do |contract|
+        if contract.contract_type == "period"
+          contract_events = Event.active.where(customer_id: contract.customer_id).where("start_date BETWEEN ? AND ?", contract.date_start, contract.date_end).pluck(:id)
+        elsif contract.contract_type == "route"
+          contract_routes = Route.active.where(contract_id: contract.id).pluck(:id)
+          contract_events = Event.where('cancelled = true').where(customer_id: contract.customer_id, route_id: contract_routes).where("start_date BETWEEN ? AND ?", contract.date_start, contract.date_end).pluck(:id)
+        end
+        exevents.push(contract_events)
+      end
+      exevents = exevents.flatten.compact.uniq
+      exevents = [0] if exevents.blank?
+
+      # render json: exevents
+      # return false
+
+      @customer_id = params[:customer_id]
+      @commodity_id = params[:commodity_id]
+
+      @customers = Customer.where('id in (select customer_id from events where deleted = false and start_date between ? and ?)', @startdate.to_date, @enddate.to_date).order(:name)
+
+      @eventsa = Event.where("(deleted = true OR cancelled = true) AND start_date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date).order(:start_date)
+
+      @transporttype = params[:transporttype]
+      @tanktype = params[:tanktype]
+
+      @createdat = params[:createdat]
+
+      if @createdat.present? and @createdat != 'all'
+        if @createdat == "08.00-12.00"
+          # Filtering records between 08:00 - 12:00
+          @eventsa = @eventsa.where("EXTRACT(HOUR FROM events.created_at + INTERVAL '7 hours') BETWEEN ? AND ?", 0, 12)
+          @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+        else
+          # Filtering records between 12:00 - 17:00
+          @eventsa = @eventsa.where("EXTRACT(HOUR FROM events.created_at + INTERVAL '7 hours') BETWEEN ? AND ?", 12, 23)
+          @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+        end
+      end
+
+      if @customer_id.present? and @customer_id != 'all'
+        @eventsa = @eventsa.where('customer_id = ?', @customer_id)
+        @customers = Customer.active.reorder(:name)
+      end
+
+      if @commodity_id.present? and @commodity_id != 'all'
+        @eventsa = @eventsa.where('commodity_id = ?', @commodity_id)
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+      end
+
+      if @transporttype.present? and @transporttype != 'all'
+        if @transporttype == 'RORO'
+          @eventsa = @eventsa.where('invoiceship = true')
+        elsif @transporttype == 'LOSING'
+          @eventsa = @eventsa.where('losing = true')
+        else
+          if @transporttype == 'KERETA'
+            @eventsa = @eventsa.where('invoicetrain = true')
+          else
+            @eventsa = @eventsa.where('invoicetrain = false')
+          end
+        end
+      end
+
+      if @tanktype.present? and @tanktype != 'all'
+        @eventsa = @eventsa.where('tanktype = ?', @tanktype)
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+      end
+
+      if params[:office_id].present? && params[:office_id] != 'all'
+        @eventsa = @eventsa.where('office_id = ?', params[:office_id])
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+      end
+
+      if params[:operator_id].present? && params[:operator_id] != 'all'
+        @eventsa = @eventsa.where(operator_id: params[:operator_id])
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+      end
+
+      if params[:routetrain_id].present? && params[:routetrain_id] != 'all'
+        @eventsa = @eventsa.where(routetrain_id: params[:routetrain_id])
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+      end
+
+      if @user_id.present?
+        @eventsa = @eventsa.where(user_id: params[:user_id])
+        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+      end
+
+      global_supir = 0
+      global_kernet = 0
+      global_solar = 0
+      global_tambahan = 0
+      global_tol_asdp = 0
+      global_premi = 0
+      global_invoice_total = 0
+      global_ppn_total = 0
+      global_total_estimation = 0
+      global_total_real = 0 
+      solar_price = Setting.find_by_name("Harga Solar").value.to_i
+      customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
+
+      # render json: @eventsa.where("id NOT IN (?)", exevents).to_sql
+      # return false
+
+      @events = @eventsa.where("id NOT IN (?)", exevents).map do |event|
+        route = event.route
+        price_per = route.price_per.to_i rescue 0
+        price_per_type = route.price_per_type rescue 'KG'
+        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
+        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
+
+        supir = route_allowance.driver_trip.to_i rescue 0
+        kernet = route_allowance.helper_trip.to_i rescue 0
+        premi = route.bonus.to_i rescue 0
+        solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
+        tambahan = route_allowance.misc_allowance.to_i rescue 0
+        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
+        invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
+
+        quantity = event.qty.to_i rescue 0
+        event_price_per_type = event.price_per_type rescue 'KG'
+        event_tonage = event.estimated_tonage.to_i rescue 0
+
+        # if price_per >= offset
+        #   estimation = quantity * price_per
+        # elsif customer_35.include? event.customer_id
+        #   estimation = quantity * 20000 * price_per
+        # elsif(price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg
+        #   estimation = quantity * event_tonage * price_per
+        # else
+        #   estimation = quantity * event_tonage * price_per
+        # end
+
+        if price_per >= offset
+          estimation = quantity * price_per
+        elsif customer_35.include? event.customer_id
+          estimation = quantity * 20000 * price_per
+        else
+          estimation = quantity * event_tonage *  price_per
+        end
+
+        ppn = 0
+        if event.customer.gst_percentage > 0
+          ppn = estimation * event.customer.gst_percentage.to_i / 100
+        end
+
+        realization = 0
+        invoices = Invoice.active.where('event_id = ? AND invoice_id is null AND id not in(select invoice_id from invoicereturns where deleted = false)', event.id).map do |bkk|
+
+          bkk_route = bkk.route
+          bkk_price_per = bkk_route.price_per.to_i rescue 0
+          est_bkk = 0
+
+          offset_bkk = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
+          if bkk_price_per >= offset_bkk
+            est_bkk = bkk_price_per
+          else
+            est_bkk = bkk.event.estimated_tonage.to_i * bkk_price_per
+          end
+
+          realization += est_bkk
+
+        end
+
+        # check target
+        @target = params[:target]
+        if @target.present? && @target != 'all'
+          case @target
+          when "Proses"
+            next if estimation == realization # Skip if estimation equals realization
+          when "Tercapai"
+            next if estimation != realization # Skip if estimation is not equal to realization
+          end
+        end
+        
+        global_supir += supir
+        global_kernet += kernet
+        global_solar += solar
+        global_tambahan += tambahan
+        global_tol_asdp += tol_asdp
+        global_premi += premi
+        global_invoice_total += invoice_total
+        global_ppn_total += ppn
+        global_total_estimation += estimation
+        global_total_real += realization
+
+        description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>"
+        description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
+
+        {
+          route_name: (route.name rescue "Kosong"),
+          route_price: (route.price_per rescue "Kosong"),
+          route_id: event.route_id,
+          tanktype: event.tanktype,
+          office: (event.office.abbr rescue "Kosong"),
+          supir: supir,
+          username: event.user.username,
+          kernet: kernet,
+          solar: solar,
+          ppn: ppn,
+          tambahan: tambahan,
+          premi_allowance: premi,
+          tol_asdp: tol_asdp,
+          invoice_total: invoice_total,
+          total_estimation: estimation,
+          description: description.html_safe,
+          start_date: event.start_date,
+          created_at: event.created_at,
+          route_train: (event.routetrain.name rescue "Kosong"),
+          route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
+          route_train_id: event.routetrain_id,
+          realization: realization,
+          reject_reason: event.reject_reason
+        }
+      end
+      
+      @summary = {
+        global_supir: global_supir ,
+        global_kernet: global_kernet ,
+        global_solar: global_solar ,
+        global_tambahan: global_tambahan ,
+        global_tol_asdp: global_tol_asdp ,
+        global_premi: global_premi ,
+        global_invoice_total: global_invoice_total ,
+        global_ppn_total: global_ppn_total ,
+        global_total_estimation: global_total_estimation ,
+        global_total_real: global_total_real ,
+      }
+
+      # render json: @events
+      # return false
+
+      # DO in contracts
+      global_contract_supir = 0
+      global_contract_kernet = 0
+      global_contract_solar = 0
+      global_contract_tambahan = 0
+      global_contract_tol_asdp = 0
+      global_contract_premi = 0
+      global_contract_invoice_total = 0
+      global_contract_ppn_total = 0
+      global_contract_total_estimation = 0
+      global_contract_total_real = 0 
+      contract_customers = []
+      contract_used = []
+
+      @contract_events = []
+
+      # render json: @contract_events
+
+      contracts.each do |contract|
+        if contract.contract_type == "period"
+          events = Event.active.where(customer_id: contract.customer_id).where("start_date BETWEEN ? AND ? AND start_date BETWEEN ? AND ?", contract.date_start, contract.date_end, @startdate.to_date, @enddate.to_date)
+        elsif contract.contract_type == "route"
+          routes = Route.active.where(contract_id: contract.id, price_per_type: 'KONTRAK').pluck(:id)
+          events = Event.active.where(customer_id: contract.customer_id, route_id: routes).where("start_date BETWEEN ? AND ? AND start_date BETWEEN ? AND ?", contract.date_start, contract.date_end, @startdate.to_date, @enddate.to_date)
+        end
+
+        # Filter
+        # if @customer_id.present? and @customer_id != 'all'
+        #   events = events.where('customer_id = ?', @customer_id)
+        # end
+
+        if @transporttype.present? and @transporttype != 'all'
+          if @transporttype == 'RORO'
+            events = events.where('invoiceship = true')
+          elsif @transporttype == 'LOSING'
+            events = events.where('losing = true')
+          else
+            if @transporttype == 'KERETA'
+              events = events.where('invoicetrain = true')
+            else
+              events = events.where('invoicetrain = false')
+            end
+          end
+        end
+
+        if @tanktype.present? and @tanktype != 'all'
+          events = events.where('tanktype = ?', @tanktype)
+        end
+
+        if params[:office_id].present? && params[:office_id] != 'all'
+          events = events.where('office_id = ?', params[:office_id])
+        end
+
+        if params[:operator_id].present? && params[:operator_id] != 'all'
+          # events = events.where(operator_id: params[:operator_id])
+          events = events.where('operator_id = ?', params[:operator_id])
+        end
+
+        if params[:routetrain_id].present? && params[:routetrain_id] != 'all'
+          # events = events.where(routetrain_id: params[:routetrain_id])
+          events = events.where('routetrain_id = ?', params[:routetrain_id])
+        end
+
+        if events.present?
+          events.each do |event|
+            route = event.route
+            price_per = route.price_per.to_i rescue 0
+            price_per_type = route.price_per_type rescue 'KG'
+            route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
+            quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
+
+            supir = route_allowance.driver_trip.to_i rescue 0
+            kernet = route_allowance.helper_trip.to_i rescue 0
+            premi = route.bonus.to_i rescue 0
+            solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
+            tambahan = route_allowance.misc_allowance.to_i rescue 0
+            tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
+            invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
+
+            quantity = event.qty.to_i rescue 0
+            event_price_per_type = event.price_per_type rescue 'KG'
+            event_tonage = event.estimated_tonage.to_i rescue 0
+
+            if contract_used.include? contract.id
+              estimation = 0
+            else
+              estimation = contract.total.to_i rescue 0
+              contract_used.push(contract.id)
+            end
+
+            ppn = 0
+            if event.customer.gst_percentage > 0
+              ppn = estimation * event.customer.gst_percentage.to_i / 100
+            end
+            
+            realization = 0
+            invoices = Invoice.active.where('event_id = ? AND invoice_id is null AND id not in(select invoice_id from invoicereturns where deleted = false)', event.id).map do |bkk|
+    
+              bkk_route = bkk.route
+              bkk_price_per = bkk_route.price_per.to_i rescue 0
+              est_bkk = 0
+    
+              offset_bkk = Setting.find_by_name('Offset Estimasi').to_i rescue 200000
+              if bkk_price_per >= offset_bkk
+                est_bkk = bkk_price_per
+              else
+                est_bkk = bkk.event.estimated_tonage.to_i * bkk_price_per
+              end
+    
+              realization += est_bkk
+    
+            end
+
+            global_contract_supir += supir
+            global_contract_kernet += kernet
+            global_contract_solar += solar
+            global_contract_tambahan += tambahan
+            global_contract_tol_asdp += tol_asdp
+            global_contract_premi += premi
+            global_contract_invoice_total += invoice_total
+            global_contract_ppn_total += ppn
+            global_contract_total_estimation += estimation
+            global_contract_total_real += realization
+
+            description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>"
+            description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
+
+            @contract_events.push({
+              route_name: (route.name rescue "Kosong"),
+              route_price: (route.price_per rescue "Kosong"),
+              route_id: event.route_id,
+              tanktype: event.tanktype,
+              office: (event.office.abbr rescue "Kosong"),
+              supir: supir,
+              username: event.user.username,
+              kernet: kernet,
+              solar: solar,
+              ppn: ppn,
+              tambahan: tambahan,
+              premi_allowance: premi,
+              tol_asdp: tol_asdp,
+              invoice_total: invoice_total,
+              total_estimation: estimation,
+              description: description.html_safe,
+              start_date: event.start_date,
+              created_at: event.created_at,
+              route_train: (event.routetrain.name rescue "Kosong"),
+              route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
+              route_train_id: event.routetrain_id,
+              realization: realization
+            })
+          end
+        end
+      end
+
+      # @contract_events = @eventsa.where(id: exevents).map do |event|
+      #   route = event.route
+      #   price_per = route.price_per.to_i rescue 0
+      #   price_per_type = route.price_per_type rescue 'KG'
+      #   route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
+      #   quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
+
+      #   supir = route_allowance.driver_trip.to_i rescue 0
+      #   kernet = route_allowance.helper_trip.to_i rescue 0
+      #   premi = route.bonus.to_i rescue 0
+      #   solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
+      #   tambahan = route_allowance.misc_allowance.to_i rescue 0
+      #   tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
+      #   invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
+
+      #   quantity = event.qty.to_i rescue 0
+      #   event_price_per_type = event.price_per_type rescue 'KG'
+      #   event_tonage = event.estimated_tonage.to_i rescue 0
+
+      #   if contract_customers.include? event.customer_id
+      #     estimation = 0
+      #   else
+      #     contract = contracts.where(customer_id: event.customer_id).first
+      #     estimation = contract.total.to_i rescue 0
+      #     contract_customers.push(event.customer_id)
+      #   end
+
+      #   global_contract_supir += supir
+      #   global_contract_kernet += kernet
+      #   global_contract_solar += solar
+      #   global_contract_tambahan += tambahan
+      #   global_contract_tol_asdp += tol_asdp
+      #   global_contract_premi += premi
+      #   global_contract_invoice_total += invoice_total
+      #   global_contract_total_estimation += estimation
+
+
+      #   description = "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
+      #   {
+      #     route_name: (route.name rescue "Kosong"),
+      #     route_price: (route.price_per rescue "Kosong"),
+      #     route_id: event.route_id,
+      #     tanktype: event.tanktype,
+      #     office: (event.office.abbr rescue "Kosong"),
+      #     supir: supir,
+      #     kernet: kernet,
+      #     solar: solar,
+      #     tambahan: tambahan,
+      #     premi_allowance: premi,
+      #     tol_asdp: tol_asdp,
+      #     invoice_total: invoice_total,
+      #     total_estimation: estimation,
+      #     description: description,
+      #     start_date: event.start_date,
+      #     route_train: (event.routetrain.name rescue "Kosong"),
+      #     route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
+      #     route_train_id: event.routetrain_id
+      #   }
+      # end
+
+      # render json: @contract_events
+
+      @contract_summary = {
+        global_supir: global_contract_supir ,
+        global_kernet: global_contract_kernet ,
+        global_solar: global_contract_solar ,
+        global_tambahan: global_contract_tambahan ,
+        global_tol_asdp: global_contract_tol_asdp ,
+        global_premi: global_contract_premi ,
+        global_invoice_total: global_contract_invoice_total ,
+        global_ppn_total: global_contract_ppn_total ,
+        global_total_estimation: global_contract_total_estimation ,
+        global_total_real: global_contract_total_real ,
+      }
+
+      # Grandtotal
+      @grandtotal_supir = global_supir + global_contract_supir
+      @grandtotal_kernet = global_kernet + global_contract_kernet
+      @grandtotal_solar = global_solar + global_contract_solar
+      @grandtotal_tambahan = global_tambahan + global_contract_tambahan
+      @grandtotal_tol_asdp = global_tol_asdp + global_contract_tol_asdp
+      @grandtotal_premi = global_premi + global_contract_premi
+      @grandtotal_invoice_total = global_invoice_total + global_contract_invoice_total
+      @grandtotal_ppn_total = global_ppn_total + global_contract_ppn_total 
+      @grandtotal_total_estimation = global_total_estimation + global_contract_total_estimation
+      @grandtotal_total_real = global_total_real + global_contract_total_real
+
+      @section = "estimationreport"
+      @where = "estimation_event_expense_cancelled"
+    else
+      redirect_to root_path()
+    end
+
+  end
+
   def branches
     @pagetitle = 'Laporan Cabang'
     role = cek_roles 'Admin Keuangan, Estimasi'
