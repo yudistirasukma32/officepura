@@ -137,7 +137,7 @@
 		<div class="widget-cardo">
 			<a href="#">
 				<p class="text-dark">Pengiriman Invoice</p>
-				<strong><%= @this_month_taxinvoices.where('sentdate is not null').count %></strong>
+				<strong><%= @this_month_taxinvoices.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong>
 			</a>
 		</div>
 		<div class="widget-cardo">
@@ -194,7 +194,14 @@
 			<small>Est. Omzet</small>
             <br/><br/>
 
-            <strong style="color: #12a812;"><%= to_currency(@stats_tuti.where('paiddate is not null').sum(:total)) %></strong>
+            <!-- <strong style="color: #12a812;"><%= to_currency(@stats_tuti.where('paiddate is not null').sum(:total)) %></strong> -->
+			<strong style="color: #12a812;">
+			<% cashin_46 = Bankexpense.joins('INNER JOIN taxinvoices ON taxinvoices.id = bankexpenses.taxinvoice_id')
+			.where('bankexpenses.bankexpense_id IS NULL AND bankexpenses.creditgroup_id = 607 AND taxinvoices.user_id = 46 
+			AND bankexpenses.date BETWEEN ? AND ?', @startdate.to_date, @enddate.to_date)
+			.sum(:total) %>
+			<%= to_currency(cashin_46) %>
+			</strong>
 			<br/>
 			<small>Cash In</small>
             <br/><br/>
@@ -209,7 +216,7 @@
             </div>
             <div class="separate">
                 <span><strong><%= @stats_tuti.where('sentdate is null').count %></strong></span>
-                <span><strong><%= @stats_tuti.where('sentdate is not null').count %></strong></span>
+                <span><strong><%= @stats_tuti.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong></span>
             </div>
 
 		</div>
@@ -226,7 +233,14 @@
 			<small>Est. Omzet</small>
             <br/><br/>
 
-            <strong style="color: #12a812;"><%= to_currency(@stats_alfi.where('paiddate is not null').sum(:total)) %></strong>
+            <!-- <strong style="color: #12a812;"><%= to_currency(@stats_alfi.where('paiddate is not null').sum(:total)) %></strong> -->
+			<strong style="color: #12a812;">
+			<% cashin_138 = Bankexpense.joins('INNER JOIN taxinvoices ON taxinvoices.id = bankexpenses.taxinvoice_id')
+			.where('bankexpenses.bankexpense_id IS NULL AND bankexpenses.creditgroup_id = 607 AND taxinvoices.user_id = 138 
+			AND bankexpenses.date BETWEEN ? AND ?', @startdate.to_date, @enddate.to_date)
+			.sum(:total) %>
+			<%= to_currency(cashin_138) %>
+			</strong>
 			<br/>
 			<small>Cash In</small>
             <br/><br/>
@@ -241,7 +255,7 @@
             </div>
             <div class="separate">
                 <span><strong><%= @stats_alfi.where('sentdate is null').count %></strong></span>
-                <span><strong><%= @stats_alfi.where('sentdate is not null').count %></strong></span>
+                <span><strong><%= @stats_alfi.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong></span>
             </div>
 		</div>
 		<div class="widget-carda">
@@ -257,7 +271,14 @@
 			<small>Est. Omzet</small>
             <br/><br/>
 
-            <strong style="color: #12a812;"><%= to_currency(@stats_sarah.where('paiddate is not null').sum(:total)) %></strong>
+            <!-- <strong style="color: #12a812;"><%= to_currency(@stats_sarah.where('paiddate is not null').sum(:total)) %></strong> -->
+			<strong style="color: #12a812;">
+			<% cashin_134 = Bankexpense.joins('INNER JOIN taxinvoices ON taxinvoices.id = bankexpenses.taxinvoice_id')
+			.where('bankexpenses.bankexpense_id IS NULL AND bankexpenses.creditgroup_id = 607 AND taxinvoices.user_id = 134 
+			AND bankexpenses.date BETWEEN ? AND ?', @startdate.to_date, @enddate.to_date)
+			.sum(:total) %>
+			<%= to_currency(cashin_134) %>
+			</strong>
 			<br/>
 			<small>Cash In</small>
             <br/><br/>
@@ -272,7 +293,7 @@
             </div>
             <div class="separate">
                 <span><strong><%= @stats_sarah.where('sentdate is null').count %></strong></span>
-                <span><strong><%= @stats_sarah.where('sentdate is not null').count %></strong></span>
+                <span><strong><%= @stats_sarah.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong></span>
             </div>
 		</div>
 		<div class="widget-carda">
@@ -288,7 +309,14 @@
 			<small>Est. Omzet</small>
             <br/><br/>
 
-            <strong style="color: #12a812;"><%= to_currency(@stats_suci.where('paiddate is not null').sum(:total)) %></strong>
+            <!-- <strong style="color: #12a812;"><%= to_currency(@stats_suci.where('paiddate is not null').sum(:total)) %></strong> -->
+			<strong style="color: #12a812;">
+			<% cashin_139 = Bankexpense.joins('INNER JOIN taxinvoices ON taxinvoices.id = bankexpenses.taxinvoice_id')
+			.where('bankexpenses.bankexpense_id IS NULL AND bankexpenses.creditgroup_id = 607 AND taxinvoices.user_id = 139
+			AND bankexpenses.date BETWEEN ? AND ?', @startdate.to_date, @enddate.to_date)
+			.sum(:total) %>
+			<%= to_currency(cashin_139) %>
+			</strong>
 			<br/>
 			<small>Cash In</small>
             <br/><br/>
@@ -303,7 +331,7 @@
             </div>
             <div class="separate">
                 <span><strong><%= @stats_suci.where('sentdate is null').count %></strong></span>
-                <span><strong><%= @stats_suci.where('sentdate is not null').count %></strong></span>
+                <span><strong><%= @stats_suci.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong></span>
             </div>
 		</div>
 	</div>
@@ -408,6 +436,20 @@
 									<%=number_with_precision(persentase, :precision => 2)%>
 								<% end %>
 								%
+							</li>
+						</ul>
+					</div>
+
+					<div class="widget medium-widget">
+						<ul>
+							<li class="head"><h3 style="color: #010101; font-weight: bold;">Cash In</h3></li>
+							<% cashin_all = Bankexpense.joins('INNER JOIN taxinvoices ON taxinvoices.id = bankexpenses.taxinvoice_id')
+							.where('bankexpenses.bankexpense_id IS NULL AND bankexpenses.creditgroup_id = 607
+							AND bankexpenses.date BETWEEN ? AND ?', @startdate.to_date, @enddate.to_date)
+							.sum(:total) %>
+							<li>
+								Cash In
+								<strong class="green"><%=to_currency_bank(cashin_all)%></strong>
 							</li>
 						</ul>
 					</div>
