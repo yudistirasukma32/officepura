@@ -146,6 +146,58 @@
 			</tr>
 			<% end %>
 
+			<!-- BKM PREMI -->
+			<% if @receiptreturns.where("money(premi_allowance) > money(0)").any? %>
+			<tr class="subheading">
+				<th colspan="<%= colspan %>"><span class="green">Premi</span></th>
+			</tr>
+
+			<% @receiptreturns.where("money(premi_allowance) > money(0)").each_with_index do |receiptreturn, i| %>
+			<% running += receiptreturn.premi_allowance %>
+			<tr>
+				<td><%=i+1%>.</td>
+				<td>#<%=zeropad(receiptreturn.invoice.id)%>: <%=receiptreturn.invoice.date.strftime("%d/%m/%y")%>, <%=receiptreturn.quantity%> Rit, <%=receiptreturn.invoice.route.name%> (<%=receiptreturn.invoice.driver.name%>)</td>
+				<td><%=receiptreturn.office.abbr%></td>
+				<td><%=receiptreturn.invoice.vehicle.current_id%></td>
+				<td align="right" class="green"><%=to_currency(receiptreturn.premi_allowance)%></td>
+				<td align="right"><%=to_currency(running)%></td>
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="green"><%=to_currency(@receiptreturns.sum(:premi_allowance))%></td>
+				<td>&nbsp;</td>
+			</tr>
+			<% end %>
+
+			<!-- BKM SOLAR KONTAN -->
+			<% if @receiptreturns.where("money(gas_allowance) > money(0)").any? %>
+			<tr class="subheading">
+				<th colspan="<%= colspan %>"><span class="green">Solar Kontan</span></th>
+			</tr>
+
+			<% @receiptreturns.where("money(gas_allowance) > money(0)").each_with_index do |receiptreturn, i| %>
+			<% running += receiptreturn.premi_allowance %>
+			<tr>
+				<td><%=i+1%>.</td>
+				<td>#<%=zeropad(receiptreturn.invoice.id)%>: <%=receiptreturn.invoice.date.strftime("%d/%m/%y")%>, <%=receiptreturn.quantity%> Rit, <%=receiptreturn.invoice.route.name%> (<%=receiptreturn.invoice.driver.name%>)</td>
+				<td><%=receiptreturn.office.abbr%></td>
+				<td><%=receiptreturn.invoice.vehicle.current_id%></td>
+				<td align="right" class="green"><%=to_currency(receiptreturn.gas_allowance)%></td>
+				<td align="right"><%=to_currency(running)%></td>
+			</tr>
+			<% end %>
+
+			<tr class="footer">
+				<td>&nbsp;</td>
+				<td colspan="3">TOTAL</td>
+				<td align="right" class="green"><%=to_currency(@receiptreturns.sum(:gas_allowance))%></td>
+				<td>&nbsp;</td>
+			</tr>
+			<% end %>
+
 			<!-- LAIN - LAIN -->
 			<% if @receiptreturns.where("money(misc_allowance + tol_fee + ferry_fee) > money(0)").any? %>
 			<tr class="subheading">
