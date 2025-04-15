@@ -143,8 +143,8 @@ OfficePuraErp::Application.routes.draw do
     member do
       get 'enable'
       get 'disable'
-
-      get "copy"
+      get 'copy'
+      get 'approve'
     end
     collection do
       get "index_api"

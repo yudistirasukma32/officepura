@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250326033606) do
+ActiveRecord::Schema.define(:version => 20250415050537) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -300,18 +300,18 @@ ActiveRecord::Schema.define(:version => 20250326033606) do
   end
 
   create_table "contracts", :force => true do |t|
-    t.boolean  "deleted",                                      :default => false
-    t.boolean  "enabled",                                      :default => true
-    t.string   "name"
-    t.string   "code"
-    t.date     "date_start"
-    t.date     "date_end"
-    t.integer  "customer_id"
-    t.string   "contract_type"
-    t.string   "description"
-    t.datetime "created_at",                                                      :null => false
-    t.datetime "updated_at",                                                      :null => false
-    t.decimal  "total",         :precision => 19, :scale => 2
+    t.boolean   "deleted",                                                   :default => false
+    t.boolean   "enabled",                                                   :default => true
+    t.string    "name"
+    t.string    "code"
+    t.date      "date_start"
+    t.date      "date_end"
+    t.integer   "customer_id"
+    t.string    "contract_type"
+    t.string    "description"
+    t.timestamp "created_at",    :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",    :limit => 6,                                                   :null => false
+    t.decimal   "total",                      :precision => 19, :scale => 2
   end
 
   create_table "customers", :force => true do |t|
@@ -1494,6 +1494,10 @@ ActiveRecord::Schema.define(:version => 20250326033606) do
     t.string    "load_city"
     t.string    "unload_city"
     t.integer   "contract_id"
+    t.boolean   "approved",                                                    :default => false
+    t.datetime  "approved_at"
+    t.integer   "approved_by"
+    t.integer   "user_id"
   end
 
   add_index "routes", ["name", "customer_id", "office_id"], :name => "route_office"

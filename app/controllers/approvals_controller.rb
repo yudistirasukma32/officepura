@@ -28,6 +28,7 @@ class ApprovalsController < ApplicationController
       @quotationgroups = Quotationgroup.active.where('date >= ?', Date.new(2025, 1, 1)).reorder('date DESC')
       @quotationgroups = @quotationgroups.where('customer_approved = false')
       
+      @draft_routes = Route.active.where('approved = false')
       respond_to :html
     else
       redirect_to root_path()

@@ -1,0 +1,49 @@
+<table class="row-view">
+	<tr>
+		<th>Nama Jurusan</th>
+		<th>Pelanggan</th>
+		<th width="200">Alamat Muat</th>
+		<th width="200">Alamat Bongkar</th>
+		<th>Komoditas</th>
+		<th>Jarak (KM)</th>
+		<th>User</th>
+		<th width="60"></th>
+	</tr>
+
+    <% if @draft_routes.any? %>
+
+	<% @draft_routes.includes(:commodity, :customer).each do |route| %>
+
+	<%
+	routelocation = Routelocation.where("route_id = ?", route.id).order("id DESC").first rescue nil
+	%>
+
+	<tr>
+		<td><strong><%= link_to route.name, edit_route_path(route) %></strong></td>
+		<td><%= route.customer.name rescue nil %></td>
+		<td><%= routelocation.address_start + ' ' rescue nil %><%= route.load_province rescue nil %></td>
+		<td><%= routelocation.address_end + ' ' rescue nil %><%= route.unload_province rescue nil %></td>
+		<td><%= route.commodity.name rescue nil %></td>
+		<td class="text-right"><%= route.distance rescue nil %></td>
+		<td><%= route.user.username if !route.user.blank? %></td>
+		<td class="right" width="60">
+			<%= link_to '&#xf044;'.html_safe, edit_route_path(route), :class => "edit tipsy", :title => 'Edit' if checkrole 'Admin Operasional, Marketing, Admin Jurusan' %> 
+		</td>
+	</tr>
+	<% end %>	
+
+	    <% else %>	
+    
+        <tr>
+			<td colspan = '6'>
+				Tidak ada data jurusan baru
+			</td>
+        </tr>
+
+    <% end %>
+
+</table>
+
+<small>*jurusan baru (tidak melalui penawaran)</small>
+
+<br class="clearfix" />

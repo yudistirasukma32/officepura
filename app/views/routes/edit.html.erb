@@ -1,3 +1,15 @@
+<style>
+	.green {
+		background-image: linear-gradient(#4CAF50, #4CAF50) !important;
+		border-color: #8BC34A #8BC34A #8BC34A !important;
+		pointer-events: none !important;
+	}
+
+	.disabled {
+		pointer-events: none !important;
+	}
+</style>
+
 <%= render "shared/header" %>
 
 <div id="nav">
@@ -6,16 +18,33 @@
 
 <div id="main">
 	<div id="content-full">
+		<div style="position: relative;display: flex;justify-content: space-between;flex-direction: row;align-items: center;">
 
-		<% if params[:operational] || params[:operational] == true %>
-			<a class="btn-txt cancel" href="<%= routes_url %>"><i class="icon-remove"></i> Kembali Ke Jurusan</a>
-			<h1>Master / <a href="<%=routes_path%>">Jurusan</a> / Index</h1>
-		<% else %>
-			<a class="btn-txt cancel" href="<%=@customer.present? ? edit_customer_path(@customer).to_s + "/#2" : routes_url%>"><i class="icon-remove"></i> Kembali Ke <%= @customer.present? ? "Pelanggan" : "Master Jurusan" %></a>
-			<h1>Pelanggan / Edit Jurusan</h1>
-		<% end %>
+			<% if params[:operational] || params[:operational] == true %>
+				<h1>Master / <a href="<%=routes_path%>">Jurusan</a> / Index</h1>
+			<% else %>
+				<h1>Pelanggan / Edit Jurusan</h1>
+			<% end %>
+
+			<div style="position: relative; display: flex;">
+				<% if !@route.approved %>
+					<% if checkrole 'General Manager' %>
+						<a class="btn-txt" href="approve"><i class="icon-check"></i> GM Approve</a>
+					<% end %>
+				<% else %>
+				<a class="btn-txt green disabled" href="#"><i class="icon-check"></i> GM Approved</a>
+				<% end %>
+
+				<% if params[:operational] || params[:operational] == true %>
+					<a class="btn-txt cancel" href="../../routes"><i class="icon-remove"></i> Kembali Ke Jurusan</a>
+				<% else %>
+					<a class="btn-txt cancel" href="<%=edit_customer_path(@customer)%>/#2"><i class="icon-remove"></i> Kembali Ke Pelanggan</a>
+				<% end %>
+			</div>
+		</div>
 		
 		<%= render "form" %>
+		
 		<br class="clearfix" />
 	</div>
 </div>

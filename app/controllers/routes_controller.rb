@@ -219,6 +219,7 @@ class RoutesController < ApplicationController
     inputs = params[:route]
     @route = Route.new(inputs)
     @route.enabled = true
+    @route.user_id = current_user.id
 
     if checkrole 'Marketing, Admin Marketing'
 
@@ -310,4 +311,14 @@ class RoutesController < ApplicationController
     @route.update_attributes(:enabled => false)
     redirect_to (routes_url)
   end
+
+  def approve
+    @route = Route.find(params[:id])
+    @route.approved = true
+    @route.approved_at = Time.new.strftime("%Y-%m-%d")
+    @route.approved_by = current_user.id
+    @route.save
+    redirect_to(edit_route_path(params['id']), :notice => 'Data Jurusan sukses di-approve.')
+  end
+
 end

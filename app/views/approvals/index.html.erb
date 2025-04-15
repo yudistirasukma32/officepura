@@ -23,6 +23,16 @@
 
 		<% end %>
 
+		<% if checkrole 'Admin Marketing, General Manager' %>
+
+		<h2 style="font-weight: bold;">Jurusan Baru (Tidak Melalui Penawaran)</h2>
+
+		<%= render "routes_draft" %>
+ 
+		<br class="clearfix" />
+
+		<% end %>
+
 		<% if checkrole 'Admin Approval, Admin Marketing, General Manager' %>
 
 		<h2 style="font-weight: bold;">Penawaran Baru</h2>
