@@ -23,11 +23,13 @@
 			<tr>
 				<th>Nama</th>
 				<th>Kota</th>
+				<th>Provinsi</th>
                 <th>Email</th>
-				<% if (checkrole 'Admin Keuangan, Admin Marketing, Marketing, Admin Invoice Tagihan, Staff Invoice Tagihan') && !(checkrole 'Lihat Pelanggan') %>
+				<% if (checkrole 'Admin Keuangan, Admin Marketing, Marketing, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Penagihan') && !(checkrole 'Lihat Pelanggan') %>
 				<th>Nama Kontak</th>
 				<th>Kontak Person</th>
 				<% end %>
+				<th width="100" class="{sorter: false}" style="text-align:center;">Dokumen</th>
 				<th width="100" class="{sorter: false}" style="text-align:center;">Jurusan</th>
                 <th width="60" data-sorter="false" class="sorter-false">Batas Hutang</th>
 				<th width="60" data-sorter="false" class="sorter-false">Aktif</th>
@@ -41,10 +43,29 @@
 				<% if current_user.adminrole %>
 				<tr class="deleted">
 					<td><%= customer.name %></td>
-					<td><%= customer.city %></td>
+					<td><%= customer.city.to_s.upcase %></td>
+					<td><%= customer.province.to_s.upcase %></td>
                     <td><%= customer.email %></td>
                     <td><%= customer.contact %></td>
 					<td><%= customer.phone.present? ? customer.phone : (customer.mobile.present? ? customer.mobile : '') %></td>
+					<td align="center">
+					<% customer.images.each do |img| %>
+					<% display_name = if img.file_name.present? && img.file_name.downcase.include?('ktp')
+										'KTP'
+										elsif img.file_name.present? && img.file_name.downcase.include?('npwp')
+										'NPWP'
+										elsif img.file_name.present? && img.file_name.downcase.include?('nib')
+										'NIB'
+										elsif img.file_name.present? && img.file_name.downcase.include?('skt')
+										'SKT'
+										elsif img.file_name.present? && img.file_name.downcase.include?('siup')
+										'SIUP'
+										else
+										img.name.present? ? img.name : 'Dokumen'
+										end %>
+					<%= display_name %>,
+					<% end %>
+					</td>
 					<td align="center"><%=customer.routes.count %></td>
                     <td align="center"><%=customer.terms_of_payment_in_days %></td>
 					<% if customer.enabled %>
@@ -56,13 +77,32 @@
 				</tr>
 				<% end %>
 			<% else %>
-				<% if (checkrole 'Admin Keuangan, Admin Marketing, Marketing, Admin Invoice Tagihan, Staff Invoice Tagihan') && !(checkrole 'Lihat Pelanggan') %>
+				<% if (checkrole 'Admin Keuangan, Admin Marketing, Marketing, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Penagihan') && !(checkrole 'Lihat Pelanggan') %>
 				<tr>
 					<td><%= link_to customer.name, edit_customer_path(customer) %></td>
-					<td><%= customer.city %></td>
+					<td><%= customer.city.to_s.upcase %></td>
+					<td><%= customer.province.to_s.upcase %></td>
                     <td><%= customer.email %></td>
 					<td><%= customer.contact %></td>
 					<td><%= customer.phone.present? ? customer.phone : (customer.mobile.present? ? customer.mobile : '') %></td>
+					<td align="center">
+					<% customer.images.each do |img| %>
+					<% display_name = if img.file_name.present? && img.file_name.downcase.include?('ktp')
+										'KTP'
+										elsif img.file_name.present? && img.file_name.downcase.include?('npwp')
+										'NPWP'
+										elsif img.file_name.present? && img.file_name.downcase.include?('nib')
+										'NIB'
+										elsif img.file_name.present? && img.file_name.downcase.include?('skt')
+										'SKT'
+										elsif img.file_name.present? && img.file_name.downcase.include?('siup')
+										'SIUP'
+										else
+										img.name.present? ? img.name : 'Dokumen'
+										end %>
+					<%= display_name %>,
+					<% end %>
+					</td>
 					<td align="center"><%=customer.routes.count %></td>
                     <td align="center"><%=customer.terms_of_payment_in_days %></td>
 					<% if customer.enabled %>
@@ -78,8 +118,27 @@
 				<% else %>
 				<tr>
 					<td><%= link_to customer.name, edit_customer_path(customer) %></td>
-					<td><%= customer.city %></td>
+					<td><%= customer.city.to_s.upcase %></td>
+					<td><%= customer.province.to_s.upcase %></td>
                     <td></td>
+					<td align="center">
+					<% customer.images.each do |img| %>
+					<% display_name = if img.file_name.present? && img.file_name.downcase.include?('ktp')
+										'KTP'
+										elsif img.file_name.present? && img.file_name.downcase.include?('npwp')
+										'NPWP'
+										elsif img.file_name.present? && img.file_name.downcase.include?('nib')
+										'NIB'
+										elsif img.file_name.present? && img.file_name.downcase.include?('skt')
+										'SKT'
+										elsif img.file_name.present? && img.file_name.downcase.include?('siup')
+										'SIUP'
+										else
+										img.name.present? ? img.name : 'Dokumen'
+										end %>
+					<%= display_name %>,
+					<% end %>
+					</td>
 					<td align="center"><%=customer.routes.count %></td>
                     <td>-</td>
 					<% if customer.enabled %>

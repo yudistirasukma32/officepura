@@ -131,7 +131,16 @@
       
       <% end %>
 
-      <br /><br /><br /><%= link_to 'Hapus File'.html_safe, '/attachments/remove/'+ img.id.to_s, class: "btn-txt danger mini" %>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; font-size: 10px;">
+        <span style="font-size: 10px; color: #717171;"><%= img.name rescue nil %> Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+
+        <% if img.enabled %>
+        <%= link_to '&raquo; Hapus File'.html_safe, '/attachments/remove/' + img.id.to_s %>
+        <% else %>
+        <span style="font-size: 10px; color: #717171;">Dihapus</span>
+        <% end %>
+
+      </div>
 
       </li>          
     <% end %>
@@ -148,9 +157,10 @@
   <input type="hidden" name="model_name" value="Customer" />
   <input type="hidden" name="item_id" value="<%=@customer.id%>" />
 
+ 
 <div class="field-row" style="width: 300px;">
-  <label for="name">Nama</label>
-  <input type="text" name="attachment[name]" style="width: 300px;"/>
+  <label for="name" style="width: 100%;">Tambah Lampiran</label>
+  <%= select_tag 'attachment[name]', options_for_select(@attachments_category), style: 'width: 300px;' %>
 </div>
 
 <div class="field-row continue" style="width: 300px;">
@@ -163,8 +173,6 @@
 </div>
 
 </form>
-
- 
 
 </div>
 

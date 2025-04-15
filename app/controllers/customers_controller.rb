@@ -7,6 +7,7 @@ class CustomersController < ApplicationController
   def set_section
     @section = "masters"
     @where = "customers"
+    @attachments_category = ["KTP", "NPWP", "NIB", "SIUP", "AKTA PERUSAHAAN", "SURAT PENAWARAN", "LAINNYA"]
   end
 
   def set_role
