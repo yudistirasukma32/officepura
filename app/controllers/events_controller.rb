@@ -1169,8 +1169,14 @@ class EventsController < ApplicationController
 
     customer_id = params[:customer_id]
     @customer = Customer.find(customer_id) rescue nil
-    @taxinvoice = Taxinvoice.active.where("paiddate is null and customer_id = ?", customer_id)
+    # @taxinvoice = Taxinvoice.active.where("paiddate is null and customer_id = ?", customer_id)
+    @taxinvoice = Taxinvoice.active.where("paiddate IS NULL AND customer_id = ? AND date >= ?", customer_id, Date.new(2022, 1, 1))
     @taxinvoice_total = @taxinvoice.sum(:total)
+    @taxinvoice_dp_total = @taxinvoice.sum(:downpayment)
+    @taxinvoice_t2_total = @taxinvoice.sum(:secondpayment)
+    @taxinvoice_t3_total = @taxinvoice.sum(:thirdpayment)
+    @taxinvoice_t4_total = @taxinvoice.sum(:fourthpayment)
+    @piutang =  @taxinvoice_total - @taxinvoice_dp_total - @taxinvoice_t2_total - @taxinvoice_t3_total - @taxinvoice_t4_total
 
     render :json => { :success => true, :html => render_to_string(:partial => "events/unpaid_inv", :layout => false) }.to_json;
   end
