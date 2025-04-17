@@ -447,7 +447,8 @@
 	<td>
         <%=receipt.officeexpense.date.strftime('%d-%m-%Y')%>, <%=nl2br(receipt.officeexpense.description).html_safe%>
         <%= (receipt.officeexpense.isotank_id.present? && receipt.officeexpense.isotank_id.to_i != 0) ? ("Isotank = " + receipt.officeexpense.isotank.isotanknumber) : '' %>
-        <%= (receipt.officeexpense.container_id.present? && receipt.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + receipt.officeexpense.container.containernumber) : '' %>
+		<%= (receipt.officeexpense.container_id.present? && receipt.officeexpense.container_id.to_i != 0) ? ("Kontainer = " + receipt.officeexpense.container.containernumber) : '' %>
+		<%= (receipt.officeexpense.event_id.present? && receipt.officeexpense.event_id != 0 ) ? "[DO " + receipt.officeexpense.event_id.to_s + "]" : ''%>
     </td>
 	<td><%=receipt.officeexpense.office.abbr if !receipt.officeexpense.office_id.nil?%></td>
 	<td><%=receipt.officeexpense.vehicle.current_id if !receipt.officeexpense.vehicle_id.blank? %></td>

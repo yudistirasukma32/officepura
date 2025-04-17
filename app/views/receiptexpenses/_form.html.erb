@@ -44,6 +44,12 @@
 				<td><%=@officeexpense.isotank.isotanknumber%></td>
 			</tr>
 			<% end %>
+			<% if !@officeexpense.event_id.blank? && @officeexpense.event_id != 0 %>
+			<tr>
+				<td width="100">DO</td>
+				<td><a style="color: #4e4edc; text-decoration: underline;" href="/events/<%=@officeexpense.event_id%>/edit" target="_blank"><%=@officeexpense.event_id%> (<%=@officeexpense.event.summary%>)</a></td>
+			</tr>
+			<% end %>
 			<tr>
 				<td width="90">Keterangan</td>
 				<td><%=@officeexpense.description%></td>

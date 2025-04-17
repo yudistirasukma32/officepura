@@ -11,9 +11,10 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250415050537) do
+ActiveRecord::Schema.define(:version => 20250417130317) do
 
-  create_table "activities", :force => true do |t|
+  create_table "activities", :id => false, :force => true do |t|
+    t.integer   "id",                          :null => false
     t.integer   "trackable_id"
     t.string    "trackable_type"
     t.integer   "owner_id"
@@ -25,10 +26,6 @@ ActiveRecord::Schema.define(:version => 20250415050537) do
     t.timestamp "created_at",     :limit => 6, :null => false
     t.timestamp "updated_at",     :limit => 6, :null => false
   end
-
-  add_index "activities", ["owner_id", "owner_type"], :name => "index_activities_on_owner_id_and_owner_type"
-  add_index "activities", ["recipient_id", "recipient_type"], :name => "index_activities_on_recipient_id_and_recipient_type"
-  add_index "activities", ["trackable_id", "trackable_type"], :name => "index_activities_on_trackable_id_and_trackable_type"
 
   create_table "allowances", :force => true do |t|
     t.boolean   "deleted",                                                     :default => false
@@ -876,6 +873,7 @@ ActiveRecord::Schema.define(:version => 20250415050537) do
     t.integer   "bankexpensegroup_id"
     t.integer   "container_id"
     t.integer   "isotank_id"
+    t.integer   "event_id"
   end
 
   create_table "offices", :force => true do |t|
@@ -1495,7 +1493,7 @@ ActiveRecord::Schema.define(:version => 20250415050537) do
     t.string    "unload_city"
     t.integer   "contract_id"
     t.boolean   "approved",                                                    :default => false
-    t.datetime  "approved_at"
+    t.timestamp "approved_at",     :limit => 6
     t.integer   "approved_by"
     t.integer   "user_id"
   end

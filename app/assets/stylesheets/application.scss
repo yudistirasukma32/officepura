@@ -359,7 +359,7 @@ h1, h2, h3, h4, h5 {font-family:MuseoSans; font-weight:500;}
 		.field-row {width:100%;}
 	}
 
-	.allowance-field, .gas-field, .weight-field {text-align:right;}
+	.allowance-field, .gas-field, .weight-field {text-align:right; font-family: 'MuseoSans';}
 	.row-view {
 		width:100%; margin-bottom:20px;
 		th {text-transform:uppercase; font-size:13px; font-weight:600; text-align:left; padding:7px 10px 7px 0; margin-bottom:3px; color:#888; margin:0; border-bottom-image:url(/assets/body-hr.png);
@@ -519,7 +519,7 @@ h1, h2, h3, h4, h5 {font-family:MuseoSans; font-weight:500;}
 			label {text-transform:uppercase; font-size:16px; font-weight:700; color:$black;}
 			input.disabled {color:$cherry; font-size:16px; font-weight:700; opacity:1;}
 		}
-		.allowance-field, .gas-field {text-align:right;}
+		.allowance-field, .gas-field {text-align:right; font-family: 'MuseoSans';}
 		.no-border tr {border:0;}
 		.actions {width:300px;}
 		.header {font-size:15px; color:$cherry; font-weight:700; text-transform:uppercase;}

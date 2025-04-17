@@ -74,6 +74,7 @@
     @officeexpense.isotank_id = inputs[:isotank_id]
     @officeexpense.total = inputs[:total]
     @officeexpense.description = inputs[:description]
+    @officeexpense.event_id = inputs[:event_id]
 
     #add bankexpensegroup_id
     @officeexpense.bankexpensegroup_id = inputs[:bankexpensegroup_id]
@@ -102,6 +103,7 @@
     @officeexpense.isotank_id = inputs[:isotank_id]
     @officeexpense.total = inputs[:total]
     @officeexpense.description = inputs[:description]
+    @officeexpense.event_id = inputs[:event_id]
 
     if @officeexpense.save
       redirect_to(officeexpenses_url(:date => @officeexpense.date.strftime('%d-%m-%Y')), :notice => 'Kas Kantor sukses di simpan.')

@@ -1,105 +1,143 @@
- <%= form_for(@officeexpense) do |f| %>
-  <% if @errors.include?'officeexpense' %>
+<%= form_for(@officeexpense) do |f| %>
+  <% if @errors.include?('officeexpense') %>
     <div class="field-row red">
-      <%=@errors['officeexpense']%>
+      <%= @errors['officeexpense'] %>
     </div>
   <% end %>
 
   <div class="field-row first">
     <%= f.label :office_id, "Kantor" %>
-    <%= f.select :office_id, options_for_select(Office.where(:deleted => false).collect {|g| [g.name, g.id]}, @officeexpense.office_id), {},:class => 'half chzn-select' %>
-  </div>  
-
-  <div class="field-row">
-    <%= f.label :expensetype, "Tipe" %>
-    <%= f.select :expensetype, options_for_select(@types.collect {|w| [w, w]}, @officeexpense.expensetype), {}, :class => 'half' %>
+    <%= f.select :office_id,
+                 options_for_select(Office.where(deleted: false).collect { |g| [g.name, g.id] }, @officeexpense.office_id),
+                 {},
+                 class: 'half chzn-select' %>
   </div>
 
   <div class="field-row">
-    <%= f.label :officeexpensegroup_id, "Group Kas", :class => 'left' %>
-    <% parentgroup_id = @officeexpense.officeexpensegroup_id
-        parentgroup = Officeexpensegroup.find(@officeexpense.officeexpensegroup_id) 
-        if !parentgroup.officeexpensegroup_id.nil?
-          parentgroup_id = parentgroup.officeexpensegroup_id
-        end %>
-      
-    <select id="officeexpensegroupparent" name="officeexpense[parentofficeexpensegroup_id]" class="half left" onchange="javascript: getOfficeexpensegroup();">
-      <% hidden_id = Officeexpensegroup.where(:name => 'Hidden').first.id %>
+    <%= f.label :expensetype, "Tipe" %>
+    <%= f.select :expensetype,
+                 options_for_select(@types.collect { |w| [w, w] }, @officeexpense.expensetype),
+                 {},
+                 class: 'half' %>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :officeexpensegroup_id, "Group Kas", class: 'left' %>
+    <% parentgroup_id = @officeexpense.officeexpensegroup_id %>
+    <% parentgroup = Officeexpensegroup.find(@officeexpense.officeexpensegroup_id) %>
+    <% if !parentgroup.officeexpensegroup_id.nil? %>
+      <% parentgroup_id = parentgroup.officeexpensegroup_id %>
+    <% end %>
+
+    <select id="officeexpensegroupparent"
+            name="officeexpense[parentofficeexpensegroup_id]"
+            class="half left"
+            onchange="javascript: getOfficeexpensegroup();">
+      <% hidden_id = Officeexpensegroup.where(name: 'Hidden').first.id %>
       <% if current_user.adminrole || current_user.owner %>
-        <% expensegroup = Officeexpensegroup.active.where(:officeexpensegroup_id => nil) %>
+        <% expensegroup = Officeexpensegroup.active.where(officeexpensegroup_id: nil) %>
       <% else %>
         <% expensegroup = Officeexpensegroup.active.where("officeexpensegroup_id IS NULL AND ID not in (?)", hidden_id) %>
       <% end %>
       <% expensegroup.each do |group| %>
-        <option value="<%=group.id%>" <% if parentgroup_id == group.id %>selected="selected" <% end %>><%=group.name %></option>
+        <option value="<%= group.id %>" <%= 'selected="selected"' if parentgroup_id == group.id %>><%= group.name %></option>
       <% end %>
     </select>
 
-    <select id="officeexpensegroupchild" name="officeexpense[officeexpensegroup_id]" class="half left" style="margin-left:10px;">
+    <select id="officeexpensegroupchild"
+            name="officeexpense[officeexpensegroup_id]"
+            class="half left"
+            style="margin-left:10px;">
       <option value="">- Group Kas -</option>
-      <% if @officeexpensegroups and @officeexpensegroups.any? %>
+      <% if @officeexpensegroups&.any? %>
         <% @officeexpensegroups.each do |group| %>
-          <option value="<%=group.id%>" <% if @officeexpense.officeexpensegroup_id == group.id %>selected="selected" <% end %>><%=group.name %></option>
+          <option value="<%= group.id %>" <%= 'selected="selected"' if @officeexpense.officeexpensegroup_id == group.id %>><%= group.name %></option>
         <% end %>
       <% end %>
     </select>
   </div>
 
- <% if active_node == "new" || !@officeexpense.bankexpensegroup_id.nil? %>
+  <% if active_node == "new" || !@officeexpense.bankexpensegroup_id.nil? %>
     <div class="field-row">
-      <%= f.label :bankexpensegroup_id, "Jurnal", :class => 'left' %>
-      <select id="bankexpensegroupparent" name="officeexpense[parentbankexpensegroup_id]" class="half left" onchange="javascript: getOfficeBankexpensegroup();">
+      <%= f.label :bankexpensegroup_id, "Jurnal", class: 'left' %>
+      <select id="bankexpensegroupparent"
+              name="officeexpense[parentbankexpensegroup_id]"
+              class="half left"
+              onchange="javascript: getOfficeBankexpensegroup();">
         <option value="">- Group Jurnal -</option>
         <% @parentgroups.each do |group| %>
-          <option value="<%=group.id%>" <% if @parentgroup_id == group.id %>selected="selected" <% end %>><%=group.name %></option>
+          <option value="<%= group.id %>" <%= 'selected="selected"' if @parentgroup_id == group.id %>><%= group.name %></option>
         <% end %>
       </select>
 
-      <select id="bankexpensegroupchild" name="officeexpense[bankexpensegroup_id]" class="half left" style="margin-left:10px;">
+      <select id="bankexpensegroupchild"
+              name="officeexpense[bankexpensegroup_id]"
+              class="half left"
+              style="margin-left:10px;">
         <option value="">- Pilih Group -</option>
-        <% if @childgroups and @childgroups.any? %>
+        <% if @childgroups&.any? %>
           <% @childgroups.where("id NOT IN (6,19)").order(:name).each do |group| %>
-            <option value="<%=group.id%>" <% if @childgroup_id == group.id %>selected="selected" <% end %>><%=group.name %></option>
+            <option value="<%= group.id %>" <%= 'selected="selected"' if @childgroup_id == group.id %>><%= group.name %></option>
           <% end %>
         <% end %>
       </select>
-    </div> 
-  <% end %> 
+    </div>
+  <% end %>
 
   <div class="field-row">
     <%= f.label :vehicle_id, "No. Pol" %>
-    <%= f.select :vehicle_id, options_for_select(Vehicle.where(:deleted => false).collect {|g| [g.current_id, g.id]}, @officeexpense.vehicle_id), {:include_blank => '- Kosong -'}, :class => 'half chzn-select',  :id => 'vehicle_id'%>
-  </div> 
+    <%= f.select :vehicle_id,
+                 options_for_select(Vehicle.where(deleted: false).collect { |g| [g.current_id, g.id] }, @officeexpense.vehicle_id),
+                 { include_blank: '- Kosong -' },
+                 class: 'half chzn-select',
+                 id: 'vehicle_id' %>
+  </div>
 
-<div class="field-row">
-<%= f.label :isotank_id, "No. Isotank" %>
-  <select id="officeexpense_isotank_id" name="officeexpense[isotank_id]" class="half chzn-select">
-    <option value="0">- No. Isotank -</option>
-    <% Isotank.active.order(:isotanknumber).each do |isotank| %>
-    <option value="<%=isotank.id%>"<%= isotank.id == @officeexpense.isotank_id ? ' selected="selected"' : '' %>><%=isotank.isotanknumber%></option>
-    <% end %>
-  </select>
-</div> 
+  <div class="field-row">
+    <%= f.label :isotank_id, "No. Isotank" %>
+    <select id="officeexpense_isotank_id" name="officeexpense[isotank_id]" class="half chzn-select">
+      <option value="">- No. Isotank -</option>
+      <% Isotank.active.order(:isotanknumber).each do |isotank| %>
+        <option value="<%= isotank.id %>"<%= ' selected="selected"' if isotank.id == @officeexpense.isotank_id %>><%= isotank.isotanknumber %></option>
+      <% end %>
+    </select>
+  </div>
 
-<div class="field-row">
-  <%= f.label :container_id, "No. Kontainer" %>
-  <select id="officeexpense_container_id" name="officeexpense[container_id]" class="half chzn-select">
-    <option value="0">- No. Kontainer -</option>
-    <% Container.active.order(:containernumber).each do |container| %>
-    <option value="<%=container.id%>"<%= container.id == @officeexpense.container_id ? ' selected="selected"' : '' %>><%=container.containernumber%></option>
-    <% end %>
-  </select>
-</div>
+  <div class="field-row">
+    <%= f.label :container_id, "No. Kontainer" %>
+    <select id="officeexpense_container_id" name="officeexpense[container_id]" class="half chzn-select">
+      <option value="">- No. Kontainer -</option>
+      <% Container.active.order(:containernumber).each do |container| %>
+        <option value="<%= container.id %>"<%= ' selected="selected"' if container.id == @officeexpense.container_id %>><%= container.containernumber %></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
+    <%= f.label :event_id, "No. DO" %>
+    <select id="officeexpense_event_id" name="officeexpense[event_id]" class="double chzn-select">
+      <option value="">- No. DO -</option>
+      <% Event.active.where('start_date >= ?', 90.days.ago).order('id desc').each do |event| %>
+        <option value="<%= event.id %>" <%= 'selected="selected"' if event.id == @officeexpense.event_id %>>
+          <%= event.id %> <%= event.summary %> => <%= event.start_date.strftime('%d-%m-%y') %>
+        </option>
+      <% end %>
+    </select>
+    <small>*DO Kalender Event dari 3 bulan terakhir</small>
+  </div>
 
   <div class="field-row">
     <%= f.label :date, "Tanggal" %>
-    <%= f.text_field :date, :class => 'half date-picker' %>
+    <%= f.text_field :date, class: 'half date-picker' %>
     <span>(tgl/bln/thn)</span>
   </div>
 
   <div class="field-row">
-    <%= f.label :total, "Jumlah" %>    
-    <%= f.text_field :total, :class => 'half', :onkeypress => 'javascript:return isNumberKey(this);', :value => @officeexpense.total.to_i %>
+    <%= f.label :total, "Jumlah" %>
+    <%= f.text_field :total,
+                     class: 'half',
+                     onkeypress: 'javascript:return isNumberKey(this);',
+                     value: @officeexpense.total.to_i %>
     <strong>Rupiah</strong>
   </div>
 
@@ -109,9 +147,8 @@
   </div>
 
   <div class="actions">
-    <%= f.submit "Tambah Data", :id => 'officeexpense_submit', :class => 'left' %>
-    <a class="back left" href="<%=officeexpenses_path({:date => @officeexpense.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
+    <%= f.submit "Tambah Data", id: 'officeexpense_submit', class: 'left' %>
+    <%= link_to "Kembali ke Index", officeexpenses_path(date: @officeexpense.date.strftime('%d-%m-%Y')), class: 'back left' %>
   </div>
 
 <% end %>
-

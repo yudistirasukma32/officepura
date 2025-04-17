@@ -16,6 +16,7 @@ class Event < ActiveRecord::Base
     has_many :eventsalesorders
     has_many :eventvendors
     has_many :eventmemos
+    has_many :officeexpenses
 
     attr_accessor :vendor, :pos
 

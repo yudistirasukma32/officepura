@@ -626,11 +626,12 @@
 		<% @officeexpenses_general.each do |expense| %>
 			<% total += expense.total %>
 
-		<tr>
+			<tr>
 				<td><%=zeropad(expense.id)%></td>
 				<td><%=nl2br(expense.description).html_safe%>
                 <%= (expense.isotank_id.present? && expense.isotank_id.to_i != 0) ? ("Isotank = " + expense.isotank.isotanknumber) : '' %>
-                <%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.event_id.present? && expense.event_id != 0 ) ? "[DO " + expense.event_id.to_s + "]" : ''%>
                 </td>
 				<td><%=expense.office.abbr if !expense.office_id.nil?%></td>
 				<td><%=expense.vehicle.current_id if !expense.vehicle_id.blank? %></td>
@@ -665,11 +666,12 @@
 		<% @officeexpenses_operational.each do |expense| %>
 			<% total += expense.total %>
 
-		<tr>
+			<tr>
 				<td><%=zeropad(expense.id)%></td>
 				<td><%=nl2br(expense.description).html_safe%>
                 <%= (expense.isotank_id.present? && expense.isotank_id.to_i != 0) ? ("Isotank = " + expense.isotank.isotanknumber) : '' %>
-                <%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.event_id.present? && expense.event_id != 0 ) ? "[DO " + expense.event_id.to_s + "]" : ''%>
                 </td>
 				<td><%=expense.office.abbr if !expense.office_id.nil?%></td>
 				<td><%=expense.vehicle.current_id if !expense.vehicle_id.blank? %></td>
@@ -707,7 +709,8 @@
 				<td><%=zeropad(expense.id)%></td>
 				<td><%=nl2br(expense.description).html_safe%>
                 <%= (expense.isotank_id.present? && expense.isotank_id.to_i != 0) ? ("Isotank = " + expense.isotank.isotanknumber) : '' %>
-                <%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+                                <%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.event_id.present? && expense.event_id != 0 ) ? "[DO " + expense.event_id.to_s + "]" : ''%>
                 </td>
 				<td><%=expense.office.abbr if !expense.office_id.nil?%></td>
 				<td><%=expense.vehicle.current_id if !expense.vehicle_id.blank? %></td>
@@ -745,7 +748,8 @@
 				<td><%=zeropad(expense.id)%></td>
 				<td><%=nl2br(expense.description).html_safe%>
                 <%= (expense.isotank_id.present? && expense.isotank_id.to_i != 0) ? ("Isotank = " + expense.isotank.isotanknumber) : '' %>
-                <%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.event_id.present? && expense.event_id != 0 ) ? "[DO " + expense.event_id.to_s + "]" : ''%>
                 </td>
 				<td><%=expense.office.abbr if !expense.office_id.nil?%></td>
 				<td><%=expense.vehicle.current_id if !expense.vehicle_id.blank? %></td>
@@ -783,7 +787,8 @@
 				<td><%=zeropad(expense.id)%></td>
 				<td><%=nl2br(expense.description).html_safe%>
                 <%= (expense.isotank_id.present? && expense.isotank_id.to_i != 0) ? ("Isotank = " + expense.isotank.isotanknumber) : '' %>
-                <%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.event_id.present? && expense.event_id != 0 ) ? "[DO " + expense.event_id.to_s + "]" : ''%>
                 </td>
 				<td><%=expense.office.abbr if !expense.office_id.nil?%></td>
 				<td><%=expense.vehicle.current_id if !expense.vehicle_id.blank? %></td>
@@ -817,11 +822,12 @@
 		<% @officeexpenses_incident.each do |expense| %>
 			<% total += expense.total %>
 
-		<tr>
+			<tr>
 				<td><%=zeropad(expense.id)%></td>
 				<td><%=nl2br(expense.description).html_safe%>
                 <%= (expense.isotank_id.present? && expense.isotank_id.to_i != 0) ? ("Isotank = " + expense.isotank.isotanknumber) : '' %>
-                <%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.event_id.present? && expense.event_id != 0 ) ? "[DO " + expense.event_id.to_s + "]" : ''%>
                 </td>
 				<td><%=expense.office.abbr if !expense.office_id.nil?%></td>
 				<td><%=expense.vehicle.current_id if !expense.vehicle_id.blank? %></td>
@@ -860,7 +866,8 @@
 				<td><%=zeropad(expense.id)%></td>
 				<td><%=nl2br(expense.description).html_safe%>
                 <%= (expense.isotank_id.present? && expense.isotank_id.to_i != 0) ? ("Isotank = " + expense.isotank.isotanknumber) : '' %>
-                <%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.container_id.present? && expense.container_id.to_i != 0) ? ("Kontainer = " + expense.container.containernumber) : '' %>
+				<%= (expense.event_id.present? && expense.event_id != 0 ) ? "[DO " + expense.event_id.to_s + "]" : ''%>
                 </td>
 				<td><%=expense.office.abbr if !expense.office_id.nil?%></td>
 				<td><%=expense.vehicle.current_id if !expense.vehicle_id.blank? %></td>
@@ -897,7 +904,7 @@
 
 			<% productname = "" %>
 			<% sale.saleitems.each do |item| %>
-			<%		productname += item.productsale.name + ", " %>
+			<% productname += item.productsale.name + ", " %>
 			<% end %>
 			<% productname = productname[0...-2] %>
 			<tr>
