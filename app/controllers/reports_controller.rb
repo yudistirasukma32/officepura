@@ -3344,6 +3344,18 @@ end
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
 
+      #check how many months
+      @number_of_months = 0
+      if @startdate && @enddate
+        months = []
+        current_date = @startdate.to_date
+        while current_date <= @enddate.to_date
+          months << current_date.strftime('%Y-%m')
+          current_date = current_date.next_month
+        end
+        @number_of_months = months.uniq.count
+      end
+
       # Get contracts
       contracts = Contract.active.where("date_start BETWEEN ? AND ? OR date_end BETWEEN ? AND ? OR ? BETWEEN date_start AND date_end OR ? BETWEEN date_start AND date_end", @startdate.to_date, @enddate.to_date, @startdate.to_date, @enddate.to_date, @startdate.to_date, @enddate.to_date)
 
@@ -3668,6 +3680,7 @@ end
               estimation = 0
             else
               estimation = contract.total.to_i rescue 0
+              estimation = estimation * @number_of_months
               contract_used.push(contract.id)
             end
 

@@ -258,7 +258,7 @@
 	<!-- Contract::begin -->
 	<% if @contract_events.any? %>
 		<hr>
-		<h2 class="title" style="font-weight: bold;">DO Kontrak</h2>
+		<h2 class="title" style="font-weight: bold;">DO Kontrak <%= @number_of_months.to_s != '0' ? @number_of_months.to_s + ' Bulan' : '' %></h2>
 		<hr>
 		<table class="tablesorter row-view tablesorterFilters">
 		<tr>
