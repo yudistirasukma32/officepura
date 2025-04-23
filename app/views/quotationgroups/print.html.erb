@@ -300,7 +300,7 @@
 				<thead>
 				<tr>
 					<th colspan="2" style="text-align:center">RUTE</th>
-					<th rowspan="2" style="text-align:center" width="100">Tarif/Rit</th>
+					<th rowspan="2" style="text-align:center" width="100">Tarif/<%= @quotations.first.price_per_type == "BORONGAN" ? "Rit" : @quotations.first.price_per_type %></th>
 				</tr>
 				<tr>
 					<th style="text-align:center">Tempat Muat</th>

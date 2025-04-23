@@ -239,7 +239,7 @@
         <%= group.customer_id.present? ? group.customer.name : (group.customer_name.present? ? group.customer_name : '') %><br>
         <span style="color: grey;"><%= group.customer_pic rescue nil %></span>
         </td>
-        <td align="right" style="padding-right: 1rem; "><%= group.quotations.count %></td>
+        <td align="right" style="padding-right: 1rem; "><%= group.quotations.where('deleted = false').count %></td>
         <td><%= creator.username if !creator.blank? %></td>
         
         <td>

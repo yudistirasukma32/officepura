@@ -149,9 +149,9 @@ class QuotationsController < ApplicationController
 
   def destroy
     @quotation = Quotation.find(params[:id])
-    customer_id = @quotation.customer_id
-    @quotation.destroy
-    redirect_to quotations_url
+    # customer_id = @quotation.customer_id
+    @quotation.update_attributes(:deleted => true)
+    redirect_to (quotations_url)
   end  
   
   def enable
