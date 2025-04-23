@@ -185,7 +185,7 @@
 				<tr>
 					<th colspan="2" style="text-align:center">RUTE</th>
 					<!-- <th rowspan="2" style="text-align:center" width="100">Tarif/Rit</th> -->
-					<th rowspan="2" style="text-align:center" width="100">Tarif/<%= @quotations.first.price_per_type == "BORONGAN" ? "Rit" : @quotations.first.price_per_type %></th>
+					<th rowspan="2" style="text-align:center" width="130">Tarif</th>
 				</tr>
 				<tr>
 					<th style="text-align:center">Tempat Muat</th>
@@ -199,7 +199,11 @@
 				<tr>
 					<td><%= quotation.name rescue nil %> <%= quotation.address_start rescue nil %></td>
 					<td class="pl-5"><%= quotation.address_end rescue nil %></td>
-					<td align="right"><%= to_currency_bank(quotation.price_per) %></td>
+					<td align="right">
+					<%= to_currency_bank(quotation.price_per) %>
+					/
+					<%= quotation.price_per_type == "BORONGAN" ? "Rit" : quotation.price_per_type %>
+					</td>
 				</tr>
 				<% end %>
 			</tbody>
