@@ -409,16 +409,19 @@
 			%>
 
 			<% if taxinvoice_ppn > 0 %>
-				<tr>
-					<td colspan="<%= colspan%>" class="footer1" align="right">PPN <%= taxinvoice_ppn %>%</td>
-					<td align="right"><span id="txt_gst_tax"><%= @taxinvoice.gst_tax.to_i == 0 ? "-" : to_currency_bank(@taxinvoice.gst_tax)%></span></td>
-				</tr>
+			<tr>
+				<td colspan="<%= colspan%>" class="footer1" align="right">PPN</td>
+				<td align="right"><span id="txt_gst_tax"><%= @taxinvoice.gst_tax.to_i == 0 ? "-" : to_currency_bank(@taxinvoice.gst_tax)%></span></td>
+			</tr>
 			<% end %>
 
-		  <tr id="pph-row">
-		    <td colspan="<%= colspan%>" class="footer1" align="right">PPh Pasal 23 2%</td>
-		    <td align="right"><span id="txt_price_tax" <% if @taxinvoice.price_tax > 0 %> class="red" <% end %>><%= to_currency_bank(0 - @taxinvoice.price_tax)%></span></td>
-		  </tr>
+			<% if @taxinvoice.price_tax > 0 %>
+			<tr id="pph-row">
+				<td colspan="<%= colspan%>" class="footer1" align="right">PPh Pasal 23 2%</td>
+				<td align="right"><span id="txt_price_tax" <% if @taxinvoice.price_tax > 0 %> class="red" <% end %>><%= to_currency_bank(0 - @taxinvoice.price_tax)%></span></td>
+			</tr>
+			<% end %>
+
 		  <% if @taxinvoice.insurance_cost.to_i > 0 %>
 			<tr>
 				<td colspan="<%= colspan%>" class="footer1" align="right">Biaya Asuransi</td>
