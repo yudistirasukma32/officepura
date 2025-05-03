@@ -12,6 +12,34 @@
     </div>
 
     <div class="field-row">
+      <label for="event_id">Nomor DO</label>
+      <input type="text" name="invoice[event_id]" class="half left" value="<%=@invoice.event_id rescue nil%>" />
+      <small style="line-height: 1.25;">
+        <%= @invoice.event.summary rescue nil %><br/>
+        <%= @invoice.event.customer.name rescue nil %>
+      </small>
+    </div>
+
+    <div class="field-row">
+      <label for="invoice_customer_id">Pelanggan</label>
+      <select id="invoice_customer_id" name="invoice[customer_id]" class="chzn-select double combo_route">
+        <option value="">- Nama Pelanggan -</option>
+        <% Customer.active.order(:name).each do |customer| %>
+        <option value="<%=customer.id%>" <%= customer.id == @invoice.customer_id ? ' selected="selected"' : '' %>><%=customer.name%></option>
+        <% end %>
+      </select> 
+    </div>
+
+
+    <% if @invoice.invoicetrain %>
+    <div class="field-row">
+      <label for="invoice_id_muat">No BKK Muat</label>
+      <input type="text" name="invoice[invoice_id_muat]" class="half left" value="<%=@invoice.invoice_id rescue nil%>" />
+      <small>Khusus untuk kereta</small>
+    </div>
+    <% end %>
+
+    <div class="field-row">
       <label for="invoice_vehicle_id">Kendaraan</label>
       <select id="invoice_vehicle_id" name="invoice[vehicle_id]" class="chzn-select half left combo_route">
         <option value="">- No Pol -</option>

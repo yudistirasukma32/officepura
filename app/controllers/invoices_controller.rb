@@ -28,6 +28,9 @@ class InvoicesController < ApplicationController
 
     @invoice.date = inputs[:date]
     @invoice.driver_id = inputs[:driver_id]
+    @invoice.event_id = inputs[:event_id]
+    @invoice.customer_id = inputs[:customer_id]
+    @invoice.invoice_id = inputs[:invoice_id_muat]
     @invoice.vehicle_id = inputs[:vehicle_id]
     @invoice.route_id = inputs[:route_id]
     @invoice.isotank_id = inputs[:isotank_id]
