@@ -39,8 +39,8 @@
     </thead>
 
     <tbody class="tablesorter-sort">
-    <% @routes.each do |route| 
-    
+    <%
+    @routes.each do |route| 
     route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
     %>
     
@@ -63,7 +63,7 @@
                 <% end %>
             </span>
         <% else %>
-            <%= route.distance.round(2) %>
+            <%= route.distance.round(2).to_i %>
         <% end %>
         
         </td>

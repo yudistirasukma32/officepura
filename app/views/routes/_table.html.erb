@@ -14,7 +14,11 @@
 	end
 	
 %>
-
+<style>
+.disabled {
+	pointer-events: auto !Important;
+}
+</style>
 
 <table class="row-view report-view tablesorter tablesorterFilters">
     <thead>
@@ -22,6 +26,7 @@
             <th class="{sorter:true, filter: true}" >Nama Jurusan</th>
             <th class="{sorter:true, filter: true}" >Nama Pelanggan</th>
             <th class="{sorter:true, filter: true}" width="80">Muatan</th>
+            <th class="{sorter:true, filter: true}" width="80">Jarak (KM)</th>
             <th class="{sorter:true, filter: true}" width="100">Kantor</th>
             <th class="{sorter: false, filter: false}">Rute</th>
             <th class="{sorter: false, filter: false}">Aktif</th>
@@ -30,17 +35,34 @@
     </thead>
 
     <tbody class="tablesorter-sort">
-    <% @routes.each do |route| %>
+    <% 
+    @routes.each do |route| 
+    route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
+    %>
     <tr>
         <td><% if checkrole 'Master Jurusan, Admin Marketing' %><%= link_to route.name, edit_route_path(route) %> <% else %> <%= route.name %> <% end %></td>
         <td><%= route.customer.name if !route.customer.nil? %></td>
         <td><%= route.commodity.name if !route.commodity.nil? %></td>
+        <td align='right' style="padding-right: 1rem;">
+        <% if route.distance.nil? ||route.distance == 0 %>
+            <span style="text-decoration: underline;">
+                <% gas_trip = (route_allowance.try(:gas_trip).to_f || 0.0) %>
+                <% if route.name.downcase.include?('kosongan') %>
+                <%= (gas_trip * 3).round().to_i %>
+                <% else %>
+                <%= (gas_trip * 2.3).round().to_i %>
+                <% end %>
+            </span>
+        <% else %>
+            <%= route.distance.round(2).to_i %>
+        <% end %>
+        </td>
         <td><%= route.office.name if !route.office.nil? %></td>
         <td><%= route.routegroup.name if !route.routegroup.nil? %></td>
         <% if route.enabled %>
-            <td><% if checkrole 'Master Jurusan, Admin Marketing'%> <%= link_to '&#xf058;'.html_safe, disable_route_path(route), :class => 'enabled tipsy', :title => 'Non Aktifkan' %><% else %><%= link_to '&#xf058;'.html_safe, '', :class => 'enabled tipsy' %><% end %></td>
+            <td><% if checkrole 'Master Jurusan, Admin Marketing'%> <%= link_to '&#xf058;'.html_safe, disable_route_path(route), :class => 'enabled tipsy', :title => 'Non Aktifkan' %><% else %><%= link_to '&#xf058;'.html_safe, '', :class => 'enabled tipsy' if checkrole 'Admin Marketing, Admin Jurusan, General Manager' %><% end %></td>
         <% else %>
-            <td><% if checkrole 'Master Jurusan, Admin Marketing'%> <%= link_to '&#xf057;'.html_safe, enable_route_path(route), :class => 'disabled tipsy', :title => 'Aktifkan' %><% else %><%= link_to '&#xf057;'.html_safe, '', :class => 'disabled tipsy' %><% end %></td>
+            <td><% if checkrole 'Master Jurusan, Admin Marketing'%> <%= link_to '&#xf057;'.html_safe, enable_route_path(route), :class => 'disabled tipsy', :title => 'Aktifkan' %><% else %><%= link_to '&#xf057;'.html_safe, '', :class => 'disabled tipsy' if checkrole 'Admin Marketing, Admin Jurusan, General Manager' %><% end %></td>
         <% end %>
         <td class="right">
             <% if checkrole 'Master Jurusan, Admin Marketing' %>
