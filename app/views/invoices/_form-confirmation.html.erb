@@ -167,6 +167,38 @@
     </tr>
     <% end %>
 
+    <!-- Jarak -->
+    <% if @invoice.route.distance.present? %>
+    <tr>
+      <td>Jarak</td>
+      <td><%= @invoice.route.distance rescue nil %> km</td>
+    </tr>
+    <% else %>
+    <tr>
+      <td>Jarak</td>
+      <td>
+          <span style="text-decoration: underline;">
+              <%
+                gas_trip = 0.0
+                if @invoice.route && @invoice.route.allowances && @invoice.route.allowances.first
+                  gas_trip_value = @invoice.route.allowances.first.gas_trip
+                  gas_trip = gas_trip_value.to_f if gas_trip_value
+                end
+
+                if @invoice.route.name
+                  if @invoice.route.name.downcase.include?('kosongan')
+                    result = (gas_trip * 3).round().to_i
+                  else
+                    result = (gas_trip * 2.3).round().to_i
+                  end
+                  %>
+                  <%= result %>
+                <% end %>
+          </span>&nbsp;km
+      </td>
+    </tr>
+    <% end %>
+
     <% if @invoice.route.routelocation.present? %>
     <tr>
       <td>Alamat Muat</td>

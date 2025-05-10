@@ -193,6 +193,16 @@ class RoutesController < ApplicationController
     @route.tol_fee_trailer = @route.tol_fee_trailer.to_i
     @route.bonus = @route.bonus.to_i
 
+    route_allowance = @route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
+    if @route.distance.nil? ||@route.distance == 0
+      gas_trip = (route_allowance.try(:gas_trip).to_f || 0.0)
+      if @route.name.downcase.include?('kosongan')
+        @route.distance = (gas_trip * 3).round().to_i
+      else
+        @route.distance = (gas_trip * 2.3).round().to_i 
+      end
+    end
+
     @routeloc = Routelocation.where("route_id = ?", params[:id]).order("id DESC").limit(1)
 
 		if @routeloc.first.nil?

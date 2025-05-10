@@ -30,6 +30,7 @@
             <th class="{sorter:true, filter: true}" width="80">Kota Muat</th>
             <th class="{sorter:true, filter: true}" width="80">Kota Bongkar</th>
             <th class="{sorter:true, filter: true}" width="80">Jarak (KM)</th>
+            <th class="{sorter:true, filter: true}" width="80">Solar (Lt)</th>
             <th class="{sorter: false, filter: false}">Um Supir</th>
             <th class="{sorter: false, filter: false}">Um Kernet</th> 
             <th class="{sorter: false, filter: false}">Aktif</th>
@@ -50,7 +51,23 @@
         <td><%= route.office.abbr if !route.office.nil? %></td>
         <td><%= safe_join([route.load_city, route.load_province].compact, "<br/>".html_safe) %></td>
         <td><%= safe_join([route.unload_city, route.unload_province].compact, "<br/>".html_safe) %></td>
-        <td align='right' style="padding-right: 1rem;"><%= route.distance %></td>
+        <td align='right' style="padding-right: 1rem;">
+        
+        <% if route.distance.nil? ||route.distance == 0 %>
+            <span style="text-decoration: underline;">
+                <% gas_trip = (route_allowance.try(:gas_trip).to_f || 0.0) %>
+                <% if route.name.downcase.include?('kosongan') %>
+                <%= (gas_trip * 3).round().to_i %>
+                <% else %>
+                <%= (gas_trip * 2.3).round().to_i %>
+                <% end %>
+            </span>
+        <% else %>
+            <%= route.distance.round(2) %>
+        <% end %>
+        
+        </td>
+        <td align='right'><%= route_allowance.gas_trip rescue 0%></td>
         <td align='right'><%= to_currency(route_allowance.driver_trip) rescue 0 %></td>
         <td align='right'><%= to_currency(route_allowance.helper_trip) rescue 0 %></td>
  
