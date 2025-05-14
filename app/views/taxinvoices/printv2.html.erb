@@ -1,395 +1,410 @@
 <style type="text/css">
-	.headsignature {margin-top:0px;margin-left: 250px;}
+    .headsignature {
+        margin-top: 0px;
+        margin-left: 250px;
+    }
 
-	@media print{
-		* {
-			-webkit-print-color-adjust: exact !important;   /* Chrome, Safari Edge */
-			color-adjust: exact !important;                 /* Firefox */
-			print-color-adjust: exact !important;           /* Firefox 97+, Safari 15.4+ */
-			}
-		@page { margin-top:0px;margin-bottom:0px; }
+    @media print {
+        * {
+            -webkit-print-color-adjust: exact !important;
+            /* Chrome, Safari Edge */
+            color-adjust: exact !important;
+            /* Firefox */
+            print-color-adjust: exact !important;
+            /* Firefox 97+, Safari 15.4+ */
+        }
 
-		.d-none-print {
-			display: none;
-		}
+        @page {
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
 
-		.print-pdf {
-			body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-      }
-			margin: 0;
-			padding: 0;
-			width: 100%;
-			height: 100%;
-		}
+        .d-none-print {
+            display: none;
+        }
 
-		iframe{
-			display:block;
-			width: 100% !important;
-			margin: 0 !important;
-		}
-		object{
-			display:block;
-			width: 100% !important;
-			margin: 0 !important;
-		}
+        .print-pdf {
+            body {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }
 
-		embed{
-			display:block;
-			width: 100% !important;
-			margin: 0 !important;
-		}
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
 
-		.d-show-print {
-			display: revert !important;
-		}
+        iframe {
+            display: block;
+            width: 100% !important;
+            margin: 0 !important;
+        }
 
-		.table-footer {
-			td {
-				padding: 2px !important;
-				text-align: center;
-			}
-		}
+        object {
+            display: block;
+            width: 100% !important;
+            margin: 0 !important;
+        }
 
-		.bg-pura {
-			background-image: url("/assets/backgroundpura-nobg.png") !important;
-			background-position: center;
-			background-repeat: no-repeat;
-			background-size: auto;
-			display: revert !important;  
-			-webkit-print-color-adjust: exact !important;   /* Chrome, Safari Edge */
-			color-adjust: exact !important;                 /* Firefox */
-			print-color-adjust: exact !important;           /* Firefox 97+, Safari 15.4+ */
-			/* height: 100%; */
-		}
-	}
-	
-	.bg-pura {
-		background-image: url("/assets/backgroundpura-nobg.png");
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: auto;
-		display: revert !important;  
-		/* height: 100%; */
-	}
+        embed {
+            display: block;
+            width: 100% !important;
+            margin: 0 !important;
+        }
 
-	.d-show-print {
-		display: none;
-	}
+        .d-show-print {
+            display: revert !important;
+        }
+
+        .table-footer {
+            td {
+                padding: 2px !important;
+                text-align: center;
+            }
+        }
+
+        .bg-pura {
+            background-image: url("/assets/backgroundpura-nobg.png") !important;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: auto;
+            display: revert !important;
+            -webkit-print-color-adjust: exact !important;
+            /* Chrome, Safari Edge */
+            color-adjust: exact !important;
+            /* Firefox */
+            print-color-adjust: exact !important;
+            /* Firefox 97+, Safari 15.4+ */
+            /* height: 100%; */
+        }
+    }
+
+    .bg-pura {
+        background-image: url("/assets/backgroundpura-nobg.png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: auto;
+        display: revert !important;
+        /* height: 100%; */
+    }
+
+    .d-show-print {
+        display: none;
+    }
 </style>
 <%= render "shared/header" %>
 
 <div id="nav">
-	<%= render "shared/nav" %>
+    <%= render "shared/nav" %>
 </div>
 
 
 <div id="main">
-	
-	<div id="content-full" class="invoice-paper">
-		<div class="bg-pura">
-			<div class="d-show-print">
-				<table style="width: 100%;">
-					<tr>
-						<td width="33%"><img src="/assets/logopura-nobg.png" alt="logopura" style="width: 200px;"></td>
-						<td width="33%" style="vertical-align: bottom; text-align: center; border-bottom: 2px solid grey;">www.puratrans.com</td>
-						<td width="33%" style="vertical-align: bottom; text-align: center; border-bottom: 2px solid grey;">email: info@puratrans.com</td>
-					</tr>
-				</table>
-			</div>
-			<a class="btn-txt cancel hideprint" href="<%=taxinvoices_path({:customer_id => $globalCustomer_id, :month => $globalMonth, :year => $globalYear})%>"><i class="icon-remove"></i> Batal</a>
-		
 
-			<% if !@taxinvoice.nil? %>
-				<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
-				<a class="print btn btn-yellow" href="/taxinvoices/<%=@taxinvoice.id%>/printreceipt"><i class="icon-print"></i> Kwitansi</a>
-				<a class="print btn-txt btn-green" href="/taxinvoices/downloadexcel/<%=@taxinvoice.id%>"><i class="icon-file"></i> Excel</a>
+    <div id="content-full" class="invoice-paper">
+        <div class="bg-pura">
+            <div class="d-show-print">
+                <table style="width: 100%;">
+                    <tr>
+                        <td width="33%"><img src="/assets/logopura-nobg.png" alt="logopura" style="width: 200px;"></td>
+                        <td width="33%" style="vertical-align: bottom; text-align: center; border-bottom: 2px solid grey;">www.puratrans.com</td>
+                        <td width="33%" style="vertical-align: bottom; text-align: center; border-bottom: 2px solid grey;">email: info@puratrans.com</td>
+                    </tr>
+                </table>
+            </div>
+            <a class="btn-txt cancel hideprint" href="<%=taxinvoices_path({:customer_id => $globalCustomer_id, :month => $globalMonth, :year => $globalYear})%>"><i class="icon-remove"></i> Batal</a>
 
-				<h1 class="hideprint"><%=Setting.find_by_name("Client Name").value%> / Invoice Tagihan</h1>
-				<% if @taxinvoice.price_tax > 0 %>
-					<div class="row continue d-none-print" style="float: right;">
-						<input type="checkbox" id="chk_price_tax_print" name="price_tax" value="Yes" /> &nbsp; <h4 style="display: inline-block">Sembunyikan PPH</h4>
-					</div>
-				<% end %>
-				<br />
-				<br />
-				<br />
-				<br />
-				<br />
-				<div class="field-row continue">
-					<label class="left">No. Invoice</label>
-					<input type="text" class="disabled left" value=":  <%=@taxinvoice.long_id%>" style="font-weight:700;" />
-				</div>
 
-				<div class="field-row continue">
-					<label class="left">Tanggal</label>
-					<input type="text" class="disabled left" value=":  <%=@taxinvoice.date.strftime('%d-%m-%Y')%>" />
-				</div>
+            <% if !@taxinvoice.nil? %>
+            <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+            <a class="print btn btn-yellow" href="/taxinvoices/<%=@taxinvoice.id%>/printreceipt"><i class="icon-print"></i> Kwitansi</a>
+            <a class="print btn-txt btn-green" href="/taxinvoices/downloadexcel/<%=@taxinvoice.id%>"><i class="icon-file"></i> Excel</a>
 
-				<div class="field-row continue">
-					<label class="left">Periode</label>
-					<input type="text" class="disabled left" value=":  <%=@taxinvoice.period_start.strftime('%d-%m-%Y')%> <% if @taxinvoice.period_start != @taxinvoice.period_end %>  s/d <%=@taxinvoice.period_end.strftime('%d-%m-%Y')%> <% end %>" />
-				</div>
+            <h1 class="hideprint"><%=Setting.find_by_name("Client Name").value%> / Invoice Tagihan</h1>
+            <% if @taxinvoice.price_tax > 0 %>
+            <div class="row continue d-none-print" style="float: right;">
+                <input type="checkbox" id="chk_price_tax_print" name="price_tax" value="Yes" /> &nbsp; <h4 style="display: inline-block">Sembunyikan PPH</h4>
+            </div>
+            <% end %>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <div class="field-row continue">
+                <label class="left">No. Invoice</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.long_id%>" style="font-weight:700;" />
+            </div>
 
-				<div class="field-row continue">
-					<label class="left">Nama</label>
-					<input type="text" class="disabled left" value=":  <%=@taxinvoice.customer.name%>" />
-				</div>
+            <div class="field-row continue">
+                <label class="left">Tanggal</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.date.strftime('%d-%m-%Y')%>" />
+            </div>
 
-				<div class="field-row continue">
-					<label class="left">Alamat</label><label style="width:5px;padding:0 0 0 5px;">:</label>  <label class="left" style="padding:0 0 0 5px;float:left;width:400px;margin-top:0px;color:#000;font-weight:400;"><%=@taxinvoice.customer.address%></label>
-				</div>
+            <div class="field-row continue">
+                <label class="left">Periode</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.period_start.strftime('%d-%m-%Y')%> <% if @taxinvoice.period_start != @taxinvoice.period_end %>  s/d <%=@taxinvoice.period_end.strftime('%d-%m-%Y')%> <% end %>" />
+            </div>
 
-				<% if !@taxinvoice.customer.city.blank? %>
-					<div class="field-row continue" style="display:none">
-						<label>&nbsp;</label>
-						<input type="text" class="disabled left" value="   <%=@taxinvoice.customer.city%>" /> 
-					</div>
-				<% end %>
+            <div class="field-row continue">
+                <label class="left">Nama</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.customer.name%>" />
+            </div>
 
-				<% if !@taxinvoice.customer.npwp.blank? %>
-					<div class="field-row continue">
-						<label class="left">N.P.W.P</label>
-							<input type="text" class="disabled left" value=":  <%=@taxinvoice.customer.npwp%>" />
-					</div>
-				<% end %>
+            <div class="field-row continue">
+                <label class="left">Alamat</label><label style="width:5px;padding:0 0 0 5px;">:</label> <label class="left" style="padding:0 0 0 5px;float:left;width:400px;margin-top:0px;color:#000;font-weight:400;"><%=@taxinvoice.customer.address%></label>
+            </div>
 
-				<% if !@taxinvoice.product_name.blank? %>
-					<div class="field-row continue">
-						<label class="left">Barang</label>
-						<input type="text" class="disabled left" value=":  <%=@taxinvoice.product_name%>" />
-					</div>
-				<% end %>
+            <% if !@taxinvoice.customer.city.blank? %>
+            <div class="field-row continue" style="display:none">
+                <label>&nbsp;</label>
+                <input type="text" class="disabled left" value="   <%=@taxinvoice.customer.city%>" />
+            </div>
+            <% end %>
 
-				<% if !@taxinvoice.spk_no.blank? %>
-					<div class="field-row continue">
-						<label class="left">SPK</label>
-						<input type="text" class="disabled left" value=":  <%=@taxinvoice.spk_no%>" />
-					</div>
-				<% end %>
+            <% if !@taxinvoice.customer.npwp.blank? %>
+            <div class="field-row continue">
+                <label class="left">N.P.W.P</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.customer.npwp%>" />
+            </div>
+            <% end %>
 
-				<% if !@taxinvoice.po_no.blank? %>
-					<div class="field-row continue">
-						<label class="left">PO</label>
-						<input type="text" class="disabled left" value=":  <%=@taxinvoice.po_no%>" />
-					</div>
-				<% end %>
+            <% if !@taxinvoice.product_name.blank? %>
+            <div class="field-row continue">
+                <label class="left">Barang</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.product_name%>" />
+            </div>
+            <% end %>
 
-				<% if !@taxinvoice.spo_no.blank? %>
-					<div class="field-row continue">
-						<label class="left">SPO</label>
-						<input type="text" class="disabled left" value=":  <%=@taxinvoice.spo_no%>" />
-					</div>
-				<% end %>
-					
-				<% if !@taxinvoice.so_no.blank? %>
-				<div class="field-row continue">
-					<label class="left">SO</label>
-					<input type="text" class="disabled left" value=":  <%=@taxinvoice.so_no%>" />
-				</div>
-				<% end %>
-						
-				<% if !@taxinvoice.sto_no.blank? %>
-				<div class="field-row continue">
-					<label class="left">STO</label>
-					<input type="text" class="disabled left" value=":  <%=@taxinvoice.sto_no%>" />
-				</div>
-				<% end %>
-						
-				<% if !@taxinvoice.do_no.blank? %>
-					<div class="field-row continue">
-						<label class="left">DO</label>
-						<input type="text" class="disabled left" value=":  <%=@taxinvoice.do_no%>" />
-					</div>
-				<% end %>
+            <% if !@taxinvoice.spk_no.blank? %>
+            <div class="field-row continue">
+                <label class="left">SPK</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.spk_no%>" />
+            </div>
+            <% end %>
 
-				<% if !@taxinvoice.ship_name.blank? %>
-				<div class="field-row continue">
-					<label class="left">Nama Kapal</label>
-						<input type="text" class="disabled left" value=":  <%=@taxinvoice.ship_name%>" />
-				</div>
-				<% end %>
+            <% if !@taxinvoice.po_no.blank? %>
+            <div class="field-row continue">
+                <label class="left">PO</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.po_no%>" />
+            </div>
+            <% end %>
 
-				<% if !@taxinvoice.tank_name.blank? %>
-				<div class="field-row continue">
-					<label class="left">Jenis Tangki</label>
-						<input type="text" class="disabled left" value=":  <%=@taxinvoice.tank_name%>" />
-				</div>
-				<% end %>
-				<br class="clear" />
-				<br class="clear" />
+            <% if !@taxinvoice.spo_no.blank? %>
+            <div class="field-row continue">
+                <label class="left">SPO</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.spo_no%>" />
+            </div>
+            <% end %>
 
-				<table class="row-view no-border">
-					<tr>
-						<th width="20" style="text-align:center">No</th>
-						<th width="70" class="nopol-col" style="text-align:center">Tgl Kirim</th>
-						<th width="80" class="nopol-col" style="text-align:center">No. Pol</th>
-						<th width="90" class="nopol-col" style="text-align:center">SJ</th>
-						<th width="40" class="qty-col" style="text-align:center">Muat (Kg)</th>
-						<th width="40" class="qty-col" style="text-align:center">Bongkar (Kg)</th>
-						<% if @taxinvoice.is_weightlost %>
-						<th width="40" class="qty-col" style="text-align:center">Selisih (Kg)</th>
-						<% end %>
-						<th width="40" style="padding-left:10px; text-align:center">Tarif</th>
-						<th colspan="2" style="text-align:center">Jurusan</th>
-						<th width="70" style="text-align:center">Total</th>
-						<th class="d-none-print"></th>
-					</tr>
-					<% subtotal = 0 %>
-					<% weight_gross = 0 %>
-					<% weight_net = 0 %>
-					<% sort = 0 %>
-					<% if !@taxinvoice.generic %>
-						<% @taxinvoice.taxinvoiceitems.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
-							<% subtotal += taxinvoiceitem.total %>
-							<% weight_gross += taxinvoiceitem.weight_gross %>
-							<% weight_net += taxinvoiceitem.weight_net %>
-							<tr>
-								<td><%= sort+=1 %>.</td>
-								<td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
-								<td>
-								<% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
-									<strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
-								<% else %>
-									<%=taxinvoiceitem.invoice.vehicle.current_id rescue nil%>
-								<% end %>
-									<span style="display: none;"><% if taxinvoiceitem.invoice.invoicetrain %>,<% if taxinvoiceitem.invoice.invoices.first %> <%= taxinvoiceitem.invoice.invoices.first.vehicle.current_id %> <% end %> <% end %></span>
-								</td>
-								<td>
-									<% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
-								<td align="right">
-									<% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxinvoiceitem.weight_gross)%> <% end %> </td>
-								</td>
-								<td align="right"><%=to_currency(taxinvoiceitem.weight_net)%></td>
-								<% if @taxinvoice.is_weightlost %>
-								<td align="right"><%= taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross%></td>
-								<% end %>
-								<td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
-								<td colspan="2" style="text-align:left">
-								<% if taxinvoiceitem.invoice.event %>
-									<%=taxinvoiceitem.invoice.event.summary%> 
-								<% else %>
+            <% if !@taxinvoice.so_no.blank? %>
+            <div class="field-row continue">
+                <label class="left">SO</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.so_no%>" />
+            </div>
+            <% end %>
 
-									<%=taxinvoiceitem.invoice.route.name%><br>
-										<% if taxinvoiceitem.invoice.invoicetrain %>
-											<% if taxinvoiceitem.invoice.invoices.first %>
-												<%= taxinvoiceitem.invoice.invoices.first.route.name %> 
-											<% end %>
-									<% end %>
+            <% if !@taxinvoice.sto_no.blank? %>
+            <div class="field-row continue">
+                <label class="left">STO</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.sto_no%>" />
+            </div>
+            <% end %>
 
-								<% end %>
-								</td>
-								<td align="right"><%= to_currency(taxinvoiceitem.total)%>  </td>
-								<td class="d-none-print">
-									<a href="/taxinvoiceitems/new/<%=taxinvoiceitem.invoice_id%>" class="delete tipsy" title="Detail SJ">
-										<i class="icon-print"></i>
-									</a>
-								</td>
-							</tr>
-						<% end %>
-						<% @taxinvoice.taxinvoiceitemvs.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
-							<% subtotal += taxinvoiceitem.total %>
-							<% weight_gross += taxinvoiceitem.weight_gross %>
-							<% weight_net += taxinvoiceitem.weight_net %>
-							<tr>
-								<td><%= sort+=1 %>.</td>
-								<td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
-								<td><%= taxinvoiceitem.vehicle_number rescue nil %></td>
-								<td><% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
-								<td align="right">
-									<% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxinvoiceitem.weight_gross)%> <% end %> </td>
-								</td>
-								<td align="right"><%=to_currency(taxinvoiceitem.weight_net)%></td>
-								<% if @taxinvoice.is_weightlost %>
-								<td align="right"><%= taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross%></td>
-								<% end %>
-								<td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
-								<td colspan="2" style="text-align:left"><%=taxinvoiceitem.event.summary rescue nil%></td>
-								<td align="right"><%= to_currency(taxinvoiceitem.total)%>  </td>
-							</tr>
-							<% end %>
-						<% else %>
-							<% @taxinvoice.taxgenericitems.active.order(:date, :sku_id).each_with_index do |taxgenericitem, i| %>
-								<% subtotal += taxgenericitem.total %>
-								<% weight_gross += taxgenericitem.weight_gross %>
-								<% weight_net += taxgenericitem.weight_net %>		  	 
-								<tr>
-									<td><%=i+1%>.</td>
-									<td><%=taxgenericitem.date.strftime('%d/%m/%Y') unless taxgenericitem.date.nil?%></td>
-									<td><%=taxgenericitem.vehicle.current_id%></td>
-									<td>
-										<% if taxgenericitem.sku_id == '' %> - <% else %> <%=taxgenericitem.sku_id %> <% end %> </td>
-									<td align="right">
-										<% if taxgenericitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxgenericitem.weight_gross)%> <% end %> </td>
-									</td>
-									<td align="right"><%=to_currency(taxgenericitem.weight_net)%></td>
-									<% if @taxinvoice.is_weightlost %>
-									<td align="right"><%= taxgenericitem.weight_net - taxgenericitem.weight_gross%></td>
-									<% end %>
-									<td align="left" style="padding-left:10px;"><%=to_currency_bank(taxgenericitem.price_per)%></td>
-									<td colspan="2" style="text-align:left"><%=taxgenericitem.description%></td>
-									<td align="right"><%= to_currency(taxgenericitem.total)%></td>
-									
-								</tr>
-							<% end %>
-						<% end %>
+            <% if !@taxinvoice.do_no.blank? %>
+            <div class="field-row continue">
+                <label class="left">DO</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.do_no%>" />
+            </div>
+            <% end %>
 
-						<tr>
-							<td></td>
-							<td colspan="3">SUBTOTAL</td>
-							<td align="right" style="border-top: 3px double"><strong><%= to_currency(weight_gross) %></strong></td>
-							<td align="right" style="border-top: 3px double"><strong><%= to_currency(weight_net) %></strong></td>
-							<% if @taxinvoice.is_weightlost %>
-							<td align="right" style="border-top: 3px double"><strong><%= to_currency(weight_net - weight_gross) %></strong></td>
-							<% end %>
-							<td colspan="3"></td>
-							<td align="right" style="border-top: 3px double"><strong><%= to_currency(subtotal) %></strong></td>
-						</tr>
+            <% if !@taxinvoice.ship_name.blank? %>
+            <div class="field-row continue">
+                <label class="left">Nama Kapal</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.ship_name%>" />
+            </div>
+            <% end %>
 
-						<% if @taxinvoice.is_weightlost
+            <% if !@taxinvoice.tank_name.blank? %>
+            <div class="field-row continue">
+                <label class="left">Jenis Tangki</label>
+                <input type="text" class="disabled left" value=":  <%=@taxinvoice.tank_name%>" />
+            </div>
+            <% end %>
+            <br class="clear" />
+            <br class="clear" />
+
+            <table class="row-view no-border">
+                <tr>
+                    <th width="20" style="text-align:center">No</th>
+                    <th width="70" class="nopol-col" style="text-align:center">Tgl Kirim</th>
+                    <th width="80" class="nopol-col" style="text-align:center">No. Pol</th>
+                    <th width="90" class="nopol-col" style="text-align:center">SJ</th>
+                    <th width="40" class="qty-col" style="text-align:center">Muat (Kg)</th>
+                    <th width="40" class="qty-col" style="text-align:center">Bongkar (Kg)</th>
+                    <% if @taxinvoice.is_weightlost %>
+                    <th width="40" class="qty-col" style="text-align:center">Selisih (Kg)</th>
+                    <% end %>
+                    <th width="40" style="padding-left:10px; text-align:center">Tarif</th>
+                    <th colspan="2" style="text-align:center">Jurusan</th>
+                    <th width="70" style="text-align:center">Total</th>
+                    <th class="d-none-print"></th>
+                </tr>
+                <% subtotal = 0 %>
+                <% weight_gross = 0 %>
+                <% weight_net = 0 %>
+                <% sort = 0 %>
+                <% if !@taxinvoice.generic %>
+                <% @taxinvoice.taxinvoiceitems.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
+                <% subtotal += taxinvoiceitem.total %>
+                <% weight_gross += taxinvoiceitem.weight_gross %>
+                <% weight_net += taxinvoiceitem.weight_net %>
+                <tr>
+                    <td><%= sort+=1 %>.</td>
+                    <td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
+                    <td>
+                        <% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
+                        <strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+                        <% else %>
+                        <%=taxinvoiceitem.invoice.vehicle.current_id rescue nil%>
+                        <% end %>
+                        <span style="display: none;"><% if taxinvoiceitem.invoice.invoicetrain %>,<% if taxinvoiceitem.invoice.invoices.first %> <%= taxinvoiceitem.invoice.invoices.first.vehicle.current_id %> <% end %> <% end %></span>
+                    </td>
+                    <td>
+                        <% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
+                    <td align="right">
+                        <% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxinvoiceitem.weight_gross)%> <% end %> </td>
+                    </td>
+                    <td align="right"><%=to_currency(taxinvoiceitem.weight_net)%></td>
+                    <% if @taxinvoice.is_weightlost %>
+                    <td align="right"><%= taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross%></td>
+                    <% end %>
+                    <td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
+                    <td colspan="2" style="text-align:left">
+                        <% if taxinvoiceitem.invoice.event %>
+                        <%=taxinvoiceitem.invoice.event.summary%>
+                        <% else %>
+
+                        <%=taxinvoiceitem.invoice.route.name%><br>
+                        <% if taxinvoiceitem.invoice.invoicetrain %>
+                        <% if taxinvoiceitem.invoice.invoices.first %>
+                        <%= taxinvoiceitem.invoice.invoices.first.route.name %>
+                        <% end %>
+                        <% end %>
+
+                        <% end %>
+                    </td>
+                    <td align="right"><%= to_currency(taxinvoiceitem.total)%> </td>
+                    <td class="d-none-print">
+                        <a href="/taxinvoiceitems/new/<%=taxinvoiceitem.invoice_id%>" class="delete tipsy" title="Detail SJ">
+                            <i class="icon-print"></i>
+                        </a>
+                    </td>
+                </tr>
+                <% end %>
+                <% @taxinvoice.taxinvoiceitemvs.order(:date, :sku_id).each_with_index do |taxinvoiceitem, i| %>
+                <% subtotal += taxinvoiceitem.total %>
+                <% weight_gross += taxinvoiceitem.weight_gross %>
+                <% weight_net += taxinvoiceitem.weight_net %>
+                <tr>
+                    <td><%= sort+=1 %>.</td>
+                    <td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
+                    <td><%= taxinvoiceitem.vehicle_number rescue nil %></td>
+                    <td><% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> </td>
+                    <td align="right">
+                        <% if taxinvoiceitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxinvoiceitem.weight_gross)%> <% end %> </td>
+                    </td>
+                    <td align="right"><%=to_currency(taxinvoiceitem.weight_net)%></td>
+                    <% if @taxinvoice.is_weightlost %>
+                    <td align="right"><%= taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross%></td>
+                    <% end %>
+                    <td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
+                    <td colspan="2" style="text-align:left"><%=taxinvoiceitem.event.summary rescue nil%></td>
+                    <td align="right"><%= to_currency(taxinvoiceitem.total)%> </td>
+                </tr>
+                <% end %>
+                <% else %>
+                <% @taxinvoice.taxgenericitems.active.order(:date, :sku_id).each_with_index do |taxgenericitem, i| %>
+                <% subtotal += taxgenericitem.total %>
+                <% weight_gross += taxgenericitem.weight_gross %>
+                <% weight_net += taxgenericitem.weight_net %>
+                <tr>
+                    <td><%=i+1%>.</td>
+                    <td><%=taxgenericitem.date.strftime('%d/%m/%Y') unless taxgenericitem.date.nil?%></td>
+                    <td><%=taxgenericitem.vehicle.current_id%></td>
+                    <td>
+                        <% if taxgenericitem.sku_id == '' %> - <% else %> <%=taxgenericitem.sku_id %> <% end %> </td>
+                    <td align="right">
+                        <% if taxgenericitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxgenericitem.weight_gross)%> <% end %> </td>
+                    </td>
+                    <td align="right"><%=to_currency(taxgenericitem.weight_net)%></td>
+                    <% if @taxinvoice.is_weightlost %>
+                    <td align="right"><%= taxgenericitem.weight_net - taxgenericitem.weight_gross%></td>
+                    <% end %>
+                    <td align="left" style="padding-left:10px;"><%=to_currency_bank(taxgenericitem.price_per)%></td>
+                    <td colspan="2" style="text-align:left"><%=taxgenericitem.description%></td>
+                    <td align="right"><%= to_currency(taxgenericitem.total)%></td>
+
+                </tr>
+                <% end %>
+                <% end %>
+
+                <tr>
+                    <td></td>
+                    <td colspan="3">SUBTOTAL</td>
+                    <td align="right" style="border-top: 3px double"><strong><%= to_currency(weight_gross) %></strong></td>
+                    <td align="right" style="border-top: 3px double"><strong><%= to_currency(weight_net) %></strong></td>
+                    <% if @taxinvoice.is_weightlost %>
+                    <td align="right" style="border-top: 3px double"><strong><%= to_currency(weight_net - weight_gross) %></strong></td>
+                    <% end %>
+                    <td colspan="3"></td>
+                    <td align="right" style="border-top: 3px double"><strong><%= to_currency(subtotal) %></strong></td>
+                </tr>
+
+                <% if @taxinvoice.is_weightlost
 							colspan = 10
 						else
 							colspan = 9
 						end %>
 
-						<% if @taxinvoice.downpayment.to_i > 0 %>
-							<tr id="pph-row">
-								<td colspan="<%= colspan%>" align="right">DP</td>
-								<td align="right"><span id="txt_price_dp" <% if @taxinvoice.downpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.downpayment.to_i)%></strong></span></td>
-							</tr>
-						<% end %>
+                <% if @taxinvoice.downpayment.to_i > 0 %>
+                <tr id="pph-row">
+                    <td colspan="<%= colspan%>" align="right">DP</td>
+                    <td align="right"><span id="txt_price_dp" <% if @taxinvoice.downpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.downpayment.to_i)%></strong></span></td>
+                </tr>
+                <% end %>
 
-						<% if @taxinvoice.secondpayment.to_i > 0 %>
-							<tr id="pph-row">
-								<td colspan="<%= colspan%>" align="right">Angsuran (<%= @taxinvoice.secondpayment_date.strftime('%d/%m/%Y') %>)</td>
-								<td align="right"><span id="txt_price_dp" <% if @taxinvoice.secondpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.secondpayment.to_i)%></strong></span></td>
-							</tr>
-						<% end %>
+                <% if @taxinvoice.secondpayment.to_i > 0 %>
+                <tr id="pph-row">
+                    <td colspan="<%= colspan%>" align="right">Angsuran (<%= @taxinvoice.secondpayment_date.strftime('%d/%m/%Y') %>)</td>
+                    <td align="right"><span id="txt_price_dp" <% if @taxinvoice.secondpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.secondpayment.to_i)%></strong></span></td>
+                </tr>
+                <% end %>
 
-						<% if @taxinvoice.thirdpayment.to_i > 0 %>
-							<tr id="pph-row">
-								<td colspan="<%= colspan%>" align="right">Angsuran (<%= @taxinvoice.thirdpayment_date.strftime('%d/%m/%Y') %>)</td>
-								<td align="right"><span id="txt_price_dp" <% if @taxinvoice.thirdpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.thirdpayment.to_i)%></strong></span></td>
-							</tr>
-						<% end %>
+                <% if @taxinvoice.thirdpayment.to_i > 0 %>
+                <tr id="pph-row">
+                    <td colspan="<%= colspan%>" align="right">Angsuran (<%= @taxinvoice.thirdpayment_date.strftime('%d/%m/%Y') %>)</td>
+                    <td align="right"><span id="txt_price_dp" <% if @taxinvoice.thirdpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.thirdpayment.to_i)%></strong></span></td>
+                </tr>
+                <% end %>
 
-						<% if @taxinvoice.fourthpayment.to_i > 0 %>
-							<tr id="pph-row">
-								<td colspan="<%= colspan%>" align="right">Angsuran (<%= @taxinvoice.fourthpayment_date.strftime('%d/%m/%Y') %>)</td>
-								<td align="right"><span id="txt_price_dp" <% if @taxinvoice.fourthpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.fourthpayment.to_i)%></strong></span></td>
-							</tr>
-						<% end %>
+                <% if @taxinvoice.fourthpayment.to_i > 0 %>
+                <tr id="pph-row">
+                    <td colspan="<%= colspan%>" align="right">Angsuran (<%= @taxinvoice.fourthpayment_date.strftime('%d/%m/%Y') %>)</td>
+                    <td align="right"><span id="txt_price_dp" <% if @taxinvoice.fourthpayment.to_i > 0 %> class="red" <% end %>><strong><%= to_currency(0 - @taxinvoice.fourthpayment.to_i)%></strong></span></td>
+                </tr>
+                <% end %>
 
-						<% if @taxinvoice.extra_cost > 0 %>
-							<tr>
-								<td colspan="<%= colspan%>" align="right">Biaya Tambahan : <%= @taxinvoice.extra_cost_info%></td>
-								<td align="right"><span id="txt_gst_tax"><%= to_currency_bank(@taxinvoice.extra_cost)%></span></td>
-							</tr>
-						<% end %>
-						<%
+                <% if @taxinvoice.extra_cost > 0 %>
+                <tr>
+                    <td colspan="<%= colspan%>" align="right">Biaya Tambahan : <%= @taxinvoice.extra_cost_info%></td>
+                    <td align="right"><span id="txt_gst_tax"><%= to_currency_bank(@taxinvoice.extra_cost)%></span></td>
+                </tr>
+                <% end %>
+                <%
 							ppn = Setting.where(name: 'ppn')
 							ppn = ppn.blank? ? 12 : ppn[0].value
 
@@ -399,61 +414,66 @@
 							is_decimal = taxinvoice_ppn.to_f - taxinvoice_ppn.to_i > 0
 							taxinvoice_ppn = is_decimal ? taxinvoice_ppn.to_f : taxinvoice_ppn.to_i
 						%>
-						<% if taxinvoice_ppn > 0 %>
-							<tr>
-								<td colspan="<%= colspan%>" align="right">PPN <%= taxinvoice_ppn %>%</td>
-								<td align="right"><span id="txt_gst_tax"><%= @taxinvoice.gst_tax.to_i == 0 ? "-" : to_currency_bank(@taxinvoice.gst_tax)%></span></td>
-							</tr>
-						<% end %>
+                <% if taxinvoice_ppn > 0 %>
+                <tr>
+                    <td colspan="<%= colspan%>" align="right">PPN <%= taxinvoice_ppn %>%</td>
+                    <td align="right"><span id="txt_gst_tax"><%= @taxinvoice.gst_tax.to_i == 0 ? "-" : to_currency_bank(@taxinvoice.gst_tax)%></span></td>
+                </tr>
+                <% end %>
 
-						<tr id="pph-row">
-							<td colspan="<%= colspan%>" align="right">PPh Pasal 23 2%</td>
-							<td align="right"><span id="txt_price_tax" <% if @taxinvoice.price_tax > 0 %> class="red" <% end %>><%= to_currency_bank(0 - @taxinvoice.price_tax)%></span></td>
-						</tr>
-						<% if @taxinvoice.insurance_cost.to_i > 0 %>
-							<tr>
-								<td colspan="<%= colspan%>" align="right">Biaya Asuransi</td>
-								<td align="right"><span id="txt_insurance_cost"><%= to_currency_bank(@taxinvoice.insurance_cost.to_i)%></span></td>
-							</tr>
-						<% end %>
-						<tr class="footer">
-							<td colspan="<%= colspan - 1%>"><span style="display: none;">&nbsp;<% if !@taxinvoice.total_in_words.blank? %> Terbilang: <%= @taxinvoice.total_in_words%><% end %></span></td>
-							<td align="right" width="40"><strong>TOTAL</strong></td>
-							<td align="right" style="border-top: 3px double"><strong><span id="txt_total"><%= @is_pembulatan ? to_currency(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i - @taxinvoice.secondpayment.to_i - @taxinvoice.thirdpayment.to_i - @taxinvoice.fourthpayment.to_i) : to_currency_bank(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i - @taxinvoice.secondpayment.to_i - @taxinvoice.thirdpayment.to_i - @taxinvoice.fourthpayment.to_i)%></span></strong></td>
-						</tr>
+                <tr id="pph-row">
+                    <td colspan="<%= colspan%>" align="right">PPh Pasal 23 2%</td>
+                    <td align="right"><span id="txt_price_tax" <% if @taxinvoice.price_tax > 0 %> class="red" <% end %>><%= to_currency_bank(0 - @taxinvoice.price_tax)%></span></td>
+                </tr>
+                <% if @taxinvoice.insurance_cost.to_i > 0 %>
+                <tr>
+                    <td colspan="<%= colspan%>" align="right">Biaya Asuransi</td>
+                    <td align="right"><span id="txt_insurance_cost"><%= to_currency_bank(@taxinvoice.insurance_cost.to_i)%></span></td>
+                </tr>
+                <% end %>
+                <tr class="footer">
+                    <td colspan="<%= colspan - 1%>"><span style="display: none;">&nbsp;<% if !@taxinvoice.total_in_words.blank? %> Terbilang: <%= @taxinvoice.total_in_words%><% end %></span></td>
+                    <td align="right" width="40"><strong>TOTAL</strong></td>
+                    <td align="right" style="border-top: 3px double"><strong><span id="txt_total"><%= @is_pembulatan ? to_currency(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i - @taxinvoice.secondpayment.to_i - @taxinvoice.thirdpayment.to_i - @taxinvoice.fourthpayment.to_i) : to_currency_bank(@taxinvoice.total.to_i - @taxinvoice.downpayment.to_i - @taxinvoice.secondpayment.to_i - @taxinvoice.thirdpayment.to_i - @taxinvoice.fourthpayment.to_i)%></span></strong></td>
+                </tr>
 
-						<tr>
-							<td colspan="<%= colspan + 1%>">&nbsp;</td>
-						</tr>
+                <tr>
+                    <td colspan="<%= colspan + 1%>">&nbsp;</td>
+                </tr>
 
-						<% if !@taxinvoice.description.blank? %>
-							<tr>
-								<td colspan="<%= colspan + 1%>"><strong><%= nl2br(@taxinvoice.description).html_safe%></strong><br/><br/></td>
-							</tr>
-						<% end %>
-				</table>
+                <% if !@taxinvoice.description.blank? %>
+                <tr>
+                    <td colspan="<%= colspan + 1%>"><strong><%= nl2br(@taxinvoice.description).html_safe%></strong><br /><br /></td>
+                </tr>
+                <% end %>
+            </table>
 
-				<table class="row-view no-border showprint d-none-print" style="border:0; width:100%;">
-					<tr>
-						<th width="150" style="text-align:center">Dibuat :</th>
-						<th width="300">&nbsp;</th>
-					</tr>
-					<tr><td colspan="3">&nbsp;</td></tr>
-					<tr><td colspan="3">&nbsp;</td></tr>
-					<tr><td colspan="3">&nbsp;</td></tr>
-					<tr>
-						<td style="text-align:center"><%= current_user.staff_id.nil? ? current_user.username : current_user.staff.name %></td>
-						<td>&nbsp;</td>
-					</tr>
-				</table>
+            <table class="row-view no-border showprint d-none-print" style="border:0; width:100%;">
+                <tr>
+                    <th width="150" style="text-align:center">Dibuat :</th>
+                    <th width="300">&nbsp;</th>
+                </tr>
+                <tr>
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center"><%= current_user.staff_id.nil? ? current_user.username : current_user.staff.name %></td>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
 
-				<% 
-					taxinvoice_bank = @taxinvoice.bank_id rescue nil
-					Bank.find(1)
-				%>
+            <% 
+				taxinvoice_bank = @taxinvoice.bank_id rescue nil
+				Bank.find(1)
+			%>
 
-
-				<% if @taxinvoice.bank_id.present? && @taxinvoice.bank_id != 0
+            <% if @taxinvoice.bank_id.present? && @taxinvoice.bank_id != 0
 					
 						bank_name = @taxinvoice.bank.name
 						bank_account_name = @taxinvoice.bank.bank_account_name
@@ -468,137 +488,156 @@
 						bank_account_number = bank.bank_account_number
 
 					end
-				%>
-					<table class="row-view no-border d-show-print" style="border: 1px solid black; width:60%;">
-						<tr>
-							<td width="150">Pembayaran ditransfer ke</th>
-							<td>&nbsp;</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td style="font-weight: 700;">No. Rek</td>
-							<td style="font-weight: 700;">:</td>
-							<td style="font-weight: 700;"><%= bank_account_number %></td>
-						</tr>
-						<tr>
-							<td style="font-weight: 700;">Bank</td>
-							<td style="font-weight: 700;">:</td>
-							<td style="font-weight: 700;"><%= bank_name %></td>
-						</tr>
-						<tr>
-							<td style="font-weight: 700;">Atas Nama</td>
-							<td style="font-weight: 700;">:</td>
-							<td style="font-weight: 700;"><%= bank_account_name %> </td>
-						</tr>
-						<tr>
-							<td colspan="3">Pembayaran dianggap lunas setelah kami uangkan</td>
-						</tr>
-					</table>
-					<table class="row-view no-border d-show-print" style="border:0; width:40%; margin-left: 60% !important;">
-						<tr>
-							<th width="150" style="text-align:center">Dibuat :</th>
-							<th width="300">&nbsp;</th>
-						</tr>
-						<tr>
-							<td>
-								<div style="margin: 0 auto; width: 200px;">
-									<img src="/assets/stempelpuraxttdbututi.png" alt="" class="d-show-print" style="width: 200px;">
-								</div>
-							</td>
-							<td>
+			%>
+			
+            <table class="row-view no-border d-show-print" style="border: 1px solid black; width:45%;">
+                <tr>
+                    <td width="150">Pembayaran ditransfer ke</th>
+                    <td>&nbsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700;">No. Rek</td>
+                    <td style="font-weight: 700;">:</td>
+                    <td style="font-weight: 700;"><%= bank_account_number %></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700;">Bank</td>
+                    <td style="font-weight: 700;">:</td>
+                    <td style="font-weight: 700;"><%= bank_name %></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700;">Atas Nama</td>
+                    <td style="font-weight: 700;">:</td>
+                    <td style="font-weight: 700;"><%= bank_account_name %> </td>
+                </tr>
+                <tr>
+                    <td colspan="3">Pembayaran dianggap lunas setelah kami uangkan</td>
+                </tr>
+            </table>
 
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align:center">Wargi Estuti</td>
-							<td>&nbsp;</td>
-						</tr>
-					</table>
-				<% end %>
-				<div style="width: 300px !important; margin: 0 auto !important;">
-					<table class="row-view no-border d-show-print table-footer" style="border:0; width:100%;">
-						<tr>
-							<td style="font-weight: 700;">PT. PUTRA RAJAWALI KENCANA Tbk</td>
-						</tr>
-						<tr>
-							<td>Ruko Section One Blok F7-11 Jl. Rungkut Industri I</td>
-						</tr>
-						<tr>
-							<td>Kendangsari - Tenggilis Mejoyo - Surabaya</td>
-						</tr>
-						<tr>
-							<td>Jawa Timur - Indonesia</td>
-						</tr>
-						<tr>
-							<td>www.puratrans.com email: info@puratrans.com</td>
-						</tr>
-						<tr>
-							<td style="font-weight: 700;">Telp. 031 99013573 Fax. 031 99850898</p></td>
-						</tr>
-					</table>
-				</div>
-		</div>
-	</div>
+            <table class="row-view no-border d-show-print" style="border:0; width:40%; margin-left: 60% !important; margin-bottom: 10%;">
+                <tr>
+                    <th width="150" style="text-align:center">Dibuat :</th>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="margin: 0 auto; width: 200px;">
+                            <%
+								name = @taxinvoice.user.username rescue 'tutik'
+								image_path = "/assets/ttd-#{name}.png"
+							%>
+                            <img src="<%=image_path%>" alt="" class="d-show-print" style="width: 200px;">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center">
+                        <%
+							case @taxinvoice.user.username
+							when 'alfi'
+							name = 'Alfi'
+							when 'sucy'
+							name = 'Sucy'
+							when 'sarah'
+							name = 'Sarah'
+							when 'tutik'
+							name = 'Wargi Estuti' # Set a default name if no match is found
+							else
+							name = 'Admin Penagihan' # Set a default name if no match is found
+							end
+						%>
+                        <%= name %>
+                    </td>
+                </tr>
+            </table>
+
+            <% end %>
+
+
+            <div style="width: 300px !important; margin: 0 auto !important; padding: 12px;">
+                <table class="row-view no-border d-show-print table-footer" style="border:0; width:100%;">
+                    <tr>
+                        <td style="font-weight: 700;">PT. PUTRA RAJAWALI KENCANA Tbk</td>
+                    </tr>
+                    <tr>
+                        <td>Ruko Section One Blok F7-11 Jl. Rungkut Industri I</td>
+                    </tr>
+                    <tr>
+                        <td>Kendangsari - Tenggilis Mejoyo - Surabaya</td>
+                    </tr>
+                    <tr>
+                        <td>Jawa Timur - Indonesia</td>
+                    </tr>
+                    <tr>
+                        <td>www.puratrans.com email: info@puratrans.com</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700;">Telp. 031 99013573 Fax. 031 99850898</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="d-show-print">
-	<% attachments = Attachment.where("imageable_id IN (?)", @invoice_images) %>
-	<% attachments.each do |img| %>
-		<% if (img.file_uid.present?) %>
-			<% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
-			<% if (ext == 'pdf') %>
+    <% attachments = Attachment.where("imageable_id IN (?)", @invoice_images) %>
+    <% attachments.each do |img| %>
+    <% if (img.file_uid.present?) %>
+    <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+    <% if (ext == 'pdf') %>
 
-			<% else %>
-				<% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
-					<a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
-					<div style="width: 800px !important; margin: 0 auto !important; padding: 2rem;">
-						<%= image_tag img.file.thumb('1280x800').url(:suffix => "/#{img.name}") if img.file_uid %>
-					</div>
-					</a>
-				<% else %>
-					<a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
-				<% end %>
-			<% end %>
-		<% end %>
-	<% end %>
+    <% else %>
+    <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png')   %>
+    <a href="<%= img.file.thumb('480x320').url() %>" target="_blank">
+        <div style="width: 800px !important; margin: 0 auto !important; padding: 2rem;">
+            <%= image_tag img.file.thumb('1280x800').url(:suffix => "/#{img.name}") if img.file_uid %>
+        </div>
+    </a>
+    <% else %>
+    <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
+    <% end %>
+    <% end %>
+    <% end %>
+    <% end %>
 </div>
 
-
-
 <%= content_for :js do %>
-	<script>
-		grandtotal = `<%= @is_pembulatan ? to_currency(@taxinvoice.total) : to_currency_bank(@taxinvoice.total)%>`;
-		pph = `<%= to_currency_bank(0 - @taxinvoice.price_tax)%>`;
-		grandtotal_no_tax = `<%= to_currency_bank((@taxinvoice.total + @taxinvoice.price_tax).to_i) %>`;
-		$(document).ready(function() {
-			
-		})
-		.on("change","#chk_price_tax_print",function() {
-			if($(this).is(":checked")){
-				$("#pph-row").hide();
-				$("#txt_total").text(grandtotal_no_tax);
-			}else{
-				$("#pph-row").show();
-				$("#txt_total").text(grandtotal);
+<script>
+    grandtotal = `<%= @is_pembulatan ? to_currency(@taxinvoice.total) : to_currency_bank(@taxinvoice.total)%>`;
+    pph = `<%= to_currency_bank(0 - @taxinvoice.price_tax)%>`;
+    grandtotal_no_tax = `<%= to_currency_bank((@taxinvoice.total + @taxinvoice.price_tax).to_i) %>`;
+    $(document).ready(function() {
 
-			}
-		});
+        })
+        .on("change", "#chk_price_tax_print", function() {
+            if ($(this).is(":checked")) {
+                $("#pph-row").hide();
+                $("#txt_total").text(grandtotal_no_tax);
+            } else {
+                $("#pph-row").show();
+                $("#txt_total").text(grandtotal);
 
-		// $("#btnPrint").live("click", function () {
-		// 	var divContents = $(".print-pdf").html();
-		// 	var printWindow = window.open('', '', 'height=400,width=800');
-		// 	printWindow.document.write('<html><head><title>DIV Contents</title>');
-		// 	printWindow.document.write('</head><body >');
-		// 	printWindow.document.write(divContents);
-		// 	printWindow.document.write('</body></html>');
-		// 	printWindow.document.close();
-		// 	printWindow.print();
-		// 	});
+            }
+        });
 
-		// let print = () => {
+    // $("#btnPrint").live("click", function () {
+    // 	var divContents = $(".print-pdf").html();
+    // 	var printWindow = window.open('', '', 'height=400,width=800');
+    // 	printWindow.document.write('<html><head><title>DIV Contents</title>');
+    // 	printWindow.document.write('</head><body >');
+    // 	printWindow.document.write(divContents);
+    // 	printWindow.document.write('</body></html>');
+    // 	printWindow.document.close();
+    // 	printWindow.print();
+    // 	});
+
+    // let print = () => {
     //     let objFra = document.getElementsByClassName('print-pdf');
     //     objFra.contentWindow.focus();
     //     objFra.contentWindow.print();
     // }
-	</script>
+</script>
 <% end %>
