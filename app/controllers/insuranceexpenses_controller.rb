@@ -25,7 +25,7 @@ class InsuranceexpensesController < ApplicationController
       @enddate = params[:enddate]
       @enddate = Date.today.strftime('%d-%m-%Y') if @enddate.nil?
   
-      @insuranceexpenses = Invoice.where('invoices.is_insurance = true AND invoices.date between ? and ? AND invoices.id not in (select invoice_id from insuranceexpenses where deleted = false) AND invoices.id not in (select invoice_id from invoicereturns where deleted = false)', @startdate.to_date, @enddate.to_date).order(:date, :event_id)
+      @insuranceexpenses = Invoice.where('kosongan = false AND invoices.is_insurance = true AND invoices.date between ? and ? AND invoices.id not in (select invoice_id from insuranceexpenses where deleted = false) AND invoices.id not in (select invoice_id from invoicereturns where deleted = false)', @startdate.to_date, @enddate.to_date).order(:date, :event_id)
   
       @commodity_id = params[:commodity_id]
 
