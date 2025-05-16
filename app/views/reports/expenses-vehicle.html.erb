@@ -16,14 +16,14 @@
 
 		<div id="filter">
 			<form id="filterform" name="filterform" action="" method="get">
-			<div class="field-row continue" style="width:100%;">
+			<div class="field-row continue" style="width:100%; display: flex; justify-content: flex-start; align-items: center;">
 				<label for="vehicle_id" style="float:none">Pilih Kendaraan</label>
 				<select name="vehicle_id" class="chzn-select half combo_route">
 					<% Vehicle.order(:current_id).all.each do |vehicle| %>
 					<option value="<%=vehicle.id%>"<% if @vehicle and vehicle.id == @vehicle.id %> selected="selected"<% end %>><%=vehicle.current_id%></option>
 					<% end %>
 		    	</select> 
-				&nbsp; &nbsp; <label class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
+				&nbsp; &nbsp; <label class="" style="float:none">Tgl Awal</label> &nbsp; &nbsp;
 				<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
 				&nbsp; &nbsp; <label for="vehicle_id" class="short" style='width:50px;float:none;'>Akhir</label> &nbsp; &nbsp;
 				<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
@@ -38,108 +38,159 @@
 	
 		<table class="row-view report-view">
 			<tr>
-				<th width="30">No.</th>
-				<th width="50">ID</th>
+				<th width="30">#.</th>
+				<th width="50">No.</th>
 				<th width="80">Tanggal</th>
 				<th>Keterangan</th>
 				<th width="45">Ktr</th>
 				<th width="100" class="right">Total</th>
 			</tr>
 
-			<% if @receipts and  @receipts.any? %>
+			<% if @receipts and @receipts.any? %>
 				
 				<!-- UANG MAKAN SUPIR -->
 				<% if @receipts.where("money(driver_allowance) + money(helper_allowance) > money(0)").any? %>
-					<tr class="subheading">
-						<th colspan="6"><span class="red">Uang Makan</span></th>
-					</tr>
-					<% total = 0 %>
-					<% @receipts.where("money(driver_allowance) + money(helper_allowance) > money(0)").each_with_index do |receipt, i| %>
-					<% receiptreturn = Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum(:quantity) rescue nil 
-						qty = receipt.quantity 
-						qty -= receiptreturn %>
-						
-						<% if qty > 0 %>	
-						<%	subtotal =  receipt.driver_allowance + receipt.helper_allowance
-							subtotal -= Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum("driver_allowance + helper_allowance").to_i
-							total += subtotal
-							%>
-						<tr>
-							<td><%=i+1%>.</td>
-							<td><%=zeropad(receipt.invoice_id)%></td>
-							<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
-							<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=qty%> Rit <% if !receiptreturn.nil? %>(<%= receipt.quantity %>-<%= receiptreturn%>)<% end %>, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
-							<td><%=receipt.office.abbr%></td>
-							<td align="right" class="red"><%=to_currency(subtotal)%></td>
-						</tr>
-						<% end %>
-					<% end %>
-						<% running += total %>
-						<tr class="footer">
-							<td>&nbsp;</td>
-							<td colspan="4">TOTAL</td>
-							<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
-						</tr>
+				<tr class="subheading">
+					<th colspan="6"><span class="red">Uang Makan</span></th>
+				</tr>
+				<% total = 0 %>
+				<% row_number = 1 %>
+				<% @receipts.where("money(driver_allowance) + money(helper_allowance) > money(0)").each do |receipt| %>
+					<% receiptreturn = Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum(:quantity) rescue nil %>
+					<% qty = receipt.quantity %>
+					<% qty -= receiptreturn %>
 					
+					<% if qty > 0 %>    
+					<%  subtotal =  receipt.driver_allowance + receipt.helper_allowance %>
+					<%  subtotal -= Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum("driver_allowance + helper_allowance").to_i %>
+					<%  total += subtotal %>
+					<tr>
+						<td><%= row_number %>.</td>
+						<td><%= zeropad(receipt.invoice_id)%></td>
+						<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+						<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=qty%> Rit <% if !receiptreturn.nil? %>(<%= receipt.quantity %>-<%= receiptreturn%>)<% end %>, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+						<td><%=receipt.office.abbr%></td>
+						<td align="right" class="red"><%=to_currency(subtotal)%></td>
+					</tr>
+					<% row_number += 1 %>
+					<% end %>
+				<% end %>
+				<% running += total %>
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td colspan="4">TOTAL</td>
+					<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
+				</tr>
 				<% end %>
 
 				<!-- LAIN - LAIN  -->
 				<% if @receipts.where("money(misc_allowance) + money(tol_fee) + money(ferry_fee) > money(0)").any? %>
-					<tr class="subheading">
-						<th colspan="6"><span class="red">Lain - lain</span></th>
-					</tr>
+				<tr class="subheading">
+					<th colspan="6"><span class="red">Lain - lain</span></th>
+				</tr>
 
-					<% total = 0 %>
-					<% @receipts.where("misc_allowance + tol_fee + ferry_fee > money(0)").each_with_index do |receipt, i| %>
-						<% receiptreturn = Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum(:quantity)
-							qty = receipt.quantity 
-							qty -= receiptreturn %>
-						<% if qty > 0 %>	
-							<%	subtotal =  receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee 
-								subtotal -= Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum("misc_allowance + tol_fee").to_i
-								total += subtotal
-								%>
-							<tr>
-								<td><%=i+1%>.</td>
-								<td><%=zeropad(receipt.invoice_id)%></td>
-								<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
-								<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=qty%> Rit <% if !receiptreturn.nil? %>(<%= receipt.quantity %>-<%= receiptreturn%>)<% end %>, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
-								<td><%=receipt.office.abbr%></td>
-								<td align="right" class="red"><%=to_currency(subtotal)%></td>
-							</tr>
-						<% end %>
-					<% end %>
-					<% running += total %>
-					<tr class="footer">
-						<td>&nbsp;</td>
-						<td colspan="4">TOTAL</td>
-						<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
+				<% total = 0 %>
+				<% row_number = 1 %>
+				<% @receipts.where("misc_allowance + tol_fee + ferry_fee > money(0)").each do |receipt| %>
+					<% receiptreturn = Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum(:quantity)
+					qty = receipt.quantity 
+					qty -= receiptreturn %>
+					<% if qty > 0 %>    
+					<%  subtotal =  receipt.misc_allowance + receipt.tol_fee + receipt.ferry_fee 
+						subtotal -= Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum("misc_allowance + tol_fee").to_i
+						total += subtotal
+						%>
+					<tr>
+						<td><%= row_number %>.</td>
+						<td><%= zeropad(receipt.invoice_id)%></td>
+						<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+						<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=qty%> Rit <% if !receiptreturn.nil? %>(<%= receipt.quantity %>-<%= receiptreturn%>)<% end %>, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+						<td><%=receipt.office.abbr%></td>
+						<td align="right" class="red"><%=to_currency(subtotal)%></td>
 					</tr>
-				
+					<% row_number += 1 %>
+					<% end %>
+				<% end %>
+				<% running += total %>
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td colspan="4">TOTAL</td>
+					<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
+				</tr>                
 				<% end %>
 
+				<!-- SOLAR -->
 				<% if @receipts.where("gas_allowance > money(0)").any? %>
-					<!-- SOLAR KONTAN -->
-					<tr class="subheading">
-						<th colspan="6"><span class="red">Solar Kontan</span></th>
+				<tr class="subheading">
+					<th colspan="6"><span class="red">Solar Kontan</span></th>
+				</tr>
+				
+				<% total = 0 %>
+				<% row_number = 1 %>
+				<% @receipts.where("gas_allowance > money(0)").each do |receipt| %>
+					<% receiptreturn = Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum(:quantity)
+					qty = receipt.quantity 
+					qty -= receiptreturn %>
+					
+					<% if qty > 0 %>    
+					<%  subtotal = receipt.gas_allowance
+						subtotal -= Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum("gas_allowance").to_i
+						total += subtotal
+						%>
+					<tr>
+						<td><%= row_number %>.</td>
+						<td><%= zeropad(receipt.invoice_id)%></td>
+						<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+						<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+						<td><%=receipt.office.abbr%></td>
+						<td align="right" class="red"><%=to_currency(subtotal)%></td>
 					</tr>
-
-					<% @receipts.where("gas_allowance > money(0)").each_with_index do |receipt, i| %>
-						<tr>
-							<td><%=i+1%>.</td>
-							<td><%=zeropad(receipt.invoice_id)%></td>
-							<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
-							<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
-							<td><%=receipt.office.abbr%></td>
-							<td align="right" class="red"><%=to_currency(receipt.gas_allowance)%></td>
-						</tr>
+					<% row_number += 1 %>
 					<% end %>
-					<% running += @receipts.sum(:gas_allowance) %>
-					<tr class="footer">
-						<td>&nbsp;</td>
-						<td colspan="4">TOTAL</td>			
-						<td align="right" class="red"><strong><%=to_currency(@receipts.sum(:gas_allowance))%></strong></td>
+				<% end %>
+				<% running += total %>
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td colspan="4">TOTAL</td>          
+					<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
+				</tr>
+				<% end %>
+
+				<!-- PREMI -->
+				<% if @receipts.where("premi_allowance > money(0)").any? %>
+				<tr class="subheading">
+					<th colspan="6"><span class="red">Premi</span></th>
+				</tr>
+				
+				<% total = 0 %>
+				<% row_number = 1 %> <%# Initialize row number here %>
+				<% @receipts.where("premi_allowance > money(0)").each do |receipt| %>
+					<% receiptreturn = Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum(:quantity)
+					qty = receipt.quantity 
+					qty -= receiptreturn %>
+					
+					<% if qty > 0 %>    
+					<%  subtotal = receipt.premi_allowance
+						subtotal -= Receiptreturn.where(:invoice_id => receipt.invoice_id, :deleted => false).sum("premi_allowance").to_i
+						total += subtotal
+						%>
+					<tr>
+						<td><%= row_number %>.</td> <%# Use row_number here %>
+						<td><%= zeropad(receipt.invoice_id)%></td>
+						<td><%=receipt.created_at.strftime('%d-%m-%Y')%></td>
+						<td><%=receipt.invoice.date.strftime('%d-%m-%Y')%>, <%=receipt.quantity%> Rit, <%=receipt.invoice.route.name%> (<%=receipt.invoice.driver.name%>) <% if !receipt.invoice.invoice_id.blank? %>(#<%= zeropad(receipt.invoice.invoice_id)%>)<% end %></td>
+						<td><%=receipt.office.abbr%></td>
+						<td align="right" class="red"><%=to_currency(subtotal)%></td>
 					</tr>
+					<% row_number += 1 %>  <%# Increment row_number only when a row is displayed %>
+					<% end %>
+				<% end %>
+				<% running += total %>
+				<tr class="footer">
+					<td>&nbsp;</td>
+					<td colspan="4">TOTAL</td>          
+					<td align="right" class="red"><strong><%=to_currency(total)%></strong></td>
+				</tr>
 				<% end %>
 
 				<% if @solar_pomps.any? %>
@@ -169,7 +220,7 @@
 
 			<% end %>
 
-			<!-- PREMI  -->
+			<!-- PREMI -->
 			<% if @receiptpremis and @receiptpremis.any? %>
 				<tr class="subheading">
 					<th colspan="6"><span class="red">Premi</span></th>
@@ -195,7 +246,7 @@
 			
 			<% end %>
 
-			<!-- INCENTIVE  -->
+			<!-- INCENTIVE -->
 			<% if @receiptincentives and @receiptincentives.any? %>
 				<tr class="subheading">
 					<th colspan="6"><span class="red">Insentif</span></th>
@@ -234,7 +285,7 @@
 				<% @officeexpense_group.each_with_index do |receiptexpense| %>
 					<tr>
 						<td><%=i+1%>.</td>
-						<td><%=zeropad(receiptexpense.id)%></td>
+						<td><%=zeropad(receiptexpense.officeexpense_id)%></td>
 						<td><%=receiptexpense.created_at.strftime('%d-%m-%Y')%></td>
 						<td><%=receiptexpense.officeexpense.date.strftime('%d-%m-%Y')%>, <%=nl2br(receiptexpense.officeexpense.description).html_safe%></td>
 						<td><%=receiptexpense.officeexpense.office.abbr if !receiptexpense.officeexpense.office_id.nil?%></td>
@@ -297,11 +348,14 @@
 				<td>&nbsp;</td>
 				<td class="total red" align="right"><%=to_currency(running) %></td>
 			</tr>
+			<!-- 
 			<tr class="footer">
 				<td class="total" align="right" colspan="4">RATA-RATA PENGELUARAN AKHIR:</td>
 				<td>&nbsp;</td>
 				<td class="total" align="right"><%=to_currency(running / 26) %></td>
 			</tr>
+			-->
+			
 		</table>
 
 	</div>

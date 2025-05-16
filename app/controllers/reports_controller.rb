@@ -1802,8 +1802,6 @@ end
 
   end
 
-
-
   def gas_vouchers
     role = cek_roles 'Admin Operasional, Admin HRD'
     if role
@@ -1811,7 +1809,10 @@ end
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+      
       @invoices = Invoice.where("gas_voucher > 0 and (date > ? and date < ?) AND deleted = false", @startdate.to_date, @enddate.to_date).order('date')
+      @invoices = @invoices.where("id not in (select invoice_id from invoicereturns where deleted = false)")
+
       @section = "reports2"
       @where = "gas-vouchers"
       render "gas-vouchers"
