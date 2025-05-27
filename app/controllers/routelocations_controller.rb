@@ -91,7 +91,8 @@ class RoutelocationsController < ApplicationController
 		lng_end = params[:longitude_end]
 		lat_end = params[:latitude_end]
 		
-		api_key = "AIzaSyDwuoQZDV6IQ7fpPGvmgBqnueUSu6uB4qU"
+		# api_key = "AIzaSyDwuoQZDV6IQ7fpPGvmgBqnueUSu6uB4qU"
+		api_key = "AIzaSyAseVu713ju2rF1ryj_KjGMoP5LkbrtJQA"
 	 
 		url_string = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=#{lat_start},#{lng_start}&destinations=#{lat_end},#{lng_end}&mode=driving&units=metric&key=#{api_key}"
 		url = URI.parse(url_string) # Use `URI.parse` instead of `URI()`
