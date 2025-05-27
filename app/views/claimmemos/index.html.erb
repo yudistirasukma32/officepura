@@ -100,6 +100,38 @@
 				<%= (memo.invoice.container_id.present? && memo.invoice.container_id.to_i != 0) ? ("Kontainer = " + memo.invoice.container.containernumber) : '' %>
 				<%= memo.invoice.ship_id.nil? ? '': ' | '+memo.invoice.ship.name rescue nil%>
 				<%= memo.invoice.user_id.nil? ? '': ' | '+memo.invoice.user.username%>
+
+				<br/>
+
+				<% if memo.images.any? %>
+					<br/>
+					<span style="font-weight: 600; color: #5a5a5a;">Lampiran:</span>
+					<ul style="padding: 0 0 0 1rem;">
+					<% i = 0%>
+					<% memo.images.each do |img|%>
+						<li>
+            				<a href="<%= img.file.url() rescue nil %>" target="_blank" style="text-decoration: underline;">
+								Lampiran [<%= i+= 1 %>]
+							</a><br/>    
+						</li>
+					<% end %>
+					</ul>
+				<% end %>
+
+				<% taxinvoiceitems = Taxinvoiceitem.where("invoice_id = #{memo.invoice_id} AND deleted = FALSE") rescue nil; %>
+				<% if !taxinvoiceitems.nil? %>
+					<br/>
+
+					<% taxinvoiceitems.each_with_index do |taxinvoiceitem,i| %>
+					<% taxinvoice = Taxinvoice.find(taxinvoiceitem.taxinvoice_id) rescue nil  %>
+						<% if !taxinvoice.nil? %>
+						<span style="font-weight: 600; color: #5a5a5a;">Inv Tagihan:</span><br/>
+						<%= taxinvoice.long_id %>
+						<br/>
+						<% end %>
+					<% end %>
+				<% end %>
+
 				</td>
 				<td><%= memo.invoice.office.abbr rescue nil %></td>
 				<td><%= memo.invoice.vehicle.current_id rescue nil %></td>

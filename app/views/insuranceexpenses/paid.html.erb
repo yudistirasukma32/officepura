@@ -45,6 +45,8 @@
 
 		<br class="clearfix" />
 
+			<p style="text-transform: uppercase; font-size: 13px; font-weight: 600;">BKK Non Kereta</p>
+
 			<table class="row-view">
 				<tr>
 					<th width="50">No. Polis</th>
@@ -66,8 +68,8 @@
 				<% @insuranceexpenses.each do |insuranceexpense| %>
 
 					<% tsitotal = insuranceexpense.invoice.event.tsi_total rescue 0 %>
-					<% rate = 0.0008 %>
-					<% rate_text = 0.0008 * 100 %>
+					<% rate = 0.0005 %>
+					<% rate_text = 0.0005 * 100 %>
 					<% est_premi = rate * tsitotal %>
 					<% qty = insuranceexpense.invoice.event.qty rescue 0 %>
 					<% est_volume = insuranceexpense.invoice.event.volume rescue 0 %>
@@ -77,7 +79,7 @@
 						<% @grandTotal += total %>
 
 						<tr>
-							<td><%=insuranceexpense.policy_number rescue nil%></td> 
+							<td><%=insuranceexpense.policy_number rescue 'Belum Terbit'%></td> 
 							<td><%= zeropad(insuranceexpense.invoice.event_id) rescue nil %></td> 
 							<td><strong>#<%= zeropad(insuranceexpense.invoice.id) %></strong> (<%=insuranceexpense.invoice.date.strftime('%d')%>.<%=insuranceexpense.invoice.date.strftime('%m')%>)<br/>
 							<%=insuranceexpense.invoice.quantity%> Rit: <%=insuranceexpense.invoice.route.name rescue nil%> <br/>(<%=insuranceexpense.invoice.driver.name rescue nil%>)
@@ -130,6 +132,288 @@
 			
 				<tr class="footer">
 					<td class="" colspan="2"><i><span style="font-size: 11px;"><%= @insuranceexpenses.count %> Premi ditemukan</span></i></td>
+					<td class="total" align="right" colspan="8">TOTAL</td>
+					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
+				</tr>
+			</table>
+
+			<br class="clearfix" />
+
+			<p style="text-transform: uppercase; font-size: 13px; font-weight: 600;">BKK Kereta Loading</p>
+
+			<table class="row-view">
+				<tr>
+					<th width="50">No. Polis</th>
+					<th width="50">No. DO</th>
+					<th width="200">Keterangan</th>
+					<th width="70">NoPol</th>
+                    <th width="90">Cont/Iso</th>
+                    <th width="90">Komoditas</th>
+                    <th width="50">Ton</th>
+                    <th width="50">Broker</th>
+					<th width="80" class="right">Pertanggungan</th>
+					<th width="50" class="right">Rate</th>
+					<th width="90" class="right">Total Premi</th>
+					<th width="40"></th>
+				</tr>
+
+				<% @grandTotal = 0%>
+
+				<% @insuranceexpenses_loading.each do |insuranceexpense| %>
+
+					<% tsitotal = insuranceexpense.invoice.event.tsi_total rescue 0 %>
+					<% rate = 0.0005 %>
+					<% rate_text = 0.0005 * 100 %>
+					<% est_premi = rate * tsitotal %>
+					<% qty = insuranceexpense.invoice.event.qty rescue 0 %>
+					<% est_volume = insuranceexpense.invoice.event.volume rescue 0 %>
+					<% est_volume = est_volume / qty %>
+					<% total = insuranceexpense.total rescue 0 %>
+
+						<% @grandTotal += total %>
+
+						<tr>
+							<td><%=insuranceexpense.policy_number rescue 'Belum Terbit'%></td> 
+							<td><%= zeropad(insuranceexpense.invoice.event_id) rescue nil %></td> 
+							<td><strong>#<%= zeropad(insuranceexpense.invoice.id) %></strong> (<%=insuranceexpense.invoice.date.strftime('%d')%>.<%=insuranceexpense.invoice.date.strftime('%m')%>)<br/>
+							<%=insuranceexpense.invoice.quantity%> Rit: <%=insuranceexpense.invoice.route.name rescue nil%> <br/>(<%=insuranceexpense.invoice.driver.name rescue nil%>)
+							</td>
+							<td><%=insuranceexpense.invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (insuranceexpense.invoice.isotank_id.present? && insuranceexpense.invoice.isotank_id.to_i != 0) ? ( insuranceexpense.invoice.isotank.isotanknumber) : '' %>
+							<%= (insuranceexpense.invoice.container_id.present? && insuranceexpense.invoice.container_id.to_i != 0) ? ( insuranceexpense.invoice.container.containernumber) : '' %></td>
+							<td><%=insuranceexpense.invoice.event.commodity.name rescue nil%></td>
+							<td><%= est_volume %></td>
+							<td><%=insuranceexpense.insurancevendor.name rescue nil%></td>
+							<td class="right"><%= to_currency(tsitotal) %></td>
+							<td class="right"><%= rate_text %>%</td>
+							<td class="red right"><%= to_currency(total) %></td>
+							<td class="right" width="60">
+
+								<% if (current_user.adminrole || current_user.owner)%>
+
+									<% if insuranceexpense.receiptinsurances.active.count == 0 %>
+
+										<a class="cta" style="opacity: 1;" href="insuranceexpenses/delete/<%=insuranceexpense.invoice.id%>">Batal</a>
+									
+									<% else %>
+
+										 <span>Confirmed</span>
+								
+									<% end %>
+
+								<% else %>
+								
+								<% if checkrole 'Admin Operasional, Admin Asuransi' %>
+
+									<% if insuranceexpense.receiptinsurances.active.count != 0 %>
+
+										<span>confirmed</span>
+
+									<% else %>
+
+										<span>delete</span>
+
+									<% end %>
+ 
+								<% end %>
+
+								<% end %>
+
+							</td>
+						</tr>
+
+				<% end %>	
+			
+				<tr class="footer">
+					<td class="" colspan="2"><i><span style="font-size: 11px;"><%= @insuranceexpenses_loading.count %> Premi ditemukan</span></i></td>
+					<td class="total" align="right" colspan="8">TOTAL</td>
+					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
+				</tr>
+			</table>
+
+			<br class="clearfix" />
+
+			<p style="text-transform: uppercase; font-size: 13px; font-weight: 600;">BKK Kereta Dooring</p>
+
+			<table class="row-view">
+				<tr>
+					<th width="50">No. Polis</th>
+					<th width="50">No. DO</th>
+					<th width="200">Keterangan</th>
+					<th width="70">NoPol</th>
+                    <th width="90">Cont/Iso</th>
+                    <th width="90">Komoditas</th>
+                    <th width="50">Ton</th>
+                    <th width="50">Broker</th>
+					<th width="80" class="right">Pertanggungan</th>
+					<th width="50" class="right">Rate</th>
+					<th width="90" class="right">Total Premi</th>
+					<th width="40"></th>
+				</tr>
+
+				<% @grandTotal = 0%>
+
+				<% @insuranceexpenses_dooring.each do |insuranceexpense| %>
+
+					<% tsitotal = insuranceexpense.invoice.event.tsi_total rescue 0 %>
+					<% rate = 0.0005 %>
+					<% rate_text = 0.0005 * 100 %>
+					<% est_premi = rate * tsitotal %>
+					<% qty = insuranceexpense.invoice.event.qty rescue 0 %>
+					<% est_volume = insuranceexpense.invoice.event.volume rescue 0 %>
+					<% est_volume = est_volume / qty %>
+					<% total = insuranceexpense.total rescue 0 %>
+
+						<% @grandTotal += total %>
+
+						<tr>
+							<td><%=insuranceexpense.policy_number rescue 'Belum Terbit'%></td> 
+							<td><%= zeropad(insuranceexpense.invoice.event_id) rescue nil %></td> 
+							<td><strong>#<%= zeropad(insuranceexpense.invoice.id) %></strong> (<%=insuranceexpense.invoice.date.strftime('%d')%>.<%=insuranceexpense.invoice.date.strftime('%m')%>)<br/>
+							<%=insuranceexpense.invoice.quantity%> Rit: <%=insuranceexpense.invoice.route.name rescue nil%> <br/>(<%=insuranceexpense.invoice.driver.name rescue nil%>)
+							</td>
+							<td><%=insuranceexpense.invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (insuranceexpense.invoice.isotank_id.present? && insuranceexpense.invoice.isotank_id.to_i != 0) ? ( insuranceexpense.invoice.isotank.isotanknumber) : '' %>
+							<%= (insuranceexpense.invoice.container_id.present? && insuranceexpense.invoice.container_id.to_i != 0) ? ( insuranceexpense.invoice.container.containernumber) : '' %></td>
+							<td><%=insuranceexpense.invoice.event.commodity.name rescue nil%></td>
+							<td><%= est_volume %></td>
+							<td><%=insuranceexpense.insurancevendor.name rescue nil%></td>
+							<td class="right"><%= to_currency(tsitotal) %></td>
+							<td class="right"><%= rate_text %>%</td>
+							<td class="red right"><%= to_currency(total) %></td>
+							<td class="right" width="60">
+
+								<% if (current_user.adminrole || current_user.owner)%>
+
+									<% if insuranceexpense.receiptinsurances.active.count == 0 %>
+
+										<a class="cta" style="opacity: 1;" href="insuranceexpenses/delete/<%=insuranceexpense.invoice.id%>">Batal</a>
+									
+									<% else %>
+
+										 <span>Confirmed</span>
+								
+									<% end %>
+
+								<% else %>
+								
+								<% if checkrole 'Admin Operasional, Admin Asuransi' %>
+
+									<% if insuranceexpense.receiptinsurances.active.count != 0 %>
+
+										<span>confirmed</span>
+
+									<% else %>
+
+										<span>delete</span>
+
+									<% end %>
+ 
+								<% end %>
+
+								<% end %>
+
+							</td>
+						</tr>
+
+				<% end %>	
+			
+				<tr class="footer">
+					<td class="" colspan="2"><i><span style="font-size: 11px;"><%= @insuranceexpenses_dooring.count %> Premi ditemukan</span></i></td>
+					<td class="total" align="right" colspan="8">TOTAL</td>
+					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
+				</tr>
+			</table>
+
+			<br class="clearfix" />
+
+			<p style="text-transform: uppercase; font-size: 13px; font-weight: 600;">BKK Losing</p>
+
+			<table class="row-view">
+				<tr>
+					<th width="50">No. Polis</th>
+					<th width="50">No. DO</th>
+					<th width="200">Keterangan</th>
+					<th width="70">NoPol</th>
+                    <th width="90">Cont/Iso</th>
+                    <th width="90">Komoditas</th>
+                    <th width="50">Ton</th>
+                    <th width="50">Broker</th>
+					<th width="80" class="right">Pertanggungan</th>
+					<th width="50" class="right">Rate</th>
+					<th width="90" class="right">Total Premi</th>
+					<th width="40"></th>
+				</tr>
+
+				<% @grandTotal = 0%>
+
+				<% @insuranceexpenses_losing.each do |insuranceexpense| %>
+
+					<% tsitotal = insuranceexpense.invoice.event.tsi_total rescue 0 %>
+					<% rate = 0.0005 %>
+					<% rate_text = 0.0005 * 100 %>
+					<% est_premi = rate * tsitotal %>
+					<% qty = insuranceexpense.invoice.event.qty rescue 0 %>
+					<% est_volume = insuranceexpense.invoice.event.volume rescue 0 %>
+					<% est_volume = est_volume / qty %>
+					<% total = insuranceexpense.total rescue 0 %>
+
+						<% @grandTotal += total %>
+
+						<tr>
+							<td><%=insuranceexpense.policy_number rescue 'Belum Terbit'%></td> 
+							<td><%= zeropad(insuranceexpense.invoice.event_id) rescue nil %></td> 
+							<td><strong>#<%= zeropad(insuranceexpense.invoice.id) %></strong> (<%=insuranceexpense.invoice.date.strftime('%d')%>.<%=insuranceexpense.invoice.date.strftime('%m')%>)<br/>
+							<%=insuranceexpense.invoice.quantity%> Rit: <%=insuranceexpense.invoice.route.name rescue nil%> <br/>(<%=insuranceexpense.invoice.driver.name rescue nil%>)
+							</td>
+							<td><%=insuranceexpense.invoice.vehicle.current_id rescue nil%></td>
+							<td><%= (insuranceexpense.invoice.isotank_id.present? && insuranceexpense.invoice.isotank_id.to_i != 0) ? ( insuranceexpense.invoice.isotank.isotanknumber) : '' %>
+							<%= (insuranceexpense.invoice.container_id.present? && insuranceexpense.invoice.container_id.to_i != 0) ? ( insuranceexpense.invoice.container.containernumber) : '' %></td>
+							<td><%=insuranceexpense.invoice.event.commodity.name rescue nil%></td>
+							<td><%= est_volume %></td>
+							<td><%=insuranceexpense.insurancevendor.name rescue nil%></td>
+							<td class="right"><%= to_currency(tsitotal) %></td>
+							<td class="right"><%= rate_text %>%</td>
+							<td class="red right"><%= to_currency(total) %></td>
+							<td class="right" width="60">
+
+								<% if (current_user.adminrole || current_user.owner)%>
+
+									<% if insuranceexpense.receiptinsurances.active.count == 0 %>
+
+										<a class="cta" style="opacity: 1;" href="insuranceexpenses/delete/<%=insuranceexpense.invoice.id%>">Batal</a>
+									
+									<% else %>
+
+										 <span>Confirmed</span>
+								
+									<% end %>
+
+								<% else %>
+								
+								<% if checkrole 'Admin Operasional, Admin Asuransi' %>
+
+									<% if insuranceexpense.receiptinsurances.active.count != 0 %>
+
+										<span>confirmed</span>
+
+									<% else %>
+
+										<span>delete</span>
+
+									<% end %>
+ 
+								<% end %>
+
+								<% end %>
+
+							</td>
+						</tr>
+
+				<% end %>	
+			
+				<tr class="footer">
+					<td class="" colspan="2"><i><span style="font-size: 11px;"><%= @insuranceexpenses_losing.count %> Premi ditemukan</span></i></td>
 					<td class="total" align="right" colspan="8">TOTAL</td>
 					<td class="total" align="right"><%= to_currency(@grandTotal)%></td>
 				</tr>
