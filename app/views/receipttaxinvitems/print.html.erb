@@ -91,10 +91,15 @@
 		<a class="btn-txt cancel hideprint" href="<%= receipttaxinvitems_path(:startdate => @receipt.created_at.strftime('%d-%m-%y'), :enddate => @receipt.created_at.strftime('%d-%m-%y'))%>"><i class="icon-remove"></i> Batal</a>
 		<!-- <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a> -->
 		<button class="btnprint_receipttaxinvitem hideprint" onclick="javascript:print_receipttaxinvitem();"><i class="icon-print"></i> Print</button>
+ 
+		<a class="print btn-txt btn-green" style="margin: 0;" href="<%= detail_excel_receipttaxinvitem_path(@receipt.id) %>"><i class="icon-file"></i> Excel</a>
+
 		<input type="hidden" id="receipt_id" value="<%= @receipt.id %>">
 		<input type="hidden" id="printdate" value="<%= @receipt.printdate rescue nil %>">
 		<h1 class="hideprint"><%=Setting.find_by_name("Client Name").value%> / Tanda Terima Surat Jalan</h1>
 
+ 		<br class="clear" />
+ 		<br class="clear" />
 		<% if @receipt.taxinvoiceitems.any? %>
 		<h1 style="text-align: center;" id="title_receipt">TANDA TERIMA SURAT JALAN</h1>
  		<br class="clear" />

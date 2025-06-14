@@ -589,6 +589,7 @@ OfficePuraErp::Application.routes.draw do
       get 'print'
       post 'confirm_billing'
       post 'update_printdate'
+      get 'detail_excel'
     end
   end
 
