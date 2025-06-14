@@ -559,9 +559,13 @@ OfficePuraErp::Application.routes.draw do
       get 'generic-vehicles' => 'taxgenericinvoices#generic_vehicles'
       match 'generic/updateitems' => 'taxgenericinvoices#updateitems'
       match 'generic(/:id)' => 'taxgenericinvoices#new'
+      get 'generic(/:id)/updatecustomer' => 'taxgenericinvoices#updatecustomer'
+
       match 'dp_only(/:id)' => 'taxinvoices#newdp'
 
       post 'updatecustomerinfo' => 'taxinvoices#updatecustomerinfo'
+      post 'updatecustomerinfogeneric' => 'taxgenericinvoices#updatecustomerinfo'
+
       post 'updatepayment' => 'taxinvoices#updatepayment'
       post 'downpayment' => 'taxinvoices#downpayment'
       post 'canceldownpayment' => 'taxinvoices#canceldownpayment'
@@ -804,6 +808,10 @@ OfficePuraErp::Application.routes.draw do
     get "containers-utilization" => 'reports#containerutilization'
 
     get "memocleanings" => 'reports#memocleanings'
+
+    #AR new modules
+    get "ar_aging" => "reports#ar_aging"
+    get "cashins" => "reports#cashins"
 
     # match "indexannualreport_vehicle" => 'reports#indexannualreport_vehicle'
     get "indexannualreport_vehicle" => "reports#indexmonthlyreport_vehicle"

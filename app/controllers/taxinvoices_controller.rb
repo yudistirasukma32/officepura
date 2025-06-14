@@ -67,6 +67,11 @@ class TaxinvoicesController < ApplicationController
       @taxinvoices = @taxinvoices.where("user_id = ?", @user_id)
     end
 
+    @office_id = params[:office_id]
+    if @office_id.present?
+      @taxinvoices = @taxinvoices.where("office_id = ?", @office_id)
+    end
+
     if params[:process] == 'payment'
       @taxinvoices.each do |taxinvoice|
         if params["cb_" + taxinvoice.id.to_s] == 'on'
@@ -342,6 +347,7 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.so_no = params[:so_no]
       @taxinvoice.do_no = params[:do_no]
       @taxinvoice.confirmeddate = params[:confirmeddate]
+      @taxinvoice.office_id = params[:office_id]
       @taxinvoice.waybill = params[:waybill]
       @taxinvoice.dp_cost = params[:dp_cost].to_i
       @taxinvoice.is_dp = params[:is_dp] == "Yes" ? true : false
@@ -358,7 +364,7 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.insurance_cost = params[:insurance_cost]
       @taxinvoice.remarks = params[:remarks]
       @taxinvoice.claim_cost = params[:claim_cost]
-      @taxinvoice.user_id = current_user.id
+      # @taxinvoice.user_id = current_user.id
       @taxinvoice.bank_id = params[:bank_id]
       @taxinvoice.booking_code = params[:booking_code]
       @taxinvoice.discount_amount = params[:discount_amount]
@@ -1638,6 +1644,7 @@ class TaxinvoicesController < ApplicationController
     @taxinvoice.insurance_cost = params[:insurance_cost]
     @taxinvoice.claim_cost = params[:claim_cost]
     @taxinvoice.remarks = params[:remarks]
+    @taxinvoice.office_id = params[:office_id]
     subtotal = params[:subtotal].to_i
     subtotal = subtotal + @taxinvoice.extra_cost.to_i
     @taxinvoice.sentdate = (params[:sentdate] rescue nil)

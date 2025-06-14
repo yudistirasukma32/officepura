@@ -1,0 +1,194 @@
+<%= content_for :css do %>
+<style>
+    #main #filter {
+        height: 46px;
+    }
+
+    .flex {
+        display: flex;
+        align-items: center;
+    }
+</style>
+<% end %>
+<%= render "shared/header" %>
+
+<div id="nav">
+    <%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+    <div id="content-full">
+        <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+        <h1><%=Setting.find_by_name("Client Name").value%> / Cash In: <span class="red"><%=Date::MONTHNAMES[@monthEnd.to_i]%> <%=@yearEnd%></span></h1>
+
+        <br class="clearfix" />
+
+        <div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+
+            <div class="field-row continue flex">
+                <label for="customer_id" style="width: 72px;">Pelanggan</label>
+                <select name="customer_id" class="third left">
+                    <option value="">Semua Pelanggan</option>
+                    <% @customers.each do |customer| %>
+                    <option value="<%=customer.id%>" <% if customer.id == @customer_id %> selected='selected' <% end %>><%=customer.name%></option>
+                    <% end %>
+                </select>
+
+				<label for="startdate" class="middle">Tanggal</label>
+				<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+				<label for="enddate" class="tiny">s/d</label>
+				<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+				<input type="hidden" name="filterbydates" value="1">
+
+				<label for="user_id" class="middle thalf">User</label>
+				<select name="user_id" class="short left" style="margin-right:10px;">
+                    <option value="all">Semua</option>
+					<% User.where('id in (46,138,134,139)').each do |m| %>
+					<option value="<%= m.id %>"<% if m.id.to_i == @user_id.to_i %> selected='selected'<% end %>><%=m.username%></option>
+					<% end %>
+				</select>
+
+                <label for="office_id" class="middle thalf">Kantor</label>
+                <select name="office_id" class="short left ">
+                    <option value="all">Semua</option>
+                    <% Office.active.each do |office| %>
+                    <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
+                    <% end %>
+                </select> 
+
+				<input class="submit left" type="submit" value="Filter" />
+			</div>
+			</form>
+		</div>
+
+        <br class="clearfix" />
+
+        <table class="row-view tablesorter">
+            <thead>
+                <tr>
+                    <th class="{sorter:true, filter: false}" width="80">Tgl Dibuat</th>
+                    <th class="{sorter:true, filter: true}" >KTR</th>
+                    <th class="{sorter:true, filter: true}" >Pelanggan</th>
+                    <th class="{sorter:true, filter: true}" width="300">Kirim&nbsp;</th>
+                    <th class="{sorter:true, filter: true}" width="90">Konfirm&nbsp;</th>
+                    <th class="{sorter:true, filter: true}" width="120">J.Tempo&nbsp;</th>
+                    <th class="right {sorter:false, filter: false}" width="80">DPP</th>
+                    <th class="right {sorter:false, filter: false}" width="80">PPN</th>
+                    <th class="right {sorter:false, filter: false}" width="80">PPh</th>
+                    <th class="right {sorter:false, filter: false}" width="80">Total</th>
+                    <th class="right {sorter:false, filter: false}" width="80">Cash In</th>
+                    <th class="{sorter:true, filter: false}" width="100">Status</th>
+                    <th class="{sorter:false, filter: false}" width="40">&nbsp;</th>
+                    <th class="{sorter:true, filter: true}" width="40">User</th>
+                </tr>
+            </thead> 
+            <% i = 0 %>
+            <%  total = 0
+                totalGeneric = 0
+                total_dpp, total_ppn, total_pph, grandtotal = 0, 0, 0, 0
+            %>
+            <tbody>
+                <% @cashin_current_month.includes(:taxinvoice).each do |bankexp| %>
+                <%
+                    grandtotal += bankexp.total    
+                %>
+
+                <% edit_url = bankexp.taxinvoice.generic ? "/taxinvoices/generic/#{bankexp.taxinvoice.id}" : edit_taxinvoice_path(bankexp.taxinvoice) %>
+
+                <tr id="<%=bankexp.id%>">
+                    <td><%=bankexp.taxinvoice.created_at.strftime('%d-%m')%></td>
+                    <td><%=bankexp.taxinvoice.office.abbr rescue nil%></td>
+                    <td>
+                        <strong><%=bankexp.taxinvoice.customer.name rescue nil%></strong> 
+                        <br/>
+                        <span><%= bankexp.taxinvoice.long_id rescue nil %></span>
+                        <br/>
+                        <% if !bankexp.taxinvoice.ship_name.blank? %>(<%=bankexp.taxinvoice.ship_name%>) <% end %> <% if !bankexp.taxinvoice.waybill.blank? %>(<%= bankexp.taxinvoice.waybill %>)<% end %> <% if bankexp.taxinvoice.generic %>&nbsp;<i class="icon-star grey"></i><% end %>
+                        <% if bankexp.taxinvoice.bank_id.to_i > 0 %><br/>(<%= bankexp.taxinvoice.bank.bank_account_number %>)<% end %>
+                        <% if bankexp.taxinvoice.downpayment > 0 %><br />Deposit <%=to_currency_bank(bankexp.taxinvoice.downpayment_date.strftime('%d-%m'))%><% end %>
+                        <% if bankexp.taxinvoice.is_dp %>&nbsp;<i class="icon-bookmark grey"></i><% end %>
+                    </td>
+                    <td>
+                        <%=bankexp.taxinvoice.sentdate.strftime('%d-%m') rescue nil%>
+                    </td>
+                    <td><%=bankexp.taxinvoice.confirmeddate.strftime('%d-%m') rescue nil%></td>
+                    
+                    <%
+                        if bankexp.taxinvoice.sentdate 
+                            different = ((bankexp.taxinvoice.sentdate + bankexp.taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
+                        else
+                            different = ((bankexp.taxinvoice.date + bankexp.taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
+                        end
+                    %>
+                    
+                    <td<% if bankexp.taxinvoice.paiddate.nil? and different < 0 %> class="red"<% end %>>
+                        <% if bankexp.taxinvoice.sentdate %>
+                            <%=(bankexp.taxinvoice.sentdate + bankexp.taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m')%> <% if bankexp.taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+                        <% else %>
+                            <%=(bankexp.taxinvoice.date + bankexp.taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m')%> <% if bankexp.taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+                        <% end %>
+                    </td>
+                    
+                    <td align="right">
+                    <% if !bankexp.taxinvoice.generic %>
+                        <%=to_currency_bank(bankexp.taxinvoice.taxinvoiceitems.sum(:total))%>
+                    <% else %>
+                        <%=to_currency_bank(bankexp.taxinvoice.taxgenericitems.sum(:total))%>
+                    <% end %>
+                    </td>
+                    <td align="right">
+                        <%=to_currency_bank(bankexp.taxinvoice.gst_tax)%>
+                    </td>
+                    <td align="right">
+                        <%=to_currency_bank(bankexp.taxinvoice.price_tax)%>
+                    </td>
+                    <!--
+                    <td align="right">
+                        <strong><%=to_currency_bank(bankexp.taxinvoice.total)%></strong>
+                        <% if bankexp.taxinvoice.downpayment > 0 %><br />
+                        (<%=to_currency_bank(( bankexp.taxinvoice.downpayment rescue 0 ) + ( bankexp.taxinvoice.secondpayment rescue 0 ) + ( bankexp.taxinvoice.thirdpayment rescue 0 ) +( bankexp.taxinvoice.fourthpayment rescue 0 ))%>)<% end %>
+                    </td>
+                    -->
+                    <td align="right">
+                        <%= to_currency_bank(bankexp.taxinvoice.total) %>
+                    </td>
+                    <td align="right">
+                        <strong><%= to_currency_bank(bankexp.total) %></strong>
+                    </td>
+
+                    <td><span style="color: grey; font-size: 10px;"><%= bankexp.description %></span></td>
+
+                    <td class="right" width="30">
+                    <% if bankexp.taxinvoice.paiddate.nil? %>
+                        <% if bankexp.taxinvoice.remarks.nil? %>
+                        <% remarks = '' %>
+                        <% else %>
+                        <% remarks = bankexp.taxinvoice.remarks %>
+                        <% end %>
+                    <% end %>
+                    </td>
+                    <td class="right" width="30">
+                        <%= bankexp.taxinvoice.user.username rescue nil  %>
+                    </td>
+                </tr>
+                <% end %>
+            </tbody>
+            <tfoot>
+                <tr class="footer">
+                    <td colspan="5"><%= @cashin_current_month.count %> data cash in ditemukan</td>
+                    <td class="total" align="right"></td>
+                    <td class="total" align="right"></td>
+                    <td class="total" align="right"></td>
+                    <td class="total" align="right"></td>
+                    <td class="total" align="right">TOTAL</td>
+                    <td class="total" align="right"><%=to_currency_bank(grandtotal)%></td>
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
+        </table>
+
+    </div>
+
+</div>

@@ -340,6 +340,18 @@ label {
   <input type="text" class="middle half" name="po_no" value="<%=@taxinvoice.po_no%>"/>
 </div>
 
+<div class="field-row continue" style="margin-top: 1rem; padding-bottom:0px;">
+  <label for="Kantor" class="half left">Kantor</label>
+  <select id="office_id" name="office_id" class="half chzn-select">
+    <option value="0">- Kantor -</option>
+    <% Office.active.each do |office| %>
+      <option value="<%=office.id%>"
+      <% if office.id == @taxinvoice.office_id %> selected="selected"<% end %>><%=office.name%></option>
+    <% end %>
+  </select>
+  <small>*diterbitkan untuk perhitungan kantor cabang</small>  
+</div>
+
 <div class="field-row continue" style="padding-bottom:0px;">
 
    <label for="spo_no" class="half left">SPO</label>

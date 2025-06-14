@@ -1,0 +1,125 @@
+<%= content_for :css do %>
+<style>
+    #main #filter {
+        height: 46px;
+    }
+
+    .flex {
+        display: flex;
+        align-items: center;
+    }
+</style>
+<% end %>
+<%= render "shared/header" %>
+
+<div id="nav">
+    <%= render "shared/nav" %>
+</div>
+
+<div id="main">
+
+    <div id="content-full">
+        <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+        <h1><%=Setting.find_by_name("Client Name").value%> / Umur Piutang Pelanggan: <span class="red"><%=Date::MONTHNAMES[@monthEnd.to_i]%> <%=@yearEnd%></span></h1>
+
+        <br class="clearfix" />
+
+        <div id="filter">
+            <form id="filterform" name="filterform" action="" method="get">
+                <div class="field-row continue flex">
+                    <label for="customer_id" style="width: 72px;">Pelanggan</label>
+                    <select name="customer_id" class="third left">
+                        <option value="">Semua Pelanggan</option>
+                        <% @customers.each do |customer| %>
+                        <option value="<%=customer.id%>" <% if customer.id == @customer_id %> selected='selected' <% end %>><%=customer.name%></option>
+                        <% end %>
+                    </select>
+                    <label for="date" class="middle" style="width: 64px;">Periode</label>
+                    <select name="month" class="half left" style="margin-right:10px; width: 90px;">
+                        <% (1.upto(12)).each do |m| %>
+                        <option value="<%="%02d" % m.to_s%>" <% if "%02d" % m.to_s == @month %> selected='selected' <% end %>><%=Date::MONTHNAMES[m]%></option>
+                        <% end %>
+                    </select>
+                    <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+                    <select name="year" class="short left" style="margin-right: 10px;">
+                        <% (Date.today.year.downto(year_to)).each do |y| %>
+                        <option value="<%=y%>" <% if y.to_s == @year %> selected='selected' <% end %>><%=y%></option>
+                        <% end %>
+                    </select>
+
+                    <label for="date" class="middle" style="width: 64px;">Sampai</label>
+                    <select name="monthEnd" class="half left" style="margin-right:10px; width: 90px;">
+                        <% (1.upto(12)).each do |m| %>
+                        <option value="<%="%02d" % m.to_s%>" <% if "%02d" % m.to_s == @monthEnd %> selected='selected' <% end %>><%=Date::MONTHNAMES[m]%></option>
+                        <% end %>
+                    </select>
+                    <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+                    <select name="yearEnd" class="short left">
+                        <% (Date.today.year.downto(year_to)).each do |y| %>
+                        <option value="<%=y%>" <% if y.to_s == @yearEnd %> selected='selected' <% end %>><%=y%></option>
+                        <% end %>
+                    </select>
+                    <input class="submit left" type="submit" value="Filter" />
+                </div>
+
+            </form>
+        </div>
+
+        <br class="clearfix" />
+
+        <table class="row-view tablesorter">
+            <thead>
+                <tr>
+                    <th class="{sorter:true, filter: false}">Pelanggan</th>
+                    <th width="80" class="center {sorter:true, filter: false}">Omzet</th>
+                    <th width="80" class="center {sorter:true, filter: false}">Piutang</th>
+                    <th width="80" class="center {sorter:true, filter: false}">Kontrol</th>
+                    <th width="100" class="center {sorter:true, filter: false}">Cash in</th>
+                    <th width="100" class="center {sorter:true, filter: false}">Umur Piutang</th>
+                    <th width="100" class="center {sorter:true, filter: false}">Limit Piutang</th>
+                    <th width="20" class="right {sorter:false, filter: false}"></th>
+                </tr>
+            </thead>
+            <% i = 0 %>
+            <% total = 0 %>
+            <tbody>
+                <% @customer_datas.each_with_index do |customer| %>
+                <tr>
+                    <td><%= customer[:name] %><br><span style="color: grey; font-size: 12px;"><%= customer[:city] %></span></td>
+                    <td class="right"><%= to_currency(customer[:total_omzet]) %></td>
+                    <td class="right"><%= to_currency(customer[:total_piutang]) %></td>
+                    <td class="right"><%= to_currency(customer[:kontrol_piutang]) %></td>
+                    <td class="right"><%= to_currency(customer[:cashin]) %></td>
+                    <td class="right"><%= customer[:umur_piutang] %> hari</td>
+                    <td class="right"><%= to_currency(customer[:limit_piutang]) %></td>
+                    <td class="">
+                        <!--
+                        <%= customer[:jumlah_bulan] %><br/>
+                        <%= customer[:rata2_piutang] %><br/>
+                        <%= customer[:rata2_omzet] %>
+                        -->
+                    </td>
+                </tr>
+                <% end %>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td class="right"><strong><%= to_currency(@grandtotal_omzet) %></strong></td>
+                    <td class="right"><strong><%= to_currency(@grandtotal_piutang) %></strong></td>
+                    <td></td>
+                    <td class="right"><strong><%= to_currency(@grandtotal_cashin) %></strong></td>
+                    <td class="right">
+                        <strong class="<%= 'green' if (@grandtotal_cashin.to_f / @grandtotal_piutang.to_f) * 100 > 0 %> <%= 'red' if (@grandtotal_cashin.to_f / @grandtotal_piutang.to_f) * 100 < 0 %>">
+                            <%= ((@grandtotal_cashin.to_f / @grandtotal_piutang.to_f) * 100).round %>
+                            %
+                        </strong>
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+
+    </div>
+
+</div>

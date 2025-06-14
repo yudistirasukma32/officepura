@@ -5389,6 +5389,91 @@ end
     if role
 
       @startdate = params[:startdate]
+      @startdate = Date.today.at_beginning_of_month.strftime('%Y-%m-%d') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%Y-%m-%d') if @enddate.nil?
+ 
+      @taxinvoices = Taxinvoice.where('customer_id is not null').active
+      @this_month_taxinvoices = @taxinvoices.where("to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}")
+
+      @taxinvoices = @taxinvoices.where("created_at BETWEEN ? AND ?", @startdate.to_date.beginning_of_day, @enddate.to_date.end_of_day).order(:long_id)
+ 
+      @stats_tuti = @taxinvoices.where('user_id = ?', 46)
+      @stats_alfi = @taxinvoices.where('user_id = ?', 138)
+      @stats_sarah = @taxinvoices.where('user_id = ?', 134)
+      @stats_suci = @taxinvoices.where('user_id = ?', 139)
+
+      start_of_month = @default_month.at_beginning_of_month
+      end_of_month = @default_month.at_beginning_of_month.next_month - 1.day
+
+      @cashin_current_month =
+        Bankexpense.joins(:taxinvoice)
+                  .where(creditgroup_id: 607)
+                  .where("bankexpenses.date BETWEEN ? AND ?", start_of_month, end_of_month) # Use explicit BETWEEN
+                  .sum(:total)
+
+      # get all AR from jan 2022
+      today = Date.today
+      start_date = Date.new(2022, 1, 1)      
+      @taxinvoices = Taxinvoice.where('customer_id is not null').active
+      @total_current_ar = @taxinvoices
+                          .where('date >= ?', start_date)
+                          .where('date <= ?', today)
+                          .where(paiddate: nil) # Add this line
+                          .sum(:total)
+      
+
+      # Cashin per Offices
+      @offices_data = Office.active.order(:name).map do |office|
+
+      # 1. omzet_office
+      omzet_office = Taxinvoice.where('customer_id IS NOT NULL') # Use IS NOT NULL
+                              .active
+                              .where(office_id: office.id)
+                              .where("created_at BETWEEN ? AND ?", @startdate, @enddate)
+                              .sum(:total)
+
+      # 2. cashin_office
+      cashin_office = Bankexpense.joins(:taxinvoice)
+                                .where(deleted: false) # This is fine as is
+                                .where(creditgroup_id: 607)
+                                .where(taxinvoices: { office_id: office.id })
+                                .where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate)
+                                .sum(:total)
+
+      # 3. invoice_tagihan_count
+      invoice_tagihan_count = Taxinvoice.where('customer_id IS NOT NULL') # Use IS NOT NULL
+                                        .active
+                                        .where(office_id: office.id)
+                                        .where("created_at BETWEEN ? AND ?", @startdate, @enddate)
+                                        .count
+
+        {
+          office: office,
+          omzet_office: omzet_office,
+          cashin_office: cashin_office,
+          invoice_tagihan_count: invoice_tagihan_count
+        }
+      end
+
+      @section = "taxinvoices"
+      @where = 'billings-stats'
+    else
+      redirect_to root_path()
+    end
+  end
+
+  def billings_stats_bak
+    @pagetitle = 'Statistik Penagihan'
+
+    @default_month = Date.today;
+    @month = "%02d" % @default_month.month.to_s
+    @year = @default_month.year
+
+    role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan'
+    if role
+
+      @startdate = params[:startdate]
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
@@ -5456,5 +5541,171 @@ end
 		render json: { success: true, month_text: month_text, users: @events_by_user, this_month: this_months, total: total, draft_vs_sent: @draft_vs_sent }
 
 	end
+
+  def ar_aging
+    @pagetitle = 'Umur Piutang Pelanggan'
+
+    @default_month = Date.today;
+    @month = "%02d" % @default_month.month.to_s
+    @year = @default_month.year
+
+    role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan'
+    if role
+
+      @month = params[:month]
+      @month = "01" if @month.nil?
+      @month = "%02d" % @month.to_s
+      @day = "01"
+      @year = params[:year]
+      @year = Date.today.year if @year.nil?
+
+      @monthEnd = params[:monthEnd]
+      @monthEnd = "%02d" % Date.today.month.to_s if @monthEnd.nil?
+      @dayEnd = getlastday (@monthEnd.to_s)
+      @yearEnd = params[:yearEnd]
+      @yearEnd = Date.today.year if @yearEnd.nil?
+
+      #calculate number of month
+      @start_date = Date.new(@year.to_i, @month.to_i, 1)
+      @end_date = Date.new(@yearEnd.to_i, @monthEnd.to_i, 1)
+      @number_of_months = (@end_date.year * 12 + @end_date.month) - (@start_date.year * 12 + @start_date.month) + 1
+
+
+      @taxinvoices = Taxinvoice.active.joins(:customer)
+
+      @taxinvoices = @taxinvoices.where("date BETWEEN ? AND ?", "#{@year}-#{@month}-#{@day}-","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
+      @taxinvoices_unpaid = @taxinvoices.where("paiddate is null")
+ 
+      @customers = Customer.active.where("id in (?)", @taxinvoices.pluck('customer_id')).order(:name)
+      # render json: @taxinvoices.to_sql
+      # return false
+
+      # @customer = Customer.find() rescue nil
+
+      @customer_id = params[:customer_id]
+
+      if @customer_id.present?
+        @taxinvoices = @taxinvoices.where("customer_id = ?", @customer_id)
+      end
+
+      #mapping new objects
+
+      @grandtotal_omzet = 0
+      @grandtotal_piutang = 0
+      @grandtotal_cashin = 0
+
+      @customer_datas = @customers.map do |customer|
+
+        omzet = @taxinvoices.where("customer_id = ?", customer.id).sum(:total)
+        piutang = @taxinvoices_unpaid.where("customer_id = ?", customer.id).sum(:total)
+        # kontrol = omzet - piutang
+        kontrol = omzet * 30 / 100
+        
+        # if piutang > 0
+        #   aging = (piutang / omzet) * 365
+        # else
+        #   aging = 0
+        # end
+        
+        aging = (piutang / omzet) * 365
+
+        cashin = Bankexpense.joins(:taxinvoice)
+                  .where("bankexpenses.bankexpense_id IS NOT NULL") # Explicit IS NOT NULL
+                  .where("creditgroup_id = ?", 6)
+                  .where("bankexpenses.date BETWEEN ? AND ?", @start_date, @end_date)
+                  .where('taxinvoices.customer_id = ?', customer.id)
+                  .sum(:total)
+
+        rata2_omzet = omzet / @number_of_months.to_f
+        rata2_piutang = piutang / @number_of_months.to_f
+
+        limit_piutang = rata2_piutang / rata2_omzet * cashin
+
+        @grandtotal_omzet += omzet
+        @grandtotal_piutang += piutang
+        @grandtotal_cashin += cashin
+
+        {
+          name: (customer.name rescue nil),
+          city: (customer.city.upcase rescue nil),
+          total_omzet: (omzet rescue 0),
+          total_piutang: (piutang rescue 0),
+          kontrol_piutang: (kontrol rescue 0),
+          cashin: (cashin rescue 0),
+          umur_piutang: (aging.round rescue 0),
+          limit_piutang: (limit_piutang rescue 0),
+          rata2_omzet: (rata2_omzet rescue 0),
+          rata2_piutang: (rata2_piutang rescue 0),
+          jumlah_bulan: (@number_of_months rescue 1)
+        }
+      end
+      
+      @section = "taxinvoices"
+      @where = 'ar_aging'
+    else
+      redirect_to root_path()
+    end
+  end
+
+  def cashins
+    @pagetitle = 'Cash In'
+
+    @default_month = Date.today;
+    @month = "%02d" % @default_month.month.to_s
+    @year = @default_month.year
+
+    role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan, Cash In'
+    if role
+
+      @startdate = params[:startdate].present? ? Date.strptime(params[:startdate], '%Y-%m-%d') : Date.today.at_beginning_of_month
+      @enddate = params[:enddate].present? ? Date.strptime(params[:enddate], '%Y-%m-%d') : (Date.today.at_beginning_of_month.next_month - 1.day)
+
+      #get cash in from bankexpenses
+      @cashin_current_month =
+        Bankexpense.joins(:taxinvoice)
+                  .where(deleted: false)
+                  .where(creditgroup_id: 607)
+                  .where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate) # Now @start_date/@end_date are Date objects
+                  .select("DISTINCT bankexpenses.*")
+                  .order("bankexpenses.id")
+
+      # render json: @cashin_current_month
+      # return false
+      
+      # get taxinvoices as cash in
+      @taxinvoices = Taxinvoice.where('customer_id is not null').active
+      # @taxinvoices = @taxinvoices.where("paiddate BETWEEN ? AND ? and paiddate is not null", @startdate.to_date, @enddate.to_date).order(:date)
+
+      @customers = Customer.active.where("id in (?)", @taxinvoices.pluck('customer_id')).order(:name)
+
+      @customer_id = params[:customer_id]
+      if @customer_id.present? && @customer_id != 'all'
+        @taxinvoices = @taxinvoices.where("customer_id = ?", @customer_id)
+      end
+
+      @office_id = params[:office_id]
+      if @office_id.present? && @office_id != 'all'
+        @taxinvoices = @taxinvoices.where("office_id = ?", @office_id)
+      end
+
+      @user_id = params[:user_id]
+      if @user_id.present? && @user_id != 'all'
+        @taxinvoices = @taxinvoices.where("user_id = ?", @user_id)
+      end
+
+      #filter by fields
+      @cashin_current_month = @cashin_current_month.where('taxinvoice_id in (?)', @taxinvoices.pluck(:id))
+
+      # @taxinvoice_numbers_in_b = @cashin_current_month.map(&:taxinvoice).compact.map(&:long_id).uniq
+      # @different_taxinvoices = @taxinvoices.reject { |ti| @taxinvoice_numbers_in_b.include?(ti.long_id) }
+
+      @section = "taxinvoices"
+      @where = 'cashins'
+
+    else
+      redirect_to root_path()
+    end
+
+  end
 
 end

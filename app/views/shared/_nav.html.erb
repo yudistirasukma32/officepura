@@ -78,6 +78,8 @@
 		<li class="<%= @where == 'taxinvoices' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Penagihan'), "Invoice Tagihan", "/taxinvoices" %></li>
 		<li class="<%= @where == 'taxinvoiceattachments' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Penagihan'), "Lampiran Invoice", "/taxinvoiceattachments" %></li>
 		<li class="<%= @where == 'claimmemos' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Klaim, Admin Approval Klaim, Admin Penagihan'), "Klaim Penagihan", "/claimmemos" %></li>
+		<li class="<%= @where == 'ar_aging' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Klaim, Admin Approval Klaim, Admin Penagihan'), "Umur Piutang", "/reports/ar_aging" %></li>
+		<li class="<%= @where == 'cashins' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Klaim, Admin Approval Klaim, Admin Penagihan, Cash In'), "Cash In", "/reports/cashins" %></li>
 	<% end %>
 
 	<% if @section == 'transactions' or @section == 'transactions2' %>

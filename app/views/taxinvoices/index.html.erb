@@ -72,6 +72,14 @@
 					<% end %>
 				</select>
 
+				<label for="office_id" class="middle" style="width: 50px;">Kantor</label>
+				<select name="office_id" class="short left" style="margin-right:10px;">
+					<option value="">All</option>
+					<% Office.active.each do |office| %>
+					<option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.abbr%></option>
+					<% end %>
+				</select> 	
+
 				<input class="submit left" type="submit" value="Filter" />
 			</div>
 			</form>
