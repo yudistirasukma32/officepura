@@ -364,7 +364,7 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.insurance_cost = params[:insurance_cost]
       @taxinvoice.remarks = params[:remarks]
       @taxinvoice.claim_cost = params[:claim_cost]
-      # @taxinvoice.user_id = current_user.id
+      @taxinvoice.user_id = current_user.id
       @taxinvoice.bank_id = params[:bank_id]
       @taxinvoice.booking_code = params[:booking_code]
       @taxinvoice.discount_amount = params[:discount_amount]
