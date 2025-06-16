@@ -5389,9 +5389,9 @@ end
     if role
 
       @startdate = params[:startdate]
-      @startdate = Date.today.at_beginning_of_month.strftime('%Y-%m-%d') if @startdate.nil?
+      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
-      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%Y-%m-%d') if @enddate.nil?
+      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
  
       @taxinvoices = Taxinvoice.where('customer_id is not null').active
       @this_month_taxinvoices = @taxinvoices.where("to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}")
@@ -5430,7 +5430,7 @@ end
       omzet_office = Taxinvoice.where('customer_id IS NOT NULL') # Use IS NOT NULL
                               .active
                               .where(office_id: office.id)
-                              .where("created_at BETWEEN ? AND ?", @startdate, @enddate)
+                              .where("created_at BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
                               .sum(:total)
 
       # 2. cashin_office
@@ -5438,14 +5438,14 @@ end
                                 .where(deleted: false) # This is fine as is
                                 .where(creditgroup_id: 607)
                                 .where(taxinvoices: { office_id: office.id })
-                                .where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate)
+                                .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
                                 .sum(:total)
 
       # 3. invoice_tagihan_count
       invoice_tagihan_count = Taxinvoice.where('customer_id IS NOT NULL') # Use IS NOT NULL
                                         .active
                                         .where(office_id: office.id)
-                                        .where("created_at BETWEEN ? AND ?", @startdate, @enddate)
+                                        .where("created_at BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
                                         .count
 
         {
@@ -5657,15 +5657,17 @@ end
     role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan, Cash In'
     if role
 
-      @startdate = params[:startdate].present? ? Date.strptime(params[:startdate], '%Y-%m-%d') : Date.today.at_beginning_of_month
-      @enddate = params[:enddate].present? ? Date.strptime(params[:enddate], '%Y-%m-%d') : (Date.today.at_beginning_of_month.next_month - 1.day)
+      @startdate = params[:startdate]
+      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
+      @enddate = params[:enddate]
+      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
 
       #get cash in from bankexpenses
       @cashin_current_month =
         Bankexpense.joins(:taxinvoice)
                   .where(deleted: false)
                   .where(creditgroup_id: 607)
-                  .where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate) # Now @start_date/@end_date are Date objects
+                  .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date) # Now @start_date/@end_date are Date objects
                   .select("DISTINCT bankexpenses.*")
                   .order("bankexpenses.id")
 

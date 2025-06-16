@@ -208,7 +208,7 @@
 								Bankexpense.joins(:taxinvoice)
 								.where(deleted: false)
 								.where(creditgroup_id: 607)
-								.where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate)
+								.where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
 								.sum(:total)
 							%>
 				<strong style="color: #12a812;"><%= to_currency(cashin_current_month) %></strong>
@@ -238,7 +238,7 @@
                 .where(deleted: false)
                 .where(creditgroup_id: 607)
 				.where(taxinvoices: { user_id: 46 })
-                .where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate)
+                .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
                 .sum(:total)
 			%>
 			<%= to_currency(cashin_46)%>
@@ -288,7 +288,7 @@
                 .where(deleted: false)
                 .where(creditgroup_id: 607)
 				.where(taxinvoices: { user_id: 138 })
-                .where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate)
+                .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
                 .sum(:total)
 			%>
 
@@ -337,7 +337,7 @@
                 .where(deleted: false)
                 .where(creditgroup_id: 607)
 				.where(taxinvoices: { user_id: 134 })
-                .where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate)
+                .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
                 .sum(:total)
 			%>
 			<%= to_currency(cashin_134)%>
@@ -385,7 +385,7 @@
                 .where(deleted: false)
                 .where(creditgroup_id: 607)
 				.where(taxinvoices: { user_id: 139 })
-                .where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate)
+                .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
                 .sum(:total)
 			%>
 			<%= to_currency(cashin_139)%>
@@ -551,7 +551,7 @@
 								Bankexpense.joins(:taxinvoice)
 								.where(deleted: false)
 								.where(creditgroup_id: 607)
-								.where("bankexpenses.date BETWEEN ? AND ?", @startdate, @enddate)
+								.where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
 								.sum(:total)
 							%>
 							<li>
