@@ -34,7 +34,7 @@
     <select id="event_customer_id" name="event[customer_id]" class="double chzn-select" onchange="javascript:getRoutesOnly2(this.value);">
       <option value="0">- Pilih Pelanggan -</option>
       <%
-        cust_kosongan = Customer.active.where("name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+        cust_kosongan = Customer.active.where("name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*' OR name ~* '\\mPURA\\M'").pluck(:id)
         @customers = Customer.active.where('id NOT IN (?)', cust_kosongan).order(:name)
       %>
       <% @customers.order(:name).each do |customer| %>
