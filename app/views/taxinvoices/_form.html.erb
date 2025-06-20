@@ -103,11 +103,21 @@ label {
  
   <br/><br/>
 
-  <% memo = Customer.find(params[:customer_id]).memo rescue nil %>
-  <% memo_att = Customer.find(params[:customer_id]).memo_attachments rescue nil %>
-  <% memo_info = Customer.find(params[:customer_id]).memo_info rescue nil %>
-  <% memo_address = Customer.find(params[:customer_id]).memo_address rescue nil %>
+  <% if @process =='edit'%>
 
+    <% cust_id =  @taxinvoice.customer_id %>
+
+  <% else %>
+
+    <% cust_id =  params[:customer_id] %>
+
+  <% end %>
+
+  <% memo = Customer.find(cust_id).memo rescue nil %>
+  <% memo_att = Customer.find(cust_id).memo_attachments rescue nil %>
+  <% memo_info = Customer.find(cust_id).memo_info rescue nil %>
+  <% memo_address = Customer.find(cust_id).memo_address rescue nil %>
+  
   <% if memo.present? || memo_att.present? || memo_info.present? || memo_address.present? %>
   <div id="infobox2" style="background: white; padding: 1rem; border-radius: 8px;">
     

@@ -549,6 +549,53 @@
 
     </div>
 
+    <div class="hideprint">
+        <% memo = Customer.find(@taxinvoice.customer_id).memo rescue nil %>
+        <% memo_att = Customer.find(@taxinvoice.customer_id).memo_attachments rescue nil %>
+        <% memo_info = Customer.find(@taxinvoice.customer_id).memo_info rescue nil %>
+        <% memo_address = Customer.find(@taxinvoice.customer_id).memo_address rescue nil %>
+
+        <% if memo.present? || memo_att.present? || memo_info.present? || memo_address.present? %>
+        <div id="infobox2" style="background: white; padding: 1rem; border-radius: 8px;">
+            
+            <% if memo.present? %>
+            <div style="line-height: 1.25;">
+            <strong><i class="icon-question-sign"></i> Ketentuan:</strong>
+            <br class="clearfix"/>
+            <%=simple_format(memo)%>
+            </div>
+            <% end %>
+
+            <% if memo_att.present? %>
+            <br class="clearfix"/>
+            <div style="line-height: 1.25;">
+            <strong><i class="icon-question-sign"></i> Lampiran:</strong>
+            <br class="clearfix"/>
+            <%=simple_format(memo_att)%>
+            </div>
+            <% end %>
+
+            <% if memo_address.present? %>
+            <br class="clearfix"/>
+            <div style="line-height: 1.25;">
+            <strong><i class="icon-question-sign"></i> Alamat Kirim:</strong>
+            <br class="clearfix"/>
+            <%=simple_format(memo_address)%>  
+            </div>
+            <% end %>
+
+            <% if memo_info.present? %>
+            <br class="clearfix"/>
+            <div style="line-height: 1.25;">
+            <strong><i class="icon-question-sign"></i> Keterangan:</strong>
+            <br class="clearfix"/>
+            <%=simple_format(memo_info)%>  
+            </div>
+            <% end %>
+        </div>
+        <% end %>
+    </div>
+
 </div>
 
 <%= content_for :js do %>
