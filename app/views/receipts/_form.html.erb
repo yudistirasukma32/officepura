@@ -89,13 +89,6 @@
         <tr>
           <td>Kendaraan</td>
           <td>
-            <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
-            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
-          </td>
-        </tr>
-        <tr>
-          <td>Kendaraan</td>
-          <td>
             <a style="cursor: pointer;" onclick="getVehicleRecords(<%=@invoice.vehicle_id%>)">
             <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
             &nbsp;<i class="icon-search" style="color: #6d6d6d;"></i>
