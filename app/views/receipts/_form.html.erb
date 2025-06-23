@@ -1,3 +1,20 @@
+<style>
+.green-box {
+  padding: 10px;
+  border: 1px solid #03b003;
+  background-color: #e6ffe6;
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+.red-box {
+  padding: 10px;
+  border: 1px solid #f44336;
+  background-color: #ffdfdd;
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+</style>
+
 <% if @invoice %>
 
 <%= form_for(@receipt) do |f| %>
@@ -15,6 +32,16 @@
   <div class="info-box" style="margin-bottom:30px; width:560px; float:left; clear:left;">  
 
     <h3>Bukti Kas Keluar <%= @invoice.invoicetrain ? "Kereta" : ""%> #<%=zeropad(@invoice.id)%></h3>
+
+    <% if @invoice.kosongan && @invoice.kosongan_type = 'non-produktif' && @invoice.kosongan_confirmed %>
+    <div class="green-box">
+      BKK Kosongan Non-Produktif <strong>sudah</strong> dikonfirmasi oleh Marketing
+    </div>
+    <% elsif @invoice.kosongan && @invoice.kosongan_type = 'non-produktif' && !@invoice.kosongan_confirmed %>
+    <div class="red-box">
+      BKK Kosongan Non-Produktif <strong>belum</strong> dikonfirmasi oleh Marketing
+    </div>
+    <% end %>
 
     <table class="row-view no-border">
         <tr>
