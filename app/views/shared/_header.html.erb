@@ -317,6 +317,12 @@
 
 						<% end %>
 					<% end %>
+
+					<li><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Posisi Terakhir Driver", "/reports/confirmed-latest-invoices" %></li>
+					<li></li>
+
+					<li class="divider"></li>
+					<li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Laporan Isotank", "/reports/isotanks_report" %></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Lap Utilisasi Isotank", "/reports/isotanks-utilization" %></li>
 					<li><%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan'), "Laporan Kontainer", "/reports/containers_report" %></li>

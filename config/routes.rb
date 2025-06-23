@@ -802,6 +802,7 @@ OfficePuraErp::Application.routes.draw do
     get 'paid_invoice' => 'reports#paid_invoice'
 
     get "confirmed-invoices" => 'reports#confirmed_invoices'
+    get "confirmed-latest-invoices" => 'reports#confirmed_latest_invoices'
     get "collectible-invoices" => 'reports#collectible_invoices'
 
     get "isotanks-utilization" => 'reports#isotankutilization'
