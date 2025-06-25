@@ -19,7 +19,7 @@ class TaxinvoiceitemsController < ApplicationController
     @invoice_id = params[:invoice_id] || ''
     @plat_type = params[:plat_type] || ''
     @spk_number = params[:spk_number] || ''
-    general_where = "(invoices.by_vendor = true and deleted = false) or (invoices.id in (select invoice_id from receipts where deleted = false) and invoices.id not in(select invoice_id from invoicereturns where deleted = false))"
+    general_where = "(invoices.by_vendor = true and deleted = false) or (invoices.id in (select invoice_id from receipts where deleted = false) and invoices.id not in(select invoice_id from invoicereturns where deleted = false) AND invoices.kosongan = false)"
 
     if !@invoice_id.blank?
       @invoices = Invoice.where('deleted = false and id = ? ', params[:invoice_id]).where(general_where)
