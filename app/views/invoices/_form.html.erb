@@ -237,6 +237,17 @@
   <input type="hidden" name="invoice[kosongan]" value="true" id="invoice_kosongan">
   <input type="hidden" name="invoice[kosongan_type]" value="non-produktif" id="invoice_kosongan_type">
 
+  <div class="field-row">
+    <%= f.label :marketing_id, "Marketing" %>
+    <select id="invoice_marketing_id" name="invoice[marketing_id]" class="half chzn-select">
+      <% Setting.find_by_name('User Marketing').value.split(',').map(&:to_i).each do |marketing| %>
+        <option value="<%=marketing%>"
+        <% if marketing == @invoice.marketing_id %> selected="selected"<% end %>><%=User.where('id = ?', marketing).first.username%></option>
+      <% end %>
+    </select>
+    <small>*Pilih user marketing untuk approval BKK Kosongan.</small>
+  </div>
+  
   <% end %>
   
   <% if @customers.present? %>
