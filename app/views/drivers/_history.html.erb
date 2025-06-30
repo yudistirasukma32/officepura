@@ -7,6 +7,10 @@
     margin-top: 1rem;
   }
 
+  .text-red {
+    color: red;
+  }
+
 </style>
 
 	<% if @invoices.any? %>
@@ -49,16 +53,19 @@
         premi_allowance_total += premi_allowance
         total_header += total
       %>
-    <tr>
+    <tr class="<%= invoice.route.routegroup_id == 1 ? 'text-red' : '' %>">
       <td><%=invoice.date.strftime('%d/%m')%></td>
       <td>#<%= invoice.id %></td>
 			<td>
       <br><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>)
+      <br><%= invoice.route.routegroup.name %>
       <br>DO <%=invoice.event.id rescue nil%> <%=invoice.event.summary rescue nil%> (<%=invoice.office.abbr rescue nil %>)
-      <br>
       <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %>
 			<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %>
+      <br>
       <%=invoice.vehicle.current_id rescue nil%>
+      <br>
+      <span style="color: grey;"><%=invoice.user.username rescue nil%></span>
       <br>
       </td>
       <td class="<%= driver_allowance > 1000000 ? "red" : ""%>" align="right"><%=to_currency(driver_allowance)%></td>
