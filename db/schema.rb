@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250625062802) do
+ActiveRecord::Schema.define(:version => 20250625062803) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -358,6 +358,7 @@ ActiveRecord::Schema.define(:version => 20250625062802) do
     t.boolean   "npwp_photo",                                                           :default => false
     t.boolean   "pic_photo",                                                            :default => false
     t.boolean   "approved",                                                             :default => false
+    t.integer   "office_id"
   end
 
   create_table "driverexpenses", :force => true do |t|

@@ -41,7 +41,7 @@
     
     <tr>
       <td>(Solar Tambahan)*</td>
-      <td style="text-align:right; font-family: FontAwesome;">(<span id="invoice_additional_gas_allowance">0</span>)</td>
+      <td style="text-align:right;">(<span id="invoice_additional_gas_allowance">0</span>)</td>
     </tr>
 
     <tr>
@@ -56,12 +56,12 @@
 
     <tr>
       <td><%= f.label :incentive, "(Insentif)" %></td>
-      <td id="invoice_incentive" align="right" style="font-family: FontAwesome;">(@ <%= to_currency(@invoice.vehicle.vehicleincentivegroup.incentive) rescue 0 %>)</td>
+      <td id="invoice_incentive" align="right" style="font-family: 'MuseoSans';">(@ <%= to_currency(@invoice.vehicle.vehicleincentivegroup.incentive) rescue 0 %>)</td>
     </tr>
       
     <tr>
       <td><%= f.label :premi, "(Premi)" %></td>
-      <td id="invoice_premi_allowance" align="right" style="font-family: FontAwesome;">(@ <%= to_currency(@invoice.premi_allowance) rescue 0 %>)</td>
+      <td id="invoice_premi_allowance" align="right" style="font-family: 'MuseoSans';">(@ <%= to_currency(@invoice.premi_allowance) rescue 0 %>)</td>
     </tr>
 
     <tr class="total-row">

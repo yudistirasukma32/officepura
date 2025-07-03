@@ -21,7 +21,19 @@
 <div style="float: left; width: 600px;">
 <p>Setting default untuk profil invoice tagihan saat membuat invoice tagihan baru.</p>
 <%= form_for(@customer) do |f| %>
+
   <div class="field-row first">
+    <label for="office_id" class="half left">Kantor Penagihan</label>
+    <select id="office_id" name="customer[office_id]" class="double chzn-select">
+    <option value="0">- Pilih Kantor -</option>
+    <% Office.active.order(:name).each do |office| %>
+    <option value="<%=office.id%>"
+      <% if office.id == @customer.office_id %> selected="selected"<% end %>><%=office.name%></option>
+    <% end %>
+    </select>
+  </div>
+
+  <div class="field-row">
     <label style="">PPN</label>
     <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="12" <% if (@customer.gst_percentage.to_f == 12 ) %> checked="checked"<% end %> /> &nbsp; PPN 12 &nbsp;
     <input type="radio" id="chk_gst_percentage" class="gst_percentage" name="customer[gst_percentage]" value="11" <% if (@customer.gst_percentage.to_f == 11 ) %> checked="checked"<% end %> /> &nbsp; PPN 11 &nbsp;

@@ -32,6 +32,7 @@ class InvoicesController < ApplicationController
     @invoice.customer_id = inputs[:customer_id]
     @invoice.invoice_id = inputs[:invoice_id_muat]
     @invoice.vehicle_id = inputs[:vehicle_id]
+    @invoice.vehicle_duplicate_id = inputs[:vehicle_duplicate_id]
     @invoice.route_id = inputs[:route_id]
     @invoice.isotank_id = inputs[:isotank_id]
     @invoice.container_id = inputs[:container_id]

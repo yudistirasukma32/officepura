@@ -197,7 +197,7 @@
 				<%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
 			<% end %>
 			<br>
-			<%= event[:tanktype] %>
+			<%= event[:tanktype] %>	<%= event[:route_id] %>
 			</td>
 			<td><%=event[:office] %></td>
 			<td class="" align="right"><%=to_currency(event[:supir])%></td>

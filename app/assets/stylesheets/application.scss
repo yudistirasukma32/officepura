@@ -435,7 +435,7 @@ h1, h2, h3, h4, h5 {font-family:MuseoSans; font-weight:500;}
 
 	.field-row {
 		background:url(/assets/body-hr.png) 0 top repeat-x; padding:15px 0; clear:left; float:left; width:560px;
-		label {width:100px; padding-right:20px; line-height:26px; float:left;}
+		label {width:100px; padding-right:20px; line-height:1.5; float:left;}
 		label.middle {padding:0 10px 0 15px; width:70px;}
 		label.tiny {width: 30px;padding:0 10px 0 15px;}
 		small {
@@ -454,7 +454,7 @@ h1, h2, h3, h4, h5 {font-family:MuseoSans; font-weight:500;}
 		.field-time {
 			select {width:100px;}
 		}
-		.align {line-height:26px; padding-left:120px;}
+		.align {line-height:1.5; padding-left:120px;}
 		&.first {background:0;}
 		&.continue {background:0; padding:5px 0;}
 		&.last {background:url(/assets/body-hr.png) 0 top repeat-x, url(/assets/body-hr.png) 0 bottom repeat-x;}
@@ -604,7 +604,7 @@ h1, h2, h3, h4, h5 {font-family:MuseoSans; font-weight:500;}
 
 	.truck-logs {
 		td {
-			strong {font-size:20px; line-height:26px;}
+			strong {font-size:20px; line-height:1.5;}
 		}
 	}
 

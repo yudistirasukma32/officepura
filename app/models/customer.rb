@@ -8,6 +8,9 @@ class Customer < ActiveRecord::Base
 	has_many :events
 	has_many :contracts
 
+	belongs_to :office
+	belongs_to :bank
+
 	# Setup accessible (or protected) attributes for your model
 	attr_accessible :enabled, :name, :address, :city, :contact, :phone, :mobile, :fax, :email,
 					:npwp, :description, :terms_of_payment_in_days, :wholesale_price, :deleted,
@@ -15,7 +18,7 @@ class Customer < ActiveRecord::Base
 					:province, :gst_percentage, :price_tax, :rating,
 					:price_by, :is_weightlost, :is_showqty_loaded, :is_showqty_unloaded, :is_rounded,
 					:bank_id, :memo, :memo_attachments, :memo_info, :memo_address,
-					:dp, :dp_notes, :ktp_photo, :npwp_photo, :pic_photo, :approved
+					:dp, :dp_notes, :ktp_photo, :npwp_photo, :pic_photo, :approved, :office_id
 
 	scope :active, lambda {where(:enabled => true, :deleted => false)}
 	scope :unverified, -> { where(approved: false).order(name: :asc) }

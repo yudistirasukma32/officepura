@@ -12,6 +12,7 @@ class CustomersController < ApplicationController
 
   def set_role
     @user_role = 'Admin Marketing, Marketing, Admin Keuangan, Master Jurusan, User Jurusan, Admin Jurusan, Lihat Pelanggan'
+    @penagihan = 'Admin Marketing, Marketing, Admin Keuangan, Admin Penagihan'
   end
 
   def index
@@ -254,6 +255,22 @@ class CustomersController < ApplicationController
     # else
     # end
 
+  end
+
+  def customer_terms
+    role = cek_roles @penagihan
+
+    @section = "taxinvoices"
+    @where = 'customer_terms'
+
+    if role
+      # @customers = Customer.active.order(:name)
+      @customers = Customer.find_by_sql("SELECT * FROM customers WHERE name not ILIKE 'PURA%' AND name not ILIKE 'RDPI%' AND name not ILIKE 'RAJAWALI INTI%' AND deleted = false ORDER BY name")
+
+      respond_to :html
+    else
+      redirect_to root_path()
+    end
   end
 
 end

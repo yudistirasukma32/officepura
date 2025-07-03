@@ -42,6 +42,9 @@ OfficePuraErp::Application.routes.draw do
       get 'clone'
       get 'gm_approve'
     end
+    collection do
+      get "customer_terms" => "customers#customer_terms"
+    end
   end
 
   get 'contracts/addnew' => 'contracts#addnew'

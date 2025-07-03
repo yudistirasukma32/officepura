@@ -239,6 +239,8 @@
 					<li class="divider"></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Klaim, Admin Approval Klaim, Admin Penagihan'), "Umur Piutang", "/reports/ar_aging" %></li>
 					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Klaim, Admin Approval Klaim, Admin Penagihan, Cash In'), "Cash In", "/reports/cashins" %></li>
+					<li class="divider"></li>
+					<li><%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Klaim, Admin Approval Klaim, Admin Penagihan, Cash In'), "Ketentuan Pelanggan", "/customers/customer_terms" %></li>
 				</ul>
 			</li>
 

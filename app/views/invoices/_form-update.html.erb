@@ -50,6 +50,16 @@
     </div>
 
     <div class="field-row">
+      <label for="invoice_vehicle_duplicate_id">Kendaraan Pinjam</label>
+      <select id="invoice_vehicle_duplicate_id" name="invoice[vehicle_duplicate_id]" class="chzn-select half left combo_routex">
+        <option value="">- No Pol -</option>
+        <% Vehicle.active.order(:current_id).each do |vehicle_dp| %>
+        <option value="<%=vehicle_dp.id%>" <%= vehicle_dp.id.to_i == @invoice.vehicle_duplicate_id.to_i ? ' selected="selected"' : '' %>><%=vehicle_dp.current_id%></option>
+        <% end %>
+      </select> 
+    </div>
+
+    <div class="field-row">
       <label for="invoice_driver_id">Driver</label>
       <select id="invoice_driver_id" name="invoice[driver_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
         <option value="0">- Supir -</option>

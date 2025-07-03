@@ -350,6 +350,10 @@ label {
   <input type="text" class="middle half" name="po_no" value="<%=@taxinvoice.po_no%>"/>
 </div>
 
+<!-- Kantor / Office -->
+<% if @process != 'edit'%>
+  <% @taxinvoice.office_id = Customer.find(params[:customer_id]).office_id.to_i %>
+<% end %>
 <div class="field-row continue" style="margin-top: 1rem; padding-bottom:0px;">
   <label for="Kantor" class="half left">Kantor</label>
   <select id="office_id" name="office_id" class="half chzn-select">

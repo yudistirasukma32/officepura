@@ -1,0 +1,89 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+
+		<h1>Invoice Tagihan / Ketentuan Pelanggan</h1>
+
+		<br class="clearfix" />
+		<br class="clearfix" />
+
+		<table id="indexCustomerTerms" class="row-view tablesorter sortable tablesorterFilters">
+			<thead>
+			<tr>
+				<th>Nama</th>
+				<th>Kota</th>
+				<th>Kantor Penagihan&nbsp;</th>
+				<th width="100" class="{sorter: false}" style="text-align:center;">Dokumen</th>
+				<th width="100" class="{sorter: false, filter: true}"> Detail Invoice</th>
+				<th>Bank</th>
+				<th>Ketentuan INV</th>
+				<th>Lampiran INV</th>
+				<th>Alamat INV</th>
+				<th width="60" class="{sorter:false, filter: false}">Aktif</th>
+			</tr>
+			</thead>
+
+			<tbody>
+			<% @customers.each do |customer| %>
+				<tr>
+					<td><%= link_to customer.name, edit_customer_path(customer) %></td>
+					<td><%= customer.city.to_s.upcase %></td>
+					<td><%= customer.office.name.to_s.upcase rescue nil %></td>
+					<td align="center">
+					<% customer.images.each do |img| %>
+					<% display_name = if img.file_name.present? && img.file_name.downcase.include?('ktp')
+										'KTP'
+										elsif img.file_name.present? && img.file_name.downcase.include?('npwp')
+										'NPWP'
+										elsif img.file_name.present? && img.file_name.downcase.include?('nib')
+										'NIB'
+										elsif img.file_name.present? && img.file_name.downcase.include?('skt')
+										'SKT'
+										elsif img.file_name.present? && img.file_name.downcase.include?('siup')
+										'SIUP'
+										else
+										img.name.present? ? img.name : 'Dokumen'
+										end %>
+					<%= display_name %>,
+					<% end %>
+					</td>
+					<td>
+					<%= customer.gst_percentage ? 'PPN '+customer.gst_percentage.to_i.to_s+'%' : ''%>
+					<%= customer.price_tax ? ('<br>PPH <i class="icon-check"></i><br>').html_safe : '' %>
+					<%= customer.is_rounded ? ('Pembulatan <i class="icon-check"></i><br>').html_safe : '' %>
+					<%= case customer.price_by
+						when 'is_net'
+						'Harga Bongkar'
+						when 'is_gross'
+						'Harga Muat'
+						when 'is_wholesale'
+						'Harga Borongan'
+						else
+						''
+					end %><br>
+					</td>
+					<td><%=customer.bank.name rescue 'Belum diset'%> (<%=customer.bank.bank_account_number rescue '-'%>)</td>
+					<td><%=simple_format(customer.memo_info)%></td>
+					<td><%=simple_format(customer.memo_attachments)%></td>
+					<td><%=simple_format(customer.memo_address)%></td>
+					<% if customer.enabled %>
+					<td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+					<% else %>
+					<td><%= link_to '&#xf057;'.html_safe, 'javascript: void();', :class => 'disabled tipsy', :title => 'Tidak Aktif' %></td>
+					<% end %>
+				</tr>
+			<% end %>	
+			</tbody>
+		
+		</table>
+		<br class="clearfix" />
+
+	</div>
+
+</div>
