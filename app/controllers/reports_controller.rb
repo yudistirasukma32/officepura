@@ -470,8 +470,9 @@ class ReportsController < ApplicationController
 
   def expenses_vehicle
     role = cek_roles 'Admin Operasional, Admin HRD, Admin Gudang'
+    
     if role
-        @startdate = params[:startdate]
+      @startdate = params[:startdate]
       @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
       @enddate = params[:enddate]
       @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
@@ -480,11 +481,12 @@ class ReportsController < ApplicationController
       @officeexpensegroups = Officeexpensegroup.active.order(:name)
       @outcome = 0
 
-
       @vehicle = Vehicle.find(params[:vehicle_id]) rescue nil
-      if @vehicle
-        @receipts = Receipt.where("(created_at > ? and created_at < ?) AND deleted = false AND invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:created_at) rescue nil
-        @receiptreturns = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where (r.created_at > ? and r.created_at < ?) and r.deleted = false and i.vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id) rescue nil
+      @driver = Driver.find(params[:driver_id]) rescue nil
+
+      if @vehicle && @driver
+        @receipts = Receipt.where("(created_at > ? and created_at < ?) AND deleted = false AND invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ? OR driver_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id, @driver.id).order(:created_at) rescue nil
+        @receiptreturns = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where (r.created_at > ? and r.created_at < ?) and r.deleted = false and i.vehicle_id = ? or i.driver_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id, @driver.id) rescue nil
         @productrequests = Productrequest.where("(date >= ? and date < ?) AND deleted = false AND vehicle_id = ?", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:date) rescue nil
         @receiptexpenses = Receiptexpense.where("(created_at >= ? and created_at < ?) AND deleted = false AND officeexpense_id IN (SELECT id FROM officeexpenses WHERE vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:created_at) rescue nil
         @productrequestitems = Productrequestitem.where("productrequest_id in (SELECT id from productrequests where(date >= ? and date < ?) AND deleted = false AND vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id)
@@ -492,7 +494,7 @@ class ReportsController < ApplicationController
         @receiptpremis = Receiptpremi.where("(created_at >= ? and created_at < ?) AND deleted = false AND invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:created_at) rescue nil
         @receiptincentives = Receiptincentive.where("(created_at >= ? and created_at < ?) AND deleted = false AND invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:created_at) rescue nil
 
-        @solar_pomps = Receipt.joins(:invoice).where("(receipts.created_at > ? and receipts.created_at < ?) AND receipts.deleted = false AND invoices.gas_voucher > 0 AND receipts.invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:created_at) rescue nil
+        @solar_pomps = Receipt.joins(:invoice).where("(receipts.created_at > ? and receipts.created_at < ?) AND receipts.deleted = false AND invoices.gas_voucher > 0 AND receipts.invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ? or driver_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id, @driver.id).order(:created_at) rescue nil
 
         @outcome = @receipts.sum(:total).to_i - @receiptreturns.sum(:total).to_i  + @receiptpremis.sum(:total).to_i + @receiptincentives.sum(:total).to_i + @receiptexpenses.where(:expensetype => 'Kredit').sum(:total).to_i - @receiptexpenses.where(:expensetype => 'Debit').sum(:total).to_i + @productrequestitems.sum(:total).to_i
       end
