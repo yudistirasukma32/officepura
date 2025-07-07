@@ -27,6 +27,7 @@
 				<label for="driver_id" style="float:none">Supir</label>
 				<select name="driver_id" class="chzn-select half combo_route">
 					<% Driver.order(:name).all.each do |driver| %>
+					<option value="">All</option>
 					<option value="<%=driver.id%>"<% if @driver and driver.id == @driver.id %> selected="selected"<% end %>><%=driver.name%></option>
 					<% end %>
 		    	</select> 

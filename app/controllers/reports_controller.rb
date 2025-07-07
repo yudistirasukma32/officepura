@@ -484,17 +484,60 @@ class ReportsController < ApplicationController
       @vehicle = Vehicle.find(params[:vehicle_id]) rescue nil
       @driver = Driver.find(params[:driver_id]) rescue nil
 
-      if @vehicle && @driver
-        @receipts = Receipt.where("(created_at > ? and created_at < ?) AND deleted = false AND invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ? OR driver_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id, @driver.id).order(:created_at) rescue nil
-        @receiptreturns = Receiptreturn.where("invoice_id in (SELECT r.invoice_id from receipts r inner join invoices i on r.invoice_id = i.id where (r.created_at > ? and r.created_at < ?) and r.deleted = false and i.vehicle_id = ? or i.driver_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id, @driver.id) rescue nil
-        @productrequests = Productrequest.where("(date >= ? and date < ?) AND deleted = false AND vehicle_id = ?", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:date) rescue nil
-        @receiptexpenses = Receiptexpense.where("(created_at >= ? and created_at < ?) AND deleted = false AND officeexpense_id IN (SELECT id FROM officeexpenses WHERE vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:created_at) rescue nil
-        @productrequestitems = Productrequestitem.where("productrequest_id in (SELECT id from productrequests where(date >= ? and date < ?) AND deleted = false AND vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id)
+      if @vehicle
+        date_start = @startdate.to_date
+        date_end   = @enddate.to_date + 1
 
+        # Build invoice conditions
+        invoice_conditions = ["vehicle_id = ?"]
+        invoice_params = [@vehicle.id]
+
+        if @driver
+          invoice_conditions << "driver_id = ?"
+          invoice_params << @driver.id
+        end
+
+        invoice_sql = invoice_conditions.join(" AND ")
+
+        # Receipts
+        @receipts = Receipt.where(
+          "(created_at > ? AND created_at < ?) AND deleted = false AND invoice_id IN (
+            SELECT id FROM invoices WHERE #{invoice_sql}
+          )",
+          date_start, date_end, *invoice_params
+        ).order("created_at ASC")
+
+        # Receipt Returns
+        @receiptreturns = Receiptreturn.where(
+          "invoice_id IN (
+            SELECT r.invoice_id FROM receipts r
+            INNER JOIN invoices i ON r.invoice_id = i.id
+            WHERE r.created_at > ? AND r.created_at < ? AND r.deleted = false AND (#{invoice_sql})
+          )",
+          date_start, date_end, *invoice_params
+        )
+
+        # Solar Pomps
+        @solar_pomps = Receipt.joins(:invoice).where(
+          "receipts.created_at > ? AND receipts.created_at < ? AND receipts.deleted = false AND invoices.gas_voucher > 0 AND receipts.invoice_id IN (
+            SELECT id FROM invoices WHERE #{invoice_sql}
+          )",
+          date_start, date_end, *invoice_params
+        ).order("receipts.created_at ASC")
+
+        # Receipt Expenses
+        @receiptexpenses = Receiptexpense.where(
+          "created_at >= ? AND created_at < ? AND deleted = false AND officeexpense_id IN (
+            SELECT id FROM officeexpenses WHERE vehicle_id = ?
+          )",
+          date_start, date_end, @vehicle.id
+        ).order("created_at ASC")
+
+        # unused
         @receiptpremis = Receiptpremi.where("(created_at >= ? and created_at < ?) AND deleted = false AND invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:created_at) rescue nil
         @receiptincentives = Receiptincentive.where("(created_at >= ? and created_at < ?) AND deleted = false AND invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:created_at) rescue nil
-
-        @solar_pomps = Receipt.joins(:invoice).where("(receipts.created_at > ? and receipts.created_at < ?) AND receipts.deleted = false AND invoices.gas_voucher > 0 AND receipts.invoice_id IN (SELECT id FROM invoices WHERE vehicle_id = ? or driver_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id, @driver.id).order(:created_at) rescue nil
+        @productrequestitems = Productrequestitem.where("productrequest_id in (SELECT id from productrequests where(date >= ? and date < ?) AND deleted = false AND vehicle_id = ?)", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id)
+        @productrequests = Productrequest.where("(date >= ? and date < ?) AND deleted = false AND vehicle_id = ?", @startdate.to_date, @enddate.to_date + 1.day, @vehicle.id).order(:date) rescue nil
 
         @outcome = @receipts.sum(:total).to_i - @receiptreturns.sum(:total).to_i  + @receiptpremis.sum(:total).to_i + @receiptincentives.sum(:total).to_i + @receiptexpenses.where(:expensetype => 'Kredit').sum(:total).to_i - @receiptexpenses.where(:expensetype => 'Debit').sum(:total).to_i + @productrequestitems.sum(:total).to_i
       end
