@@ -24,6 +24,161 @@
     <%= submit_tag "Import", :class => 'print btn-txt btn-green' %>
     <% end %>
     <% end %>
+
+    <br /><br />
+
+    <% if @process =='edit'%>
+
+    <% cust_id =  @taxinvoice.customer_id %>
+
+    <% else %>
+
+    <% cust_id =  params[:customer_id] %>
+
+    <% end %>
+
+    <% memo = Customer.find(cust_id).memo rescue nil %>
+    <% memo_att = Customer.find(cust_id).memo_attachments rescue nil %>
+    <% memo_info = Customer.find(cust_id).memo_info rescue nil %>
+    <% memo_address = Customer.find(cust_id).memo_address rescue nil %>
+
+    <% if memo.present? || memo_att.present? || memo_info.present? || memo_address.present? %>
+    <div id="infobox2" style="background: white; padding: 1rem; border-radius: 8px;">
+
+        <% if memo.present? %>
+        <div style="line-height: 1.25;">
+            <strong><i class="icon-question-sign"></i> Ketentuan:</strong>
+            <br class="clearfix" />
+            <%=simple_format(memo)%>
+        </div>
+        <% end %>
+
+        <% if memo_att.present? %>
+        <br class="clearfix" />
+        <div style="line-height: 1.25;">
+            <strong><i class="icon-question-sign"></i> Lampiran:</strong>
+            <br class="clearfix" />
+            <%=simple_format(memo_att)%>
+        </div>
+        <% end %>
+
+        <% if memo_address.present? %>
+        <br class="clearfix" />
+        <div style="line-height: 1.25;">
+            <strong><i class="icon-question-sign"></i> Alamat Kirim:</strong>
+            <br class="clearfix" />
+            <%=simple_format(memo_address)%>
+        </div>
+        <% end %>
+
+        <% if memo_info.present? %>
+        <br class="clearfix" />
+        <div style="line-height: 1.25;">
+            <strong><i class="icon-question-sign"></i> Keterangan:</strong>
+            <br class="clearfix" />
+            <%=simple_format(memo_info)%>
+        </div>
+        <% end %>
+    </div>
+    <% end %>
+
+    <br /><br />
+
+    <% the_customer_img = Customer.find(params[:customer_id]).images rescue nil %>
+    <% if the_customer_img.present? %>
+
+    <h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment Pelanggan</h3>
+
+    <ul style="margin-left: 0; padding-left: 0;">
+
+        <% @customer.images.each do |img| %>
+
+        <% if img.file_uid.present? %>
+
+        <li style="margin-bottom: 2.5rem; list-style: none;">
+
+            <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+
+            <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+
+            <a href="<%= img.file.url() %>" target="_blank">
+                <%= image_tag img.file.url(:suffix => "/#{img.name}") if img.file_uid %>
+            </a>
+
+            <% else %>
+
+            <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid).truncate(40) %></a>
+
+            <% end %>
+
+        </li>
+        <% end %>
+
+        <% end %>
+
+    </ul>
+
+    <% end %>
+
+    <h3 class="zone" style="font-weight: bold; margin-bottom: 1rem;">Attachment Invoice</h3>
+
+    <% if @taxinvoice.images.any? %>
+
+    <ul style="margin-left: 0; padding-left: 0;">
+
+        <% @taxinvoice.images.each do |img| %>
+
+        <% if img.file_uid.present? %>
+
+        <li style="margin-bottom: 2.5rem; list-style: none;">
+
+            <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+
+            <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+
+            <a href="<%= img.file.url() %>" target="_blank">
+                <%= image_tag img.file.url(:suffix => "/#{img.name}") if img.file_uid %>
+            </a>
+
+            <% else %>
+
+            <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid).truncate(40) %></a>
+
+            <% end %>
+
+            <br /><br /><br /><%= link_to 'Hapus File'.html_safe, '/attachments/remove/'+ img.id.to_s, class: "btn-txt danger mini" %>
+
+        </li>
+        <% end %>
+
+        <% end %>
+
+        <% end %>
+
+    </ul>
+
+    <br />
+
+    <form action="/attachments/upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+        <input type="hidden" name="model_name" value="Taxinvoice" />
+        <input type="hidden" name="item_id" value="<%=@taxinvoice.id%>" />
+
+        <div class="field-row" style="width: 300px;">
+            <label for="name">Nama</label>
+            <input type="text" name="attachment[name]" style="width: 300px;" />
+        </div>
+
+        <div class="field-row continue" style="width: 300px;">
+            <label for="file">Browse File</label>
+            <input type="file" name="attachment[file]" />
+        </div>
+
+        <div class="actions">
+            <input type="submit" value="Simpan File" />
+        </div>
+
+    </form>
+
 </div>
 
 <% if @customer %>
@@ -98,6 +253,10 @@
     <input type="text" class="middle half" name="spk_no" value="<%=@taxinvoice.spk_no%>" />
 </div>
 
+<!-- Kantor / Office -->
+<% if @process != 'edit'%>
+<% @taxinvoice.office_id = Customer.find(params[:customer_id]).office_id.to_i %>
+<% end %>
 <div class="field-row continue" style="margin-top: 1rem; padding-bottom:0px;">
     <label for="Kantor" class="half left">Kantor</label>
     <select id="office_id" name="office_id" class="half chzn-select">
@@ -138,6 +297,10 @@
 </div>
 
 <div class="field-row" style="padding: 15px 0 0;">
+    <% if @process != 'edit'%>
+    <% @taxinvoice.bank_id = Customer.find(params[:customer_id]).bank_id %>
+    <% end %>
+
     <label for="bank_id" class="half left">BANK</label>
     <select id="" name="bank_id" class="double chzn-select">
         <option value="0">- Pilih Bank -</option>
@@ -184,57 +347,80 @@
 </div>
 
 <%
-        ppn = Setting.where(name: 'ppn')
-        ppn = ppn.blank? ? 12 : ppn[0].value
-    %>
+    ppn = Setting.where(name: 'ppn')
+    ppn = ppn.blank? ? 12 : ppn[0].value
+    taxinvoice_ppn = @taxinvoice.get_ppn(ppn) 
+    # ppn = taxinvoice_ppn == 10 ? 10 : ppn
+%>
+<input type="hidden" id="ppn" value="<%= ppn %>" />
 <div class="field-row" style="padding-bottom:0px;">
-    <label style="color:#000; font-weight:700;">PPN </label>
-    <input type="hidden" id="ppn" value="<%= ppn %>" />
-    <input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax" value="<%= ppn %>" onchange="javascript:changeTaxesGeneric();" <% if (@taxinvoice.gst_tax > 0 && @taxinvoice.gst_percentage.to_f == 0) || (@taxinvoice.gst_percentage.to_f == ppn.to_f) %> checked="checked" <% end %> /> &nbsp; PPN <%= ppn %>% &nbsp; &nbsp; &nbsp;
-    <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="11" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.gst_percentage.to_f  == 11 %> checked="checked" <% end %> /> &nbsp; PPN 11% &nbsp; &nbsp; &nbsp;
-    <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1.1" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.gst_percentage.to_f  == 1.1 %> checked="checked" <% end %> /> &nbsp; PPN 1,1% &nbsp; &nbsp; &nbsp;
-    <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="0" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.gst_percentage.to_f == 0 && @taxinvoice.gst_tax.to_i == 0 %> checked="checked" <% end %> /> &nbsp; No PPN &nbsp; &nbsp; &nbsp;
+    <label style="color:#000; font-weight:700;">PPN</label>
+    <% if @process != 'edit'%>
+    <% @taxinvoice.gst_percentage = Customer.find(params[:customer_id]).gst_percentage.to_f %>
+    <% end %>
+    <input type="radio" id="chk_gst_tax" name="gst_tax" class="gst_tax" value="12" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.gst_percentage.to_f  == 12 %> checked="checked" <% end %> /> &nbsp; PPN 12 &nbsp;
+    <input type="radio" id="chk_gst_tax2" name="gst_tax" class="gst_tax" value="11" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.gst_percentage.to_f  == 11 %> checked="checked" <% end %> /> &nbsp; PPN 11 &nbsp;
+    <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="10" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.gst_percentage.to_f  == 10  %> checked="checked" <% end %> /> &nbsp; PPN 10 &nbsp;
+    <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1.1" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.gst_percentage.to_f  == 1.1   %> checked="checked" <% end %> /> &nbsp; PPN 1,1 &nbsp;
+    <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="1" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.gst_percentage.to_f  == 1  %> checked="checked" <% end %> /> &nbsp; PPN 1 &nbsp;
+    <input type="radio" id="chk_gst_tax2" class="gst_tax" name="gst_tax" value="0" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.gst_percentage.to_f  == 0 && @taxinvoice.gst_tax.to_i == 0 %> checked="checked" <% end %> /> &nbsp; PPN 0 &nbsp;
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
     <label style="color:#000; font-weight:700;">PPH</label>
-    <input type="checkbox" id="chk_price_tax" name="price_tax" value="Yes" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.price_tax > 0 %> checked="checked" <% end %> /> &nbsp; PPh PASAL 23 2%
+    <% if @process != 'edit'%>
+    <% @taxinvoice.price_tax = Customer.find(params[:customer_id]).price_tax %>
+    <% end %>
+    <input type="checkbox" id="chk_price_tax" name="price_tax" value="Yes" onchange="javascript:changeTaxesGeneric();" <% if @taxinvoice.price_tax > 0 %> checked="checked" <% end %> />
+    &nbsp; PPh PASAL 23 (2%)
 </div>
 
 <div class="field-row continue" style="padding-bottom:0px;">
+    <% if @process != 'edit'%>
+    <% @taxinvoice.price_by = Customer.find(params[:customer_id]).price_by %>
+    <% end %>
     <label style="color:#000; font-weight:700;">Harga Hitung </label>
     <input type="radio" id="price_by" name="price_by" value="is_net" onchange="javascript:changeCountRatesInvoiceGeneric();" <% if @taxinvoice.price_by == 'is_net' %>checked="checked" <% end%> /> &nbsp; Bongkar &nbsp;
     <input type="radio" id="price_by" name="price_by" value="is_gross" onchange="javascript:changeCountRatesInvoiceGeneric();" <% if @taxinvoice.price_by == 'is_gross' %>checked="checked" <% end%> /> &nbsp; Muat &nbsp;
-    <!-- 
-  <input type="radio" id="price_by" name="price_by" value="is_wholesale" onchange="javascript:changeWholesalePriceInvoice();" <% if @taxinvoice.price_by == 'is_wholesale' %>checked="checked"<% end%>/> &nbsp; Borongan
-   -->
 </div>
 
 <div class="field-row continue" style="padding-bottom:10px;">
+    <% if @process != 'edit'%>
+    <% @taxinvoice.is_weightlost = Customer.find(params[:customer_id]).is_weightlost %>
+    <% end %>
     <label style="color:#000; font-weight:700;">+/-</label>
-    <input type="checkbox" id="is_weightlost" name="is_weightlost" value="Yes" <% if @taxinvoice.is_weightlost %> checked="checked" <% end %> /> &nbsp; Tampilkan data susut saat print invoice &nbsp;
+    <input type="checkbox" id="is_weightlost" name="is_weightlost" value="Yes" <% if @taxinvoice.is_weightlost %> checked="checked" <% end %> /> &nbsp; Tampilkan data susut/selisih saat print invoice &nbsp;
 </div>
 
 <div class="field-row continue" style="padding-bottom:10px;">
+    <% if @process != 'edit'%>
+    <% @taxinvoice.is_showqty_loaded = Customer.find(params[:customer_id]).is_showqty_loaded %>
+    <% end %>
     <label style="color:#000; font-weight:700;">Qty Muat</label>
     <input type="checkbox" id="is_showqty_loaded" name="is_showqty_loaded" value="Yes" <% if @taxinvoice.is_showqty_loaded %> checked="checked" <% end %> /> &nbsp; Tampilkan quantity muat saat print invoice &nbsp;
 </div>
 
 <div class="field-row continue" style="padding-bottom:10px;">
+    <% if @process != 'edit'%>
+    <% @taxinvoice.is_showqty_unloaded = Customer.find(params[:customer_id]).is_showqty_unloaded %>
+    <% end %>
     <label style="color:#000; font-weight:700;">Qty Bongkar</label>
     <input type="checkbox" id="is_showqty_unloaded" name="is_showqty_unloaded" value="Yes" <% if @taxinvoice.is_showqty_unloaded %> checked="checked" <% end %> /> &nbsp; Tampilkan quantity bongkar saat print invoice &nbsp;
 </div>
 
 <div class="field-row continue" style="padding-bottom:10px;">
+    <% is_rounded = Customer.find(cust_id).is_rounded %>
     <label style="color:#000; font-weight:700;">Pembulatan Nominal</label>
-    <input type="checkbox" id="is_rounded" name="pembulatan" onclick="bulatkan_generic()" /> &nbsp; Bulatkan angka - angka yang bernilai Decimal &nbsp;
+    <input type="checkbox" id="is_rounded" name="pembulatan" onclick="bulatkan_generic()" <% if is_rounded %> checked="checked" <% end %> /> &nbsp; Bulatkan angka - angka yang bernilai Decimal &nbsp;
 </div>
+
 <!-- 
 <div class="field-row" style="padding-bottom:0px;">
   <label for="total_in_words" class="half  left">Terbilang</label>
   <input type="text" class="double left" id="taxinvoice_total_in_words" name="total_in_words" value="<%=@taxinvoice.total_in_words%>" /> 
 </div>
  -->
+
 <div class="field-row continue" style="margin-bottom:30pxip;">
     <label for="description" class="half left">Keterangan</label>
     <textarea cols="40" id="taxinvoice_description" name="description" rows="20"><%=@taxinvoice.description%></textarea>
