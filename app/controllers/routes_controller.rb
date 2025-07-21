@@ -108,7 +108,7 @@ class RoutesController < ApplicationController
       additional_query += " and name ~* '.*#{params[:query]}.*'"
     end
     if params[:customer_id].present? && params[:customer_id] != "all"
-      additional_query += " and customer_id = '#{params[:customer_id]}"
+      additional_query += " and customer_id = '#{params[:customer_id]}'"
     end
     if params[:load_province].present? && params[:load_province] != "all"
       additional_query += " and load_province = '#{params[:load_province]}'"
