@@ -368,6 +368,14 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.bank_id = params[:bank_id]
       @taxinvoice.booking_code = params[:booking_code]
       @taxinvoice.discount_amount = params[:discount_amount]
+
+      if params[:doubtful_ar] == "Yes"
+        @taxinvoice.doubtful_ar = true
+      else
+        @taxinvoice.doubtful_ar = false
+      end
+      @taxinvoice.doubtful_ar_note = params[:doubtful_ar_note]
+
       @taxinvoice.save
 
       if @taxinvoiceitems && @taxinvoiceitems.any?
@@ -1652,6 +1660,13 @@ class TaxinvoicesController < ApplicationController
     @taxinvoice.waybill = (params[:waybill] rescue nil)
     ppn = Setting.where(name: 'ppn')
     ppn = ppn.blank? ? 12 : ppn[0].value
+
+    if params[:doubtful_ar] == "Yes"
+      @taxinvoice.doubtful_ar = true
+    else
+      @taxinvoice.doubtful_ar = false
+    end
+    @taxinvoice.doubtful_ar_note = params[:doubtful_ar_note]
 
     ppn_percentage = params[:gst_tax].to_f
     if ppn_percentage > 0

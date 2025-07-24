@@ -23,7 +23,7 @@ class Taxinvoice < ActiveRecord::Base
 					:spo_no, :sentdate, :so_no, :sto_no, :do_no, :confirmeddate, :waybill, :remarks, :insurance_cost, :claim_cost, :company_id, :user_id,
 					:generic, :gst_tax, :gst_percentage, :price_tax, :bank_id, :booking_code,
 					:secondpayment, :secondpayment_date, :is_showqty_loaded, :is_showqty_unloaded, :is_dp, :dp_cost, 
-					:discount_percent, :discount_amount
+					:discount_percent, :discount_amount, :doubtful_ar, :doubtful_ar_note
 
 	scope :active, lambda {where(:deleted => false)}
 

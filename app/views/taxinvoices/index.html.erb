@@ -230,6 +230,27 @@
 				<small>Penyebab Invoice gantung / tidak bisa ditagihkan (Sebagai Catatan Internal)</small>
 			</div>
 		</div>
+
+		<hr />
+		
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Piutang Bermasalah?</label>
+			</div>
+			<div style="width: 50%;">
+				<input type="checkbox" id="chk_doubtful_ar" name="doubtful_ar" value="Yes" /> &nbsp; <span> Bermasalah </span>
+			</div>
+		</div>
+
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 20px;">
+				<label style="color:#000; font-weight:700;">Keterangan Piutang Bermasalah</label>
+			</div>
+			<div style="width: 50%;">
+				<textarea cols="40" id="taxinvoice_doubtful_ar_note" name="doubtful_ar_note" rows="3" style="height: 25px;"></textarea>
+				<small>Isi alasan mengapa invoice tagihan / piutang ini bermasalah.</small>
+			</div>
+		</div>
  
 		<input type="hidden" class="half left" id="taxinvoice_extra_cost" name="extra_cost" value="0"/> 
 		<input type="hidden" class="half left" id="taxinvoice_id" name="id"/>

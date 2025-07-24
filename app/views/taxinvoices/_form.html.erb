@@ -437,7 +437,11 @@
         <small>Penyebab Invoice gantung / tidak bisa ditagihkan (Sebagai Catatan Internal)</small>
     </div>
 
-    <div class="field-row" style="padding: 15px 0 0;">
+    <div class="field-row" style="margin-bottom:10px;">
+        <strong style="padding-left: 0;">Bank & Nominal</strong>
+    </div>
+
+    <div class="field-row continue" style="padding: 15px 0 0;">
         <% if @process != 'edit'%>
         <% @taxinvoice.bank_id = Customer.find(params[:customer_id]).bank_id %>
         <% end %>
@@ -487,14 +491,20 @@
         <input type="text" id="wholesale_price" name="wholesale_price" class="short none" readonly="readonly" value="<%=to_currency(@customer.wholesale_price) %>" />
     </div>
 
+
+    <div class="field-row" style="margin-bottom:10px;">
+        <strong style="padding-left: 0;">Ketentuan</strong>
+    </div>
+
     <%
     ppn = Setting.where(name: 'ppn')
     ppn = ppn.blank? ? 12 : ppn[0].value
     taxinvoice_ppn = @taxinvoice.get_ppn(ppn) 
     # ppn = taxinvoice_ppn == 10 ? 10 : ppn
-%>
+    %>
+
     <input type="hidden" id="ppn" value="<%= ppn %>" />
-    <div class="field-row" style="padding-bottom:0px;">
+    <div class="field-row continue" style="padding-bottom:0px;">
         <label style="color:#000; font-weight:700;">PPN</label>
         <% if @process != 'edit'%>
         <% @taxinvoice.gst_percentage = Customer.find(params[:customer_id]).gst_percentage.to_f %>
@@ -556,12 +566,28 @@
         <input type="checkbox" id="is_rounded" name="pembulatan" onclick="bulatkan_generic()" <% if is_rounded %> checked="checked" <% end %> /> &nbsp; Bulatkan angka - angka yang bernilai Decimal &nbsp;
     </div>
 
-    <div class="field-row" style="margin-bottom:30px;">
+    <div class="field-row continue" style="margin-bottom:30px;">
         <label for="total_in_words" class="half left">Terbilang</label>
         <textarea cols="40" id="taxinvoice_total_in_words" name="total_in_words" rows="20" style="height: 50px;"><%=@taxinvoice.total_in_words%></textarea>
     </div>
 
-    <br class="clear" />
+    <div class="field-row" style="margin-bottom:10px;">
+        <strong style="padding-left: 0;">Masalah</strong>
+    </div>
+
+    <div class="field-row continue" style="margin-bottom:30px;">
+        <label style="">Piutang Bermasalah?</label>
+        <input type="checkbox" id="chk_doubtful_ar" name="doubtful_ar" value="Yes" <% if @taxinvoice.doubtful_ar %> checked="checked" <% end %> /> &nbsp; <span> Bermasalah </span>
+    </div>
+
+    <div class="field-row continue" style="margin-bottom:30px;">
+        <label for="remarks" class="half left">Keterangan Piutang Bermasalah</label>
+        <textarea cols="40" id="taxinvoice_doubtful_ar_note" name="doubtful_ar_note" rows="20"><%=@taxinvoice.doubtful_ar_note%></textarea>
+        <small>Keterangan mengapa Invoice Tagihan ini bermasalah.</small>
+    </div>
+
+    <br class="clear" /><br class="clear" />
+
     <% if (@taxinvoiceitems && @taxinvoiceitems.any?) || (@taxinvoiceitemvs && @taxinvoiceitemvs.any?) %>
 
     <% if @taxinvoiceitems && @taxinvoiceitems.any? %>

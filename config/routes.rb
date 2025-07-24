@@ -816,6 +816,7 @@ OfficePuraErp::Application.routes.draw do
     #AR new modules
     get "ar_aging" => "reports#ar_aging"
     get "cashins" => "reports#cashins"
+    get "doubtful_ar_reports" => "summaries#doubtful_ar_reports"
 
     # match "indexannualreport_vehicle" => 'reports#indexannualreport_vehicle'
     get "indexannualreport_vehicle" => "reports#indexmonthlyreport_vehicle"
