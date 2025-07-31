@@ -653,6 +653,9 @@ OfficePuraErp::Application.routes.draw do
   match 'events/remove' => 'events#remove'
 
   resources :events do
+    member do
+      get 'restore'
+    end
     collection do
       get 'getdovendor' => 'events#getdovendor'
     end

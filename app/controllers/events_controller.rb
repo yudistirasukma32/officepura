@@ -1165,6 +1165,19 @@ class EventsController < ApplicationController
     # render json: data["status"] == 200
   end
 
+  def restore
+    @event = Event.find(params[:id])
+    @event.deleted = false
+    @event.cancelled = false
+    @event.reject_reason = nil
+    @event.deleteuser_id = nil
+    @event.save
+
+    add_eventlog @event.id, 'DO dipulihkan'
+
+    redirect_to(edit_event_url(@event), :notice => 'Data Event / DO berhasil dipulihkan')
+  end
+
   def get_unpaid_inv
 
     customer_id = params[:customer_id]

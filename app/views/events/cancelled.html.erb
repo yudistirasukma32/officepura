@@ -1,114 +1,117 @@
 <%= render "shared/header" %>
 
 <div id="nav">
-	<%= render "shared/nav" %>		
+    <%= render "shared/nav" %>
 </div>
 
 <div id="main">
 
-	<div id="content-full">
+    <div id="content-full">
 
         <h1><a href="<%=events_path%>">Kalendar Event</a> / DO Ditolak</h1>
-		
-		<br class="clearfix" />
 
-		<div id="filter">
-			<form id="filterform" name="filterform" action="" method="get">
-			<div class="field-row continue">
-				<label for="startdate" class="middle" style="width: 48px;">Tanggal</label>
-				<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
-				<label for="enddate" class="tiny" style="width: 24px;">s/d</label>
-				<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+        <br class="clearfix" />
 
-				<label for="customer_id" class="middle">Pelanggan</label>
-				<select name="customer_id" class="third left">
-					<option value="">Semua</option>
-					<% @customers.order(:name).each do |customer| %>
-					<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%> - <%=customer.city%></option>
-					<% end %>
-				</select>
+        <div id="filter">
+            <form id="filterform" name="filterform" action="" method="get">
+                <div class="field-row continue">
+                    <label for="startdate" class="middle" style="width: 48px;">Tanggal</label>
+                    <input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+                    <label for="enddate" class="tiny" style="width: 24px;">s/d</label>
+                    <input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
 
-				<label for="office_id" class="middle" style="width: 48px;">Kantor</label>
-                <select name="office_id" class="half left " style="width: 72px;">
-                    <option value="all">Semua</option>
-                    <% @offices.active.each do |office| %>
-                    <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
-                    <% end %>
-                </select>
- 
-				<input class="submit left" type="submit" value="Filter" />
-			</div>
-			</form>
-		</div>
+                    <label for="customer_id" class="middle">Pelanggan</label>
+                    <select name="customer_id" class="third left">
+                        <option value="">Semua</option>
+                        <% @customers.order(:name).each do |customer| %>
+                        <option value="<%=customer.id%>" <% if customer.id == @customer_id %> selected='selected' <% end %>><%=customer.name%> - <%=customer.city%></option>
+                        <% end %>
+                    </select>
 
-		<br class="clearfix" />
-		
-		<table id="reportevent" class="row-view tablesorter sortable tablesorterFilters">
-		<thead>
-		<tr>
-			<th class="{sorter:true, filter: true}" style="width: 50px;">No</th>
-			<th class="{sorter:true, filter: false}" style="width: 40px;">Tgl</th>
-			<th class="{sorter:true, filter: true}" style="width: 40px;">KTR</th> 
-			<th class="{sorter:true, filter: true}">Pelanggan</th> 
-			<th class="{sorter:true, filter: true}" width="150">Jurusan DO</th>
-			<th class="{sorter:true, filter: true}">Komoditas</th>
-			<th class="{sorter:true, filter: true}" width="40">Muat</th>
-			<th class="{sorter:true, filter: true}" width="40">BKR</th>
-			<th class="{sorter:true, filter: true}">Moda</th>
-			<th class="{sorter:true, filter: true}">Kargo</th>
-			<th class="{sorter:true, filter: true}">Tangki</th>
-			<th class="{sorter:true, filter: true}">Est. Tonase</th>
-			<th class="{sorter:false, filter: false}">Keterangan</th>
-			<th class="{sorter:true, filter: true}">Status</th>
-			<th class="{sorter:false, filter: false}"></th>
-		</tr>
-		</thead>
-		
-		<tbody>
+                    <label for="office_id" class="middle" style="width: 48px;">Kantor</label>
+                    <select name="office_id" class="half left " style="width: 72px;">
+                        <option value="all">Semua</option>
+                        <% @offices.active.each do |office| %>
+                        <option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected" <% end %>><%=office.name%></option>
+                        <% end %>
+                    </select>
 
-		<% @events.each do |event| %>
-			<tr class="">
-				<td><%= event.id %></td>
-				<td><strong><%=event.start_date.strftime('%d')%></strong>.<%=event.start_date.strftime('%m')%></td>
-				<td><%= event.office.abbr rescue nil %></td>
-				<td><%= event.customer.name rescue nil %></td>
-				<td><%= event.qty %> Rit. <%= event.summary %></td>
-				<td><%= event.commodity.name rescue nil %></td>
-				<td><strong><%=event.load_date.strftime('%d')%></strong>.<%=event.load_date.strftime('%m')%></td>
-				<td><strong><%=event.unload_date.strftime('%d')%></strong>.<%=event.unload_date.strftime('%m')%></td>
-				<td><%= event.invoicetrain ? 'Kereta' : 'Industri' %></td>
-				<td><%= event.cargo_type %></td>
-				<td><%= event.tanktype %></td>
-				<td class="right">
-					<%= event.price_per_type != 'BORONGAN' ? event.estimated_tonage : '' %> 
-					<%= event.price_per_type %>
-				</td>
-				<td><%= event.reject_reason %></td>
-				<td>
-					<% if event.deleted %>
-					<a class="cta" style="background: grey; color: white; opacity: 1;">dihapus</a>
-					<% else %>
-					<a class="cta" style="background: #d50000; color: white; opacity: 1;">ditolak</a>
-					<% end %>
-				</td>
-				<td class="right" width="60">
-					<%= link_to '&#xf044;'.html_safe, edit_event_path(event, origin: 'report'), :class => "edit tipsy", :title => 'Edit' %>
-					<% if !event.deleted %>
-					<%= link_to '&#xf00d;'.html_safe, event, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
-					<% end %>
-				</td>
-			</tr>
-		<% end %>
+                    <input class="submit left" type="submit" value="Filter" />
+                </div>
+            </form>
+        </div>
 
-		</tbody>
+        <br class="clearfix" />
 
-		<tr class="footer">
-			<td class="" colspan="15"><i><span style="font-size: 11px;"><%= @events.where('cancelled = true').count %> DO tolakan, <%= @events.where('deleted = true').count %> DO dihapus ditemukan</span></i></td>
-		</tr>
+        <table id="reportevent" class="row-view tablesorter sortable tablesorterFilters">
+            <thead>
+                <tr>
+                    <th class="{sorter:true, filter: true}" style="width: 50px;">No</th>
+                    <th class="{sorter:true, filter: false}" style="width: 40px;">Tgl</th>
+                    <th class="{sorter:true, filter: true}" style="width: 40px;">KTR</th>
+                    <th class="{sorter:true, filter: true}">Pelanggan</th>
+                    <th class="{sorter:true, filter: true}" width="150">Jurusan DO</th>
+                    <th class="{sorter:true, filter: true}">Komoditas</th>
+                    <th class="{sorter:true, filter: true}" width="40">Muat</th>
+                    <th class="{sorter:true, filter: true}" width="40">BKR</th>
+                    <th class="{sorter:true, filter: true}">Moda</th>
+                    <th class="{sorter:true, filter: true}">Kargo/Tangki</th>
+                    <th class="{sorter:true, filter: true}">Est. Tonase</th>
+                    <th class="{sorter:false, filter: false}">Keterangan</th>
+                    <th class="{sorter:true, filter: true}">User</th>
+                    <th class="{sorter:true, filter: true}">Status</th>
+                    <th class="{sorter:false, filter: false}"></th>
+                </tr>
+            </thead>
 
-		</table>
-		
-		<br class="clearfix" /> 
-	</div>
+            <tbody>
+
+                <% @events.each do |event| %>
+                <tr class="">
+                    <td><%= event.id %></td>
+                    <td><strong><%=event.start_date.strftime('%d')%></strong>.<%=event.start_date.strftime('%m')%></td>
+                    <td><%= event.office.abbr rescue nil %></td>
+                    <td><%= event.customer.name rescue nil %></td>
+                    <td><%= event.qty %> Rit. <%= event.summary %></td>
+                    <td><%= event.commodity.name rescue nil %></td>
+                    <td><strong><%=event.load_date.strftime('%d')%></strong>.<%=event.load_date.strftime('%m')%></td>
+                    <td><strong><%=event.unload_date.strftime('%d')%></strong>.<%=event.unload_date.strftime('%m')%></td>
+                    <td><%= event.invoicetrain ? 'Kereta' : 'Industri' %></td>
+                    <td><%= event.cargo_type %> / <%= event.tanktype %></td>
+                    <td class="right">
+                        <%= event.price_per_type != 'BORONGAN' ? event.estimated_tonage : '' %>
+                        <%= event.price_per_type %>
+                    </td>
+                    <td><%= event.reject_reason %></td>
+                    <td><%= event.user.username rescue nil %></td>
+                    <td>
+                        <% if event.deleted %>
+                        <a class="cta" style="background: grey; color: white; opacity: 1;">dihapus</a>
+                        <% else %>
+                        <a class="cta" style="background: #d50000; color: white; opacity: 1;">ditolak</a>
+                        <% end %>
+                    </td>
+                    <td class="right" width="60">
+                        <%= link_to '&#xf044;'.html_safe, edit_event_path(event, origin: 'report'), :class => "edit tipsy", :title => 'Edit' %>
+                        <% if !event.deleted %>
+                        <%= link_to '&#xf00d;'.html_safe, event, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete if current_user.owner %>
+                        <% end %>
+                        <% if event.deleted || event.cancelled && (current_user.owner || checkroleonly('General Manager')) %>
+                        <%= link_to '&#xf021;'.html_safe, restore_event_path(event, origin: 'report'), :class => "edit tipsy", :title => 'Pulihkan' %>
+                        <% end %>
+                    </td>
+                </tr>
+                <% end %>
+
+            </tbody>
+
+            <tr class="footer">
+                <td class="" colspan="15"><i><span style="font-size: 11px;"><%= @events.where('cancelled = true').count %> DO tolakan, <%= @events.where('deleted = true').count %> DO dihapus ditemukan</span></i></td>
+            </tr>
+
+        </table>
+
+        <br class="clearfix" />
+    </div>
 
 </div>
