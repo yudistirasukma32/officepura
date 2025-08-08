@@ -149,6 +149,21 @@
 		</div>
 		<div class="" style="padding-bottom:0px; display: flex; margin-top: 10px;">
 			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Kantor</label>
+			</div>
+			<div style="width: 50%;">
+				<select id="office_id" name="office_id" class="half">
+					<option value="0">- Kantor -</option>
+					<% Office.active.each do |office| %>
+					<option value="<%=office.id%>"><%=office.name%></option>
+					<% end %>
+				</select>
+				<br>
+				<small>*diterbitkan untuk perhitungan kantor cabang</small>
+			</div>
+		</div>
+		<div class="" style="padding-bottom:0px; display: flex; margin-top: 10px;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
 				<label style="color:#000; font-weight:700;">Tanggal Kirim</label>
 			</div>
 			<div style="width: 50%; display: flex; align-items: center;">

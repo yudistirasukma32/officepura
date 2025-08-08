@@ -5115,6 +5115,12 @@ $(document)
     $("#taxinvoice_remarks").text($(this).data("remarks"));
     $("#taxinvoice_insurance_cost").val($(this).data("insurance-cost"));
     $("#taxinvoice_claim_cost").val($(this).data("claim-cost"));
+ 
+    console.log($(this).data("office-id"));
+    var officeId = $(this).data("office-id");
+    if ($("#office_id option[value='" + officeId + "']").length) {
+        $("#office_id").val(officeId).trigger("change");
+    }
 
     $("#txt_claim_cost").text();
     $("#txt_insurance_cost").text();
