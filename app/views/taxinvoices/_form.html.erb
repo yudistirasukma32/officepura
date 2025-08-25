@@ -621,9 +621,14 @@
                 <td>
 
                     <% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
-                    <strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+                        <strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
                     <% else %>
-                    <%=taxinvoiceitem.invoice.vehicle.current_id rescue nil%>
+                        <% manual = taxinvoiceitem.manual_vehicle_number rescue nil %>
+                        <% if manual.present? %>
+                            <%= manual %>
+                        <% else %>
+                            <%= taxinvoiceitem.invoice.vehicle.current_id %>
+                        <% end%>
                     <% end %>
 
                     <% if taxinvoiceitem.invoice.invoicetrain %>

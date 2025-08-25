@@ -22,7 +22,14 @@
       </td>  
       <td><%=i+1%>.</td>
       <td><%=taxinvoiceitem.date.strftime('%d-%m-%Y') if !taxinvoiceitem.date.nil?%></td>
-      <td><%= taxinvoiceitem.invoice.vehicle.current_id %></td>
+      <td>
+          <% manual = taxinvoiceitem.manual_vehicle_number rescue nil %>
+          <% if manual.present? %>
+              <%= manual %>
+          <% else %>
+              <%= taxinvoiceitem.invoice.vehicle.current_id %>
+          <% end%>
+      </td>
       <td><%=taxinvoiceitem.sku_id%></td>
       <td><%= taxinvoiceitem.invoice.event_id rescue nil %></td>
       <td><%=taxinvoiceitem.invoice.route.name%></td>
