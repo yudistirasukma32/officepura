@@ -76,6 +76,16 @@
     @officeexpense.description = inputs[:description]
     @officeexpense.event_id = inputs[:event_id]
 
+    if inputs[:taxinvoiced] == 'Yes'
+      @officeexpense.taxinvoiced = true
+      @officeexpense.customer_id = inputs[:customer_id]
+      @officeexpense.taxinvoice_item_name = inputs[:taxinvoice_item_name]
+    else
+      @officeexpense.taxinvoiced = false
+      @officeexpense.customer_id = nil
+      @officeexpense.taxinvoice_item_name = nil
+    end
+
     #add bankexpensegroup_id
     @officeexpense.bankexpensegroup_id = inputs[:bankexpensegroup_id]
     #======
@@ -104,6 +114,16 @@
     @officeexpense.total = inputs[:total]
     @officeexpense.description = inputs[:description]
     @officeexpense.event_id = inputs[:event_id]
+
+    if inputs[:taxinvoiced] == 'Yes'
+      @officeexpense.taxinvoiced = true
+      @officeexpense.customer_id = inputs[:customer_id]
+      @officeexpense.taxinvoice_item_name = inputs[:taxinvoice_item_name]
+    else
+      @officeexpense.taxinvoiced = false
+      @officeexpense.customer_id = nil
+      @officeexpense.taxinvoice_item_name = nil
+    end
 
     if @officeexpense.save
       redirect_to(officeexpenses_url(:date => @officeexpense.date.strftime('%d-%m-%Y')), :notice => 'Kas Kantor sukses di simpan.')

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250723082036) do
+ActiveRecord::Schema.define(:version => 20250825065601) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -879,6 +879,10 @@ ActiveRecord::Schema.define(:version => 20250723082036) do
     t.integer   "container_id"
     t.integer   "isotank_id"
     t.integer   "event_id"
+    t.boolean   "taxinvoiced",                                                       :default => false
+    t.integer   "taxinvoice_id"
+    t.integer   "customer_id"
+    t.string    "taxinvoice_item_name"
   end
 
   create_table "offices", :force => true do |t|
@@ -1704,32 +1708,33 @@ ActiveRecord::Schema.define(:version => 20250723082036) do
   end
 
   create_table "taxinvoiceitems", :force => true do |t|
-    t.boolean   "deleted",                                                          :default => false
+    t.boolean   "deleted",                                                           :default => false
     t.date      "date"
     t.string    "sku_id"
-    t.integer   "weight_gross",                                                     :default => 0
-    t.integer   "weight_net",                                                       :default => 0
+    t.integer   "weight_gross",                                                      :default => 0
+    t.integer   "weight_net",                                                        :default => 0
     t.text      "description"
     t.integer   "invoice_id"
     t.integer   "customer_id"
     t.integer   "taxinvoice_id"
     t.integer   "office_id"
-    t.timestamp "created_at",           :limit => 6,                                                   :null => false
-    t.timestamp "updated_at",           :limit => 6,                                                   :null => false
-    t.decimal   "price_per",                         :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "total",                             :precision => 19, :scale => 2, :default => 0.0
+    t.timestamp "created_at",            :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",            :limit => 6,                                                   :null => false
+    t.decimal   "price_per",                          :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "total",                              :precision => 19, :scale => 2, :default => 0.0
     t.date      "load_date"
     t.date      "unload_date"
-    t.boolean   "is_wholesale",                                                     :default => false
-    t.decimal   "wholesale_price",                   :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "is_gross",                                                         :default => false
-    t.boolean   "is_net",                                                           :default => false
+    t.boolean   "is_wholesale",                                                      :default => false
+    t.decimal   "wholesale_price",                    :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "is_gross",                                                          :default => false
+    t.boolean   "is_net",                                                            :default => false
     t.integer   "user_id"
     t.string    "note"
-    t.boolean   "rejected",                                                         :default => false
+    t.boolean   "rejected",                                                          :default => false
     t.string    "reject_reason"
     t.string    "event_name"
     t.integer   "receipttaxinvitem_id"
+    t.string    "manual_vehicle_number"
   end
 
   create_table "taxinvoiceitemvs", :force => true do |t|

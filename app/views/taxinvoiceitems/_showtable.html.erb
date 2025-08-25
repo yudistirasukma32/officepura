@@ -81,7 +81,12 @@
             <% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
                 <strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
             <% else %>
-                <%=invoice.vehicle.current_id rescue nil%>
+                <% manual = invoice.taxinvoiceitems.first.manual_vehicle_number rescue nil %>
+                <% if manual.present? %>
+                    <%= manual %>
+                <% else %>
+                    <%=invoice.vehicle.current_id rescue nil%>
+                <% end%>
             <% end %>
             <%= second_nopol.nil? ? '' : ' ' +second_nopol %>
             </td> 

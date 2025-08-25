@@ -55,7 +55,13 @@
               <tr class="deleted">
                 <td><strong><%= officeexpense.date.strftime('%d') %></strong>.<%= officeexpense.date.strftime('%m') %></td>
                 <td><%= zeropad(officeexpense.id) %></td>
-                <td><%= nl2br(officeexpense.description).html_safe %></td>
+                <td>
+                  <%= nl2br(officeexpense.description).html_safe %>
+                  <% if officeexpense.taxinvoiced %>
+                    <br/>
+                    <span style="font-size: 10px; color: #717171;">Dapat ditagihkan ke Pelanggan <strong><%= officeexpense.customer.name rescue nil %></strong>
+                  <% end %>
+                </td>
                 <td><%= officeexpense.office.abbr unless officeexpense.office_id.nil? %></td>
                 <td><%= officeexpense.event_id rescue nil %></td>
                 <td><%= officeexpense.vehicle.current_id unless officeexpense.vehicle.nil? %></td>
@@ -78,7 +84,13 @@
               <tr>
                 <td><strong><%= officeexpense.date.strftime('%d') %></strong>.<%= officeexpense.date.strftime('%m') %></td>
                 <td><%= link_to zeropad(officeexpense.id), edit_officeexpense_path(officeexpense) %></td>
-                <td><%= nl2br(officeexpense.description).html_safe %></td>
+                <td>
+                  <%= nl2br(officeexpense.description).html_safe %>
+                  <% if officeexpense.taxinvoiced %>
+                    <br/>
+                    <span style="font-size: 10px; color: #717171;">Dapat ditagihkan ke Pelanggan <strong><%= officeexpense.customer.name rescue nil %></strong>
+                  <% end %>
+                </td>
                 <td><%= officeexpense.office.abbr unless officeexpense.office_id.nil? %></td>
                 <td><%= officeexpense.event_id rescue nil %></td>
                 <td><%= officeexpense.vehicle.current_id unless officeexpense.vehicle.nil? %></td>
@@ -99,7 +111,13 @@
               <tr>
                 <td><strong><%= officeexpense.date.strftime('%d') %></strong>.<%= officeexpense.date.strftime('%m') %></td>
                 <td><%= link_to zeropad(officeexpense.id), edit_officeexpense_path(officeexpense) %></td>
-                <td><%= nl2br(officeexpense.description).html_safe %></td>
+                <td>
+                  <%= nl2br(officeexpense.description).html_safe %>
+                  <% if officeexpense.taxinvoiced %>
+                    <br/>
+                    <span style="font-size: 10px; color: #717171;">Dapat ditagihkan ke Pelanggan <strong><%= officeexpense.customer.name rescue nil %></strong>
+                  <% end %>
+                </td>
                 <td><%= officeexpense.office.abbr unless officeexpense.office_id.nil? %></td>
                 <td><%= officeexpense.event_id rescue nil %></td>
                 <td><%= officeexpense.vehicle.current_id unless officeexpense.vehicle.nil? %></td>

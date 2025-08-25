@@ -7,13 +7,15 @@ class Officeexpense < ActiveRecord::Base
     belongs_to :isotank
     belongs_to :container
 	belongs_to :event
+	belongs_to :customer
 
 	has_many :receiptexpenses
 
   	# Setup accessible (or protected) attributes for your model
   	attr_accessible :enabled, :deleted, :date, :expensetype, :description, 
 	:vehicle_id, :officeexpensegroup_id, :total, :office_id, :deleteuser_id, 
-	:bankexpensegroup_id, :container_id, :isotank_id, :event_id
+	:bankexpensegroup_id, :container_id, :isotank_id, :event_id,
+	:taxinvoiced,:taxinvoice_id,:customer_id,:taxinvoice_item_name
 
   	scope :active, lambda {where(:enabled => true, :deleted => false)}
 
