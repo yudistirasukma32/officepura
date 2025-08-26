@@ -12,7 +12,7 @@
 
     <table class="row-view no-border">
       <tr>
-        <td width="90">Tanggal</td>
+        <td width="120">Tanggal</td>
         <td><%=@invoice.date.strftime('%d-%m-%Y')%>&nbsp;(KTR: <%=@invoice.invoice.office.name%>)</td>
       </tr>
       <tr>
@@ -50,6 +50,10 @@
       <tr>
         <td>Supir</td>
         <td><%=@invoice.invoice.driver.name%><% if !@invoice.invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.invoice.driver.helpers.first.name%>)<% end %></td>
+      </tr>
+      <tr>
+        <td>User BKM</td>
+        <td><%=@invoice.user.username%></td>
       </tr>
     </table>
 
