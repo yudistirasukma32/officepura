@@ -149,7 +149,7 @@ class InvoicesController < ApplicationController
                                       join vehicles ON invoices.vehicle_id = vehicles.id
                                       join offices ON invoices.office_id = offices.id
                                       where vendors.id = #{@vendor[0].id} AND date = '#{@date.to_date}'
-                                      AND invoices.customer_id NOT IN (SELECT id from customers WHERE name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*') ORDER BY invoices.id")
+                                      ORDER BY invoices.id")
 
       end
 
