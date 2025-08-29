@@ -12,7 +12,7 @@ class Taxinvoiceitem < ActiveRecord::Base
   				:sku_id, :weight_gross, :weight_net, :price_per,
   				:invoice_id, :taxinvoice_id, :office_id, :load_date, :unload_date, 
 				:is_wholesale, :wholesale_price, :is_gross, :is_net, :user_id, :note,
-				:reject_reason, :rejected, :receipttaxinvitem_id
+				:reject_reason, :rejected, :receipttaxinvitem_id, :is_dooring_invoice
 
   	scope :active, lambda {where(:deleted => false)}
 

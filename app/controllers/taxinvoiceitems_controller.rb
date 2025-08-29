@@ -221,6 +221,13 @@ class TaxinvoiceitemsController < ApplicationController
           item.customer_id = @invoice.customer_id
           item.wholesale_price = inputs["wholesale_price"].to_f
           item.user_id = current_user.id
+
+          if inputs["is_dooring_invoice"] == "Yes" && inputs["is_dooring_invoice"].present? 
+            item.is_dooring_invoice = true
+          else
+            item.is_dooring_invoice = false
+          end
+          
           item.save
         end
       end

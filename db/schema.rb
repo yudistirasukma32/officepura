@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250829094527) do
+ActiveRecord::Schema.define(:version => 20250829133635) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -1735,6 +1735,7 @@ ActiveRecord::Schema.define(:version => 20250829094527) do
     t.string    "event_name"
     t.integer   "receipttaxinvitem_id"
     t.string    "manual_vehicle_number"
+    t.boolean   "is_dooring_invoice",                                                :default => false
   end
 
   create_table "taxinvoiceitemvs", :force => true do |t|

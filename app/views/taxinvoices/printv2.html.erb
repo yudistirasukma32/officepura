@@ -269,15 +269,29 @@
                     <td><%= sort+=1 %>.</td>
                     <td><%=taxinvoiceitem.date.strftime('%d/%m/%Y') unless taxinvoiceitem.date.nil?%></td>
                     <td>
-                        <% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
-                        <strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+                        <% if taxinvoiceitem.is_dooring_invoice %>
+                        
+                            <% bongkar = taxinvoiceitem.invoice.invoices.active.first %>
+
+                            <% if bongkar.vehicle_duplicate.present? && bongkar.vehicle_duplicate_id != 0%>
+                                <strong><%=bongkar.vehicle_duplicate.current_id rescue nil%></strong>
+                            <% else %>
+                                <%=bongkar.vehicle.current_id rescue nil%>
+                            <% end %>
+
                         <% else %>
-                        <% manual = taxinvoiceitem.manual_vehicle_number rescue nil %>
-                        <% if manual.present? %>
-                            <%= manual %>
-                        <% else %>
-                            <%= taxinvoiceitem.invoice.vehicle.current_id rescue nil %>
-                        <% end%>
+
+                            <% if taxinvoiceitem.invoice.vehicle_duplicate.present? && taxinvoiceitem.invoice.vehicle_duplicate_id != 0%>
+                                <strong><%=taxinvoiceitem.invoice.vehicle_duplicate.current_id rescue nil%></strong>
+                            <% else %>
+                                <% manual = taxinvoiceitem.manual_vehicle_number rescue nil %>
+                                <% if manual.present? %>
+                                    <%= manual %>
+                                <% else %>
+                                    <%= taxinvoiceitem.invoice.vehicle.current_id rescue nil %>
+                                <% end%>
+                            <% end %>
+
                         <% end %>
                         <span style="display: none;"><% if taxinvoiceitem.invoice.invoicetrain %>,<% if taxinvoiceitem.invoice.invoices.first %> <%= taxinvoiceitem.invoice.invoices.first.vehicle.current_id %> <% end %> <% end %></span>
                     </td>
@@ -374,7 +388,9 @@
                 <tr>
                     <td></td>
                     <td colspan="3">SUBTOTAL</td>
+                    <% if @taxinvoice.is_show_container %>
                     <td></td>
+                    <% end %>
                     <td align="right" style="border-top: 3px double"><strong><%= to_currency(weight_gross) %></strong></td>
                     <td align="right" style="border-top: 3px double"><strong><%= to_currency(weight_net) %></strong></td>
                     <% if @taxinvoice.is_weightlost %>

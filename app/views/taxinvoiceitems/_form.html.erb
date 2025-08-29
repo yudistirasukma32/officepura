@@ -76,9 +76,11 @@
       <td>
       <%=bongkar.quantity%> Rit: <%= bongkar.route.name rescue nil %>, 
       <% if bongkar.vehicle_duplicate.present? && bongkar.vehicle_duplicate_id != 0%>
-        <strong><%=bongkar.vehicle_duplicate.current_id rescue nil%></strong>
+        <% dooring_vehicle = bongkar.vehicle_duplicate.current_id rescue nil %>
+        <strong><%= dooring_vehicle %></strong>
       <% else %>
-          <%=bongkar.vehicle.current_id rescue nil%>
+        <% dooring_vehicle = bongkar.vehicle.current_id rescue nil %>
+        <%=bongkar.vehicle.current_id rescue nil%>
       <% end %>
 
       <span style="display: none;">
@@ -404,6 +406,14 @@
       <% end %>
     </td>
 	</tr>
+  <% if @invoice.invoicetrain %>  
+  <tr>
+    <td colspan="8">
+      <input <% if !taxinvoiceitem.taxinvoice_id.nil? %> disabled="disabled" <%end%> type="checkbox" id="is_dooring_invoice" name="taxinvoiceitems[is_dooring_invoice]" value="Yes" <% if taxinvoiceitem.is_dooring_invoice == true %> checked="checked" <% end %>/>
+      Gunakan No Pol Dooring <strong><%= dooring_vehicle rescue nil %></strong> sebagai item Invoice.
+    </td>
+  </tr>
+  <% end %>
 <% end %>
 </tbody>
 </table>
