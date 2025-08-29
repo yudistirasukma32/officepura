@@ -160,7 +160,7 @@ class InvoicesController < ApplicationController
       # @invoices = Invoice.where("date = ? and invoicetrain is false", @date.to_date).order(:id)
       @invoices = Invoice.where("date = ? and invoicetrain is false AND kosongan = false", @date.to_date)
 
-      cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+      cust_kosongan = Customer.active.where("name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
 
       @invoices = @invoices.where("customer_id NOT IN (?)", cust_kosongan).order(:id)
       # fetch_excel()
