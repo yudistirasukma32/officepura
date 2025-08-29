@@ -566,6 +566,11 @@
         <input type="checkbox" id="is_rounded" name="pembulatan" onclick="bulatkan_generic()" <% if is_rounded %> checked="checked" <% end %> /> &nbsp; Bulatkan angka - angka yang bernilai Decimal &nbsp;
     </div>
 
+    <div class="field-row continue" style="padding-bottom:10px;">
+        <label style="color:#000; font-weight:700;">Isotank/ Kontainer</label>
+        <input type="checkbox" id="is_show_container" name="is_show_container" value="Yes" <% if @taxinvoice.is_show_container %> checked="checked" <% end %> /> &nbsp; Tampilkan isotank/kontainer saat print invoice &nbsp;
+    </div>
+
     <div class="field-row continue" style="margin-bottom:30px;">
         <label for="total_in_words" class="half left">Terbilang</label>
         <textarea cols="40" id="taxinvoice_total_in_words" name="total_in_words" rows="20" style="height: 50px;"><%=@taxinvoice.total_in_words%></textarea>

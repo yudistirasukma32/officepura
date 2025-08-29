@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250825065601) do
+ActiveRecord::Schema.define(:version => 20250829094527) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -1822,6 +1822,7 @@ ActiveRecord::Schema.define(:version => 20250825065601) do
     t.decimal   "discount_amount",                  :precision => 19, :scale => 2, :default => 0.0
     t.boolean   "doubtful_ar",                                                     :default => false
     t.string    "doubtful_ar_note"
+    t.boolean   "is_show_container",                                               :default => false
   end
 
   create_table "tirebudgets", :force => true do |t|

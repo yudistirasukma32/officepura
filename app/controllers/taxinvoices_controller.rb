@@ -376,6 +376,12 @@ class TaxinvoicesController < ApplicationController
       end
       @taxinvoice.doubtful_ar_note = params[:doubtful_ar_note]
 
+      if params[:is_show_container] == "Yes"
+        @taxinvoice.is_show_container = true
+      else
+        @taxinvoice.is_show_container = false
+      end
+
       @taxinvoice.save
 
       if @taxinvoiceitems && @taxinvoiceitems.any?
