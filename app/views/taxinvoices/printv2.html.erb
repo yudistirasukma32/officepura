@@ -293,7 +293,23 @@
                             <% end %>
 
                         <% end %>
-                        <span style="display: none;"><% if taxinvoiceitem.invoice.invoicetrain %>,<% if taxinvoiceitem.invoice.invoices.first %> <%= taxinvoiceitem.invoice.invoices.first.vehicle.current_id %> <% end %> <% end %></span>
+
+                        <% if @taxinvoice.is_show_loadunload %>
+                            <span style="display: block;">
+                                <% if taxinvoiceitem.invoice.invoicetrain %>
+            
+                                    <% bongkar = taxinvoiceitem.invoice.invoices.active.first %>
+
+                                    <% if bongkar.vehicle_duplicate.present? && bongkar.vehicle_duplicate_id != 0%>
+                                        <strong><%=bongkar.vehicle_duplicate.current_id rescue nil%></strong>
+                                    <% else %>
+                                        <%=bongkar.vehicle.current_id rescue nil%>
+                                    <% end %>
+
+                                <% end %>
+                            </span>
+                        <% end %>
+                        
                     </td>
                     <td>
                         <% if taxinvoiceitem.sku_id == '' %> - <% else %> <%=taxinvoiceitem.sku_id %> <% end %> 
