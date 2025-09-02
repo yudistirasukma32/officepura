@@ -4,7 +4,7 @@
             <th class="{sorter:false, filter: false}" width="20">
                 <input type="checkbox" id="is_all_paid" <% if @taxinvoices.where("paiddate IS NULL").count() == 0 %> checked="checked" <% end %> onchange="javascript: checkAllTaxinvoices();" />
             </th>
-            <th class="{sorter:true, filter: false}" width="80">Dibuat</th>
+            <th class="{sorter:true, filter: true}" width="80">Dibuat</th>
             <th class="{sorter:true, filter: true}" width="50">INV</th>
             <th class="{sorter:true, filter: true}" width="50">KTR</th>
             <th class="{sorter:true, filter: true}">Pelanggan</th>
@@ -15,7 +15,7 @@
             <th class="right {sorter:false, filter: false}" width="80">PPN</th>
             <th class="right {sorter:false, filter: false}" width="80">PPh</th>
             <th class="right {sorter:false, filter: false}" width="80">Total</th>
-            <th class="{sorter:true, filter: false}" width="100">Lunas</th>
+            <th class="{sorter:true, filter: true}" width="100">Lunas</th>
             <th class="{sorter:true, filter: true}" width="30">User</th>
             <th class="{sorter:false, filter: false}" width="120">&nbsp;</th>
         </tr>
