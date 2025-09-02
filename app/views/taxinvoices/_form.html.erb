@@ -545,6 +545,11 @@
     </div>
 
     <div class="field-row continue" style="padding-bottom:10px;">
+        <label style="color:#000; font-weight:700;">Nopol Muat + Bongkar</label>
+        <input type="checkbox" id="is_show_loadunload" name="is_show_loadunload" value="Yes" <% if @taxinvoice.is_show_loadunload %> checked="checked" <% end %> /> &nbsp; Tampilkan nopol muat dan bongkar &nbsp;
+    </div>
+
+    <div class="field-row continue" style="padding-bottom:10px;">
         <% if @process != 'edit'%>
         <% @taxinvoice.is_showqty_loaded = Customer.find(params[:customer_id]).is_showqty_loaded %>
         <% end %>

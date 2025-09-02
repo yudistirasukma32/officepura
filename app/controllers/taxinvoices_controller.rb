@@ -382,6 +382,12 @@ class TaxinvoicesController < ApplicationController
         @taxinvoice.is_show_container = false
       end
 
+      if params[:is_show_loadunload] == "Yes"
+        @taxinvoice.is_show_loadunload = true
+      else
+        @taxinvoice.is_show_loadunload = false
+      end
+
       @taxinvoice.save
 
       if @taxinvoiceitems && @taxinvoiceitems.any?
