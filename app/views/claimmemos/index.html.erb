@@ -52,7 +52,8 @@
 		<thead>
 
 		<tr>
-			<th class="{sorter:true, filter: false}">Tgl</th>
+			<th class="{sorter:true, filter: false}">Tgl Klaim</th>
+			<th class="{sorter:true, filter: false}">Tgl BKK</th>
 			<th class="{sorter:true, filter: true}">BKK</th>
 			<th class="{sorter:true, filter: true}">Keterangan</th>
 			<th class="{sorter:true, filter: true}">KTR</th>
@@ -61,7 +62,7 @@
 			<th class="{sorter:true, filter: false}">Muat</th>
 			<th class="{sorter:true, filter: false}">Bongkar</th>
 			<th class="{sorter:true, filter: false}">Susut</th>
-			<th class="{sorter:true, filter: false}">Toleransi</th>
+			<th class="{sorter:true, filter: false}">Tole ransi</th>
 			<th class="{sorter:true, filter: false}">Beban Susut</th>
 			<!-- <th>Harga</th> -->
 			<th class="{sorter:true, filter: false}">Beban Supir</th>
@@ -90,7 +91,8 @@
 						end
 			%>
 			<tr>
-				<td><strong><%=memo.date.strftime('%d')%></strong>.<%=memo.date.strftime('%m')%></td>
+				<td><strong><%=memo.date.strftime('%d')%></strong>/<%=memo.date.strftime('%m')%>/<%=memo.date.strftime('%y')%></td>
+				<td><strong><%=memo.invoice.date.strftime('%d')%></strong>/<%=memo.invoice.date.strftime('%m')%>/<%=memo.invoice.date.strftime('%y')%></td>
 				<td><%= memo.invoice_id %></td>
 				<td>
 				<strong><%= memo.invoice.customer.name rescue nil %></strong><br/>
