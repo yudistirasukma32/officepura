@@ -32,7 +32,7 @@
 			<tbody>
 			<% @customers.each do |customer| %>
 				<tr>
-					<td><%= link_to customer.name, edit_customer_path(customer) %></td>
+					<td><%= link_to customer.name, edit_customer_path(customer.id) %></td>
 					<td><%= customer.city.to_s.upcase %></td>
 					<td><%= customer.office.name.to_s.upcase rescue nil %></td>
 					<td align="center">

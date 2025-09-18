@@ -11,9 +11,10 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250901233638) do
+ActiveRecord::Schema.define(:version => 20250918040500) do
 
-  create_table "activities", :force => true do |t|
+  create_table "activities", :id => false, :force => true do |t|
+    t.integer   "id",                          :null => false
     t.integer   "trackable_id"
     t.string    "trackable_type"
     t.integer   "owner_id"
@@ -26,11 +27,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",     :limit => 6, :null => false
   end
 
-  add_index "activities", ["owner_id", "owner_type"], :name => "index_activities_on_owner_id_and_owner_type"
-  add_index "activities", ["recipient_id", "recipient_type"], :name => "index_activities_on_recipient_id_and_recipient_type"
-  add_index "activities", ["trackable_id", "trackable_type"], :name => "index_activities_on_trackable_id_and_trackable_type"
-
-  create_table "allowances", :force => true do |t|
+  create_table "allowances", :id => false, :force => true do |t|
+    t.integer   "id",                                                                             :null => false
     t.boolean   "deleted",                                                     :default => false
     t.integer   "route_id"
     t.integer   "vehiclegroup_id"
@@ -43,8 +41,6 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "train_trip",                   :precision => 19, :scale => 2, :default => 0.0
   end
 
-  add_index "allowances", ["route_id", "vehiclegroup_id"], :name => "allowance_routes"
-
   create_table "assetgroups", :id => false, :force => true do |t|
     t.integer   "id",                                               :null => false
     t.boolean   "deleted",                       :default => false
@@ -55,7 +51,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",       :limit => 6,                    :null => false
   end
 
-  create_table "assetorders", :force => true do |t|
+  create_table "assetorders", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.integer   "asset_id"
     t.date      "date"
@@ -70,7 +67,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                      :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "assetpayments", :force => true do |t|
+  create_table "assetpayments", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.integer   "assetorder_id"
     t.date      "date"
@@ -82,7 +80,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                      :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "assets", :force => true do |t|
+  create_table "assets", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.boolean   "enabled",                                                   :default => true
     t.string    "name"
@@ -97,7 +96,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "assetgroup_id"
   end
 
-  create_table "attachments", :force => true do |t|
+  create_table "attachments", :id => false, :force => true do |t|
+    t.integer   "id",                                            :null => false
     t.boolean   "enabled",                     :default => true
     t.string    "name"
     t.string    "file_uid"
@@ -109,7 +109,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",     :limit => 6,                   :null => false
   end
 
-  create_table "bankexpensegroups", :force => true do |t|
+  create_table "bankexpensegroups", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                 :null => false
     t.boolean   "deleted",                                                         :default => false
     t.boolean   "enabled",                                                         :default => true
     t.string    "name"
@@ -121,7 +122,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "bankexpensegroup_id"
   end
 
-  create_table "bankexpenses", :force => true do |t|
+  create_table "bankexpenses", :id => false, :force => true do |t|
+    t.integer   "id",                                                                               :null => false
     t.boolean   "deleted",                                                       :default => false
     t.boolean   "enabled",                                                       :default => true
     t.date      "date"
@@ -144,7 +146,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.boolean   "money_in"
   end
 
-  create_table "banks", :force => true do |t|
+  create_table "banks", :id => false, :force => true do |t|
+    t.integer   "id",                                                  :null => false
     t.boolean   "deleted",                          :default => false
     t.boolean   "enabled",                          :default => true
     t.string    "name"
@@ -155,7 +158,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",          :limit => 6,                    :null => false
   end
 
-  create_table "bonusreceipts", :force => true do |t|
+  create_table "bonusreceipts", :id => false, :force => true do |t|
+    t.integer   "id",                                                                             :null => false
     t.boolean   "deleted",                                                     :default => false
     t.integer   "invoice_id"
     t.integer   "quantity"
@@ -174,7 +178,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "deleteuser_id"
   end
 
-  create_table "bookings", :force => true do |t|
+  create_table "bookings", :id => false, :force => true do |t|
+    t.integer   "id",                                            :null => false
     t.boolean   "deleted",                    :default => false
     t.boolean   "enabled",                    :default => true
     t.date      "date"
@@ -188,14 +193,16 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",    :limit => 6,                    :null => false
   end
 
-  create_table "cashdailylogs", :force => true do |t|
+  create_table "cashdailylogs", :id => false, :force => true do |t|
+    t.integer   "id",                                                                      :null => false
     t.date      "date"
     t.timestamp "created_at", :limit => 6,                                                 :null => false
     t.timestamp "updated_at", :limit => 6,                                                 :null => false
     t.decimal   "total",                   :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "claimmemos", :force => true do |t|
+  create_table "claimmemos", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                              :default => false
     t.boolean   "enabled",                                                              :default => true
     t.integer   "taxinvoiceitem_id"
@@ -227,7 +234,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.boolean   "approved_unload_spv",                                                  :default => false
   end
 
-  create_table "commodities", :force => true do |t|
+  create_table "commodities", :id => false, :force => true do |t|
+    t.integer   "id",                                                                              :null => false
     t.boolean   "deleted",                                                      :default => false
     t.boolean   "enabled",                                                      :default => true
     t.string    "name"
@@ -238,7 +246,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "industry"
   end
 
-  create_table "companies", :force => true do |t|
+  create_table "companies", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.string    "name"
@@ -248,7 +257,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "containerexpenses", :force => true do |t|
+  create_table "containerexpenses", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
     t.date      "date"
@@ -270,7 +280,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "containermemo_id"
   end
 
-  create_table "containermemos", :force => true do |t|
+  create_table "containermemos", :id => false, :force => true do |t|
+    t.integer   "id",                                                                            :null => false
     t.boolean   "deleted",                                                    :default => false
     t.boolean   "enabled",                                                    :default => true
     t.date      "date"
@@ -288,7 +299,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "price_per",                   :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "containers", :force => true do |t|
+  create_table "containers", :id => false, :force => true do |t|
+    t.integer   "id",                                              :null => false
     t.boolean   "deleted",                      :default => false
     t.boolean   "enabled",                      :default => true
     t.string    "containernumber"
@@ -299,7 +311,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "group"
   end
 
-  create_table "contracts", :force => true do |t|
+  create_table "contracts", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.boolean   "enabled",                                                   :default => true
     t.string    "name"
@@ -314,7 +327,19 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                      :precision => 19, :scale => 2
   end
 
-  create_table "customers", :force => true do |t|
+  create_table "customernotes", :force => true do |t|
+    t.boolean  "deleted",       :default => false
+    t.boolean  "enabled",       :default => true
+    t.integer  "customer_id"
+    t.text     "description"
+    t.integer  "user_id"
+    t.integer  "deleteuser_id"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+  end
+
+  create_table "customers", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                              :default => false
     t.boolean   "enabled",                                                              :default => true
     t.string    "name"
@@ -361,7 +386,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "office_id"
   end
 
-  create_table "driverexpenses", :force => true do |t|
+  create_table "driverexpenses", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.integer   "driver_id"
     t.integer   "office_id"
@@ -379,7 +405,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "bon",                        :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "driverlogs", :force => true do |t|
+  create_table "driverlogs", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.boolean   "ready",                    :default => false
@@ -390,7 +417,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "drivers", :force => true do |t|
+  create_table "drivers", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                              :default => false
     t.boolean   "enabled",                                                              :default => true
     t.string    "name"
@@ -431,7 +459,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "office_id"
   end
 
-  create_table "eventcleaningmemos", :force => true do |t|
+  create_table "eventcleaningmemos", :id => false, :force => true do |t|
+    t.integer   "id",                                               :null => false
     t.boolean   "deleted",                       :default => false
     t.boolean   "enabled",                       :default => true
     t.date      "date"
@@ -446,7 +475,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",       :limit => 6,                    :null => false
   end
 
-  create_table "eventlogs", :force => true do |t|
+  create_table "eventlogs", :id => false, :force => true do |t|
+    t.integer   "id",                                           :null => false
     t.boolean   "deleted",                   :default => false
     t.boolean   "enabled",                   :default => true
     t.string    "name"
@@ -459,7 +489,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",   :limit => 6,                    :null => false
   end
 
-  create_table "eventmemos", :force => true do |t|
+  create_table "eventmemos", :id => false, :force => true do |t|
+    t.integer   "id",                                            :null => false
     t.boolean   "deleted",                    :default => false
     t.boolean   "enabled",                    :default => true
     t.date      "date"
@@ -480,7 +511,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "platform_type"
   end
 
-  create_table "events", :force => true do |t|
+  create_table "events", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                    :null => false
     t.boolean   "deleted",                                                            :default => false
     t.date      "start_date"
     t.date      "end_date"
@@ -540,9 +572,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "reject_reason"
   end
 
-  add_index "events", ["id", "start_date", "end_date", "customer_id"], :name => "index_events_on_customer_id"
-
-  create_table "eventsalesorders", :force => true do |t|
+  create_table "eventsalesorders", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.integer   "customer_id"
@@ -552,7 +583,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "eventvendors", :force => true do |t|
+  create_table "eventvendors", :id => false, :force => true do |t|
+    t.integer   "id",                                                 :null => false
     t.boolean   "deleted",                         :default => false
     t.boolean   "enabled",                         :default => true
     t.integer   "event_id"
@@ -564,7 +596,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",         :limit => 6,                    :null => false
   end
 
-  create_table "helpers", :force => true do |t|
+  create_table "helpers", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                   :null => false
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
     t.string    "name"
@@ -600,7 +633,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "office_id"
   end
 
-  create_table "incentives", :force => true do |t|
+  create_table "incentives", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.integer   "invoice_id"
     t.integer   "quantity"
@@ -613,7 +647,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                      :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "insuranceexpenses", :force => true do |t|
+  create_table "insuranceexpenses", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
     t.date      "date"
@@ -636,7 +671,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.date      "due_date"
   end
 
-  create_table "insurancevendors", :force => true do |t|
+  create_table "insurancevendors", :id => false, :force => true do |t|
+    t.integer   "id",                                                     :null => false
     t.boolean   "deleted",                             :default => false
     t.boolean   "enabled",                             :default => true
     t.string    "name"
@@ -652,7 +688,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "group"
   end
 
-  create_table "invoicereturns", :force => true do |t|
+  create_table "invoicereturns", :id => false, :force => true do |t|
+    t.integer   "id",                                                                              :null => false
     t.boolean   "deleted",                                                      :default => false
     t.date      "date"
     t.integer   "invoice_id"
@@ -674,7 +711,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "premi_allowance",               :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "invoices", :force => true do |t|
+  create_table "invoices", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                             :null => false
     t.boolean   "deleted",                                                                    :default => false
     t.boolean   "enabled",                                                                    :default => true
     t.date      "date"
@@ -771,7 +809,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal  "total",         :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "invoicetrains", :force => true do |t|
+  create_table "invoicetrains", :id => false, :force => true do |t|
+    t.integer   "id",                                                                              :null => false
     t.boolean   "deleted",                                                      :default => false
     t.boolean   "enabled",                                                      :default => true
     t.date      "date"
@@ -793,7 +832,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                         :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "isotanks", :force => true do |t|
+  create_table "isotanks", :id => false, :force => true do |t|
+    t.integer   "id",                                            :null => false
     t.boolean   "deleted",                    :default => false
     t.boolean   "enabled",                    :default => true
     t.string    "isotanknumber"
@@ -803,7 +843,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "group"
   end
 
-  create_table "legalities", :force => true do |t|
+  create_table "legalities", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.string    "name"
@@ -814,7 +855,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "mechaniclogs", :force => true do |t|
+  create_table "mechaniclogs", :id => false, :force => true do |t|
+    t.integer   "id",                                               :null => false
     t.boolean   "deleted",                       :default => false
     t.boolean   "enabled",                       :default => true
     t.date      "date"
@@ -839,7 +881,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.boolean   "finished",                      :default => false
   end
 
-  create_table "mechanics", :force => true do |t|
+  create_table "mechanics", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.string    "name"
@@ -851,7 +894,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "officeexpensegroups", :force => true do |t|
+  create_table "officeexpensegroups", :id => false, :force => true do |t|
+    t.integer   "id",                                                    :null => false
     t.boolean   "deleted",                            :default => false
     t.boolean   "enabled",                            :default => true
     t.integer   "officeexpensegroup_id"
@@ -861,7 +905,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",            :limit => 6,                    :null => false
   end
 
-  create_table "officeexpenses", :force => true do |t|
+  create_table "officeexpenses", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                   :null => false
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
     t.date      "date"
@@ -885,7 +930,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "taxinvoice_item_name"
   end
 
-  create_table "offices", :force => true do |t|
+  create_table "offices", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.string    "name"
@@ -903,7 +949,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.boolean   "garage",                   :default => false
   end
 
-  create_table "operators", :force => true do |t|
+  create_table "operators", :id => false, :force => true do |t|
+    t.integer   "id",                                           :null => false
     t.boolean   "deleted",                   :default => false
     t.boolean   "enabled",                   :default => true
     t.string    "name"
@@ -914,7 +961,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "operatortype"
   end
 
-  create_table "paymentchecks", :force => true do |t|
+  create_table "paymentchecks", :id => false, :force => true do |t|
+    t.integer   "id",                                                                         :null => false
     t.boolean   "deleted",                                                 :default => false
     t.date      "date"
     t.string    "check_no"
@@ -924,7 +972,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                    :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "payrollreturns", :force => true do |t|
+  create_table "payrollreturns", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                  :null => false
     t.boolean   "deleted",                                                          :default => false
     t.date      "date"
     t.integer   "payroll_id"
@@ -945,7 +994,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "bonus",                             :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "payrolls", :force => true do |t|
+  create_table "payrolls", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                  :null => false
     t.boolean   "deleted",                                                          :default => false
     t.date      "date"
     t.date      "period_start"
@@ -981,7 +1031,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "helper_fee",                        :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "ports", :force => true do |t|
+  create_table "ports", :id => false, :force => true do |t|
+    t.integer   "id",                                         :null => false
     t.boolean   "deleted",                 :default => false
     t.boolean   "enabled",                 :default => true
     t.string    "name"
@@ -991,7 +1042,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at", :limit => 6,                    :null => false
   end
 
-  create_table "productgroups", :force => true do |t|
+  create_table "productgroups", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.string    "name"
@@ -1001,7 +1053,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.boolean   "tire_flag",                :default => false
   end
 
-  create_table "productorderitemreturns", :force => true do |t|
+  create_table "productorderitemreturns", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.integer   "productorder_id"
     t.integer   "product_id"
     t.integer   "quantity"
@@ -1015,7 +1068,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.text      "description"
   end
 
-  create_table "productorderitems", :force => true do |t|
+  create_table "productorderitems", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                 :null => false
     t.integer   "productorder_id"
     t.integer   "productrequestitem_id"
     t.integer   "product_id"
@@ -1030,7 +1084,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "paymentcheck_id"
   end
 
-  create_table "productorders", :force => true do |t|
+  create_table "productorders", :id => false, :force => true do |t|
+    t.integer   "id",                                                                               :null => false
     t.boolean   "deleted",                                                       :default => false
     t.date      "date"
     t.text      "description"
@@ -1043,7 +1098,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "deleteuser_id"
   end
 
-  create_table "productpricelogs", :force => true do |t|
+  create_table "productpricelogs", :id => false, :force => true do |t|
+    t.integer   "id",                                                                      :null => false
     t.integer   "product_id"
     t.timestamp "created_at", :limit => 6,                                                 :null => false
     t.timestamp "updated_at", :limit => 6,                                                 :null => false
@@ -1051,7 +1107,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "new_price",               :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "productrequestitems", :force => true do |t|
+  create_table "productrequestitems", :id => false, :force => true do |t|
+    t.integer   "id",                                                                               :null => false
     t.integer   "productrequest_id"
     t.integer   "product_id"
     t.decimal   "quantity"
@@ -1062,7 +1119,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                          :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "productrequests", :force => true do |t|
+  create_table "productrequests", :id => false, :force => true do |t|
+    t.integer   "id",                                              :null => false
     t.boolean   "deleted",                      :default => false
     t.date      "date"
     t.integer   "driver_id"
@@ -1073,7 +1131,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",      :limit => 6,                    :null => false
   end
 
-  create_table "products", :force => true do |t|
+  create_table "products", :id => false, :force => true do |t|
+    t.integer   "id",                                                                              :null => false
     t.boolean   "deleted",                                                      :default => false
     t.boolean   "enabled",                                                      :default => true
     t.string    "name"
@@ -1094,7 +1153,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.boolean   "archive",                                                      :default => false
   end
 
-  create_table "productsales", :force => true do |t|
+  create_table "productsales", :id => false, :force => true do |t|
+    t.integer   "id",                                                                        :null => false
     t.boolean   "deleted",                                                :default => false
     t.boolean   "onsale",                                                 :default => false
     t.string    "name"
@@ -1104,7 +1164,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "unit_price",              :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "productstocks", :force => true do |t|
+  create_table "productstocks", :id => false, :force => true do |t|
+    t.integer   "id",                                         :null => false
     t.boolean   "deleted",                 :default => false
     t.integer   "product_id"
     t.integer   "quantity"
@@ -1112,7 +1173,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at", :limit => 6,                    :null => false
   end
 
-  create_table "quotationgroups", :force => true do |t|
+  create_table "quotationgroups", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                    :null => false
     t.boolean   "deleted",                                                            :default => false
     t.boolean   "enabled",                                                            :default => true
     t.string    "long_id"
@@ -1143,7 +1205,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "customer_approved_date", :limit => 6
   end
 
-  create_table "quotationlogs", :force => true do |t|
+  create_table "quotationlogs", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.boolean   "enabled",                                                   :default => true
     t.integer   "quotation_id"
@@ -1156,7 +1219,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "new_price_per",              :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "quotations", :force => true do |t|
+  create_table "quotations", :id => false, :force => true do |t|
+    t.integer   "id",                                                                               :null => false
     t.boolean   "deleted",                                                       :default => false
     t.boolean   "enabled",                                                       :default => true
     t.string    "name"
@@ -1179,7 +1243,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "quotationgroup_id"
   end
 
-  create_table "receiptcontainers", :force => true do |t|
+  create_table "receiptcontainers", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
     t.date      "date"
@@ -1196,7 +1261,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "gst_tax",                            :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "receiptdrivers", :force => true do |t|
+  create_table "receiptdrivers", :id => false, :force => true do |t|
+    t.integer   "id",                                                                              :null => false
     t.boolean   "deleted",                                                      :default => false
     t.integer   "driverexpense_id"
     t.integer   "user_id"
@@ -1210,7 +1276,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "bon",                           :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "receiptexpenses", :force => true do |t|
+  create_table "receiptexpenses", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                   :null => false
     t.boolean   "deleted",                                                           :default => false
     t.integer   "officeexpense_id"
     t.integer   "officeexpensegroup_id"
@@ -1222,7 +1289,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "deleteuser_id"
   end
 
-  create_table "receiptincentives", :force => true do |t|
+  create_table "receiptincentives", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.integer   "invoice_id"
     t.date      "date"
@@ -1234,7 +1302,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                      :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "receiptinsurances", :force => true do |t|
+  create_table "receiptinsurances", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
     t.date      "date"
@@ -1251,7 +1320,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                              :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "receiptorders", :force => true do |t|
+  create_table "receiptorders", :id => false, :force => true do |t|
+    t.integer   "id",                                                                             :null => false
     t.boolean   "deleted",                                                     :default => false
     t.date      "date"
     t.integer   "productorder_id"
@@ -1263,7 +1333,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "deleteuser_id"
   end
 
-  create_table "receiptpayrollreturns", :force => true do |t|
+  create_table "receiptpayrollreturns", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                  :null => false
     t.boolean   "deleted",                                                          :default => false
     t.integer   "payroll_id"
     t.integer   "user_id"
@@ -1283,7 +1354,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "bonus",                             :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "receiptpayrolls", :force => true do |t|
+  create_table "receiptpayrolls", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                  :null => false
     t.boolean   "deleted",                                                          :default => false
     t.integer   "payroll_id"
     t.integer   "user_id"
@@ -1303,7 +1375,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "bonus",                             :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "receiptpremis", :force => true do |t|
+  create_table "receiptpremis", :id => false, :force => true do |t|
+    t.integer   "id",                                                                             :null => false
     t.boolean   "deleted",                                                     :default => false
     t.integer   "invoice_id"
     t.date      "date"
@@ -1315,7 +1388,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "deleteuser_id"
   end
 
-  create_table "receiptreturns", :force => true do |t|
+  create_table "receiptreturns", :id => false, :force => true do |t|
+    t.integer   "id",                                                                              :null => false
     t.boolean   "deleted",                                                      :default => false
     t.integer   "invoice_id"
     t.integer   "quantity"
@@ -1336,7 +1410,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "premi_allowance",               :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "receipts", :force => true do |t|
+  create_table "receipts", :id => false, :force => true do |t|
+    t.integer   "id",                                                                              :null => false
     t.boolean   "deleted",                                                      :default => false
     t.integer   "invoice_id"
     t.integer   "quantity"
@@ -1356,7 +1431,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "premi_allowance",               :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "receiptsales", :force => true do |t|
+  create_table "receiptsales", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.date      "date"
     t.integer   "sale_id"
@@ -1367,7 +1443,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "deleteuser_id"
   end
 
-  create_table "receiptships", :force => true do |t|
+  create_table "receiptships", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
     t.integer   "shipexpense_id"
@@ -1402,7 +1479,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal  "total",            :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "receipttaxinvitems", :force => true do |t|
+  create_table "receipttaxinvitems", :id => false, :force => true do |t|
+    t.integer   "id",                                            :null => false
     t.boolean   "deleted",                    :default => false
     t.boolean   "enabled",                    :default => true
     t.integer   "user_id"
@@ -1414,7 +1492,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.date      "billingdate"
   end
 
-  create_table "receipttrains", :force => true do |t|
+  create_table "receipttrains", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                           :default => false
     t.integer   "trainexpense_id"
     t.string    "description"
@@ -1432,7 +1511,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "misc_total",                         :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "roles", :force => true do |t|
+  create_table "roles", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.string    "name"
@@ -1441,7 +1521,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "routegroups", :force => true do |t|
+  create_table "routegroups", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.string    "name"
@@ -1450,7 +1531,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "routelocations", :force => true do |t|
+  create_table "routelocations", :id => false, :force => true do |t|
+    t.integer   "id",                                              :null => false
     t.boolean   "deleted",                      :default => false
     t.boolean   "enabled",                      :default => true
     t.integer   "customer_id"
@@ -1466,7 +1548,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",      :limit => 6,                    :null => false
   end
 
-  create_table "routes", :force => true do |t|
+  create_table "routes", :id => false, :force => true do |t|
+    t.integer   "id",                                                                              :null => false
     t.boolean   "deleted",                                                     :default => false
     t.boolean   "enabled",                                                     :default => true
     t.string    "name"
@@ -1509,7 +1592,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
 
   add_index "routes", ["name", "customer_id", "office_id"], :name => "route_office"
 
-  create_table "routeships", :force => true do |t|
+  create_table "routeships", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                 :null => false
     t.boolean   "deleted",                                                         :default => false
     t.boolean   "enabled",                                                         :default => true
     t.string    "name"
@@ -1523,7 +1607,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "description"
   end
 
-  create_table "routetrains", :force => true do |t|
+  create_table "routetrains", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                    :null => false
     t.boolean   "deleted",                                                            :default => false
     t.boolean   "enabled",                                                            :default => true
     t.string    "name"
@@ -1539,7 +1624,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                               :precision => 19, :scale => 2
   end
 
-  create_table "saleitems", :force => true do |t|
+  create_table "saleitems", :id => false, :force => true do |t|
+    t.integer   "id",                                                                          :null => false
     t.integer   "sale_id"
     t.integer   "productsale_id"
     t.integer   "quantity"
@@ -1549,7 +1635,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                       :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "sales", :force => true do |t|
+  create_table "sales", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.date      "date"
     t.text      "description"
@@ -1560,7 +1647,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "deleteuser_id"
   end
 
-  create_table "settings", :force => true do |t|
+  create_table "settings", :id => false, :force => true do |t|
+    t.integer   "id",                                         :null => false
     t.boolean   "editable",                 :default => true
     t.boolean   "enabled",                  :default => true
     t.string    "group"
@@ -1571,7 +1659,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                   :null => false
   end
 
-  create_table "shipexpenses", :force => true do |t|
+  create_table "shipexpenses", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
     t.date      "date"
@@ -1592,7 +1681,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "misc_total",                         :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "ships", :force => true do |t|
+  create_table "ships", :id => false, :force => true do |t|
+    t.integer   "id",                                            :null => false
     t.boolean   "deleted",                    :default => false
     t.boolean   "enabled",                    :default => true
     t.string    "name"
@@ -1605,7 +1695,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",    :limit => 6,                    :null => false
   end
 
-  create_table "staffs", :force => true do |t|
+  create_table "staffs", :id => false, :force => true do |t|
+    t.integer   "id",                                                       :null => false
     t.boolean   "deleted",                               :default => false
     t.boolean   "enabled",                               :default => true
     t.string    "email"
@@ -1644,7 +1735,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "supplierpayments", :force => true do |t|
+  create_table "supplierpayments", :id => false, :force => true do |t|
+    t.integer   "id",                                                                         :null => false
     t.boolean   "deleted",                                                 :default => false
     t.date      "date"
     t.date      "due_date"
@@ -1655,7 +1747,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                    :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "suppliers", :force => true do |t|
+  create_table "suppliers", :id => false, :force => true do |t|
+    t.integer   "id",                                                       :null => false
     t.boolean   "deleted",                               :default => false
     t.boolean   "enabled",                               :default => true
     t.string    "name"
@@ -1672,7 +1765,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",               :limit => 6,                    :null => false
   end
 
-  create_table "taxgenericitems", :force => true do |t|
+  create_table "taxgenericitems", :id => false, :force => true do |t|
+    t.integer   "id",                                                                           :null => false
     t.boolean   "deleted",                                                   :default => false
     t.integer   "taxinvoice_id"
     t.integer   "customer_id"
@@ -1692,7 +1786,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "total",                      :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "taxinvoiceattachments", :force => true do |t|
+  create_table "taxinvoiceattachments", :id => false, :force => true do |t|
+    t.integer   "id",                                              :null => false
     t.boolean   "deleted",                      :default => false
     t.boolean   "enabled",                      :default => true
     t.integer   "taxinvoice_id"
@@ -1707,7 +1802,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",      :limit => 6,                    :null => false
   end
 
-  create_table "taxinvoiceitems", :force => true do |t|
+  create_table "taxinvoiceitems", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                   :null => false
     t.boolean   "deleted",                                                           :default => false
     t.date      "date"
     t.string    "sku_id"
@@ -1738,7 +1834,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.boolean   "is_dooring_invoice",                                                :default => false
   end
 
-  create_table "taxinvoiceitemvs", :force => true do |t|
+  create_table "taxinvoiceitemvs", :id => false, :force => true do |t|
+    t.integer   "id",                                                                             :null => false
     t.boolean   "deleted",                                                     :default => false
     t.integer   "oriitem"
     t.string    "sku_id"
@@ -1764,7 +1861,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "wholesale_price",              :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "taxinvoices", :force => true do |t|
+  create_table "taxinvoices", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                 :null => false
     t.boolean   "deleted",                                                         :default => false
     t.date      "date"
     t.string    "long_id"
@@ -1827,7 +1925,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.boolean   "is_show_loadunload",                                              :default => false
   end
 
-  create_table "tirebudgets", :force => true do |t|
+  create_table "tirebudgets", :id => false, :force => true do |t|
+    t.integer   "id",                                              :null => false
     t.boolean   "deleted",                      :default => false
     t.integer   "vehicle_id"
     t.integer   "productgroup_id"
@@ -1836,7 +1935,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",      :limit => 6,                    :null => false
   end
 
-  create_table "trainexpenses", :force => true do |t|
+  create_table "trainexpenses", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                           :default => false
     t.boolean   "enabled",                                                           :default => true
     t.date      "date"
@@ -1857,7 +1957,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "misc_total",                         :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "transporttypes", :force => true do |t|
+  create_table "transporttypes", :id => false, :force => true do |t|
+    t.integer   "id",                                         :null => false
     t.boolean   "deleted",                 :default => false
     t.boolean   "enabled",                 :default => true
     t.string    "name"
@@ -1865,14 +1966,16 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at", :limit => 6,                    :null => false
   end
 
-  create_table "userroles", :force => true do |t|
+  create_table "userroles", :id => false, :force => true do |t|
+    t.integer   "id",                      :null => false
     t.integer   "user_id"
     t.integer   "role_id"
     t.timestamp "created_at", :limit => 6, :null => false
     t.timestamp "updated_at", :limit => 6, :null => false
   end
 
-  create_table "users", :force => true do |t|
+  create_table "users", :id => false, :force => true do |t|
+    t.integer   "id",                                                     :null => false
     t.boolean   "deleted",                             :default => false
     t.boolean   "enabled",                             :default => true
     t.string    "username"
@@ -1898,7 +2001,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.boolean   "owner",                               :default => false
   end
 
-  create_table "vehiclegroups", :force => true do |t|
+  create_table "vehiclegroups", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.string    "name"
@@ -1907,7 +2011,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "vehicleincentivegroups", :force => true do |t|
+  create_table "vehicleincentivegroups", :id => false, :force => true do |t|
+    t.integer   "id",                                                                         :null => false
     t.boolean   "deleted",                                                 :default => false
     t.boolean   "enabled",                                                 :default => true
     t.string    "name"
@@ -1917,7 +2022,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.decimal   "incentive",                :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "vehiclelogs", :force => true do |t|
+  create_table "vehiclelogs", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.boolean   "ready",                    :default => false
@@ -1928,7 +2034,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "vehiclepositions", :force => true do |t|
+  create_table "vehiclepositions", :id => false, :force => true do |t|
+    t.integer   "id",                                          :null => false
     t.boolean   "deleted",                  :default => false
     t.boolean   "enabled",                  :default => true
     t.date      "date"
@@ -1946,7 +2053,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.timestamp "updated_at",  :limit => 6,                    :null => false
   end
 
-  create_table "vehicles", :force => true do |t|
+  create_table "vehicles", :id => false, :force => true do |t|
+    t.integer   "id",                                                                                      :null => false
     t.boolean   "deleted",                                                              :default => false
     t.boolean   "enabled",                                                              :default => true
     t.string    "current_id"
@@ -1994,7 +2102,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.string    "previous_data"
   end
 
-  create_table "vendors", :force => true do |t|
+  create_table "vendors", :id => false, :force => true do |t|
+    t.integer   "id",                                                  :null => false
     t.boolean   "deleted",                    :default => false
     t.boolean   "enabled",                    :default => true
     t.string    "name"
@@ -2014,7 +2123,8 @@ ActiveRecord::Schema.define(:version => 20250901233638) do
     t.integer   "created_by"
   end
 
-  create_table "vendorvehicles", :force => true do |t|
+  create_table "vendorvehicles", :id => false, :force => true do |t|
+    t.integer   "id",                                            :null => false
     t.boolean   "deleted",                    :default => false
     t.boolean   "enabled",                    :default => true
     t.integer   "vendor_id"

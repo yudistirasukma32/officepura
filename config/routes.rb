@@ -47,6 +47,8 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
+  resources :customernotes, only: [:create, :update, :destroy]
+
   get 'contracts/addnew' => 'contracts#addnew'
   resources :contracts do
     member do

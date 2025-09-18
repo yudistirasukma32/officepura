@@ -257,20 +257,29 @@ class CustomersController < ApplicationController
 
   end
 
-  def customer_terms
-    role = cek_roles @penagihan
+def customer_terms
+  role = cek_roles(@penagihan)
 
-    @section = "taxinvoices"
-    @where = 'customer_terms'
+  @section = "taxinvoices"
+  @where   = "customer_terms"
 
-    if role
-      # @customers = Customer.active.order(:name)
-      @customers = Customer.find_by_sql("SELECT * FROM customers WHERE name not ILIKE 'PURA%' AND name not ILIKE 'RDPI%' AND name not ILIKE 'RAJAWALI INTI%' AND deleted = false ORDER BY name")
+  if role
+    excluded = ["RDPI%", "PURA%", "RAJAWALI INTI%"]
 
-      respond_to :html
-    else
-      redirect_to root_path()
+    @customers = Customer.active.
+      joins(:events).
+      where("events.start_date >= ?", Date.today.beginning_of_year).
+      where("customers.name NOT ILIKE ? AND customers.name NOT ILIKE ? AND customers.name NOT ILIKE ?", *excluded).
+      select("DISTINCT customers.*").
+      order("customers.name ASC")
+
+    respond_to do |format|
+      format.html
     end
+  else
+    redirect_to root_path
   end
+end
+
 
 end

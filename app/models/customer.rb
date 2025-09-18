@@ -1,4 +1,5 @@
 class Customer < ActiveRecord::Base
+	self.primary_key = 'id'
 
 	has_many :routes
 	has_many :invoices
@@ -7,6 +8,7 @@ class Customer < ActiveRecord::Base
 	has_many :taxinvoiceitemvs
 	has_many :events
 	has_many :contracts
+	has_many :customernotes, :class_name => "Customernote", :foreign_key => "customer_id"
 
 	belongs_to :office
 	belongs_to :bank

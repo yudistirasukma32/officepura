@@ -5765,6 +5765,7 @@ end
         @grandtotal_cashin += cashin
 
         {
+          customer_id: (customer.id rescue nil),
           name: (customer.name rescue nil),
           city: (customer.city.upcase rescue nil),
           total_omzet: (omzet rescue 0),
@@ -5775,7 +5776,16 @@ end
           limit_piutang: (limit_piutang rescue 0),
           rata2_omzet: (rata2_omzet rescue 0),
           rata2_piutang: (rata2_piutang rescue 0),
-          jumlah_bulan: (@number_of_months rescue 1)
+          jumlah_bulan: (@number_of_months rescue 1),
+          customer_notes: Customernote.where('customer_id = ?', customer.id).enabled.order("created_at DESC").map do |note|
+            {
+              id: note.id,
+              description: note.description,
+              user_id: note.user_id,
+              created_at: note.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            }
+          end
+
         }
       end
       
