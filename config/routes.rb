@@ -820,6 +820,7 @@ OfficePuraErp::Application.routes.draw do
 
     #AR new modules
     get "ar_aging" => "reports#ar_aging"
+    get "ar_aging/offices" => "reports#ar_aging_offices"
     get "cashins" => "reports#cashins"
     get "doubtful_ar_reports" => "summaries#doubtful_ar_reports"
 

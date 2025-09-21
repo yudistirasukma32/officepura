@@ -17,7 +17,7 @@
       h3 {
         font-size: 16px;
       }
-      
+
       td {
         font-size: 11px;
       }
@@ -79,103 +79,131 @@
             </form>
         </div>
 
-        <br class="clearfix" />
+        <ul class="rounded" id="tabbed">
+            <% Office.active.reorder('id').each_with_index do |office, i| %>
+            <% i = i+1 %>
+            <li><a id="link_<%=i%>" class="finger"><%= office.name %></a></li>
+            <% end %>
+        </ul>
 
-        <table class="row-view tablesorter tablesorterFilters">
-            <thead>
-                <tr>
-                    <th class="{sorter:true, filter: true}">Pelanggan</th>
-                    <th width="200" class="{sorter:true, filter: true}">Follow-Up</th>
-                    <th width="80" class="center {sorter:true, filter: true}">Omzet</th>
-                    <th width="80" class="center {sorter:true, filter: true}">Piutang</th>
-                    <th width="80" class="center {sorter:true, filter: true}">Kontrol</th>
-                    <th width="100" class="center {sorter:true, filter: true}">Cash in</th>
-                    <th width="100" class="center {sorter:true, filter: true}">Umur Piutang</th>
-                    <th width="100" class="center {sorter:true, filter: true}">Limit Piutang</th>
-                    <th width="20" class="right {sorter:false, filter: false}"></th>
-                </tr>
-            </thead>
-            <% i = 0 %>
-            <% total = 0 %>
-            <tbody>
-                <% @customer_datas.each_with_index do |customer| %>
-                <tr data-customer-id = "<%= customer[:customer_id] %>">
-                    <td><%= customer[:name] %><br><span style="color: grey; font-size: 12px;"><%= customer[:city] %></span></td>
-                    <td>
-                    <% if customer[:customer_notes].present? %>
-                    <ul id="notes-list-<%= customer[:customer_id] %>" style="padding-left: 15px; margin: 0; font-size: 12px; color: #555;">
-                        <% customer[:customer_notes].each do |note| %>
-                        <li id="note-<%= note[:id] %>">
-                        <span>
-                            <%= note[:description] %>&nbsp;
-                            <%= link_to "✕", customernote_path(note[:id]),
-                            method: :delete,
-                            remote: true,
-                            data: { confirm: "Hapus note ini?" },
-                            style: "color: red; margin-left: 5px; font-weight: bold; text-decoration: none; position: absolute;" %>
+        <div id="sliding_window" style="margin-top:10px; width: 100%; max-width: 1080px;">
+          <div class="sliding_container">
+              <% Office.active.reorder('id').each_with_index do |office, i| %>
+              <% i = i+1 %>
+              <div class="sliding_tab" id="tab_<%=i%>" style="width: 1080px;">
+              
+                  <% customers = @customer_datas[office.id] || [] %>
+                  <% # next if customers.empty? %> 
+                  <!-- skip kalau tidak ada customer di office -->
 
-                        </span>
-                        <br>
-                        <span style="color: grey; font-size: 10px;">
-                            (<%= Time.parse(note[:created_at]).strftime("%Y-%m-%d %H:%M") %>)
-                        </span>
-                        </li>
+                  <br class="clearfix" />
 
-                        <% end %>
-                    </ul>
-                    <br/>
-                    <% else %>
-                    
-                    <ul id="notes-list-<%= customer[:customer_id] %>" style="padding-left: 15px; margin: 0; font-size: 12px; color: #555;">
-                    </ul>
-                    <br/>
+                  <h3 style="font-size: 18px; font-weight: 700;">Cabang <%= office.name %></h3>
 
-                    <% end %>
+                  <% if !customers.empty?%>
+                  <table id="office-<%=office.id%>" class="row-view tablesorter tablesorterFilters">
+                    <thead>
+                      <tr>
+                        <th class="{sorter:true, filter: true}">Pelanggan</th>
+                        <th width="200" class="{sorter:true, filter: true}">Follow-Up</th>
+                        <th width="80" class="center {sorter:true, filter: true}">Omzet</th>
+                        <th width="80" class="center {sorter:true, filter: true}">Piutang</th>
+                        <th width="80" class="center {sorter:true, filter: true}">Kontrol</th>
+                        <th width="100" class="center {sorter:true, filter: true}">Cash in</th>
+                        <th width="100" class="center {sorter:true, filter: true}">Umur Piutang</th>
+                        <th width="100" class="center {sorter:true, filter: true}">Limit Piutang</th>
+                        <th width="20" class="right {sorter:false, filter: false}"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% customers.each do |customer| %>
+                        <tr data-customer-id = "<%= customer[:customer_id] %>">
+                          <td>
+                            <%= customer[:name] %><br>
+                            <span style="color: grey; font-size: 12px;"><%= customer[:city] %></span>
+                          </td>
+                          <td>
+                            <% if customer[:customer_notes].present? %>
+                              <ul id="notes-list-<%= customer[:customer_id] %>" style="padding-left: 15px; margin: 0; font-size: 12px; color: #555;">
+                                <% customer[:customer_notes].each do |note| %>
+                                  <li id="note-<%= note[:id] %>">
+                                    <span>
+                                      <%= note[:description] %>&nbsp;
+                                      <a href="#" class="delete-note-btn"
+                                        data-note-id="<%= note[:id] %>"
+                                        style="color: red; margin-left: 5px; font-weight: bold; text-decoration: none; position: absolute;">
+                                        ✕
+                                      </a>
+                                    </span>
+                                    <br>
+                                    <span style="color: grey; font-size: 10px;">
+                                      (<%= Time.parse(note[:created_at]).strftime("%Y-%m-%d %H:%M") %>)
+                                    </span>
+                                  </li>
+                                <% end %>
+                              </ul>
+                              <br/>
+                            <% else %>
+                              <ul id="notes-list-<%= customer[:customer_id] %>" style="padding-left: 15px; margin: 0; font-size: 12px; color: #555;"></ul>
+                              <br/>
+                            <% end %>
 
-                    <a href="#" style="font-size: 10px;
-                        text-decoration: underline;
-                        font-weight: 500;
-                        color: darkslateblue;
-                        padding-left: 14px;
-                        padding-bottom: 6px;" class="add-note-btn" data-customer-id="<%= customer[:customer_id] %>">
-                        Tambah data
-                    </a>
-                    </td>
+                            <a href="#"
+                              style="font-size: 10px;
+                                      text-decoration: underline;
+                                      font-weight: 500;
+                                      color: darkslateblue;
+                                      padding-left: 14px;
+                                      padding-bottom: 6px;"
+                              class="add-note-btn d-none-print"
+                              data-customer-id="<%= customer[:customer_id] %>">
+                              Tambah data
+                            </a>
+                          </td>
 
-                    <td class="right"><%= to_currency(customer[:total_omzet]) %></td>
-                    <td class="right"><%= to_currency(customer[:total_piutang]) %></td>
-                    <td class="right"><%= to_currency(customer[:kontrol_piutang]) %></td>
-                    <td class="right"><%= to_currency(customer[:cashin]) %></td>
-                    <td class="right"><%= customer[:umur_piutang] %> hari</td>
-                    <td class="right"><%= to_currency(customer[:limit_piutang]) %></td>
-                    <td class="">
-                        <!--
-                        <%= customer[:jumlah_bulan] %><br/>
-                        <%= customer[:rata2_piutang] %><br/>
-                        <%= customer[:rata2_omzet] %>
-                        -->
-                    </td>
-                </tr>
-                <% end %>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td class="right"><strong><%= to_currency(@grandtotal_omzet) %></strong></td>
-                    <td class="right"><strong><%= to_currency(@grandtotal_piutang) %></strong></td>
-                    <td></td>
-                    <td class="right"><strong><%= to_currency(@grandtotal_cashin) %></strong></td>
-                    <td class="right">
-                        <strong class="<%= 'green' if (@grandtotal_cashin.to_f / @grandtotal_piutang.to_f) * 100 > 0 %> <%= 'red' if (@grandtotal_cashin.to_f / @grandtotal_piutang.to_f) * 100 < 0 %>">
-                            <%= ((@grandtotal_cashin.to_f / @grandtotal_piutang.to_f) * 100).round %>
-                            %
-                        </strong>
-                    </td>
-                    <td></td>
-                </tr>
-            </tfoot>
-        </table>
+                          <td class="right"><%= to_currency(customer[:total_omzet]) %></td>
+                          <td class="right"><%= to_currency(customer[:total_piutang]) %></td>
+                          <td class="right"><%= to_currency(customer[:kontrol_piutang]) %></td>
+                          <td class="right"><%= to_currency(customer[:cashin]) %></td>
+                          <td class="right"><%= customer[:umur_piutang] %> hari</td>
+                          <td class="right"><%= to_currency(customer[:limit_piutang]) %></td>
+                          <td></td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td></td>
+                        <td></td>
+                        <% total_omzet   = customers.sum { |c| c[:total_omzet] } %>
+                        <% total_piutang = customers.sum { |c| c[:total_piutang] } %>
+                        <% total_cashin  = customers.sum { |c| c[:cashin] } %>
+                        <% persen_cashin = total_piutang > 0 ? (total_cashin.to_f / total_piutang.to_f) * 100 : 0 %>
+
+                        <td class="right"><strong><%= to_currency(total_omzet) %></strong></td>
+                        <td class="right"><strong><%= to_currency(total_piutang) %></strong></td>
+                        <td></td>
+                        <td class="right"><strong><%= to_currency(total_cashin) %></strong></td>
+                        <td class="right">
+                          <strong class="<%= 'green' if persen_cashin > 0 %> <%= 'red' if persen_cashin < 0 %>">
+                            <%= persen_cashin.round %> %
+                          </strong>
+                        </td>
+                        <td></td>
+                      </tr>
+                    </tfoot>
+
+                  </table>
+                  <% else %>
+                  <p>Tidak ada data ditemukan</p>
+                  <% end %>
+
+                  <br class="clearfix" />
+
+              </div>
+              <% end %>
+          </div>
+        </div>
 
     </div>
 

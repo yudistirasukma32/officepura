@@ -5796,6 +5796,110 @@ end
     end
   end
 
+  def ar_aging_offices
+    @pagetitle = 'Umur Piutang Pelanggan'
+
+    @default_month = Date.today
+    @month = "%02d" % @default_month.month
+    @year  = @default_month.year
+
+    role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan'
+    if role
+      # parameter filter
+      @month     = (params[:month].present? ? params[:month] : "01").to_s.rjust(2, "0")
+      @day       = "01"
+      @year      = params[:year].present? ? params[:year] : Date.today.year
+      @monthEnd  = (params[:monthEnd].present? ? params[:monthEnd] : Date.today.month).to_s.rjust(2, "0")
+      @dayEnd    = getlastday(@monthEnd.to_s)
+      @yearEnd   = params[:yearEnd].present? ? params[:yearEnd] : Date.today.year
+
+      # calculate number of month
+      @start_date = Date.new(@year.to_i, @month.to_i, 1)
+      @end_date   = Date.new(@yearEnd.to_i, @monthEnd.to_i, 1)
+      @number_of_months = (@end_date.year * 12 + @end_date.month) - (@start_date.year * 12 + @start_date.month) + 1
+
+      # invoices
+      @taxinvoices = Taxinvoice.active.joins(:customer).
+        where(:date => "#{@year}-#{@month}-#{@day}".. "#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
+      @taxinvoices_unpaid = @taxinvoices.where(:paiddate => nil)
+
+      # customer filter
+      @customer_id = params[:customer_id]
+      @taxinvoices = @taxinvoices.where(:customer_id => @customer_id) if @customer_id.present?
+
+      # customers (with preload notes)
+      @customers = Customer.active.
+        where(:id => @taxinvoices.select(:customer_id)).
+        includes(:customernotes).
+        order(:name)
+
+      # aggregated values
+      omzet_per_customer   = @taxinvoices.group(:customer_id).sum(:total)
+      piutang_per_customer = @taxinvoices_unpaid.group(:customer_id).sum(:total)
+      cashin_per_customer  = Bankexpense.joins(:taxinvoice).
+        where("bankexpense_id IS NOT NULL").
+        where(:creditgroup_id => 607).
+        where(:date => @start_date..@end_date).
+        group("taxinvoices.customer_id").
+        sum(:total)
+
+      # grand totals
+      @grandtotal_omzet   = 0
+      @grandtotal_piutang = 0
+      @grandtotal_cashin  = 0
+
+      # build result
+      customer_datas = @customers.map do |customer|
+        omzet   = omzet_per_customer[customer.id]   || 0
+        piutang = piutang_per_customer[customer.id] || 0
+        cashin  = cashin_per_customer[customer.id]  || 0
+
+        kontrol = omzet * 30 / 100
+        aging   = omzet > 0 ? (piutang.to_f / omzet) * 365 : 0
+
+        rata2_omzet   = omzet / @number_of_months.to_f
+        rata2_piutang = piutang / @number_of_months.to_f
+        limit_piutang = rata2_omzet > 0 ? (rata2_piutang / rata2_omzet * cashin) : 0
+
+        @grandtotal_omzet   += omzet
+        @grandtotal_piutang += piutang
+        @grandtotal_cashin  += cashin
+
+        {
+          :customer_id    => customer.id,
+          :office_id      => customer.office_id,
+          :name           => customer.name,
+          :city           => customer.city ? customer.city.upcase : nil,
+          :total_omzet    => omzet,
+          :total_piutang  => piutang,
+          :kontrol_piutang => kontrol,
+          :cashin         => cashin,
+          :umur_piutang   => aging.round,
+          :limit_piutang  => limit_piutang,
+          :rata2_omzet    => rata2_omzet,
+          :rata2_piutang  => rata2_piutang,
+          :jumlah_bulan   => @number_of_months,
+          customer_notes: Customernote.where('customer_id = ?', customer.id).enabled.order("created_at DESC").map do |note|
+            {
+              id: note.id,
+              description: note.description,
+              user_id: note.user_id,
+              created_at: note.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            }
+          end
+        }
+      end
+
+      # Grouping berdasarkan office_id
+      @customer_datas = customer_datas.group_by { |c| c[:office_id] }
+
+      @section = "taxinvoices"
+      @where   = 'ar_aging'
+    else
+      redirect_to root_path
+    end
+  end
+
   def cashins
     @pagetitle = 'Cash In'
 
