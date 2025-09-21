@@ -5749,11 +5749,10 @@ end
         aging = (piutang / omzet) * 365
 
         cashin = Bankexpense.joins(:taxinvoice)
-                  .where("bankexpenses.bankexpense_id IS NOT NULL") # Explicit IS NOT NULL
-                  .where("creditgroup_id = ?", 6)
+                  .where("creditgroup_id = ?", 607)
                   .where("bankexpenses.date BETWEEN ? AND ?", @start_date, @end_date)
                   .where('taxinvoices.customer_id = ?', customer.id)
-                  .sum(:total)
+                  .sum('bankexpenses.total')
 
         rata2_omzet = omzet / @number_of_months.to_f
         rata2_piutang = piutang / @number_of_months.to_f
@@ -5836,12 +5835,25 @@ end
       # aggregated values
       omzet_per_customer   = @taxinvoices.group(:customer_id).sum(:total)
       piutang_per_customer = @taxinvoices_unpaid.group(:customer_id).sum(:total)
-      cashin_per_customer  = Bankexpense.joins(:taxinvoice).
-        where("bankexpense_id IS NOT NULL").
-        where(:creditgroup_id => 607).
-        where(:date => @start_date..@end_date).
-        group("taxinvoices.customer_id").
-        sum(:total)
+      # cashin_per_customer  = Bankexpense.joins(:taxinvoice).
+      #   where("bankexpense_id IS NOT NULL").
+      #   where(:creditgroup_id => 607).
+      #   where(:date => @start_date..@end_date).
+      #   group("taxinvoices.customer_id").
+      #   sum(:total)
+
+      cashin_per_customer = Bankexpense
+        .joins(:taxinvoice)
+        .where(creditgroup_id: 607)
+        .where(bankexpenses: { deleted: false, date: @start_date..@end_date })
+        .group("taxinvoices.customer_id")
+        .sum("bankexpenses.total")
+
+        # render json: piutang_per_customer
+        # return false    
+        
+        # render json: cashin_per_customer
+        # return false    
 
       # grand totals
       @grandtotal_omzet   = 0
@@ -5852,7 +5864,7 @@ end
       customer_datas = @customers.map do |customer|
         omzet   = omzet_per_customer[customer.id]   || 0
         piutang = piutang_per_customer[customer.id] || 0
-        cashin  = cashin_per_customer[customer.id]  || 0
+        cashin  = cashin_per_customer[customer.id.to_s]  || 0
 
         kontrol = omzet * 30 / 100
         aging   = omzet > 0 ? (piutang.to_f / omzet) * 365 : 0
