@@ -257,29 +257,28 @@ class CustomersController < ApplicationController
 
   end
 
-def customer_terms
-  role = cek_roles(@penagihan)
+  def customer_terms
+    role = cek_roles(@penagihan)
 
-  @section = "taxinvoices"
-  @where   = "customer_terms"
+    @section = "taxinvoices"
+    @where   = "customer_terms"
 
-  if role
-    excluded = ["RDPI%", "PURA%", "RAJAWALI INTI%"]
+    if role
+      excluded = ["RDPI%", "PURA%", "RAJAWALI INTI%"]
 
-    @customers = Customer.active.
-      joins(:events).
-      where("events.start_date >= ?", Date.today.beginning_of_year).
-      where("customers.name NOT ILIKE ? AND customers.name NOT ILIKE ? AND customers.name NOT ILIKE ?", *excluded).
-      select("DISTINCT customers.*").
-      order("customers.name ASC")
+      @customers = Customer.active.
+        joins(:events).
+        where("events.start_date >= ?", Date.today.beginning_of_year).
+        where("customers.name NOT ILIKE ? AND customers.name NOT ILIKE ? AND customers.name NOT ILIKE ?", *excluded).
+        select("DISTINCT customers.*").
+        order("customers.name ASC")
 
-    respond_to do |format|
-      format.html
+      respond_to do |format|
+        format.html
+      end
+    else
+      redirect_to root_path
     end
-  else
-    redirect_to root_path
   end
-end
-
-
+  
 end

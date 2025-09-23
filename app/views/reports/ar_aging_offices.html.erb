@@ -48,6 +48,8 @@
                         <option value="<%=customer.id%>" <% if customer.id == @customer_id %> selected='selected' <% end %>><%=customer.name%></option>
                         <% end %>
                     </select>
+
+                    <!--
                     <label for="date" class="middle" style="width: 64px;">Periode</label>
                     <select name="month" class="half left" style="margin-right:10px; width: 90px;">
                         <% (1.upto(12)).each do |m| %>
@@ -72,7 +74,14 @@
                         <% (Date.today.year.downto(year_to)).each do |y| %>
                         <option value="<%=y%>" <% if y.to_s == @yearEnd %> selected='selected' <% end %>><%=y%></option>
                         <% end %>
-                    </select>
+                    </select> -->
+
+                    <label for="startdate" class="middle">Tanggal</label>
+                    <input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+                    <label for="enddate" class="tiny">s/d</label>
+                    <input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+                    <input type="hidden" name="filterbydates" value="1">
+
                     <input class="submit left" type="submit" value="Filter" />
                 </div>
 
@@ -139,6 +148,11 @@
                                     <span style="color: grey; font-size: 10px;">
                                       (<%= Time.parse(note[:created_at]).strftime("%Y-%m-%d %H:%M") %>)
                                     </span>
+                                    <!--
+                                    <span style="color: grey; font-size: 10px;">
+                                      (<%= (Time.parse(note[:created_at]) + 7*60*60).strftime('%d-%m-%Y %H:%M wib') %>)
+                                    </span>
+                                    -->
                                   </li>
                                 <% end %>
                               </ul>
@@ -194,6 +208,7 @@
                     </tfoot>
 
                   </table>
+                  <small>* Omzet & Piutang start 1 Januari tahun berjalan </small>
                   <% else %>
                   <p>Tidak ada data ditemukan</p>
                   <% end %>

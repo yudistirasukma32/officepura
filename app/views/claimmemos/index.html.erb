@@ -4,6 +4,23 @@
 	<%= render "shared/nav" %>
 </div>
 
+<style>
+th, td {
+	font-size: 10px !important;
+}
+
+.flex {
+	display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.cta {
+	font-size: 8px !important;
+}
+
+</style>
+
 <div id="main">
 
 	<div id="content-full">
@@ -25,7 +42,7 @@
 					<select name="customer_id" class="third left">
 						<option value="">Semua Pelanggan</option>
 						<% Customer.active.reorder(:name).each do |customer| %>
-						<option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
+						<option value="<%=customer.id%>"<% if customer.id == @customer_id.to_i %> selected='selected'<% end %>><%=customer.name%></option>
 						<% end %>
 					</select>
 
@@ -51,25 +68,27 @@
 
 		<thead>
 
-		<tr>
-			<th class="{sorter:true, filter: false}">Tgl Klaim</th>
-			<th class="{sorter:true, filter: false}">Tgl BKK</th>
-			<th class="{sorter:true, filter: true}">BKK</th>
-			<th class="{sorter:true, filter: true}">Keterangan</th>
-			<th class="{sorter:true, filter: true}">KTR</th>
-			<th class="{sorter:true, filter: true}">Nopol</th>
-			<th class="{sorter:true, filter: true}">Komoditas</th>
-			<th class="{sorter:true, filter: false}">Muat</th>
-			<th class="{sorter:true, filter: false}">Bongkar</th>
-			<th class="{sorter:true, filter: false}">Susut</th>
-			<th class="{sorter:true, filter: false}">Tole ransi</th>
-			<th class="{sorter:true, filter: false}">Beban Susut</th>
-			<!-- <th>Harga</th> -->
-			<th class="{sorter:true, filter: false}">Beban Supir</th>
-			<th class="{sorter:true, filter: true}">User</th>
-			<th class="{sorter:true, filter: true}">Status</th>
-			<th class="{sorter:false, filter: false}"></th>
-		</tr>
+			<tr>
+				<th class="{sorter:true, filter: false}">Tgl Klaim</th>
+				<th class="{sorter:true, filter: false}">Tgl<br/>BKK</th>
+				<th class="{sorter:true, filter: true}">BKK / DO</th>
+				<th class="{sorter:true, filter: true}" width="200">Keterangan</th>
+				<th class="{sorter:true, filter: true}">KTR</th>
+				<th class="{sorter:true, filter: true}">Nopol</th>
+				<th class="{sorter:true, filter: true}">Supir</th>
+				<th class="{sorter:true, filter: true}">Inv Tagihan</th>
+				<th class="{sorter:true, filter: true}">Komo ditas</th>
+				<th class="{sorter:true, filter: false}">Muat</th>
+				<th class="{sorter:true, filter: false}">Bong kar</th>
+				<th class="{sorter:true, filter: false}">Susut</th>
+				<th class="{sorter:true, filter: false}">Tole ransi</th>
+				<th class="{sorter:true, filter: false}">Beban Susut</th>
+				<!-- <th>Harga</th> -->
+				<th class="{sorter:true, filter: false}">Klaim/<br/>Beban Supir</th>
+				<th class="{sorter:true, filter: true}">User</th>
+				<th class="{sorter:true, filter: true}"  width="60">Status</th>
+				<th class="{sorter:false, filter: false}" width="60"></th>
+			</tr>
 
 		</thead>
 
@@ -77,9 +96,11 @@
 
 		<%
 		total = 0 
-		@claimmemos.each do |memo| 
+		driver_charge_total = 0
+		@claimmemos.includes(invoice: [:vehicle, :customer, :route, :driver, :event, :ship]).includes(:taxinvoiceitem, :user, :bankexpenses).each do |memo| 
 		%>
 			<% total += memo.total %>
+			<% driver_charge_total += memo.driver_charge %>
 			<% 
 				status = case 
 						when memo.approved_by_gm then 'Approved GM'
@@ -93,10 +114,10 @@
 			<tr>
 				<td><strong><%=memo.date.strftime('%d')%></strong>/<%=memo.date.strftime('%m')%>/<%=memo.date.strftime('%y')%></td>
 				<td><strong><%=memo.invoice.date.strftime('%d')%></strong>/<%=memo.invoice.date.strftime('%m')%>/<%=memo.invoice.date.strftime('%y')%></td>
-				<td><%= memo.invoice_id %></td>
+				<td><strong><%= memo.invoice_id rescue nil%></strong><br><span style="font-weight: 500; color: #5a5a5a;">(<%= memo.invoice.event_id rescue nil %>)<span></td>
 				<td>
 				<strong><%= memo.invoice.customer.name rescue nil %></strong><br/>
-				1 Rit <%= memo.invoice.route.name rescue nil %> (<%= memo.invoice.driver.name rescue nil %>)
+				1 Rit <%= memo.invoice.route.name rescue nil %>
 				<%= memo.invoice.invoicetrain ? '= Kereta =' : '' %> 
 				<%= (memo.invoice.isotank_id.present? && memo.invoice.isotank_id.to_i != 0) ? ("Isotank = " + memo.invoice.isotank.isotanknumber) : '' %>
 				<%= (memo.invoice.container_id.present? && memo.invoice.container_id.to_i != 0) ? ("Kontainer = " + memo.invoice.container.containernumber) : '' %>
@@ -119,7 +140,11 @@
 					<% end %>
 					</ul>
 				<% end %>
-
+				</td>
+				<td><%= memo.invoice.office.abbr rescue nil %></td>
+				<td><%= memo.invoice.vehicle.current_id rescue nil %></td>
+				<td><%= memo.invoice.driver.name rescue nil %></td>
+				<td>
 				<% taxinvoiceitems = Taxinvoiceitem.where("invoice_id = #{memo.invoice_id} AND deleted = FALSE") rescue nil; %>
 				<% if !taxinvoiceitems.nil? %>
 					<br/>
@@ -127,26 +152,21 @@
 					<% taxinvoiceitems.each_with_index do |taxinvoiceitem,i| %>
 					<% taxinvoice = Taxinvoice.find(taxinvoiceitem.taxinvoice_id) rescue nil  %>
 						<% if !taxinvoice.nil? %>
-						<span style="font-weight: 600; color: #5a5a5a;">Inv Tagihan:</span><br/>
 						<%= taxinvoice.long_id %>
-						<br/>
 						<% end %>
 					<% end %>
 				<% end %>
-
 				</td>
-				<td><%= memo.invoice.office.abbr rescue nil %></td>
-				<td><%= memo.invoice.vehicle.current_id rescue nil %></td>
 				<td><%= memo.invoice.event.commodity.name rescue nil %></td>
 				<td class="right"><%= memo.weight_gross rescue 0 %></td>
 				<td class="right"><%= memo.weight_net rescue 0 %></td>
 				<td class="right red"><%= memo.shrink rescue 0 %></td>
-				<td class="right"><%= memo.tolerance_total rescue 0 %></td>
-				<td class="right"><%= memo.shrinkage_load rescue 0 %></td>
+				<td class="right green"><%= memo.tolerance_total rescue 0 %></td>
+				<td class="right red"><%= memo.shrinkage_load rescue 0 %></td>
 				<!-- <td class="right"><%= memo.price_per rescue 0 %></td> -->
-				<td class="right"><%= to_currency(memo.total) rescue 0 %></td>
+				<td class="right"><%= to_currency(memo.total) rescue 0 %><br/><%= to_currency(memo.driver_charge) rescue 0 %></td>
 				<td><%= memo.user.username rescue nil %></td>
-				<td style="width:80px;">
+				<td style="width:60px;">
 					<% if status == 'Approved GM' %>
 					<a class="cta" style="background: green; color: white; opacity: 1;">GM Apprv</a>
 					<% elsif status == 'Approved Manager' %>
@@ -162,8 +182,15 @@
 					<% end %>
 				</td>
 				<td class="right" width="60">
-				<%= link_to '&#xf044;'.html_safe, edit_claimmemo_path(memo), :class => "edit tipsy", :title => 'Edit' %>
-				<%= link_to '&#xf00d;'.html_safe, memo, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %> 
+				<div class="flex">
+					<div>
+					<%= link_to '&#xf044;'.html_safe, edit_claimmemo_path(memo), :class => "edit tipsy", :title => 'Edit' %>
+					<%= link_to '&#xf00d;'.html_safe, memo, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %> 
+					</div>
+					<div>
+					<%= memo.bankexpenses.any? ? content_tag(:span, "✔ Jurnal", style: "color:green; font-size:10px; margin-left: 6px;") : '' %>
+					</div>
+				<div>
 				</td>
 			</tr>
 			<% end %>
@@ -171,8 +198,8 @@
 
 		<tfoot>
 			<tr class="footer">
-				<td class="right" colspan="11">Total</td>
-				<td class="right"><strong><%= to_currency(total) %></strong></td>
+				<td class="right" colspan="14">Total</td>
+				<td class="right"><strong><%= to_currency(total) %></strong><br/><strong><%= to_currency(driver_charge_total) %></strong></td>
 				<td class="right" colspan="3"></td>
 			</tr>
 		</tfoot>

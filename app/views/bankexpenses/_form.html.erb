@@ -22,7 +22,7 @@
   <div class="field-row">
     <% if !@bankledger.nil? %>
       <%= f.label :debitgroup_id, "Dari Bank", :class => 'left' %>
-      <select id="bankexpensegroupparentdebit" name="bankexpenseparent[parentbankexpensegroup_id]" class="half left" onchange="javascript: getBankexpensegroupdebit();">
+      <select id="bankexpensegroupparentdebit" name="bankexpenseparent[parentbankexpensegroup_id]" class="half left" onchange="javascript: getBankexpensegroupdebit();" style="margin-right:1.5rem;">
       <option value="">- Group Jurnal -</option>
       <% @bankgroups.each do |group| %>
         <option value="<%=group.id%>" <% if @parentdebitgroup_id == group.id %>selected="selected" <% end %>><%=group.name %></option>
@@ -30,7 +30,7 @@
     </select>
     <% else %>
       <%= f.label :debitgroup_id, "Debit", :class => 'left' %>
-      <select id="bankexpensegroupparentdebit" name="bankexpenseparent[parentbankexpensegroup_id]" class="half left" onchange="javascript: getBankexpensegroupdebit();">
+      <select id="bankexpensegroupparentdebit" name="bankexpenseparent[parentbankexpensegroup_id]" class="half left " onchange="javascript: getBankexpensegroupdebit();" style="margin-right:1.5rem;">
       <option value="">- Group Jurnal -</option>
       <% @parentgroups.each do |group| %>
         <option value="<%=group.id%>" <% if @parentdebitgroup_id == group.id %>selected="selected" <% end %>><%=group.name %></option>
@@ -38,8 +38,7 @@
     </select>
     <% end %>
     
-
-    <select id="bankexpensegroupchilddebit" name="bankexpense[debitgroup_id]" class="half left" style="margin-left:10px;">
+    <select id="bankexpensegroupchilddebit" name="bankexpense[debitgroup_id]" class="half left chzn-select" style="margin-left:1.5rem;" onchange="javascript: toggleKlaim();">
       <option value="">- Pilih Group -</option>
       <% if @childgroupsdebit and @childgroupsdebit.any? %>
         <% @childgroupsdebit.active.order(:name).each do |group| %>
@@ -50,20 +49,20 @@
   </div>
 
 <!-- credit -->
- <div class="field-row">
-  <% if !@bankledger.nil? %>
+  <div class="field-row">
+    <% if !@bankledger.nil? %>
       <%= f.label :debitgroup_id, "Posisi Jurnal", :class => 'left' %>
     <% else %>
       <%= f.label :creditgroup_id, "Credit", :class => 'left' %>
     <% end %>
-    <select id="bankexpensegroupparentcredit" name="bankexpenseparent[parentbankexpensegroup_id]" class="half left" onchange="javascript: getBankexpensegroupcredit();">
+    <select id="bankexpensegroupparentcredit" name="bankexpenseparent[parentbankexpensegroup_id]" class="half left" onchange="javascript: getBankexpensegroupcredit();" style="margin-right:1.5rem;">
       <option value="">- Group Jurnal -</option>
       <% @parentgroups.each do |group| %>
         <option value="<%=group.id%>" <% if @parentcreditgroup_id == group.id %>selected="selected" <% end %>><%=group.name %></option>
       <% end %>
     </select>
 
-    <select id="bankexpensegroupchildcredit" name="bankexpense[creditgroup_id]" class="half left" style="margin-left:10px;">
+    <select id="bankexpensegroupchildcredit" name="bankexpense[creditgroup_id]" class="half left chzn-select" style="margin-left:1.5rem;" onchange="javascript: toggleKlaim();">
       <option value="">- Pilih Group -</option>
       <% if @childgroupscredit and @childgroupscredit.any? %>
         <% @childgroupscredit.active.order(:name).each do |group| %>
@@ -84,6 +83,32 @@
     <strong>Rupiah</strong>
   </div>
 
+  <div class="field-row" id="klaim" style="<%= 
+    (@bankexpense && (
+      @bankexpense.debitgroup_id == 657 || 
+      @bankexpense.creditgroup_id == 657 || 
+      (@bankexpense.respond_to?(:name) && @bankexpense.name == 'Biaya - Klaim Susut')
+    )) ? '' : 'display:none;' %>">
+
+    <%= f.label :claimmemo_id, "Klaim Penagihan" %>
+    <%= f.select :claimmemo_id, options_for_select(
+          [["Pilih Data Klaim", nil]] +
+          Claimmemo.active
+            .where(:deleted => false)
+            .joins(:taxinvoiceitem => :taxinvoice)
+            .order("taxinvoices.date DESC")
+            .collect { |g|
+              begin
+                label = "#{g.taxinvoiceitem.taxinvoice.customer.name} | #{g.taxinvoiceitem.taxinvoice.long_id} | #{number_to_currency(g.total, :unit => 'Rp ', :delimiter => '.', :precision => 0)}"
+                [label, g.id]
+              rescue
+                ["Data tidak lengkap (##{g.id})", g.id]
+              end
+            },
+          @bankexpense && @bankexpense.claimmemo_id
+        ), {}, :class => 'double chzn-select' %>
+  </div>
+
   <div class="field-row">
     <%= f.label :description, "Keterangan" %>
     <%= f.text_area :description %>
@@ -95,4 +120,3 @@
   </div>
 
 <% end %>
-

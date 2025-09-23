@@ -3925,6 +3925,39 @@ function getBankexpensegroup() {
   });
 }
 
+function toggleKlaim() {
+  var $klaimDiv = $('#klaim');
+  if (!$klaimDiv.length) return;
+
+  var $debit  = $('#bankexpensegroupchilddebit');
+  var $credit = $('#bankexpensegroupchildcredit');
+
+  // ambil value dan teks via jQuery (compatible dengan Chosen)
+  var debitVal   = $debit.length ? $debit.val() : null;
+  var creditVal  = $credit.length ? $credit.val() : null;
+  var debitText  = $debit.length ? $debit.find('option:selected').text().trim() : '';
+  var creditText = $credit.length ? $credit.find('option:selected').text().trim() : '';
+
+  // cek kondisi (case-insensitive untuk teks)
+  var isKlaim = 
+      (String(debitVal) === '657') ||
+      (String(creditVal) === '657') ||
+      /biaya - klaim susut/i.test(debitText) ||
+      /biaya - klaim susut/i.test(creditText);
+
+  if (isKlaim) {
+    $klaimDiv.show();
+  } else {
+    $klaimDiv.hide();
+
+    // reset dropdown klaim (pastikan id ini sesuai form kamu)
+    var $klaimSelect = $('#bankexpense_claimmemo_id');
+    if ($klaimSelect.length) {
+      $klaimSelect.val('').trigger('chosen:updated').trigger('liszt:updated');
+    }
+  }
+}
+
 function getBankexpensegroupdebit() {
   var group_id = $("#bankexpensegroupparentdebit").val();
 
@@ -3932,17 +3965,26 @@ function getBankexpensegroupdebit() {
     type: "GET",
     url: "/bankexpenses/getbankexpensegroupdebit/" + group_id,
     success: function (data) {
-      prod = data.group;
+      var prod = data.group;
 
-      $("#bankexpensegroupchilddebit").find("option").remove();
-      $("#bankexpensegroupchilddebit").append(
-        '<option value="">- Pilih Group -</option>'
-      );
-      for (i = 0; i < prod.length; i++) {
+      $("#bankexpensegroupchilddebit")
+        .empty()
+        .append('<option value="">- Pilih Group -</option>');
+
+      for (var i = 0; i < prod.length; i++) {
         $("#bankexpensegroupchilddebit").append(
           '<option value="' + prod[i].id + '">' + prod[i].name + "</option>"
         );
       }
+
+      // reset & refresh chosen
+      $("#bankexpensegroupchilddebit")
+        .val("")
+        .trigger("chosen:updated")
+        .trigger("liszt:updated");
+
+      // cek klaim setelah update
+      toggleKlaim();
     },
     failure: function () {
       alert("Error. Mohon refresh browser Anda.");
@@ -3957,17 +3999,26 @@ function getBankexpensegroupcredit() {
     type: "GET",
     url: "/bankexpenses/getbankexpensegroupcredit/" + group_id,
     success: function (data) {
-      prod = data.group;
+      var prod = data.group;
 
-      $("#bankexpensegroupchildcredit").find("option").remove();
-      $("#bankexpensegroupchildcredit").append(
-        '<option value="">- Pilih Group -</option>'
-      );
-      for (i = 0; i < prod.length; i++) {
+      $("#bankexpensegroupchildcredit")
+        .empty()
+        .append('<option value="">- Pilih Group -</option>');
+
+      for (var i = 0; i < prod.length; i++) {
         $("#bankexpensegroupchildcredit").append(
           '<option value="' + prod[i].id + '">' + prod[i].name + "</option>"
         );
       }
+
+      // reset & refresh chosen
+      $("#bankexpensegroupchildcredit")
+        .val("")
+        .trigger("chosen:updated")
+        .trigger("liszt:updated");
+
+      // cek klaim setelah update
+      toggleKlaim();
     },
     failure: function () {
       alert("Error. Mohon refresh browser Anda.");

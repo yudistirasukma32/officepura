@@ -5798,39 +5798,30 @@ end
   def ar_aging_offices
     @pagetitle = 'Umur Piutang Pelanggan'
 
-    @default_month = Date.today
-    @month = "%02d" % @default_month.month
-    @year  = @default_month.year
-
     role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan'
     if role
-      # parameter filter
-      @month     = (params[:month].present? ? params[:month] : "01").to_s.rjust(2, "0")
-      @day       = "01"
-      @year      = params[:year].present? ? params[:year] : Date.today.year
-      @monthEnd  = (params[:monthEnd].present? ? params[:monthEnd] : Date.today.month).to_s.rjust(2, "0")
-      @dayEnd    = getlastday(@monthEnd.to_s)
-      @yearEnd   = params[:yearEnd].present? ? params[:yearEnd] : Date.today.year
+      # ambil dari params, fallback ke default bulan berjalan
+      @beginning_of_year = Date.new(Date.today.year, 1, 1)
+      @startdate = params[:startdate].present? ? Date.parse(params[:startdate]) : Date.today.beginning_of_month
+      @enddate   = params[:enddate].present?   ? Date.parse(params[:enddate])   : Date.today.end_of_month
 
-      # calculate number of month
-      @start_date = Date.new(@year.to_i, @month.to_i, 1)
-      @end_date   = Date.new(@yearEnd.to_i, @monthEnd.to_i, 1)
-      @number_of_months = (@end_date.year * 12 + @end_date.month) - (@start_date.year * 12 + @start_date.month) + 1
+      # hitung jumlah bulan
+      @number_of_months = ((@enddate.year * 12 + @enddate.month) - (@beginning_of_year.year * 12 + @beginning_of_year.month)) + 1
 
       # invoices
-      @taxinvoices = Taxinvoice.active.joins(:customer).
-        where(:date => "#{@year}-#{@month}-#{@day}".. "#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
-      @taxinvoices_unpaid = @taxinvoices.where(:paiddate => nil)
+      @taxinvoices = Taxinvoice.active.joins(:customer)
+        .where(date: @beginning_of_year..@enddate)
+      @taxinvoices_unpaid = @taxinvoices.where(paiddate: nil)
 
       # customer filter
       @customer_id = params[:customer_id]
-      @taxinvoices = @taxinvoices.where(:customer_id => @customer_id) if @customer_id.present?
+      @taxinvoices = @taxinvoices.where(customer_id: @customer_id) if @customer_id.present?
 
-      # customers (with preload notes)
-      @customers = Customer.active.
-        where(:id => @taxinvoices.select(:customer_id)).
-        includes(:customernotes).
-        order(:name)
+      # customers
+      @customers = Customer.active
+        .where(id: @taxinvoices.select(:customer_id))
+        .includes(:customernotes)
+        .order(:name)
 
       # aggregated values
       omzet_per_customer   = @taxinvoices.group(:customer_id).sum(:total)
