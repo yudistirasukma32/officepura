@@ -6,7 +6,7 @@
 
 <style>
 th, td {
-	font-size: 10px !important;
+	font-size: 11px !important;
 }
 
 .flex {
@@ -77,16 +77,17 @@ th, td {
 				<th class="{sorter:true, filter: true}">Nopol</th>
 				<th class="{sorter:true, filter: true}">Supir</th>
 				<th class="{sorter:true, filter: true}">Inv Tagihan</th>
-				<th class="{sorter:true, filter: true}">Komo ditas</th>
+				<!-- <th class="{sorter:true, filter: true}">Komo ditas</th>
 				<th class="{sorter:true, filter: false}">Muat</th>
 				<th class="{sorter:true, filter: false}">Bong kar</th>
 				<th class="{sorter:true, filter: false}">Susut</th>
 				<th class="{sorter:true, filter: false}">Tole ransi</th>
 				<th class="{sorter:true, filter: false}">Beban Susut</th>
-				<!-- <th>Harga</th> -->
-				<th class="{sorter:true, filter: false}">Klaim/<br/>Beban Supir</th>
+				<th>Harga</th> -->
 				<th class="{sorter:true, filter: true}">User</th>
+				<th class="{sorter:true, filter: false}">Klaim/<br/>Beban Supir</th>
 				<th class="{sorter:true, filter: true}"  width="60">Status</th>
+				<th class="{sorter:true, filter: true}"  width="60">Jurnal</th>
 				<th class="{sorter:false, filter: false}" width="60"></th>
 			</tr>
 
@@ -157,15 +158,15 @@ th, td {
 					<% end %>
 				<% end %>
 				</td>
-				<td><%= memo.invoice.event.commodity.name rescue nil %></td>
+				<!--<td><%= memo.invoice.event.commodity.name rescue nil %></td>
 				<td class="right"><%= memo.weight_gross rescue 0 %></td>
 				<td class="right"><%= memo.weight_net rescue 0 %></td>
 				<td class="right red"><%= memo.shrink rescue 0 %></td>
 				<td class="right green"><%= memo.tolerance_total rescue 0 %></td>
 				<td class="right red"><%= memo.shrinkage_load rescue 0 %></td>
-				<!-- <td class="right"><%= memo.price_per rescue 0 %></td> -->
-				<td class="right"><%= to_currency(memo.total) rescue 0 %><br/><%= to_currency(memo.driver_charge) rescue 0 %></td>
+				<td class="right"><%= memo.price_per rescue 0 %></td> -->
 				<td><%= memo.user.username rescue nil %></td>
+				<td class="right"><%= to_currency(memo.total) rescue 0 %><br/><%= to_currency(memo.driver_charge) rescue 0 %></td>
 				<td style="width:60px;">
 					<% if status == 'Approved GM' %>
 					<a class="cta" style="background: green; color: white; opacity: 1;">GM Apprv</a>
@@ -182,13 +183,20 @@ th, td {
 					<% end %>
 				</td>
 				<td class="right" width="60">
+					<div>
+					<% memo.bankexpenses.active.each do |be| %>
+						<%= link_to "#{be.date.strftime('%d/%m/%y')}",
+									edit_bankexpense_path(be),
+									style: "color:green; font-size:10px; margin-left: 6px;",
+									target: "_blank" %><br>
+					<% end %>
+					</div>
+				</td>
+				<td class="right" width="60">
 				<div class="flex">
 					<div>
-					<%= link_to '&#xf044;'.html_safe, edit_claimmemo_path(memo), :class => "edit tipsy", :title => 'Edit' %>
-					<%= link_to '&#xf00d;'.html_safe, memo, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %> 
-					</div>
-					<div>
-					<%= memo.bankexpenses.any? ? content_tag(:span, "✔ Jurnal", style: "color:green; font-size:10px; margin-left: 6px;") : '' %>
+						<%= link_to '&#xf044;'.html_safe, edit_claimmemo_path(memo), :class => "edit tipsy", :title => 'Edit' %>
+						<%= link_to '&#xf00d;'.html_safe, memo, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %> 
 					</div>
 				<div>
 				</td>
@@ -198,7 +206,8 @@ th, td {
 
 		<tfoot>
 			<tr class="footer">
-				<td class="right" colspan="14">Total</td>
+				<td class="right" colspan="8">Total</td>
+				<td class="right"></td>
 				<td class="right"><strong><%= to_currency(total) %></strong><br/><strong><%= to_currency(driver_charge_total) %></strong></td>
 				<td class="right" colspan="3"></td>
 			</tr>
