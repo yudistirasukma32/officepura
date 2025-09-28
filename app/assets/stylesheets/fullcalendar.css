@@ -380,8 +380,11 @@ a.fc-event,
 	overflow: hidden; /* hacky spaces (IE6/7) */
 	font-size: 300%;  /* */
 	line-height: 50%; /* */
-	}
+}
 	
+.is_bold {
+	font-weight: 600;
+}	
 	
 	
 /* Horizontal Events

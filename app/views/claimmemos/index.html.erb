@@ -19,6 +19,13 @@ th, td {
 	font-size: 8px !important;
 }
 
+.flex {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: row;
+}
+
 </style>
 
 <div id="main">
@@ -32,7 +39,7 @@ th, td {
 		
 		<div id="filter">
 			<form id="filterform" name="filterform" action="" method="get">
-				<div class="field-row continue">
+				<div class="field-row continue flex">
 					<label for="startdate" class="middle">Tgl Awal</label>
 					<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
 					<label for="enddate" class="tiny">s/d</label>
@@ -72,7 +79,8 @@ th, td {
 				<th class="{sorter:true, filter: false}">Tgl Klaim</th>
 				<th class="{sorter:true, filter: false}">Tgl<br/>BKK</th>
 				<th class="{sorter:true, filter: true}">BKK / DO</th>
-				<th class="{sorter:true, filter: true}" width="200">Keterangan</th>
+				<th class="{sorter:true, filter: true}" width="150">Keterangan</th>
+				<th class="{sorter:true, filter: true}" width="150">Rute</th>
 				<th class="{sorter:true, filter: true}">KTR</th>
 				<th class="{sorter:true, filter: true}">Nopol</th>
 				<th class="{sorter:true, filter: true}">Supir</th>
@@ -102,23 +110,13 @@ th, td {
 		%>
 			<% total += memo.total %>
 			<% driver_charge_total += memo.driver_charge %>
-			<% 
-				status = case 
-						when memo.approved_by_gm then 'Approved GM'
-						when memo.approved then 'Approved Manager'
-						when memo.approved_marketing then 'Approved Marketing'
-						when memo.approved_unload_spv then 'Approved Unload'
-						when memo.approved_load_spv then 'Approved Load'
-						else 'Draft'
-						end
-			%>
+			<% status = claimmemo_status(memo) %>
 			<tr>
 				<td><strong><%=memo.date.strftime('%d')%></strong>/<%=memo.date.strftime('%m')%>/<%=memo.date.strftime('%y')%></td>
 				<td><strong><%=memo.invoice.date.strftime('%d')%></strong>/<%=memo.invoice.date.strftime('%m')%>/<%=memo.invoice.date.strftime('%y')%></td>
 				<td><strong><%= memo.invoice_id rescue nil%></strong><br><span style="font-weight: 500; color: #5a5a5a;">(<%= memo.invoice.event_id rescue nil %>)<span></td>
 				<td>
 				<strong><%= memo.invoice.customer.name rescue nil %></strong><br/>
-				1 Rit <%= memo.invoice.route.name rescue nil %>
 				<%= memo.invoice.invoicetrain ? '= Kereta =' : '' %> 
 				<%= (memo.invoice.isotank_id.present? && memo.invoice.isotank_id.to_i != 0) ? ("Isotank = " + memo.invoice.isotank.isotanknumber) : '' %>
 				<%= (memo.invoice.container_id.present? && memo.invoice.container_id.to_i != 0) ? ("Kontainer = " + memo.invoice.container.containernumber) : '' %>
@@ -142,6 +140,7 @@ th, td {
 					</ul>
 				<% end %>
 				</td>
+				<td>1 Rit <%= memo.invoice.route.name rescue nil %></td>
 				<td><%= memo.invoice.office.abbr rescue nil %></td>
 				<td><%= memo.invoice.vehicle.current_id rescue nil %></td>
 				<td><%= memo.invoice.driver.name rescue nil %></td>
@@ -168,19 +167,9 @@ th, td {
 				<td><%= memo.user.username rescue nil %></td>
 				<td class="right"><%= to_currency(memo.total) rescue 0 %><br/><%= to_currency(memo.driver_charge) rescue 0 %></td>
 				<td style="width:60px;">
-					<% if status == 'Approved GM' %>
-					<a class="cta" style="background: green; color: white; opacity: 1;">GM Apprv</a>
-					<% elsif status == 'Approved Manager' %>
-					<a class="cta" style="background: lightgreen; color: black; opacity: 1;">Manager Apprv</a>
-					<% elsif status == 'Approved Marketing' %>
-					<a class="cta" style="background: lime; color: black; opacity: 1;">Marketing Apprv</a>
-					<% elsif status == 'Approved Unload' %>
-					<a class="cta" style="background: orange; color: black; opacity: 1;">Bkr Apprv</a>
-					<% elsif status == 'Approved Load' %>
-					<a class="cta" style="background: yellow; color: black; opacity: 1;">Muat Apprv</a>
-					<% else %>
-					<a class="cta" style="background: grey; color: white; opacity: 1;">Draft</a>
-					<% end %>
+					<a class="cta" style="background: <%= status[:color] %>; color: <%= status[:text_color] %>; opacity: 1;">
+						<%= status[:text] %>
+					</a>
 				</td>
 				<td class="right" width="60">
 					<div>
@@ -206,7 +195,7 @@ th, td {
 
 		<tfoot>
 			<tr class="footer">
-				<td class="right" colspan="8">Total</td>
+				<td class="right" colspan="9">Total</td>
 				<td class="right"></td>
 				<td class="right"><strong><%= to_currency(total) %></strong><br/><strong><%= to_currency(driver_charge_total) %></strong></td>
 				<td class="right" colspan="3"></td>

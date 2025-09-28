@@ -231,6 +231,22 @@ module ApplicationHelper
 
 	end
 
+	def claimmemo_status(memo)
+		if memo.approved_by_gm
+		{ text: "Approved GM",       color: "green",      text_color: "white" }
+		elsif memo.approved
+		{ text: "Approved Manager",  color: "lightgreen", text_color: "black" }
+		elsif memo.approved_marketing
+		{ text: "Approved Marketing", color: "lime",      text_color: "black" }
+		elsif memo.approved_unload_spv
+		{ text: "Approved Muat",   color: "orange",     text_color: "black" }
+		elsif memo.approved_load_spv
+		{ text: "Approved Bongkar",     color: "yellow",     text_color: "black" }
+		else
+		{ text: "Draft",             color: "grey",       text_color: "white" }
+		end
+	end  
+
 	# def updatecashdailylogold total, date = nil, officecash = 0
 	# 	date = Date.today.strftime('%d-%m-%Y') if date.nil?
 

@@ -20,58 +20,36 @@
     <tbody>
     <% if @claimmemos.any? %>
     
-        <% @claimmemos.includes(invoice: [:vehicle, :customer, :route, :driver, :isotank, :container, :ship, :user, :event]).each do |memo|  %>
-
-			<% 
-				status = case 
-						when memo.approved_by_gm then 'Approved GM'
-						when memo.approved then 'Approved Manager'
-						when memo.approved_marketing then 'Approved Marketing'
-						when memo.approved_unload_spv then 'Approved Unload'
-						when memo.approved_load_spv then 'Approved Load'
-						else 'Draft'
-						end
-			%>
-
-			<tr>
-				<td><strong><%=memo.date.strftime('%d')%></strong>.<%=memo.date.strftime('%m')%></td>
-				<td><%= link_to memo.invoice_id, edit_claimmemo_path(memo, rel: 'approval') %></td>
-				<td>
-				1 Rit <%= memo.invoice.route.name rescue nil %> (<%= memo.invoice.driver.name rescue nil %>)
-				<%= memo.invoice.invoicetrain ? '= Kereta =' : '' %> 
-				<%= (memo.invoice.isotank_id.present? && memo.invoice.isotank_id.to_i != 0) ? ("Isotank = " + memo.invoice.isotank.isotanknumber) : '' %>
-				<%= (memo.invoice.container_id.present? && memo.invoice.container_id.to_i != 0) ? ("Kontainer = " + memo.invoice.container.containernumber) : '' %>
-				<%= memo.invoice.ship_id.nil? ? '': ' | '+memo.invoice.ship.name rescue nil%>
-				<%= memo.invoice.user_id.nil? ? '': ' | '+memo.invoice.user.username%>
-				</td>
-				<td><%= memo.invoice.event.commodity.name rescue nil %></td>
-				<td class="right"><%= memo.weight_gross rescue 0 %></td>
-				<td class="right"><%= memo.weight_net rescue 0 %></td>
-				<td class="right red"><%= memo.shrink rescue 0 %></td>
-				<td class="right"><%= memo.tolerance_total rescue 0 %></td>
-				<td class="right"><%= memo.shrinkage_load rescue 0 %></td>
-				<!-- <td class="right"><%= memo.price_per rescue 0 %></td> -->
-				<td class="right"><%= to_currency(memo.total) rescue 0 %></td>
-				<td style="width:80px;">
-					<% if status == 'Approved GM' %>
-					<a class="cta" style="background: green; color: white; opacity: 1;">GM Apprv</a>
-					<% elsif status == 'Approved Manager' %>
-					<a class="cta" style="background: lightgreen; color: black; opacity: 1;">Manager Apprv</a>
-					<% elsif status == 'Approved Marketing' %>
-					<a class="cta" style="background: lime; color: black; opacity: 1;">Marketing Apprv</a>
-					<% elsif status == 'Approved Unload' %>
-					<a class="cta" style="background: orange; color: black; opacity: 1;">Bkr Apprv</a>
-					<% elsif status == 'Approved Load' %>
-					<a class="cta" style="background: yellow; color: black; opacity: 1;">Muat Apprv</a>
-					<% else %>
-					<a class="cta" style="background: grey; color: white; opacity: 1;">Draft</a>
-					<% end %>
-				</td>
-				<td class="right" width="60">
-				<%= link_to '&#xf044;'.html_safe, edit_claimmemo_path(memo, rel: 'approval'), :class => "edit tipsy", :title => 'Edit' %>
-				</td>
-			</tr>
-        <% end %>	
+		<% @claimmemos.each do |memo| %>
+		<% status = claimmemo_status(memo) %>
+		<tr>
+			<td><strong><%= memo.date.strftime('%d') %></strong>.<%= memo.date.strftime('%m') %></td>
+			<td><%= link_to memo.invoice_id, edit_claimmemo_path(memo, rel: 'approval') %></td>
+			<td>
+			1 Rit <%= memo.invoice.route&.name %> (<%= memo.invoice.driver&.name %>)
+			<%= memo.invoice.invoicetrain ? '= Kereta =' : '' %> 
+			<%= memo.invoice.isotank_id.present? ? "Isotank = #{memo.invoice.isotank&.isotanknumber}" : '' %>
+			<%= memo.invoice.container_id.present? ? "Kontainer = #{memo.invoice.container&.containernumber}" : '' %>
+			<%= memo.invoice.ship_id.present? ? " | #{memo.invoice.ship&.name}" : '' %>
+			<%= memo.invoice.user_id.present? ? " | #{memo.invoice.user&.username}" : '' %>
+			</td>
+			<td><%= memo.invoice.event&.commodity&.name %></td>
+			<td class="right"><%= memo.weight_gross || 0 %></td>
+			<td class="right"><%= memo.weight_net || 0 %></td>
+			<td class="right red"><%= memo.shrink || 0 %></td>
+			<td class="right"><%= memo.tolerance_total || 0 %></td>
+			<td class="right"><%= memo.shrinkage_load || 0 %></td>
+			<td class="right"><%= to_currency(memo.total) || 0 %></td>
+			<td style="width:80px;">
+			<a class="cta" style="background: <%= status[:color] %>; color: <%= status[:text_color] %>; opacity: 1;">
+				<%= status[:text] %>
+			</a>
+			</td>
+			<td class="right" width="60">
+			<%= link_to '&#xf044;'.html_safe, edit_claimmemo_path(memo, rel: 'approval'), class: "edit tipsy", title: 'Edit' %>
+			</td>
+		</tr>
+		<% end %>
 
     <% else %>	
     

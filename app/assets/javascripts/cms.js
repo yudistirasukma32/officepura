@@ -2008,8 +2008,11 @@ function getDataEvents(cl) {
         if (object.is_insurance) {
           obj.title += " (*INS)";
         }
-
-        if (object.customer_id > 0) obj.title += " (*P)";
+        if (object.invoicetrain == false) {
+          obj.className += " is_bold";
+          obj.title += " (*Darat)";
+        }
+        // if (object.customer_id > 0) obj.title += " (*P)";
 
         events.push(obj);
       }
@@ -2096,7 +2099,11 @@ function getDataEvents2(cl) {
           obj.className += " taxinvoiced";
           obj.title += " (*INV)";
         }
-        if (object.customer_id > 0) obj.title += " (*P)";
+        if (object.invoicetrain == false) {
+          obj.className += " is_bold";
+          obj.title += " (*Darat)";
+        }
+        // if (object.customer_id > 0) obj.title += " (*P)";
 
         events.push(obj);
       }
