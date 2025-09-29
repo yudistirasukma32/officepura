@@ -593,6 +593,8 @@ class EventsController < ApplicationController
       completed_by_vendor = false
       is_stapel = false
       is_insurance = false
+      addclass = nil
+      darat = false
 
       handled = false
       half_completed = false
@@ -637,6 +639,7 @@ class EventsController < ApplicationController
 
         if invoicetrain
           train = true
+          addclass = 'is_invoicetrain'
           if bkk_confirmed.to_i >= event_qty.to_i*2
             completed = true
           else
@@ -686,6 +689,11 @@ class EventsController < ApplicationController
 
       end
 
+      if !e.invoicetrain
+        summary = summary + ' (*Darat)'
+        darat = true
+      end
+
       {
         :id => e.id,
         :handled => handled,
@@ -697,6 +705,8 @@ class EventsController < ApplicationController
         :customer_id => e.customer_id,
         :downpayment_amount => e.downpayment_amount.to_i,
         :invoicetrain => train,
+        :darat => darat,
+        :addclass => addclass,
         :half_completed => half_completed,
         :completed => completed,
         :completed_by_vendor => completed_by_vendor,

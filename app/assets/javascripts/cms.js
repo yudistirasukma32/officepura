@@ -2099,9 +2099,8 @@ function getDataEvents2(cl) {
           obj.className += " taxinvoiced";
           obj.title += " (*INV)";
         }
-        if (object.invoicetrain == false) {
+        if (object.darat) {
           obj.className += " is_bold";
-          obj.title += " (*Darat)";
         }
         // if (object.customer_id > 0) obj.title += " (*P)";
 
