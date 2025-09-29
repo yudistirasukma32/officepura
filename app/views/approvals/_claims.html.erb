@@ -1,65 +1,60 @@
 <table class="row-view tablesorter hasFilters">
-    <thead>
-		<tr>
-			<th>Tgl</th>
-			<th>BKK</th>
-			<th>Keterangan</th>
-			<th>Komoditas</th>
-			<th>Muat</th>
-			<th>Bongkar</th>
-			<th>Susut</th>
-			<th>Toleransi</th>
-			<th>Beban Susut</th>
-			<!-- <th>Harga</th> -->
-			<th>Beban Supir</th>
-			<th>Status</th>
-			<th></th>
-		</tr>
-    </thead>
+  <thead>
+    <tr>
+      <th>Tgl</th>
+      <th>BKK</th>
+      <th>Keterangan</th>
+      <th>Komoditas</th>
+      <th>Muat</th>
+      <th>Bongkar</th>
+      <th>Susut</th>
+      <th>Toleransi</th>
+      <th>Beban Susut</th>
+      <!-- <th>Harga</th> -->
+      <th>Beban Supir</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
 
-    <tbody>
+  <tbody>
     <% if @claimmemos.any? %>
-    
-		<% @claimmemos.each do |memo| %>
-		<% status = claimmemo_status(memo) %>
-		<tr>
-			<td><strong><%= memo.date.strftime('%d') %></strong>.<%= memo.date.strftime('%m') %></td>
-			<td><%= link_to memo.invoice_id, edit_claimmemo_path(memo, rel: 'approval') %></td>
-			<td>
-			1 Rit <%= memo.invoice.route&.name %> (<%= memo.invoice.driver&.name %>)
-			<%= memo.invoice.invoicetrain ? '= Kereta =' : '' %> 
-			<%= memo.invoice.isotank_id.present? ? "Isotank = #{memo.invoice.isotank&.isotanknumber}" : '' %>
-			<%= memo.invoice.container_id.present? ? "Kontainer = #{memo.invoice.container&.containernumber}" : '' %>
-			<%= memo.invoice.ship_id.present? ? " | #{memo.invoice.ship&.name}" : '' %>
-			<%= memo.invoice.user_id.present? ? " | #{memo.invoice.user&.username}" : '' %>
-			</td>
-			<td><%= memo.invoice.event&.commodity&.name %></td>
-			<td class="right"><%= memo.weight_gross || 0 %></td>
-			<td class="right"><%= memo.weight_net || 0 %></td>
-			<td class="right red"><%= memo.shrink || 0 %></td>
-			<td class="right"><%= memo.tolerance_total || 0 %></td>
-			<td class="right"><%= memo.shrinkage_load || 0 %></td>
-			<td class="right"><%= to_currency(memo.total) || 0 %></td>
-			<td style="width:80px;">
-			<a class="cta" style="background: <%= status[:color] %>; color: <%= status[:text_color] %>; opacity: 1;">
-				<%= status[:text] %>
-			</a>
-			</td>
-			<td class="right" width="60">
-			<%= link_to '&#xf044;'.html_safe, edit_claimmemo_path(memo, rel: 'approval'), class: "edit tipsy", title: 'Edit' %>
-			</td>
-		</tr>
-		<% end %>
-
-    <% else %>	
-    
+      <% @claimmemos.each do |memo| %>
+        <% status = claimmemo_status(memo) %>
         <tr>
-			<td colspan = '11'>
-				Tidak ada data klaim susut baru
-			</td>
+          <td><strong><%= memo.date.strftime('%d') %></strong>.<%= memo.date.strftime('%m') %></td>
+          <td><%= link_to memo.invoice_id, edit_claimmemo_path(memo, rel: 'approval') %></td>
+          <td>
+            1 Rit <%= memo.invoice.route.try(:name) %> (<%= memo.invoice.driver.try(:name) %>)
+            <%= memo.invoice.invoicetrain ? '= Kereta =' : '' %> 
+            <%= memo.invoice.isotank_id.present? ? "Isotank = #{memo.invoice.isotank.try(:isotanknumber)}" : '' %>
+            <%= memo.invoice.container_id.present? ? "Kontainer = #{memo.invoice.container.try(:containernumber)}" : '' %>
+            <%= memo.invoice.ship_id.present? ? " | #{memo.invoice.ship.try(:name)}" : '' %>
+            <%= memo.invoice.user_id.present? ? " | #{memo.invoice.user.try(:username)}" : '' %>
+          </td>
+          <td><%= memo.invoice.event.try(:commodity).try(:name) %></td>
+          <td class="right"><%= memo.weight_gross || 0 %></td>
+          <td class="right"><%= memo.weight_net || 0 %></td>
+          <td class="right red"><%= memo.shrink || 0 %></td>
+          <td class="right"><%= memo.tolerance_total || 0 %></td>
+          <td class="right"><%= memo.shrinkage_load || 0 %></td>
+          <td class="right"><%= to_currency(memo.total) || 0 %></td>
+          <td style="width:80px;">
+            <a class="cta" style="background: <%= status[:color] %>; color: <%= status[:text_color] %>; opacity: 1;">
+              <%= status[:text] %>
+            </a>
+          </td>
+          <td class="right" width="60">
+            <%= link_to '&#xf044;'.html_safe, edit_claimmemo_path(memo, rel: 'approval'), class: "edit tipsy", title: 'Edit' %>
+          </td>
         </tr>
-
-    <% end %>	
-    </tbody>
-
+      <% end %>
+    <% else %> 
+      <tr>
+        <td colspan='11'>
+          Tidak ada data klaim susut baru
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
 </table>
