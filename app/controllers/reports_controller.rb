@@ -5882,7 +5882,7 @@ end
           :rata2_omzet    => rata2_omzet,
           :rata2_piutang  => rata2_piutang,
           :jumlah_bulan   => @number_of_months,
-          customer_notes: Customernote.where('customer_id = ?', customer.id).enabled.order("created_at DESC").map do |note|
+          customer_notes: Customernote.where('customer_id = ?', customer.id).where('taxinvoice_id is null').enabled.order("created_at DESC").map do |note|
             {
               id: note.id,
               description: note.description,

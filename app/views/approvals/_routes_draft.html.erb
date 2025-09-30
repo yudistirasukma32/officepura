@@ -7,6 +7,7 @@
 		<th>Komoditas</th>
 		<th>Jarak (KM)</th>
 		<th>User</th>
+		<th>Status</th>
 		<th width="60"></th>
 	</tr>
 
@@ -26,6 +27,14 @@
 		<td><%= route.commodity.name rescue nil %></td>
 		<td class="text-right"><%= route.distance rescue nil %></td>
 		<td><%= route.user.username if !route.user.blank? %></td>
+		<td>
+			<% text = route.rejected ? 'Rejected by GM' : 'Menunggu Approval GM' %>
+			<% color = route.rejected ? 'red' : 'yellow' %>
+			<% text_color = route.rejected ? 'white' : 'black' %>
+			<a class="cta" style="background: <%= color %>; color: <%= text_color %>; opacity: 1;">
+				<%= text %>
+			</a>
+		</td>
 		<td class="right" width="60">
 			<%= link_to '&#xf044;'.html_safe, edit_route_path(route), :class => "edit tipsy", :title => 'Edit' if checkrole 'Admin Operasional, Marketing, Admin Jurusan' %> 
 		</td>

@@ -5,8 +5,19 @@
 		pointer-events: none !important;
 	}
 
+	.yellow {
+		background-image: linear-gradient(#FFC107, #FF9800) !important;
+		border-color: #FF9800 #FF9800 #FF9800 !important;
+		pointer-events: none !important;
+	}
+
 	.disabled {
 		pointer-events: none !important;
+	}
+
+	.grey {
+		background: grey !important;
+		background-color: grey !important;
 	}
 </style>
 
@@ -27,21 +38,33 @@
 			<% end %>
 
 			<div style="position: relative; display: flex;">
-				<% if !@route.approved %>
+				<% if !@route.approved && !@route.rejected %>
 					<% if checkrole 'General Manager' %>
 						<a class="btn-txt" href="approve"><i class="icon-check"></i> GM Approve</a>
+						<a class="btn-txt cancel" href="reject"><i class="icon-remove"></i> GM Reject</a>
+					<% else %>
+						<a class="btn-txt yellow disabled"><i class="icon-time"></i> Menunggu Approval GM</a>
 					<% end %>
-				<% else %>
-				<a class="btn-txt green disabled" href="#"><i class="icon-check"></i> GM Approved</a>
+				<% elsif @route.approved %>
+					<a class="btn-txt green disabled" href="#"><i class="icon-check"></i> GM Approved</a>
+				<% elsif @route.rejected %>
+					<a class="btn-txt cancel disabled" href="#"><i class="icon-check"></i> GM Rejected</a>
 				<% end %>
 
 				<% if params[:operational] || params[:operational] == true %>
-					<a class="btn-txt cancel" href="../../routes"><i class="icon-remove"></i> Kembali Ke Jurusan</a>
+					<a class="btn-txt grey" href="../../routes"><i class="icon-back"></i> Kembali Ke Jurusan</a>
 				<% else %>
-					<a class="btn-txt cancel" href="<%=edit_customer_path(@customer)%>/#2"><i class="icon-remove"></i> Kembali Ke Pelanggan</a>
+					<a class="btn-txt grey" href="<%=edit_customer_path(@customer)%>/#2"><i class="icon-back"></i> Kembali Ke Pelanggan</a>
 				<% end %>
 			</div>
 		</div>
+
+		<% if !@route.approved && !@route.rejected %>
+		<div style="background: #fff; padding: 1rem 1rem 0;">
+			<strong>Perhatian.</strong>
+			<p>Jurusan belum di-approve oleh General Manager. Jurusan tidak akan muncul di opsi BKK.</p>
+		</div>
+		<% end %>
 		
 		<%= render "form" %>
 		

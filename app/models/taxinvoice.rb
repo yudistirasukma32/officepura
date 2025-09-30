@@ -16,6 +16,7 @@ class Taxinvoice < ActiveRecord::Base
 	has_many :taxinvoiceitemvs
 	has_many :taxgenericitems
 	has_many :taxinvoices
+	has_many :customernotes, :class_name => "Customernote", :foreign_key => "customer_id"
 
   	# Setup accessible (or protected) attributes for your model
   	attr_accessible :customer_id, :office_id, :date, :long_id, :ship_name, :description, :total, :deleted, :paiddate, :duedate, :period_start, :period_end, :product_name,

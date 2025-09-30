@@ -1368,6 +1368,8 @@ class InvoicesController < ApplicationController
         @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name ~* '.*depo.*'").order(:name)
     end
 
+    @routes = @routes.where(:approved => true)
+
     puts "QUERY: " + @routes.to_sql
 
     render :json => { :success => true, :train => is_train, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json;
@@ -1382,6 +1384,7 @@ class InvoicesController < ApplicationController
 
         @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).order(:name)
         # @routes = Route.where(:office_id => params[:office_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
+        @routes = @routes.where(:approved => true)
 
     else
 
@@ -1397,6 +1400,8 @@ class InvoicesController < ApplicationController
     # return false
     # @routes = Route.where(:customer_id => params[:customer_id], :transporttype => params[:transporttype], :enabled => true, :deleted => false).order(:name)
     @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
+    @routes = @routes.where(:approved => true)
+
     render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes", :layout => false) }.to_json;
   end
 
@@ -1405,6 +1410,8 @@ class InvoicesController < ApplicationController
     # return false
     # @routes = Route.where(:customer_id => params[:customer_id], :transporttype => params[:transporttype], :enabled => true, :deleted => false).order(:name)
     @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
+    @routes = @routes.where(:approved => true)
+
     render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes_for_events", :layout => false) }.to_json;
   end
 
@@ -1430,6 +1437,8 @@ class InvoicesController < ApplicationController
 
   def get_routes2
     @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).order(:name)
+    @routes = @routes.where(:approved => true)
+    
     if params[:type] == "0"
       render :json => { :success => true, :html => render_to_string(:partial => "invoices/routes2", :layout => false) }.to_json;
     else

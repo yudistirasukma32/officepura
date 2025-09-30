@@ -92,10 +92,11 @@ th, td {
 				<th class="{sorter:true, filter: false}">Tole ransi</th>
 				<th class="{sorter:true, filter: false}">Beban Susut</th>
 				<th>Harga</th> -->
-				<th class="{sorter:true, filter: true}">User</th>
+				
 				<th class="{sorter:true, filter: false}">Klaim/<br/>Beban Supir</th>
-				<th class="{sorter:true, filter: true}"  width="60">Status</th>
 				<th class="{sorter:true, filter: true}"  width="60">Jurnal</th>
+				<th class="{sorter:true, filter: true}">User</th>
+				<th class="{sorter:true, filter: true}"  width="60">Status</th>
 				<th class="{sorter:false, filter: false}" width="60"></th>
 			</tr>
 
@@ -164,13 +165,8 @@ th, td {
 				<td class="right green"><%= memo.tolerance_total rescue 0 %></td>
 				<td class="right red"><%= memo.shrinkage_load rescue 0 %></td>
 				<td class="right"><%= memo.price_per rescue 0 %></td> -->
-				<td><%= memo.user.username rescue nil %></td>
+				
 				<td class="right"><%= to_currency(memo.total) rescue 0 %><br/><%= to_currency(memo.driver_charge) rescue 0 %></td>
-				<td style="width:60px;">
-					<a class="cta" style="background: <%= status[:color] %>; color: <%= status[:text_color] %>; opacity: 1;">
-						<%= status[:text] %>
-					</a>
-				</td>
 				<td class="right" width="60">
 					<div>
 					<% memo.bankexpenses.active.each do |be| %>
@@ -180,6 +176,12 @@ th, td {
 									target: "_blank" %><br>
 					<% end %>
 					</div>
+				</td>
+				<td><%= memo.user.username rescue nil %></td>
+				<td style="width:60px;">
+					<a class="cta" style="background: <%= status[:color] %>; color: <%= status[:text_color] %>; opacity: 1;">
+						<%= status[:text] %>
+					</a>
 				</td>
 				<td class="right" width="60">
 				<div class="flex">
@@ -195,10 +197,10 @@ th, td {
 
 		<tfoot>
 			<tr class="footer">
-				<td class="right" colspan="9">Total</td>
+				<td class="right" colspan="8">Total</td>
 				<td class="right"></td>
 				<td class="right"><strong><%= to_currency(total) %></strong><br/><strong><%= to_currency(driver_charge_total) %></strong></td>
-				<td class="right" colspan="3"></td>
+				<td class="right" colspan="4"></td>
 			</tr>
 		</tfoot>
 

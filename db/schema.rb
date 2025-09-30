@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250923035353) do
+ActiveRecord::Schema.define(:version => 20250930041047) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -326,6 +326,7 @@ ActiveRecord::Schema.define(:version => 20250923035353) do
     t.integer   "deleteuser_id"
     t.timestamp "created_at",    :limit => 6,                    :null => false
     t.timestamp "updated_at",    :limit => 6,                    :null => false
+    t.integer   "taxinvoice_id"
   end
 
   create_table "customers", :force => true do |t|
@@ -1519,6 +1520,10 @@ ActiveRecord::Schema.define(:version => 20250923035353) do
     t.timestamp "approved_at",     :limit => 6
     t.integer   "approved_by"
     t.integer   "user_id"
+    t.boolean   "rejected",                                                    :default => false
+    t.datetime  "rejected_at"
+    t.integer   "rejected_by"
+    t.text      "rejected_note"
   end
 
   add_index "routes", ["name", "customer_id", "office_id"], :name => "route_office"

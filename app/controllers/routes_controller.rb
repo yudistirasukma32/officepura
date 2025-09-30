@@ -331,4 +331,15 @@ class RoutesController < ApplicationController
     redirect_to(edit_route_path(params['id']), :notice => 'Data Jurusan sukses di-approve.')
   end
 
+  def reject
+    @route = Route.find(params[:id])
+    @route.approved = false
+    @route.rejected = true
+    @route.rejected_note = params[:rejected_note]
+    @route.rejected_at = Time.new.strftime("%Y-%m-%d")
+    @route.rejected_by = current_user.id
+    @route.save
+    redirect_to(edit_route_path(params['id']), :notice => 'Data Jurusan sukses di-reject.')
+  end
+
 end
