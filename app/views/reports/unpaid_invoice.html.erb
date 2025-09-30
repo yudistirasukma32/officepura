@@ -124,9 +124,9 @@
                         <td align="right"><%= to_currency(taxinvoice.price_tax) %></td>
                         <td align="right"><%= to_currency(taxinvoice.total - ( taxinvoice.downpayment rescue 0 ) - (taxinvoice.secondpayment rescue 0 ) - ( taxinvoice.thirdpayment rescue 0 ) - (taxinvoice.fourthpayment rescue 0 )) %></td>
                         <td>
-                            <% if Customernote.where('taxinvoice_id = ?',taxinvoice.id).present? %>
+                            <% if Customernote.where('taxinvoice_id = ?',taxinvoice.id).enabled.present? %>
                               <ul id="notes-list-<%= taxinvoice.id %>" style="padding-left: 15px; margin: 0; font-size: 12px; color: #555;">
-                                <% Customernote.where('taxinvoice_id = ?',taxinvoice.id).each do |note| %>
+                                <% Customernote.where('taxinvoice_id = ?',taxinvoice.id).enabled.each do |note| %>
                                   <li id="note-<%= note.id %>">
                                     <span>
                                       <%= note[:description] %>&nbsp;
