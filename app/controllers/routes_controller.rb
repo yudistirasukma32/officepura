@@ -154,8 +154,8 @@ class RoutesController < ApplicationController
       all_data = Route.active.where("office_id = ?#{additional_query}", @office_id).select(:id).count()
       @routes = Route.active.where("office_id = ?#{additional_query}", @office_id).limit(batas).offset(halaman_awal).order("name asc")
     else
-      all_data = Route.where("deleted = false#{additional_query}").select(:id).count()
-      @routes = Route.where("deleted = false#{additional_query}").limit(batas).offset(halaman_awal).order("name asc")
+      all_data = Route.active.where("deleted = false#{additional_query}").select(:id).count()
+      @routes = Route.active.where("deleted = false#{additional_query}").limit(batas).offset(halaman_awal).order("name asc")
     end
 
 

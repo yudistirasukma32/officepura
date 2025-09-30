@@ -33,6 +33,7 @@
             <th class="{sorter:true, filter: true}" width="80">Solar (Lt)</th>
             <th class="{sorter: false, filter: false}">Um Supir</th>
             <th class="{sorter: false, filter: false}">Um Kernet</th> 
+            <th class="{sorter: false, filter: false}">GM Approved</th>
             <th class="{sorter: false, filter: false}">Aktif</th>
             <th width="60" class="{sorter: false, filter: false}"></th>
         </tr>
@@ -70,7 +71,13 @@
         <td align='right'><%= route_allowance.gas_trip rescue 0%></td>
         <td align='right'><%= to_currency(route_allowance.driver_trip) rescue 0 %></td>
         <td align='right'><%= to_currency(route_allowance.helper_trip) rescue 0 %></td>
- 
+        <td class="center">
+        <% if route.approved %>
+            <%= link_to '&#xf058;'.html_safe, '#', :class => 'enabled tipsy', :title => 'Approved GM' %>
+        <% else %>
+            <%= link_to '&#xf057;'.html_safe, '#', :class => 'disabled tipsy', :title => 'Waiting GM' %>
+        <% end %>
+        </td>
         <% if route.enabled %>
             <td><% if checkrole 'Master Jurusan, Admin Marketing, Management Jurusan'%> <%= link_to '&#xf058;'.html_safe, disable_route_path(route), :class => 'enabled tipsy', :title => 'Non Aktifkan' %><% else %><%= link_to '&#xf058;'.html_safe, '', :class => 'enabled tipsy' if checkrole 'Admin Marketing, Admin Jurusan, General Manager' %><% end %></td>
         <% else %>
