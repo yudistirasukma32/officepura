@@ -1663,7 +1663,7 @@ end
   end
 
   def expenses_daily_new
-    role = cek_roles 'Admin Keuangan, Admin Operasional'
+    role = cek_roles 'Admin Keuangan, Admin Operasional, Admin Penagihan'
     if role
     @where = "expenses-daily-new"
       @section = "reports1"
@@ -1769,7 +1769,7 @@ end
   end
 
   def expenses_bank
-    role = cek_roles 'Admin Keuangan'
+    role = cek_roles 'Admin Keuangan, Admin Penagihan'
     if role
         @where = "expenses-bank"
       @section = "reports1"
@@ -1807,7 +1807,7 @@ end
   end
 
   def filterledger
-    role = cek_roles 'Admin Keuangan'
+    role = cek_roles 'Admin Keuangan, Admin Penagihan'
     if role
         @where = "ledger"
       @section = "reports1"

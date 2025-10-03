@@ -183,7 +183,7 @@
 			<li class="<%= @where == 'incomes-statement' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Laba Rugi Biaya", "/reports/incomes-statement" %></li>
 			<li class="<%= @where == 'incomes-cashinout' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "LR Cash in/out", "/reports/incomes-cashinout" %></li>
 			<li class="<%= @where == 'incomes-statement-nocharge' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "LR non Biaya", "/reports/incomes-statement-nocharge" %></li>
-			<li class="<%= @where == 'ledger' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Buku Besar", "/reports/filterledger" %></li>
+			<li class="<%= @where == 'ledger' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan, Admin Penagihan'), "Buku Besar", "/reports/filterledger" %></li>
 			<li class="<%= @where == 'balances' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Neraca", "/reports/balances" %></li>
 			<li class="<%= @where == 'reports-assets' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin Keuangan'), "Penyusutan Aktiva", "/reports/assets" %></li>			
 		<% end %>
