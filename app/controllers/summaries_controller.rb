@@ -17,6 +17,7 @@ class SummariesController  < ApplicationController
             @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
 
             @taxinvoices = Taxinvoice.active.where("doubtful_ar = true AND (date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order(:date)
+            @taxinvoices = @taxinvoices.where("paiddate is null")
 
             @section = "taxinvoices"
             @where = "doubtful_ar_reports"
