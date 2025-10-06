@@ -331,7 +331,7 @@
                     <% if @taxinvoice.is_weightlost %>
                     <td align="right"><%= taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross%></td>
                     <% end %>
-                    <td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
+                    <td align="left" style="padding-left:10px;"><%= to_currency(taxinvoiceitem.price_per)%></td>
                     <td colspan="2" style="text-align:left">
                         <% if taxinvoiceitem.invoice.event %>
                         <%=taxinvoiceitem.invoice.event.summary%>
@@ -370,7 +370,7 @@
                     <% if @taxinvoice.is_weightlost %>
                     <td align="right"><%= taxinvoiceitem.weight_net - taxinvoiceitem.weight_gross%></td>
                     <% end %>
-                    <td align="left" style="padding-left:10px;"><%= to_currency_bank(taxinvoiceitem.price_per)%></td>
+                    <td align="left" style="padding-left:10px;"><%= to_currency(taxinvoiceitem.price_per)%></td>
                     <td colspan="2" style="text-align:left"><%=taxinvoiceitem.event.summary rescue nil%></td>
                     <td align="right"><%= to_currency(taxinvoiceitem.total)%> </td>
                 </tr>
@@ -393,7 +393,7 @@
                     <% if @taxinvoice.is_weightlost %>
                     <td align="right"><%= taxgenericitem.weight_net - taxgenericitem.weight_gross%></td>
                     <% end %>
-                    <td align="left" style="padding-left:10px;"><%=to_currency_bank(taxgenericitem.price_per)%></td>
+                    <td align="left" style="padding-left:10px;"><%=to_currency(taxgenericitem.price_per)%></td>
                     <td colspan="2" style="text-align:left"><%=taxgenericitem.description%></td>
                     <td align="right"><%= to_currency(taxgenericitem.total)%></td>
 
