@@ -60,6 +60,12 @@
     </div>
 
     <div class="field-row">
+      <label for="manual_vehicle_number">Kendaraan Manual di SJ</label>
+      <input type="text" name="manual_vehicle_number" class="half left" value="<%=@invoice.taxinvoiceitems.first.manual_vehicle_number rescue nil%>" />
+      <small>*Diisi untuk SJ jika muat/bongkar pakai kendaraan selain di master.</small>
+    </div>
+
+    <div class="field-row">
       <label for="invoice_driver_id">Driver</label>
       <select id="invoice_driver_id" name="invoice[driver_id]" class="chzn-select double combo_route" onchange="javascript:getDriverPhone(this.value);">
         <option value="0">- Supir -</option>

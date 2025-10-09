@@ -38,6 +38,19 @@ class InvoicesController < ApplicationController
     @invoice.container_id = inputs[:container_id]
 
     if @invoice.save
+
+      if !params[:manual_vehicle_number].blank?
+        taxinvoiceitem = Taxinvoiceitem.find_by_invoice_id(@invoice.id)
+        if taxinvoiceitem
+          taxinvoiceitem.manual_vehicle_number = params[:manual_vehicle_number]
+            if taxinvoiceitem.save
+              Rails.logger.info "✅ Manual vehicle number saved successfully"
+            else
+              Rails.logger.error "❌ Failed to save: #{taxinvoiceitem.errors.full_messages.join(', ')}"
+            end
+        end
+      end
+
       redirect_to("/search?invoice_id="+@invoice.id.to_s, :notice => 'Data BKK berhasil diupdate.')
     end
 

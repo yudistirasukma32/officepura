@@ -1,3 +1,64 @@
+<div class="infobox-2" style="width: fit-content;">
+
+    <h3 style="font-weight: bold;">Upload Gambar Surat Jalan BKK Sebelumnya</h3>
+
+      <% if Invoice.find(params[:invoice_id]).images.where("enabled = true and file_uid is not null and file_uid <> ''").any? %>
+        <% Invoice.find(params[:invoice_id]).images.where("enabled = true and file_uid is not null and file_uid <> ''").each do |img| %>
+          <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+	
+          <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+          
+          <a href="<%= img.file.url() %>" target="_blank">
+              <%= image_tag img.file.thumb('480x320').url(:suffix => "/#{img.name}"), style: "width: 100%;" if img.file_uid %>
+          </a>
+          
+          <% else %>
+          
+            <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
+          
+          <% end %>
+
+          <br />
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
+          <span style="font-size: 10px; color: #717171;">Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+
+          </div>
+          <br>
+          <br>
+        <% end %>
+			<% end %>
+
+    <form action="/attachments/uploadTaxInv" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+        <input type="hidden" name="model_name" value="Invoice" />
+        <input type="hidden" name="item_id" value="<%= params[:invoice_id] %>" />
+        <input type="hidden" name="origin" value="add_kosongan">
+
+        <div style="display: flex;">
+            <div>
+                <div class="field-row" style="width: 300px;">
+                    <label for="name">Nama</label>
+                    <input type="text" name="attachment[name]" style="width: 100%; max-width: 280px;"/>
+                </div>
+
+                <div class="field-row continue" style="width: 100%;">
+                    <label for="file">Browse File</label>
+                    <input type="file" name="attachment[file]"/>
+                </div>
+            </div>
+
+            <div>
+                <div class="actions" style="text-align: left; padding: 0; margin-top: 2.25rem; margin-bottom: 1.5rem;">
+                    <input type="submit" value="Simpan File" />
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <br>
+    <br>
+</div>
+
 <%= form_for @invoice, url: createkosongan_url do |f| %>
   
   <%= render "info-box", :f => f %>

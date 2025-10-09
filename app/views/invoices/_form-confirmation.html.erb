@@ -13,498 +13,568 @@
     border-radius: 12px;
     margin: 1rem 0;
   }
+
+  .flex {
+    display: flex;
+  }
+
+  .infobox-2 {
+    padding-top: 3.5rem;
+    padding-left: 3.5rem;
+  }
+
 </style>
-  
-  <%= form_for(@invoice) do |f| %>
-  <div class="actions" style="float:left; padding:0 0 30px 20px;">
-    <input type="hidden" id="printername" value="<%= Setting.find_by_name("Printer Name").value if !Setting.find_by_name("Printer Name").nil? %>" />
-    <a class="left" href="javascript:print();"><i class="icon-print"></i> Print Normal</a>
-    <a id="bkk_printmatrix" class="left" href="javascript:zebraprint('invoice');"><i class="icon-print"></i> Print Dot Matrix</a>
-    <a class="back left" href="<%=invoices_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
 
-    <% if !@invoice.kosongan %>
-    <a class="back left success-btn" href="/invoices/add_kosongan/<%=@invoice.id%>">Tambah Add-On</a>
-    <a class="back left grey-btn" title="Tambah Add-On digunakan untuk membuat BKK Kosongan Produktif. Sebagai lanjutan BKK apabila tidak menuju garasi / pulang.">?</a>
-    <% end %>
+<div class="flex">
+  <div class="infobox-1">
+    <%= form_for(@invoice) do |f| %>
+    <div class="actions" style="float:left; padding:0 0 30px 20px;">
+      <input type="hidden" id="printername" value="<%= Setting.find_by_name("Printer Name").value if !Setting.find_by_name("Printer Name").nil? %>" />
+      <a class="left" href="javascript:print();"><i class="icon-print"></i> Print Normal</a>
+      <a id="bkk_printmatrix" class="left" href="javascript:zebraprint('invoice');"><i class="icon-print"></i> Print Dot Matrix</a>
+      <a class="back left" href="<%=invoices_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index</a>
 
-  </div>  
-
-  <div id="bkk-print" class="hideprint info-box bkk-paper" onLoad="javascript: LoadAppletPrinter();" style="width:560px; float:left; clear:left;">
-
-    <table class="row-view no-border">
-      <tr valign="top">
-        <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
-        <td align="right" class="header">
-        Bukti Kas Keluar 
-        <%= @invoice.kosongan ? "Kosongan [" + @invoice.kosongan_type[0] + "]" : ""%>
-        <%= @invoice.invoicetrain ? "Kereta" : ""%>
-        <br/>#<%=zeropad(@invoice.id)%><input type="hidden" id="strInvoiceId" value="#<%=zeropad(@invoice.id)%>" />
-        <% if @invoice.is_insurance %><i class="icon-star-empty"></i><% end%>
-        </td>
-      </tr>
-    </table>
-
-    <hr style="width:600px;" />
-
-    <% if @invoice.kosongan && @invoice.kosongan_type = 'non-produktif' && @invoice.kosongan_confirmed %>
-      <div class="green-box">
-        BKK Kosongan Non-Produktif <strong>sudah</strong> dikonfirmasi oleh Marketing
-      </div>
-      <% elsif @invoice.kosongan && @invoice.kosongan_type = 'non-produktif' && !@invoice.kosongan_confirmed %>
-      <div class="red-box">
-        BKK Kosongan Non-Produktif <strong>belum</strong> dikonfirmasi oleh Marketing
-      </div>
-    <% end %>
-
-    <table class="row-view no-border">
-      <tr>
-        <td width="90">Tanggal</td>
-        <td><span id="strDate"><%=@invoice.date.strftime('%d %B %Y')%></span> &nbsp;(KTR: <span id="strOffice"><%=@invoice.office.name%></span>)</td>
-      </tr>
-
-      <tr>
-        <td>Pelanggan</td>
-        <td id="strCustomer"><%=@invoice.customer.name%></td>
-      </tr>
-      <tr>
-        <td>Jurusan</td>
-        <td>
-          <strong><span id="strQty"><%=@invoice.quantity%></span></strong> Rit: <span id="strRoute"><%=@invoice.route.name%></span>
-         </td>
-      </tr>
-      <tr>
-        <td>Tipe</td>
-        <td id="strType"><%=@invoice.route.routegroup.name%></td>
-      </tr>
-
-      <% if @invoice.vehicle_duplicate_id.present? && @invoice.vehicle_duplicate_id != 0 %>
-      <tr>
-        <td>Kendaraan Asli</td>
-        <td>
-          <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
-          <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
-        </td>
-      </tr>
-      <tr>
-        <td>Kendaraan Jalan/Pinjam</td>
-        <td>
-          <strong><%=@invoice.vehicle_duplicate.current_id%></strong> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
-          <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle_duplicate.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
-        </td>
-      </tr>
-      <% else %>
-      <tr>
-        <td>Kendaraan</td>
-        <td>
-          <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
-          <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
-        </td>
-      </tr>
+      <% if !@invoice.kosongan %>
+      <a class="back left success-btn" href="/invoices/add_kosongan/<%=@invoice.id%>">Tambah Add-On</a>
+      <a class="back left grey-btn" title="Tambah Add-On digunakan untuk membuat BKK Kosongan Produktif. Sebagai lanjutan BKK apabila tidak menuju garasi / pulang.">?</a>
       <% end %>
-        
-    <% if @invoice.isotank_id != 0 %>
-      <tr>
-        <td>No. Isotank</td>
-        <td id="strIsotank"><%=@invoice.isotank.isotanknumber rescue nil%></td>
-      </tr>
-    <% else %>
-      <% if !@invoice.isotank_number.nil? %>
+
+    </div>  
+
+    <div id="bkk-print" class="hideprint info-box bkk-paper" onLoad="javascript: LoadAppletPrinter();" style="width:560px; float:left; clear:left;">
+
+      <table class="row-view no-border">
+        <tr valign="top">
+          <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span><br /> <%= Setting.find_by_name("Client Address").value if !Setting.find_by_name("Client Address").nil? %></strong></td>
+          <td align="right" class="header">
+          Bukti Kas Keluar 
+          <%= @invoice.kosongan ? "Kosongan [" + @invoice.kosongan_type[0] + "]" : ""%>
+          <%= @invoice.invoicetrain ? "Kereta" : ""%>
+          <br/>#<%=zeropad(@invoice.id)%><input type="hidden" id="strInvoiceId" value="#<%=zeropad(@invoice.id)%>" />
+          <% if @invoice.is_insurance %><i class="icon-star-empty"></i><% end%>
+          </td>
+        </tr>
+      </table>
+
+      <hr style="width:600px;" />
+
+      <% if @invoice.kosongan && @invoice.kosongan_type = 'non-produktif' && @invoice.kosongan_confirmed %>
+        <div class="green-box">
+          BKK Kosongan Non-Produktif <strong>sudah</strong> dikonfirmasi oleh Marketing
+        </div>
+        <% elsif @invoice.kosongan && @invoice.kosongan_type = 'non-produktif' && !@invoice.kosongan_confirmed %>
+        <div class="red-box">
+          BKK Kosongan Non-Produktif <strong>belum</strong> dikonfirmasi oleh Marketing
+        </div>
+      <% end %>
+
+      <table class="row-view no-border">
+        <tr>
+          <td width="90">Tanggal</td>
+          <td><span id="strDate"><%=@invoice.date.strftime('%d %B %Y')%></span> &nbsp;(KTR: <span id="strOffice"><%=@invoice.office.name%></span>)</td>
+        </tr>
+
+        <tr>
+          <td>Pelanggan</td>
+          <td id="strCustomer"><%=@invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td>
+            <strong><span id="strQty"><%=@invoice.quantity%></span></strong> Rit: <span id="strRoute"><%=@invoice.route.name%></span>
+          </td>
+        </tr>
+        <tr>
+          <td>Tipe</td>
+          <td id="strType"><%=@invoice.route.routegroup.name%></td>
+        </tr>
+
+        <% if @invoice.vehicle_duplicate_id.present? && @invoice.vehicle_duplicate_id != 0 %>
+        <tr>
+          <td>Kendaraan Asli</td>
+          <td>
+            <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <tr>
+          <td>Kendaraan Jalan/Pinjam</td>
+          <td>
+            <strong><%=@invoice.vehicle_duplicate.current_id%></strong> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle_duplicate.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <% else %>
+        <tr>
+          <td>Kendaraan</td>
+          <td>
+            <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <% end %>
+          
+      <% if @invoice.isotank_id != 0 %>
         <tr>
           <td>No. Isotank</td>
-          <td id="strIsotank2"><%=@invoice.isotank_number%></td>
+          <td id="strIsotank"><%=@invoice.isotank.isotanknumber rescue nil%></td>
         </tr>
+      <% else %>
+        <% if !@invoice.isotank_number.nil? %>
+          <tr>
+            <td>No. Isotank</td>
+            <td id="strIsotank2"><%=@invoice.isotank_number%></td>
+          </tr>
+        <% end %>
       <% end %>
-    <% end %>
-        
-    
-    <% if @invoice.container_id != 0 %>
-      <tr>
-        <td>No. Kontainer</td>
-        <td id="strContainer">
-        <%=@invoice.container.containernumber rescue nil%>
-          <% if (@invoice.container.vendor_id.present?)%>
-						<br>
-						<%= @invoice.container.vendor.name rescue nil%>
-					<% end %>
-        </td>
-      </tr>
-    <% else %>
-      <% if !@invoice.container_number.nil? %>
-        <tr>
-          <td>No. Kontainer</td>
-          <td id="strContainer2"><%=@invoice.container_number%></td>
-        </tr>
-      <% end %>
-    <% end %>
-
-    <tr>
-      <td style="padding-top: 1.5rem;">
-        <strong>Supir</strong>
-      </td>
-    </tr>
-
-    <tr>
-      <td>Supir</td>
-      <td>
-        <%=@invoice.driver.name rescue nil%> (<%= zeropad(@invoice.driver.id) rescue nil%>)
-        <% if !@invoice.driver.helpers.first.nil? && @invoice.need_helper %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil %>)<% end %>
-        <input type="hidden" id="strDriver" value="<%=@invoice.driver.name rescue nil%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil%>)<% end %>" />
-      </td>
-    </tr>
-
-    <td>No. Telp.</td>
-      <td><%=@invoice.driver.phone rescue nil%> &nbsp; <%=@invoice.driver.mobile rescue nil%></td>
-    </tr>
-
-    <tr>
-      <td>No. Rek.</td>
-      <td><%=@invoice.driver.bank_account rescue nil%></td>
-    </tr>
-
-    <% if @invoice.event_id %>
-    <tr>
-      <td style="padding-top: 1.5rem;">
-        <strong>Target</strong>
-      </td>
-    </tr>
-    <tr>
-      <td>Tgl Muat</td>
-      <td><%= @invoice.event.load_date.strftime('%d %B %Y') rescue nil %></td>
-    </tr>
-
-    <tr>
-      <td>Tgl Bongkar</td>
-      <td><%= @invoice.event.unload_date.strftime('%d %B %Y') rescue nil %></td>
-    </tr>
-
-    <tr>
-      <td>Min. Tonage</td>
-      <td><%= @invoice.event.estimated_tonage rescue nil %>&nbsp;<%= @invoice.event.price_per_type rescue nil %></td>
-    </tr>
+          
       
-    <% end %>
+      <% if @invoice.container_id != 0 %>
+        <tr>
+          <td>No. Kontainer</td>
+          <td id="strContainer">
+          <%=@invoice.container.containernumber rescue nil%>
+            <% if (@invoice.container.vendor_id.present?)%>
+              <br>
+              <%= @invoice.container.vendor.name rescue nil%>
+            <% end %>
+          </td>
+        </tr>
+      <% else %>
+        <% if !@invoice.container_number.nil? %>
+          <tr>
+            <td>No. Kontainer</td>
+            <td id="strContainer2"><%=@invoice.container_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
 
-    <% if @invoice.route.distance.present? %>
-    <tr>
-      <td style="padding-top: 1.5rem;">
-        <strong>Informasi</strong>
-      </td>
-    </tr>
-    <tr>
-      <td>Jarak</td>
-      <td><%= @invoice.route.distance rescue nil %> km</td>
-    </tr>
-    <% end %>
-
-    <!-- Jarak -->
-    <% if @invoice.route.distance.present? %>
-    <tr>
-      <td>Jarak</td>
-      <td><%= @invoice.route.distance rescue nil %> km</td>
-    </tr>
-    <% else %>
-    <tr>
-      <td>Jarak</td>
-      <td>
-          <span style="text-decoration: underline;">
-              <%
-                gas_trip = 0.0
-                if @invoice.route && @invoice.route.allowances && @invoice.route.allowances.first
-                  gas_trip_value = @invoice.route.allowances.first.gas_trip
-                  gas_trip = gas_trip_value.to_f if gas_trip_value
-                end
-
-                if @invoice.route.name
-                  if @invoice.route.name.downcase.include?('kosongan')
-                    result = (gas_trip * 3).round().to_i
-                  else
-                    result = (gas_trip * 2.3).round().to_i
-                  end
-                  %>
-                  <%= result %>
-                <% end %>
-          </span>&nbsp;km
-      </td>
-    </tr>
-    <% end %>
-
-    <% if @invoice.route.routelocation.present? %>
-    <tr>
-      <td>Alamat Muat</td>
-      <td><%= @routelocation.address_start rescue nil %></td>
-    </tr>
-    <tr>
-      <td>Alamat Bongkar</td>
-      <td><%= @routelocation.address_end rescue nil %></td>
-    </tr>
-    <% end %>
-
-    <% if @invoice.transporttype == "KAPAL (TOL LAUT)" %>
-
-    <tr>
-      <td>Kapal</td>
-      <td id="strShip"><%=@invoice.ship.name rescue nil%></td>
-    </tr>
-    
-    <tr>
-      <td>Pelabuhan</td>
-      <td id="strPort"><%=@invoice.port.name rescue nil%></td>
-    </tr>
-
-    <% end %>
-
-    <% if !@invoice.description.blank? %>
       <tr>
-        <td>Keterangan</td>
-        <td id="strDescription"><%= @invoice.description %></td>
-      </tr>   
-      <% end %>     
-    </table>
-
-    <table class="row-view">
-      <tr class="border-bottom">
-        <th>Keterangan</th>
-        <th width="160" class="right">Total</th>
+        <td style="padding-top: 1.5rem;">
+          <strong>Supir</strong>
+        </td>
       </tr>
 
-    <tr>
-      <td><%= f.label :driver_allowance, "UM Supir" %></td>
-      <td><%= f.text_field :driver_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.driver_allowance), :readOnly => 'true' %></td>
-    </tr>
-
-    <tr>
-      <td><%= f.label :helper_allowance, "UM Kernet" %></td>
-      <td><%= f.text_field :helper_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.helper_allowance), :readOnly => 'true' %></td>
-    </tr>
-
-    <tr>
-      <td><%= f.label :misc_allowance, "Lain-lain" %></td>
-      <td><%= f.text_field :misc_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.misc_allowance), :readOnly => 'true' %></td>
-    </tr>
-
-    <tr>
-      <td><%= f.label :gas_allowance, "Solar" %> *</td>
-      <td><%= f.text_field :gas_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.gas_allowance), :readOnly => 'true' %></td>
-    </tr>
-
-    <tr>
-      <td><%= f.label :ferry_fee, "ASDP" %></td>
-      <td><%= f.text_field :ferry_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.ferry_fee), :readOnly => 'true' %></td>
-    </tr>
-
-    <tr>
-      <td><%= f.label :tol_fee, "Tol" %></td>
-      <td><%= f.text_field :tol_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.tol_fee), :readOnly => 'true' %></td>
-    </tr>
-
-    <% if @invoice.invoicetrain%>
-    <tr>
-      <td><%= f.label :train_fee, "Kereta" %></td>
-      <td><%= f.text_field :train_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.train_fee), :readOnly => 'true' %></td>
-    </tr>
-    <% end %>
-
-    <% 
-    if @invoice.premi
-    %>
-    <tr>
-      <td><%= f.label :premi_allowance, "Premi" %></td>
-      <td><%= f.text_field :premi_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.premi_allowance), :readOnly => 'true' %></td>
-    </tr>
-    <% end %>  
-
-    <tr class="total-row">
-      <td><%= f.label :total, "Total" %></td>
-      <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.total), :readOnly => 'true' %></td>
-    </tr>
-
-    </table>
-
-    <p><span id="strFooter">* Ket. Solar: <%=@invoice.gas_litre+@invoice.gas_voucher+@invoice.gas_leftover%> (Awal) - <%=@invoice.gas_voucher%> (B) - <%=@invoice.gas_leftover%> (G) = <%=@invoice.gas_litre%> liter @ <%=to_currency(@invoice.gas_cost)%></span></p>
-
-    <p>Dibuat oleh <strong id="strCreator"><%= @invoice.user_id.nil? ? current_user.username : @invoice.user.username%></strong></p>
-
-  </div>
-
-  <div id="print-bkk" class="showprint info-box bkk-paper" style="width:330px; float:left; clear:left; height: 450px;">
-
-    <table class="no-border">
       <tr>
-        <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span></strong></td>
-      </tr>
-      <tr>
-        <td align="right" class="header">Bukti Kas Keluar #<%=zeropad(@invoice.id)%><input type="hidden" id="strInvoiceId" value="#<%=zeropad(@invoice.id)%>" /></td>
-      </tr>
-    </table>
-    <hr style="width:600px;" />
-    <table class="row-view no-border">
-      <tr>
-        <td width="90">Tanggal</td>
-        <td><span id="strDate"><%=@invoice.date.strftime('%d %B %Y')%></span> &nbsp;(KTR: <span id="strOffice"><%=@invoice.office.name%></span>)</td>
-      </tr>
-      <tr>
-        <td>Kantor</td>
-        <td id="strOffice"><%=@invoice.office.name%></td>
-      </tr>
-      <tr>
-        <td>Pelanggan</td>
-        <td id="strCustomer"><%=@invoice.customer.name%></td>
-      </tr>
-      <tr>
-        <td>Jurusan</td>
+        <td>Supir</td>
         <td>
-          <span id="strRoute"><%=@invoice.route.name%></span>
-         </td>
-      </tr>
-      <tr>
-        <td>Jumlah</td>
-        <td id="strQty"><%=@invoice.quantity%> Rit</td>
-      </tr>
-      <tr>
-        <td>Tipe</td>
-        <td id="strType"><%=@invoice.route.routegroup.name%></td>
+          <%=@invoice.driver.name rescue nil%> (<%= zeropad(@invoice.driver.id) rescue nil%>)
+          <% if !@invoice.driver.helpers.first.nil? && @invoice.need_helper %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil %>)<% end %>
+          <input type="hidden" id="strDriver" value="<%=@invoice.driver.name rescue nil%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil%>)<% end %>" />
+        </td>
       </tr>
 
-      <% if @invoice.vehicle_duplicate_id.present? && @invoice.vehicle_duplicate_id != 0 %>
+      <td>No. Telp.</td>
+        <td><%=@invoice.driver.phone rescue nil%> &nbsp; <%=@invoice.driver.mobile rescue nil%></td>
+      </tr>
+
       <tr>
-        <td>Kendaraan Asli</td>
-        <td>
-          <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
-          <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+        <td>No. Rek.</td>
+        <td><%=@invoice.driver.bank_account rescue nil%></td>
+      </tr>
+
+      <% if @invoice.event_id %>
+      <tr>
+        <td style="padding-top: 1.5rem;">
+          <strong>Target</strong>
         </td>
       </tr>
       <tr>
-        <td>Kendaraan Jalan</td>
-        <td>
-          <%=@invoice.vehicle_duplicate.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
-          <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle_duplicate.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+        <td>Tgl Muat</td>
+        <td><%= @invoice.event.load_date.strftime('%d %B %Y') rescue nil %></td>
+      </tr>
+
+      <tr>
+        <td>Tgl Bongkar</td>
+        <td><%= @invoice.event.unload_date.strftime('%d %B %Y') rescue nil %></td>
+      </tr>
+
+      <tr>
+        <td>Min. Tonage</td>
+        <td><%= @invoice.event.estimated_tonage rescue nil %>&nbsp;<%= @invoice.event.price_per_type rescue nil %></td>
+      </tr>
+        
+      <% end %>
+
+      <% if @invoice.route.distance.present? %>
+      <tr>
+        <td style="padding-top: 1.5rem;">
+          <strong>Informasi</strong>
         </td>
+      </tr>
+      <tr>
+        <td>Jarak</td>
+        <td><%= @invoice.route.distance rescue nil %> km</td>
+      </tr>
+      <% end %>
+
+      <!-- Jarak -->
+      <% if @invoice.route.distance.present? %>
+      <tr>
+        <td>Jarak</td>
+        <td><%= @invoice.route.distance rescue nil %> km</td>
       </tr>
       <% else %>
       <tr>
-        <td>Kendaraan</td>
+        <td>Jarak</td>
         <td>
-          <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
-          <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+            <span style="text-decoration: underline;">
+                <%
+                  gas_trip = 0.0
+                  if @invoice.route && @invoice.route.allowances && @invoice.route.allowances.first
+                    gas_trip_value = @invoice.route.allowances.first.gas_trip
+                    gas_trip = gas_trip_value.to_f if gas_trip_value
+                  end
+
+                  if @invoice.route.name
+                    if @invoice.route.name.downcase.include?('kosongan')
+                      result = (gas_trip * 3).round().to_i
+                    else
+                      result = (gas_trip * 2.3).round().to_i
+                    end
+                    %>
+                    <%= result %>
+                  <% end %>
+            </span>&nbsp;km
         </td>
       </tr>
       <% end %>
 
-
-    <% if @invoice.isotank_id != 0 %>
+      <% if @invoice.route.routelocation.present? %>
       <tr>
-        <td>No. Isotank</td>
-        <td id="strIsotank"><%=@invoice.isotank.isotanknumber rescue nil%></td>
+        <td>Alamat Muat</td>
+        <td><%= @routelocation.address_start rescue nil %></td>
       </tr>
-    <% else %>
-      <% if !@invoice.isotank_number.nil? %>
-        <tr>
-          <td>No. Isotank</td>
-          <td id="strIsotank2"><%=@invoice.isotank_number%></td>
-        </tr>
-      <% end %>
-    <% end %>
-        
-    <% if @invoice.container_id != 0 %>
       <tr>
-        <td>No. Kontainer</td>
-        <td id="strContainer"><%=@invoice.container.containernumber rescue nil%></td>
+        <td>Alamat Bongkar</td>
+        <td><%= @routelocation.address_end rescue nil %></td>
       </tr>
-    <% else %>
-      <% if !@invoice.container_number.nil? %>
-        <tr>
-          <td>No. Kontainer</td>
-          <td id="strContainer2"><%=@invoice.container_number%></td>
-        </tr>
       <% end %>
-    <% end %>
 
-    <tr>
-      <td style="padding-top: 1.5rem;">
-        <strong>Supir</strong>
-      </td>
-    </tr>
+      <% if @invoice.transporttype == "KAPAL (TOL LAUT)" %>
 
-    <tr>
-      <td>Supir</td>
-      <td>
-        <%=@invoice.driver.name rescue nil%> (<%= zeropad(@invoice.driver.id) rescue nil%>)
-        <% if !@invoice.driver.helpers.first.nil? && @invoice.need_helper %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil %>)<% end %>
-        <input type="hidden" id="strDriver" value="<%=@invoice.driver.name rescue nil%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil%>)<% end %>" />
-      </td>
-    </tr>
+      <tr>
+        <td>Kapal</td>
+        <td id="strShip"><%=@invoice.ship.name rescue nil%></td>
+      </tr>
+      
+      <tr>
+        <td>Pelabuhan</td>
+        <td id="strPort"><%=@invoice.port.name rescue nil%></td>
+      </tr>
 
-    <td>No. Telp.</td>
-      <td><%=@invoice.driver.phone rescue nil%> &nbsp; <%=@invoice.driver.mobile rescue nil%></td>
-    </tr>
-
-    <tr>
-      <td>No. Rek.</td>
-      <td><%=@invoice.driver.bank_account rescue nil%></td>
-    </tr>
-
-
+      <% end %>
 
       <% if !@invoice.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td id="strDescription"><%= @invoice.description %></td>
+        </tr>   
+        <% end %>     
+      </table>
+
+      <table class="row-view">
+        <tr class="border-bottom">
+          <th>Keterangan</th>
+          <th width="160" class="right">Total</th>
+        </tr>
+
       <tr>
-        <td>Keterangan</td>
-        <td id="strDescription"><%= @invoice.description %></td>
-      </tr>   
-      <% end %>     
-    </table>
-    <hr style="width:600px;" />
+        <td><%= f.label :driver_allowance, "UM Supir" %></td>
+        <td><%= f.text_field :driver_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.driver_allowance), :readOnly => 'true' %></td>
+      </tr>
 
-    <table class="row-view">
-    <tr>
-      <td width="90"><%= f.label :driver_allowance, "UM Supir" %></td>
-      <td>Rp. <%= to_currency_bank(@invoice.driver_allowance) %></td>
-    </tr>
+      <tr>
+        <td><%= f.label :helper_allowance, "UM Kernet" %></td>
+        <td><%= f.text_field :helper_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.helper_allowance), :readOnly => 'true' %></td>
+      </tr>
 
-    <tr>
-      <td><%= f.label :helper_allowance, "UM Kernet" %></td>
-      <td>Rp. <%= to_currency_bank(@invoice.helper_allowance) %></td>
-    </tr>
+      <tr>
+        <td><%= f.label :misc_allowance, "Lain-lain" %></td>
+        <td><%= f.text_field :misc_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.misc_allowance), :readOnly => 'true' %></td>
+      </tr>
 
-    <tr>
-      <td><%= f.label :misc_allowance, "Lain-lain" %></td>
-      <td>Rp. <%= to_currency_bank(@invoice.misc_allowance) %></td>
-    </tr>
+      <tr>
+        <td><%= f.label :gas_allowance, "Solar" %> *</td>
+        <td><%= f.text_field :gas_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.gas_allowance), :readOnly => 'true' %></td>
+      </tr>
 
-    <tr>
-      <td><%= f.label :gas_allowance, "Solar" %> *</td>
-      <td>Rp. <%= to_currency_bank(@invoice.gas_allowance) %></td>
-    </tr>
+      <tr>
+        <td><%= f.label :ferry_fee, "ASDP" %></td>
+        <td><%= f.text_field :ferry_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.ferry_fee), :readOnly => 'true' %></td>
+      </tr>
 
-    <tr>
-      <td><%= f.label :ferry_fee, "ASDP" %></td>
-      <td>Rp. <%= to_currency_bank(@invoice.ferry_fee) %></td>
-    </tr>
+      <tr>
+        <td><%= f.label :tol_fee, "Tol" %></td>
+        <td><%= f.text_field :tol_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.tol_fee), :readOnly => 'true' %></td>
+      </tr>
 
-    <tr>
-      <td><%= f.label :tol_fee, "Tol" %></td>
-      <td>Rp. <%= to_currency_bank(@invoice.tol_fee) %></td>
-    </tr>
+      <% if @invoice.invoicetrain%>
+      <tr>
+        <td><%= f.label :train_fee, "Kereta" %></td>
+        <td><%= f.text_field :train_fee, :class => 'half disabled allowance-field', :value => to_currency(@invoice.train_fee), :readOnly => 'true' %></td>
+      </tr>
+      <% end %>
 
-    <% 
-    if @invoice.premi
-    %>
-    <tr>
-      <td><%= f.label :premi_allowance, "Premi" %></td>
-      <td>Rp. <%= to_currency_bank(@invoice.premi_allowance) %></td>
-    </tr>
-    <% end %>  
+      <% 
+      if @invoice.premi
+      %>
+      <tr>
+        <td><%= f.label :premi_allowance, "Premi" %></td>
+        <td><%= f.text_field :premi_allowance, :class => 'half disabled allowance-field', :value => to_currency(@invoice.premi_allowance), :readOnly => 'true' %></td>
+      </tr>
+      <% end %>  
 
-    <tr class="total-row">
-      <td><%= f.label :total, "Total" %></td>
-      <td>Rp. <%= to_currency_bank(@invoice.total) %></td>
-    </tr>
+      <tr class="total-row">
+        <td><%= f.label :total, "Total" %></td>
+        <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.total), :readOnly => 'true' %></td>
+      </tr>
 
-    </table>
+      </table>
 
-    <p class="hideprint"><span id="strFooter">* Ket. Solar: <%=@invoice.gas_litre+@invoice.gas_voucher+@invoice.gas_leftover%> (Awal) - <%=@invoice.gas_voucher%> (B) - <%=@invoice.gas_leftover%> (G) = <%=@invoice.gas_litre%> liter @ <%=to_currency(@invoice.gas_cost)%></span></p>
+      <p><span id="strFooter">* Ket. Solar: <%=@invoice.gas_litre+@invoice.gas_voucher+@invoice.gas_leftover%> (Awal) - <%=@invoice.gas_voucher%> (B) - <%=@invoice.gas_leftover%> (G) = <%=@invoice.gas_litre%> liter @ <%=to_currency(@invoice.gas_cost)%></span></p>
 
-    <p>Dibuat oleh <strong id="strCreator"><%= @invoice.user_id.nil? ? current_user.username : @invoice.user.username%></strong></p>
+      <p>Dibuat oleh <strong id="strCreator"><%= @invoice.user_id.nil? ? current_user.username : @invoice.user.username%></strong></p>
 
+    </div>
+
+    <div id="print-bkk" class="showprint info-box bkk-paper" style="width:330px; float:left; clear:left; height: 450px;">
+
+      <table class="no-border">
+        <tr>
+          <td><strong><span id="strClientName"><%= Setting.find_by_name("Client Name").value.upcase if !Setting.find_by_name("Client Name").nil? %></span></strong></td>
+        </tr>
+        <tr>
+          <td align="right" class="header">Bukti Kas Keluar #<%=zeropad(@invoice.id)%><input type="hidden" id="strInvoiceId" value="#<%=zeropad(@invoice.id)%>" /></td>
+        </tr>
+      </table>
+      <hr style="width:600px;" />
+      <table class="row-view no-border">
+        <tr>
+          <td width="90">Tanggal</td>
+          <td><span id="strDate"><%=@invoice.date.strftime('%d %B %Y')%></span> &nbsp;(KTR: <span id="strOffice"><%=@invoice.office.name%></span>)</td>
+        </tr>
+        <tr>
+          <td>Kantor</td>
+          <td id="strOffice"><%=@invoice.office.name%></td>
+        </tr>
+        <tr>
+          <td>Pelanggan</td>
+          <td id="strCustomer"><%=@invoice.customer.name%></td>
+        </tr>
+        <tr>
+          <td>Jurusan</td>
+          <td>
+            <span id="strRoute"><%=@invoice.route.name%></span>
+          </td>
+        </tr>
+        <tr>
+          <td>Jumlah</td>
+          <td id="strQty"><%=@invoice.quantity%> Rit</td>
+        </tr>
+        <tr>
+          <td>Tipe</td>
+          <td id="strType"><%=@invoice.route.routegroup.name%></td>
+        </tr>
+
+        <% if @invoice.vehicle_duplicate_id.present? && @invoice.vehicle_duplicate_id != 0 %>
+        <tr>
+          <td>Kendaraan Asli</td>
+          <td>
+            <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <tr>
+          <td>Kendaraan Jalan</td>
+          <td>
+            <%=@invoice.vehicle_duplicate.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle_duplicate.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <% else %>
+        <tr>
+          <td>Kendaraan</td>
+          <td>
+            <%=@invoice.vehicle.current_id%> &nbsp;(UP: <%= @invoice.insurance > 0 ? "Ada" : "Tidak Ada" %>)
+            <input type="hidden" id="strVehicle" value="<%=@invoice.vehicle.current_id%> (UP: <%= @invoice.insurance > 0 ? "Ya" : "Tidak" %>)" />
+          </td>
+        </tr>
+        <% end %>
+
+
+      <% if @invoice.isotank_id != 0 %>
+        <tr>
+          <td>No. Isotank</td>
+          <td id="strIsotank"><%=@invoice.isotank.isotanknumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@invoice.isotank_number.nil? %>
+          <tr>
+            <td>No. Isotank</td>
+            <td id="strIsotank2"><%=@invoice.isotank_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+          
+      <% if @invoice.container_id != 0 %>
+        <tr>
+          <td>No. Kontainer</td>
+          <td id="strContainer"><%=@invoice.container.containernumber rescue nil%></td>
+        </tr>
+      <% else %>
+        <% if !@invoice.container_number.nil? %>
+          <tr>
+            <td>No. Kontainer</td>
+            <td id="strContainer2"><%=@invoice.container_number%></td>
+          </tr>
+        <% end %>
+      <% end %>
+
+      <tr>
+        <td style="padding-top: 1.5rem;">
+          <strong>Supir</strong>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Supir</td>
+        <td>
+          <%=@invoice.driver.name rescue nil%> (<%= zeropad(@invoice.driver.id) rescue nil%>)
+          <% if !@invoice.driver.helpers.first.nil? && @invoice.need_helper %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil %>)<% end %>
+          <input type="hidden" id="strDriver" value="<%=@invoice.driver.name rescue nil%><% if !@invoice.driver.helpers.first.nil? %> &nbsp;(Kernet: <%=@invoice.driver.helpers.first.name rescue nil%>)<% end %>" />
+        </td>
+      </tr>
+
+      <td>No. Telp.</td>
+        <td><%=@invoice.driver.phone rescue nil%> &nbsp; <%=@invoice.driver.mobile rescue nil%></td>
+      </tr>
+
+      <tr>
+        <td>No. Rek.</td>
+        <td><%=@invoice.driver.bank_account rescue nil%></td>
+      </tr>
+
+
+
+        <% if !@invoice.description.blank? %>
+        <tr>
+          <td>Keterangan</td>
+          <td id="strDescription"><%= @invoice.description %></td>
+        </tr>   
+        <% end %>     
+      </table>
+      <hr style="width:600px;" />
+
+      <table class="row-view">
+      <tr>
+        <td width="90"><%= f.label :driver_allowance, "UM Supir" %></td>
+        <td>Rp. <%= to_currency_bank(@invoice.driver_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :helper_allowance, "UM Kernet" %></td>
+        <td>Rp. <%= to_currency_bank(@invoice.helper_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :misc_allowance, "Lain-lain" %></td>
+        <td>Rp. <%= to_currency_bank(@invoice.misc_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :gas_allowance, "Solar" %> *</td>
+        <td>Rp. <%= to_currency_bank(@invoice.gas_allowance) %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :ferry_fee, "ASDP" %></td>
+        <td>Rp. <%= to_currency_bank(@invoice.ferry_fee) %></td>
+      </tr>
+
+      <tr>
+        <td><%= f.label :tol_fee, "Tol" %></td>
+        <td>Rp. <%= to_currency_bank(@invoice.tol_fee) %></td>
+      </tr>
+
+      <% 
+      if @invoice.premi
+      %>
+      <tr>
+        <td><%= f.label :premi_allowance, "Premi" %></td>
+        <td>Rp. <%= to_currency_bank(@invoice.premi_allowance) %></td>
+      </tr>
+      <% end %>  
+
+      <tr class="total-row">
+        <td><%= f.label :total, "Total" %></td>
+        <td>Rp. <%= to_currency_bank(@invoice.total) %></td>
+      </tr>
+
+      </table>
+
+      <p class="hideprint"><span id="strFooter">* Ket. Solar: <%=@invoice.gas_litre+@invoice.gas_voucher+@invoice.gas_leftover%> (Awal) - <%=@invoice.gas_voucher%> (B) - <%=@invoice.gas_leftover%> (G) = <%=@invoice.gas_litre%> liter @ <%=to_currency(@invoice.gas_cost)%></span></p>
+
+      <p>Dibuat oleh <strong id="strCreator"><%= @invoice.user_id.nil? ? current_user.username : @invoice.user.username%></strong></p>
+
+    </div>
   </div>
+
+  <% if !@invoice.kosongan %>
+    <div class="infobox-2">
+
+      <h3 style="font-weight: bold;">Upload Gambar Surat Jalan</h3>
+
+      <% if @invoice.images.where("enabled = true and file_uid is not null and file_uid <> ''").any? %>
+        <% @invoice.images.where("enabled = true and file_uid is not null and file_uid <> ''").each do |img| %>
+          <% ext = File.extname(img.file_uid).strip.downcase[1..-1] %>
+	
+          <% if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' )  %>
+          
+          <a href="<%= img.file.url() %>" target="_blank">
+              <%= image_tag img.file.thumb('480x320').url(:suffix => "/#{img.name}"), style: "width: 100%;" if img.file_uid %>
+          </a>
+          
+          <% else %>
+          
+            <a href="<%= img.file.url() %>" target="_blank"><%= File.basename(img.file_uid) %></a>
+          
+          <% end %>
+
+          <br />
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
+          <span style="font-size: 10px; color: #717171;">Diupload: <%= img.created_at.strftime('%d-%m-%Y') rescue nil %></span>
+
+          </div>
+          <br>
+          <br>
+        <% end %>
+			<% end %>
+
+      <form action="/attachments/uploadTaxInv" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+        <input type="hidden" name="model_name" value="Invoice" />
+        <input type="hidden" name="item_id" value="<%=@invoice.id%>" />
+        <input type="hidden" name="origin" value="confirmation" />
+
+        <div class="field-row" style="width: 300px;">
+          <label for="name">Nama</label>
+          <input type="text" name="attachment[name]" style="width: 100%; max-width: 280px;"/>
+        </div>
+
+        <div class="field-row continue" style="width: 100%;">
+          <label for="file">Browse File</label>
+          <input type="file" name="attachment[file]"/>
+        </div>
+
+        <div class="actions" style="text-align: left; padding: 0; margin-top: 1.5rem; margin-bottom: 1.5rem;">
+          <input type="submit" value="Simpan File" />
+        </div>
+
+      </form>
+
+    </div>
+  <% end %>
+
+</div>
 
 <% end %>

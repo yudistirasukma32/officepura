@@ -53,8 +53,15 @@ class AttachmentsController < ApplicationController
     @attachment.enabled = true
     @attachment.media = false
     @attachment.save
-#    redirect_to(get_parent_edit_path(params[:model_name].capitalize, params[:item_id]), :notice => 'File sukses di simpan.')
-		redirect_to("/taxinvoiceitems/new/" + params[:item_id], :notice => 'File sukses disimpan.')    
+
+    if params[:origin] == 'add_kosongan'
+      redirect_to("/invoices/add_kosongan?invoice_id=" + params[:item_id], :notice => 'File sukses disimpan.')   
+    elsif params[:origin] == 'confirmation'
+      redirect_to("/invoices/" + params[:item_id] + '/confirmation', :notice => 'File sukses disimpan.')   
+    else
+      redirect_to("/taxinvoiceitems/new/" + params[:item_id], :notice => 'File sukses disimpan.')   
+    end
+    
 	end
 
 	def removeTaxInv
