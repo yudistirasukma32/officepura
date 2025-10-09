@@ -70,9 +70,9 @@
 
 		<div class="field-row continue" style="padding-bottom:15px;">
 		    <%= f.label :weight_loss, "Klaim" %>    
-		    <%= f.text_field :weight_loss, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.weight_loss.to_i%>
-		    <%= f.text_field :accident, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.accident.to_i%>
-		    <%= f.text_field :sparepart, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.sparepart.to_i%>
+		    <%= f.text_field :weight_loss, min: 0, required: true, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.weight_loss.to_i rescue 0 %>
+		    <%= f.text_field :accident, min: 0, required: true, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.accident.to_i rescue 0 %>
+		    <%= f.text_field :sparepart, min: 0, required: true, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.sparepart.to_i rescue 0 %>
 		</div>
 
 		<div class="field-row" style="padding:5px 0 0 0;">
@@ -84,8 +84,8 @@
 
 		<div class="field-row continue" style="padding-bottom:15px;">
 			<%= f.label :bon, "Lain-lain" %>    
-			<%= f.text_field :bon, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.bon.to_i%>
-			<%= f.text_field :allowance, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.allowance.to_i%>
+			<%= f.text_field :bon, min: 0, required: true, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.bon.to_i rescue 0 %>
+			<%= f.text_field :allowance, min: 0, required: true, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.allowance.to_i rescue 0 %>
 			
 		</div>
 
@@ -97,18 +97,18 @@
 
 		<div class="field-row continue" style="padding-bottom:15px;">
 			<%= f.label :saving, "Tabungan" %>    
-			<%= f.text_field :saving, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.saving.to_i%>
-			<%= f.text_field :saving_reduction, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.saving_reduction.to_i%>
+			<%= f.text_field :saving, min: 0, required: true, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.saving.to_i rescue 0 %>
+			<%= f.text_field :saving_reduction, required: true, min: 0, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.saving_reduction.to_i rescue 0 %>
 		</div>
 
 		<div class="field-row">
 			<%= f.label :bonus, "Premi Hadir"%>
-			<%= f.text_field :bonus, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.bonus.to_i%>
+			<%= f.text_field :bonus, :class => 'short payroll', min: 0, required: true, :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.bonus.to_i rescue 0 %>
 		</div>
 
 		<div class="field-row">
 			<%= f.label :helper_fee, "Uang Hadir Kernet"%>
-			<%= f.text_field :helper_fee, :class => 'short payroll', :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.helper_fee.to_i%>
+			<%= f.text_field :helper_fee, :class => 'short payroll', min: 0, required: true, :onkeypress => 'javascript:return isNumberKey(this);', :onchange => 'javascript: countPayrollDriverExpense();', :value => @payroll.helper_fee.to_i rescue 0 %>
 		</div>
 
 		<div class="field-row">
