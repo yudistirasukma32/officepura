@@ -424,13 +424,13 @@
             </li>
 
             <li style="margin: 0 0 0 12px;" class="icon-only<%= @section == 'logs' ? ' on' : '' %>">
-                <%= link_to_if (checkrole 'Admin HRD, Mekanik, Marketing, Auditor, Operasional BKK, Admin Marketing, Admin Penagihan'), "<i class='icon-check'></i>".html_safe, "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('logs');".html_safe %>
+                <%= link_to_if (checkrole 'Admin HRD, Mekanik, Marketing, Auditor, Operasional BKK, Admin Marketing, Admin Penagihan, Admin Keuangan'), "<i class='icon-check'></i>".html_safe, "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('logs');".html_safe %>
 
                 <ul id="sub-logs" class="submenu">
                     <li><%= link_to_if (checkrole 'Admin HRD, Mekanik'), "Check Kendaraan", "/vehiclelogs" %></li>
                     <li><%= link_to_if (checkrole 'Admin HRD, Mekanik'), "Check Supir", "/driverlogs" %></li>
                     <li><%= link_to_if (checkrole 'Admin HRD, Mekanik'), "Tanggal Penting", "/vehicledates" %></li>
-                    <li><%= link_to_if (checkrole 'Admin HRD, Marketing, Auditor, Admin Marketing, Admin Penagihan'), "Report DO", "/report-events" %></li>
+                    <li><%= link_to_if (checkrole 'Admin HRD, Marketing, Auditor, Admin Marketing, Admin Keuangan, Admin Penagihan'), "Report DO", "/report-events" %></li>
                     <li><%= link_to_if (checkrole 'Admin HRD, Marketing, Auditor, Admin Marketing, Admin Keuangan, Admin Penagihan'), "Report DP DO", "/report-dp-events" %></li>
                     <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "Kalender Event BKK", "/invoices/form_event" %></li>
                     <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK, Marketing, Admin Keuangan'), "Report Memo Clean", "/reports/memocleanings" %></li>
