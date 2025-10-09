@@ -44,9 +44,9 @@ class InvoicesController < ApplicationController
         if taxinvoiceitem
           taxinvoiceitem.manual_vehicle_number = params[:manual_vehicle_number]
             if taxinvoiceitem.save
-              Rails.logger.info "✅ Manual vehicle number saved successfully"
+              Rails.logger.info "Manual vehicle number saved successfully"
             else
-              Rails.logger.error "❌ Failed to save: #{taxinvoiceitem.errors.full_messages.join(', ')}"
+              Rails.logger.error "Failed to save: #{taxinvoiceitem.errors.full_messages.join(', ')}"
             end
         end
       end
