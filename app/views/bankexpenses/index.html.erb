@@ -51,7 +51,15 @@
 			<% else %>
 			<tr>
 				<td><%= link_to zeropad(bankexpense.id), edit_bankexpense_path(bankexpense) %></td>
-				<td><%=bankexpense.description%></td>
+				<td style="line-height: 1.5;">
+					<%=bankexpense.description%>
+					<% if bankexpense.debitgroup_id.present?%>
+					<br/>
+					<% if Bankexpensegroup.find(bankexpense.debitgroup_id).name == 'Biaya - Klaim Susut' %>
+						<a target="_blank" style="color: #10789b; text-decoration: underline; line-height: 1.5;" href="claimmemos/<%= bankexpense.claimmemo_id %>/edit">&#9432; Detail Klaim</a>
+					<% end %>
+					<% end %>
+				</td>
 				<td><%=Bankexpensegroup.find(bankexpense.debitgroup_id).name if !bankexpense.debitgroup_id.nil?%></td>
 				<td><%=Bankexpensegroup.find(bankexpense.creditgroup_id).name if !bankexpense.creditgroup_id.nil?%></td>
 				<td align="right"><%=to_currency_bank(bankexpense.total)%></td>
