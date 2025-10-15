@@ -5833,12 +5833,13 @@ end
       #   group("taxinvoices.customer_id").
       #   sum(:total)
 
-      cashin_per_customer = Bankexpense
-        .joins(:taxinvoice)
-        .where(creditgroup_id: 607)
-        .where(bankexpenses: { deleted: false, date: @start_date..@end_date })
-        .group("taxinvoices.customer_id")
-        .sum("bankexpenses.total")
+      cashin_per_customer = Bankexpense.
+        joins(:taxinvoice).
+        where(:creditgroup_id => 607).
+        where("bankexpenses.deleted = ? AND bankexpenses.date BETWEEN ? AND ?", false, @startdate, @enddate).
+        group("taxinvoices.customer_id").
+        sum("bankexpenses.total")
+
 
         # render json: piutang_per_customer
         # return false    
@@ -5898,6 +5899,8 @@ end
 
       @section = "taxinvoices"
       @where   = 'ar_aging'
+
+      # render json: @customer_datas
     else
       redirect_to root_path
     end
