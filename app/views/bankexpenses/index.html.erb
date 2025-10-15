@@ -55,7 +55,7 @@
 					<%=bankexpense.description%>
 					<% if bankexpense.debitgroup_id.present?%>
 					<br/>
-					<% if Bankexpensegroup.find(bankexpense.debitgroup_id).name == 'Biaya - Klaim Susut' %>
+					<% if bankexpense.claimmemo_id.present?%>
 						<a target="_blank" style="color: #10789b; text-decoration: underline; line-height: 1.5;" href="claimmemos/<%= bankexpense.claimmemo_id %>/edit">&#9432; Detail Klaim</a>
 					<% end %>
 					<% end %>
