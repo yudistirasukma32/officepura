@@ -518,6 +518,7 @@
       <p>Dibuat oleh <strong id="strCreator"><%= @invoice.user_id.nil? ? current_user.username : @invoice.user.username%></strong></p>
 
     </div>
+    <% end %>
   </div>
 
   <% if !@invoice.kosongan %>
@@ -576,5 +577,3 @@
   <% end %>
 
 </div>
-
-<% end %>
