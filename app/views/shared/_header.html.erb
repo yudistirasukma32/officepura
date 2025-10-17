@@ -172,7 +172,7 @@
             </li>
 
             <li class="<%= @section == 'transactions' ? 'on' : '' %>">
-                <%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan, Admin HRD, Operasional BKK, BKK Standart, BKK Kosongan, BKK Kereta, Vendor Supir, Admin Hutang Operator'), "Kas", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('transactions');".html_safe %>
+                <%= link_to_if (checkrole 'Admin Operasional, Admin Keuangan, Admin HRD, Payslip, Operasional BKK, BKK Standart, BKK Kosongan, BKK Kereta, Vendor Supir, Admin Hutang Operator'), "Kas", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('transactions');".html_safe %>
 
                 <ul id="sub-transactions" class="submenu two-column-list" style="width:200px;">
                     <!-- <li><%= link_to_if (checkrole 'Admin Operasional'), "BKK (Uji Coba)", "/invoicetests" %></li> -->
@@ -205,9 +205,9 @@
                     <!-- <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Isotank", invoice_isotank_url %></li>		-->
                     <!-- <li><%= link_to_if (checkrole 'Admin Operasional, Operasional BKK'), "BKK Kapal", invoice_ship_url %></li>	-->
 
-                    <li><%= link_to_if (checkrole 'Admin HRD'), "BKK Supir", "/payrolls" %></li>
-                    <li><%= link_to_if (checkrole 'Admin HRD'), "BKM Supir", "/payrollreturns" %></li>
-                    <li><%= link_to_if (checkrole 'Admin HRD'), "Kas Supir", "/driverexpenses" %></li>
+                    <li><%= link_to_if (checkrole 'Admin HRD, Payslip'), "BKK Supir", "/payrolls" %></li>
+                    <li><%= link_to_if (checkrole 'Admin HRD, Payslip'), "BKM Supir", "/payrollreturns" %></li>
+                    <li><%= link_to_if (checkrole 'Admin HRD, Payslip'), "Kas Supir", "/driverexpenses" %></li>
                     <li></li>
 
                     <li class="divider"></li>

@@ -109,9 +109,9 @@
 		<% end %>
 
 		<% if ["payrolls", "payrollreturns", "driverexpenses"].include?@where %>
-			<li class="<%= @where == 'payrolls' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "BKK Supir", "/payrolls" %></li>
-			<li class="<%= @where == 'payrollreturns' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "BKM Supir", "/payrollreturns" %></li>
-			<li class="<%= @where == 'driverexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD'), "Kas Supir", "/driverexpenses" %></li>
+			<li class="<%= @where == 'payrolls' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Payslip'), "BKK Supir", "/payrolls" %></li>
+			<li class="<%= @where == 'payrollreturns' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Payslip'), "BKM Supir", "/payrollreturns" %></li>
+			<li class="<%= @where == 'driverexpenses' ? 'on' : '' %>"><%= link_to_if (checkrole 'Admin HRD, Payslip'), "Kas Supir", "/driverexpenses" %></li>
 		<% end %>
 
 		<% if ["officeexpenses", "officeexpensegroups", "bankexpenses", "bankexpensegroups", "officebankexpenses","bankinvoices"].include?@where %>
