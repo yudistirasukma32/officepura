@@ -243,7 +243,7 @@
 			</li> -->
 
             <li class="<%= @section == 'taxinvoices' ? 'on' : '' %>">
-                <%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Penagihan'), "Inv. Tagihan", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('taxinvoices');".html_safe %>
+                <%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Penagihan, Admin Klaim'), "Inv. Tagihan", "javascript:void(0);", :class => 'finger', :onclick => "javascript:toggleSub('taxinvoices');".html_safe %>
 
                 <ul id="sub-taxinvoices" class="submenu" style="width:200px;">
                     <li><%= link_to_if (checkrole 'Admin Keuangan, Admin Invoice Tagihan, Staff Invoice Tagihan, Admin Penagihan'), "Dashboard", "/reports/billings-stats" %></li>
