@@ -216,43 +216,50 @@
 		</div>
 	</div>
 
+	<!-- User Penagihan -->
+
 	<div class="flex">
+
+		<%
+			setting = Setting.find_by_name('User Penagihan')
+			ids = setting ? setting.value.to_s.split(',').map(&:to_i) : []
+		%>
+
+		<% User.where(id: ids).each do |user_stat| %>
+		<% stats = @taxinvoices_global.where('user_id = ?', user_stat.id) %>
 		<div class="widget-carda">
-			<a class="check" target="_blank" href="/taxinvoices?user_id=46&username=tutik&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
+			<a class="check" target="_blank" href="/taxinvoices?user_id=<%= user_stat.id %>&username=<%= user_stat.username %>&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
 				<i class="icon-search" style="color: #6d6d6d;"></i>
 			</a>
-			<p>Tuti<br>
-			<span>Surabaya<span>
-			</p>
+			<p><%= user_stat.username.capitalize %></p>
 
-			<strong><%= to_currency(@stats_tuti.sum(:total)) %></strong>
+			<strong><%= to_currency(stats.sum(:total)) %></strong>
 			<br/>
 			<small>Est. Omzet</small>
             <br/><br/>
 
-            <!-- <strong style="color: #12a812;"><%= to_currency(@stats_tuti.where('paiddate is not null').sum(:total)) %></strong> -->
 			<div style="position: relative;">
 			<strong style="color: #12a812;">
-			<%	cashin_46 = 
+			<%	cashin_total = 
 				Bankexpense.joins(:taxinvoice)
                 .where(deleted: false)
                 .where(creditgroup_id: 607)
-				.where(taxinvoices: { user_id: 46 })
+				.where(taxinvoices: { user_id: user_stat.id })
                 .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
                 .sum(:total)
 			%>
-			<%= to_currency(cashin_46)%>
-			</strong>
-			<a class="check-2" target="_blank" href="cashins?user_id=46&username=tutik&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
-				<i class="icon-search" style="color: #6d6d6d;"></i>
+			<a style="color: #12a812; text-decoration: underline;" title="Jumlah Cash In, klik untuk ke halaman cash in" target="_blank" href="cashins?user_id=<%= user_stat.id %>&username=<%= user_stat.username %>&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
+				<%= to_currency(cashin_total)%>
 			</a>
+			</strong>
+
 			</div>
 
 			<br/>
 			<small>Cash In</small>
             <br/><br/>
 
-			<strong><%= @stats_tuti.count %></strong>
+			<strong><%= stats.count %></strong>
 			<br/>
 			<small>Invoice Tagihan</small>
 
@@ -261,157 +268,22 @@
                 <span><small>Draft</small></span><span><small>Terkirim</small></span>
             </div>
             <div class="separate">
-                <span><strong><%= @stats_tuti.where('sentdate is null').count %></strong></span>
-                <span><strong><%= @stats_tuti.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong></span>
+                <span><strong><%= stats.where('sentdate is null').count %></strong></span>
+                <span><strong><%= stats.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong></span>
             </div>
-
+			
 		</div>
-		<div class="widget-carda">
-			<a class="check" target="_blank" href="/taxinvoices?user_id=138&username=alfi&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
-				<i class="icon-search" style="color: #6d6d6d;"></i>
-			</a>
-			<p>Alfi<br>
-			<span>Sidoarjo<span>
-			</p>
+		<% end %>
+ 
+	</div>
 
-			<strong><%= to_currency(@stats_alfi.sum(:total)) %></strong>
-			<br/>
-			<small>Est. Omzet</small>
-            <br/><br/>
-
-            <!-- <strong style="color: #12a812;"><%= to_currency(@stats_alfi.where('paiddate is not null').sum(:total)) %></strong>-->
-			<div style="position: relative;">
-			<strong style="color: #12a812;">
-			<%	
-				cashin_138 = 
-				Bankexpense.joins(:taxinvoice)
-                .where(deleted: false)
-                .where(creditgroup_id: 607)
-				.where(taxinvoices: { user_id: 138 })
-                .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
-                .sum(:total)
-			%>
-
-			<%= to_currency(cashin_138)%>
-			</strong>
-			<a class="check-2" target="_blank" href="cashins?user_id=138&username=alfi&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
-				<i class="icon-search" style="color: #6d6d6d;"></i>
-			</a>
+	<div class="flex" id="chart-omzet-penagihan">
+		<% ids.each do |user_id| %>
+			<div id="chart-omzet-<%=user_id%>" class="widget-carda">
+			<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
+			<small>Total omzet 3 bulan terakhir dalam juta</small>
 			</div>
-
-			<br/>
-			<small>Cash In</small>
-            <br/><br/>
-            
-			<strong><%= @stats_alfi.count %></strong>
-			<br/>
-			<small>Invoice Tagihan</small>
-
-            <br/>
-            <div class="separate mt-1">
-               <span><small>Draft</small></span><span><small>Terkirim</small></span>
-            </div>
-            <div class="separate">
-                <span><strong><%= @stats_alfi.where('sentdate is null').count %></strong></span>
-                <span><strong><%= @stats_alfi.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong></span>
-            </div>
-		</div>
-		<div class="widget-carda">
-			<a class="check" target="_blank" href="/taxinvoices?user_id=134&username=sarah&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
-				<i class="icon-search" style="color: #6d6d6d;"></i>
-			</a>
-			<p>Sarah<br>
-			<span>Semarang<span>
-			</p>
-
-			<strong><%= to_currency(@stats_sarah.sum(:total)) %></strong>
-			<br/>
-			<small>Est. Omzet</small>
-            <br/><br/>
-
-            <!-- <strong style="color: #12a812;"><%= to_currency(@stats_sarah.where('paiddate is not null').sum(:total)) %></strong>-->
-			<div style="position: relative;">
-			<strong style="color: #12a812;">
-			<% cashin_134 =
-				Bankexpense.joins(:taxinvoice)
-                .where(deleted: false)
-                .where(creditgroup_id: 607)
-				.where(taxinvoices: { user_id: 134 })
-                .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
-                .sum(:total)
-			%>
-			<%= to_currency(cashin_134)%>
-			</strong>
-			<a class="check-2" target="_blank" href="cashins?user_id=134&username=sarah&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
-				<i class="icon-search" style="color: #6d6d6d;"></i>
-			</a>
-			</div>
-
-			<br/>
-			<small>Cash In</small>
-            <br/><br/>
-
-			<strong><%= @stats_sarah.count %></strong>
-			<br/>
-			<small>Invoice Tagihan</small>
-
-            <br/>
-            <div class="separate mt-1">
-                <span><small>Draft</small></span><span><small>Terkirim</small></span>
-            </div>
-            <div class="separate">
-                <span><strong><%= @stats_sarah.where('sentdate is null').count %></strong></span>
-                <span><strong><%= @stats_sarah.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong></span>
-            </div>
-		</div>
-		<div class="widget-carda">
-			<a class="check" target="_blank" href="/taxinvoices?user_id=139&username=sucy&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
-				<i class="icon-search" style="color: #6d6d6d;"></i>
-			</a>
-			<p>Suci<br>
-			<span>Jakarta<span>
-			</p>
-
-			<strong><%= to_currency(@stats_suci.sum(:total)) %></strong>
-			<br/>
-			<small>Est. Omzet</small>
-            <br/><br/>
-
-            <!-- <strong style="color: #12a812;"><%= to_currency(@stats_suci.where('paiddate is not null').sum(:total)) %></strong>-->
-			<div style="position: relative;">
-			<strong style="color: #12a812;">
-			<% cashin_139 = 
-				Bankexpense.joins(:taxinvoice)
-                .where(deleted: false)
-                .where(creditgroup_id: 607)
-				.where(taxinvoices: { user_id: 139 })
-                .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
-                .sum(:total)
-			%>
-			<%= to_currency(cashin_139)%>
-			</strong>
-			<a class="check-2" target="_blank" href="cashins?user_id=139&username=sucy&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
-				<i class="icon-search" style="color: #6d6d6d;"></i>
-			</a>
-			</div>
-
-			<br/>
-			<small>Cash In</small>
-            <br/><br/>
-
-			<strong><%= @stats_suci.count %></strong>
-			<br/>
-			<small>Invoice Tagihan</small>
-
-            <br/>
-            <div class="separate mt-1">
-                <span><small>Draft</small></span><span><small>Terkirim</small></span>
-            </div>
-            <div class="separate">
-                <span><strong><%= @stats_suci.where('sentdate is null').count %></strong></span>
-                <span><strong><%= @stats_suci.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong></span>
-            </div>
-		</div>
+		<% end %>
 	</div>
 
 	<div class="flex">
@@ -438,25 +310,6 @@
 		<small>Invoice Tagihan</small><br/>
 		</div>
 	<% end %>
-	</div>
-
-	<div class="flex" id="chart-omzet-penagihan">
-		<div id="chart-omzet-46" class="widget-carda">
-		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
-		<small>Total omzet 3 bulan terakhir dalam juta</small>
-		</div>
-		<div id="chart-omzet-138" class="widget-carda">
-		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
-		<small>Total omzet 3 bulan terakhir dalam juta</small>
-		</div>
-		<div id="chart-omzet-134" class="widget-carda">
-		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
-		<small>Total omzet 3 bulan terakhir dalam juta</small>
-		</div>
-		<div id="chart-omzet-139" class="widget-carda">
-		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
-		<small>Total omzet 3 bulan terakhir dalam juta</small>
-		</div>
 	</div>
 
     <div class="flex">

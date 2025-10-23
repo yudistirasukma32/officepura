@@ -3466,7 +3466,7 @@ function getOmzetMarketing() {
   });
 }
 
-function getOmzetPenagihan() {
+function getOmzetPenagihan_bak() {
   $.ajax({
     type: "GET",
     url: "/reports/getomzetbillings",
@@ -3739,6 +3739,98 @@ function getOmzetPenagihan() {
       }
     },
     failure: function () {
+      alert("Error. Mohon refresh browser Anda.");
+    },
+  });
+}
+
+function getOmzetPenagihan() {
+  $.ajax({
+    type: "GET",
+    url: "/reports/getomzetbillings",
+    success: function (data) {
+      $(".loader.marketing-u").removeClass("d-block").addClass("d-none");
+      console.log(data);
+
+      if (!window.ApexCharts) return;
+
+      // === Ambil semua user_id dari key di data.users ===
+      const USER_KEYS = Object.keys(data.users); // ["omzet_46", "omzet_132", ...]
+      const USER_IDS = USER_KEYS.map((key) => key.replace("omzet_", ""));
+      const USERNAMES = data.usernames || [];
+
+      // === Loop setiap user dan render chart ===
+      USER_KEYS.forEach((key, index) => {
+        const userId = USER_IDS[index];
+        const username = USERNAMES[index] || `User ${userId}`;
+        const omzetData = data.users[key];
+        const chartElement = document.querySelector(`#chart-omzet-${userId}`);
+
+        if (!chartElement || !omzetData) return; // skip kalau tidak ada data atau elemen
+
+        const options = {
+          chart: {
+            type: "line",
+            fontFamily: "inherit",
+            height: 200,
+            width: 150,
+            animations: { enabled: true },
+          },
+          stroke: { width: 4, curve: "smooth" },
+          dataLabels: { enabled: false },
+          series: [
+            {
+              name: username,
+              data: omzetData,
+            },
+          ],
+          title: {
+            text: username,
+            align: "center",
+            margin: 10,
+            style: {
+              fontSize: "14px",
+              fontWeight: "bold",
+            },
+          },
+          tooltip: {
+            theme: "light",
+            x: { formatter: (value) => value },
+          },
+          grid: { strokeDashArray: 4 },
+          xaxis: {
+            categories: data.month_text,
+            labels: { rotate: -45 },
+            type: "category",
+          },
+          yaxis: { labels: { padding: 2 } },
+          colors: ["#14a714"],
+          legend: { show: false },
+        };
+
+        const chart = new ApexCharts(chartElement, options);
+        chart.render();
+      });
+
+      // === PIE CHART: total per bulan ===
+      const pie1 = new ApexCharts($("#pie-chart")[0], {
+        series: data.this_month,
+        chart: { width: 480, type: "pie" },
+        labels: USERNAMES, // pakai username
+        legend: { position: "bottom" },
+      });
+      pie1.render();
+
+      // === PIE CHART 2: draft vs sent ===
+      const pie2 = new ApexCharts($("#pie-chart-2")[0], {
+        series: data.draft_vs_sent,
+        chart: { width: 480, type: "pie" },
+        labels: ["Draft", "Terkirim"],
+        legend: { position: "bottom" },
+      });
+      pie2.render();
+    },
+    error: function () {
       alert("Error. Mohon refresh browser Anda.");
     },
   });

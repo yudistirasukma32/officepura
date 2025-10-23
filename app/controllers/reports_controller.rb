@@ -5535,12 +5535,13 @@ end
       @taxinvoices = Taxinvoice.where('customer_id is not null').active
       @this_month_taxinvoices = @taxinvoices.where("to_char(created_at, 'MM-YYYY') = ?", "#{@month}-#{@year}")
 
+      @taxinvoices_global = @taxinvoices.where('office_id is not null').where("created_at BETWEEN ? AND ?", @startdate.to_date.beginning_of_day, @enddate.to_date.end_of_day).order(:long_id)
       @taxinvoices = @taxinvoices.where("created_at BETWEEN ? AND ?", @startdate.to_date.beginning_of_day, @enddate.to_date.end_of_day).order(:long_id)
  
-      @stats_tuti = @taxinvoices.where('user_id = ?', 46)
-      @stats_alfi = @taxinvoices.where('user_id = ?', 138)
-      @stats_sarah = @taxinvoices.where('user_id = ?', 134)
-      @stats_suci = @taxinvoices.where('user_id = ?', 139)
+      # @stats_tuti = @taxinvoices.where('user_id = ?', 46)
+      # @stats_alfi = @taxinvoices.where('user_id = ?', 138)
+      # @stats_sarah = @taxinvoices.where('user_id = ?', 134)
+      # @stats_suci = @taxinvoices.where('user_id = ?', 139)
 
       start_of_month = @default_month.at_beginning_of_month
       end_of_month = @default_month.at_beginning_of_month.next_month - 1.day
@@ -5638,8 +5639,12 @@ end
 		month_text = []
  
 		#penagihan
-		user_ids = [46, 138, 134, 139]
+		# user_ids = [46, 138, 134, 139]
+    setting = Setting.find_by_name('User Penagihan')
+    user_ids = setting ? setting.value.to_s.split(',').map(&:to_i).reject(&:zero?) : []
+
 		@events_by_user = {}
+    @usernames = []
 		
 		user_ids.each do |user_id|
 		  @omzet_per_month = []
@@ -5659,6 +5664,7 @@ end
 			@omzet_per_month << total_bill.ceil / 1000000
 		  end
 		
+      @usernames << User.find(user_id).username.capitalize
 		  @events_by_user["omzet_#{user_id}"] = @omzet_per_month
 		end
 
@@ -5677,7 +5683,7 @@ end
     @draft_vs_sent << @this_month_taxinvoices.where('sentdate is not null').count
 
 		
-		render json: { success: true, month_text: month_text, users: @events_by_user, this_month: this_months, total: total, draft_vs_sent: @draft_vs_sent }
+		render json: { success: true, month_text: month_text, usernames: @usernames, users: @events_by_user, this_month: this_months, total: total, draft_vs_sent: @draft_vs_sent }
 
 	end
 
@@ -5826,6 +5832,7 @@ end
       # aggregated values
       omzet_per_customer   = @taxinvoices.group(:customer_id).sum(:total)
       piutang_per_customer = @taxinvoices_unpaid.group(:customer_id).sum(:total)
+      downpayment_per_customer = @taxinvoices_unpaid.group(:customer_id).sum(:downpayment)
       # cashin_per_customer  = Bankexpense.joins(:taxinvoice).
       #   where("bankexpense_id IS NOT NULL").
       #   where(:creditgroup_id => 607).
@@ -5855,7 +5862,12 @@ end
       # build result
       customer_datas = @customers.map do |customer|
         omzet   = omzet_per_customer[customer.id]   || 0
-        piutang = piutang_per_customer[customer.id] || 0
+        # piutang = piutang_per_customer[customer.id] - downpayment_per_customer[customer.id] || 0
+
+        total_piutang = piutang_per_customer[customer.id].to_f
+        downpayment = downpayment_per_customer[customer.id].to_f
+        piutang = total_piutang - downpayment
+
         cashin  = cashin_per_customer[customer.id.to_s]  || 0
 
         kontrol = omzet * 30 / 100

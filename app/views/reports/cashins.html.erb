@@ -45,7 +45,12 @@
 				<label for="user_id" class="middle thalf">User</label>
 				<select name="user_id" class="short left" style="margin-right:10px;">
                     <option value="all">Semua</option>
-					<% User.where('id in (46,138,134,139)').each do |m| %>
+					<%
+						setting = Setting.find_by_name('User Penagihan')
+						ids = setting ? setting.value.to_s.split(',').map(&:to_i) : []
+					%>
+
+					<% User.where(id: ids).each do |m| %>
 					<option value="<%= m.id %>"<% if m.id.to_i == @user_id.to_i %> selected='selected'<% end %>><%=m.username%></option>
 					<% end %>
 				</select>
