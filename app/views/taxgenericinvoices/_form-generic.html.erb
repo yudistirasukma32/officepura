@@ -434,6 +434,7 @@
             <th width="30">No</th>
             <th width="85">Tanggal</th>
             <th width="70">NoPol</th>
+            <th width="110">Isotank/Cont</th>
             <th width="110">Surat Jalan</th>
             <th>Jurusan</th>
             <th width="30" class="right">Berat <%="(" + @unitname +")" if !@unitname.blank? %></th>
@@ -450,6 +451,7 @@
             <td valign="top"><%=i+1%>.</td>
             <td valign="top"><input type="text" name="_date_<%=item.id%>" class="short date-picker" value="<%=item.date.strftime('%d-%m-%Y')%>" /></td>
             <td valign="top"><input type="text" name="_vehicle_<%=item.id%>" class="short vehicle_autocomplete" value="<%=vehicle.current_id%>" /></td>
+            <td valign="top"><input type="text" name="_container_number_<%=item.id%>" class="half" value="<%=item.container_number%>" /></td>
             <td valign="top"><input type="text" name="_sku_<%=item.id%>" class="half" value="<%=item.sku_id%>" /></td>
             <td><textarea name="_route_<%=item.id%>" style="width:300px; min-width:0; height:50px;"><%=raw nl2br(item.description)%></textarea></td>
             <td>
@@ -467,6 +469,7 @@
             <td valign="top"><%=i+1%>.</td>
             <td valign="top"><input type="text" name="_date[]" class="short date-picker" value="" /></td>
             <td valign="top"><input type="text" name="_vehicle[]" class="short vehicle_autocomplete" value="" /></td>
+            <td valign="top"><input type="text" name="_container_number[]" class="half" value="" /></td>
             <td valign="top"><input type="text" name="_sku[]" class="half" value="" /></td>
             <td><textarea name="_route[]" style="width:300px; min-width:0; height:50px;"></textarea></td>
             <td>
@@ -483,7 +486,7 @@
 
     <tfoot>
         <tr id="-1">
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td></td>
             <td></td>
             <td align="right">SUBTOTAL</td>
@@ -496,7 +499,7 @@
         </tr>
 
         <tr id="-2">
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td align="right">&nbsp;</td>
             <td align="right">&nbsp;</td>
             <td align="right">Biaya Tambahan</td>
@@ -504,7 +507,7 @@
         </tr>
 
         <tr id="-2">
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td align="right">&nbsp;</td>
             <td align="right">&nbsp;</td>
             <td align="right">Down Payment</td>
@@ -512,7 +515,7 @@
         </tr>
 
         <tr id="-2">
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td align="right">&nbsp;</td>
             <td align="right">&nbsp;</td>
             <td align="right">Discount</td>
@@ -520,7 +523,7 @@
         </tr>
 
         <tr id="-3">
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td align="right">&nbsp;</td>
             <td align="right">&nbsp;</td>
             <td align="right">Biaya Asuransi</td>
@@ -528,7 +531,7 @@
         </tr>
 
         <tr id="-3">
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td align="right">&nbsp;</td>
             <td align="right">&nbsp;</td>
             <td align="right">Potongan Klaim Selisih</td>
@@ -536,7 +539,7 @@
         </tr>
 
         <tr id="-3">
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td align="right">&nbsp;</td>
             <td align="right">&nbsp;</td>
             <td align="right">PPN <span id="ppn_amount"><%= @taxinvoice.get_ppn(ppn) %></span>%</td>
@@ -544,7 +547,7 @@
         </tr>
 
         <tr id="-4">
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td align="right">&nbsp;</td>
             <td align="right">&nbsp;</td>
             <td align="right">PPH 2%</td>
@@ -552,7 +555,7 @@
         </tr>
 
         <tr id="-5" class="footer">
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td align="right">&nbsp;</td>
             <td align="right">&nbsp;</td>
             <td align="right" class="total">TOTAL</td>

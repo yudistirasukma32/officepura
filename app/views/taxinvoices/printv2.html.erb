@@ -385,7 +385,11 @@
                     <td><%=taxgenericitem.date.strftime('%d/%m/%Y') unless taxgenericitem.date.nil?%></td>
                     <td><%=taxgenericitem.vehicle.current_id%></td>
                     <td>
-                        <% if taxgenericitem.sku_id == '' %> - <% else %> <%=taxgenericitem.sku_id %> <% end %> </td>
+                        <% if taxgenericitem.sku_id == '' %> - <% else %> <%=taxgenericitem.sku_id %> <% end %>
+                    </td>
+                    <% if @taxinvoice.is_show_container %>
+                    <td><%=taxgenericitem.container_number%></td>
+                    <% end %>
                     <td align="right">
                         <% if taxgenericitem.weight_gross == 0 %> - <% else %> <%=to_currency(taxgenericitem.weight_gross)%> <% end %> </td>
                     </td>
@@ -422,6 +426,10 @@
                     colspan = 10
                 else
                     colspan = 9
+                end %>
+
+                <% if @taxinvoice.is_show_container && @taxinvoice.generic 
+                    colspan = 10
                 end %>
 
                 <% if @taxinvoice.downpayment.to_i > 0 %>

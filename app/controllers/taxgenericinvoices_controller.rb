@@ -146,6 +146,7 @@ class TaxgenericinvoicesController < ApplicationController
 
             item.date = params["_date_#{item.id}"]
             item.vehicle_id = vehicle.id unless vehicle.nil?
+            item.container_number = params["_container_number_#{item.id}"]
             item.sku_id = params["_sku_#{item.id}"]
             item.description = params["_route_#{item.id}"]
             item.weight_gross = params["_gross_#{item.id}"].to_i rescue 0
@@ -170,7 +171,7 @@ class TaxgenericinvoicesController < ApplicationController
         #----- new values if total generic item <= 10 ----- #
 
       if @taxinvoice.taxgenericitems.count <= 20
-        _dates, _vehicles, _skus, _routes = params[:_date], params[:_vehicle], params[:_sku], params[:_route]
+        _dates, _vehicles, _skus, _routes, _container_number = params[:_date], params[:_vehicle], params[:_sku], params[:_route], params[:_container_number]
         _gross, _net, _price = params[:_gross], params[:_net], params[:_price], params[:_total]
 
         _dates.each_with_index do |date, i|
@@ -183,6 +184,7 @@ class TaxgenericinvoicesController < ApplicationController
               @taxgenericitem.customer_id = @taxinvoice.customer_id
               @taxgenericitem.date = date
               @taxgenericitem.vehicle_id = vehicle.id
+              @taxgenericitem.container_number = _container_number[i]
               @taxgenericitem.sku_id = _skus[i]
               @taxgenericitem.description = _routes[i]
               @taxgenericitem.weight_gross = _gross[i].to_i rescue 0

@@ -7,7 +7,8 @@ class Taxgenericitem < ActiveRecord::Base
 
   	# Setup accessible (or protected) attributes for your model
   	attr_accessible :date, :load_date, :unload_date, :description, :deleted, :sku_id, 
-  				:quantity, :price_per, :total, :taxinvoice_id, :office_id, :weight_gross, :weight_net, :customer_id, :vehicle_id
+  				:quantity, :price_per, :total, :taxinvoice_id, :office_id, :weight_gross, :weight_net, :customer_id, 
+				:vehicle_id, :vehicle_number, :container_number
 
   	scope :active, lambda {where(:deleted => false)}
 

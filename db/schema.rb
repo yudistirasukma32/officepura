@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250930041047) do
+ActiveRecord::Schema.define(:version => 20251029073658) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -44,6 +44,13 @@ ActiveRecord::Schema.define(:version => 20250930041047) do
   end
 
   add_index "allowances", ["route_id", "vehiclegroup_id"], :name => "allowance_routes"
+
+  create_table "ar_internal_metadata", :id => false, :force => true do |t|
+    t.string    "key",        :limit => nil, :null => false
+    t.string    "value",      :limit => nil
+    t.timestamp "created_at", :limit => 6,   :null => false
+    t.timestamp "updated_at", :limit => 6,   :null => false
+  end
 
   create_table "assetgroups", :id => false, :force => true do |t|
     t.integer   "id",                                               :null => false
@@ -1521,7 +1528,7 @@ ActiveRecord::Schema.define(:version => 20250930041047) do
     t.integer   "approved_by"
     t.integer   "user_id"
     t.boolean   "rejected",                                                    :default => false
-    t.datetime  "rejected_at"
+    t.timestamp "rejected_at",     :limit => 6
     t.integer   "rejected_by"
     t.text      "rejected_note"
   end
@@ -1692,7 +1699,7 @@ ActiveRecord::Schema.define(:version => 20250930041047) do
   end
 
   create_table "taxgenericitems", :force => true do |t|
-    t.boolean   "deleted",                                                   :default => false
+    t.boolean   "deleted",                                                      :default => false
     t.integer   "taxinvoice_id"
     t.integer   "customer_id"
     t.integer   "office_id"
@@ -1702,13 +1709,15 @@ ActiveRecord::Schema.define(:version => 20250930041047) do
     t.date      "date"
     t.date      "load_date"
     t.date      "unload_date"
-    t.integer   "weight_gross",                                              :default => 0
-    t.integer   "weight_net",                                                :default => 0
+    t.integer   "weight_gross",                                                 :default => 0
+    t.integer   "weight_net",                                                   :default => 0
     t.integer   "deleteuser_id"
-    t.timestamp "created_at",    :limit => 6,                                                   :null => false
-    t.timestamp "updated_at",    :limit => 6,                                                   :null => false
-    t.decimal   "price_per",                  :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "total",                      :precision => 19, :scale => 2, :default => 0.0
+    t.timestamp "created_at",       :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",       :limit => 6,                                                   :null => false
+    t.decimal   "price_per",                     :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "total",                         :precision => 19, :scale => 2, :default => 0.0
+    t.string    "vehicle_number"
+    t.string    "container_number"
   end
 
   create_table "taxinvoiceattachments", :force => true do |t|
