@@ -131,6 +131,8 @@ class TaxgenericinvoicesController < ApplicationController
     @taxinvoice.is_weightlost = params[:is_weightlost] == "Yes" ? true : false
     @taxinvoice.is_showqty_loaded = params[:is_showqty_loaded] == "Yes" ? true : false
     @taxinvoice.is_showqty_unloaded = params[:is_showqty_unloaded] == "Yes" ? true : false
+    @taxinvoice.is_show_container = params[:is_show_container] == "Yes" ? true : false
+    
     @taxinvoice.generic = true
     @taxinvoice.sentdate = params[:sentdate]
     @taxinvoice.user_id = current_user.id
