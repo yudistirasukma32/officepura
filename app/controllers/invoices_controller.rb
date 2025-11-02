@@ -205,6 +205,9 @@ class InvoicesController < ApplicationController
       if checkrole 'BKK Kantor Sumatera'
         @office_role.push(6)
       end
+      if checkrole 'BKK Kantor Cikarang'
+          @office_role.push(11)
+      end
       # if checkrole 'BKK Cargo Padat'
       #   @office_role.push(7)
       # end
@@ -297,6 +300,9 @@ class InvoicesController < ApplicationController
       if checkrole 'BKK Kantor Sumatera'
         @office_role.push(6)
       end
+      if checkrole 'BKK Kantor Cikarang'
+          @office_role.push(11)
+      end
       # if checkrole 'BKK Cargo Padat'
       #   @office_role.push(7)
       # end
@@ -383,6 +389,9 @@ class InvoicesController < ApplicationController
       if checkrole 'BKK Kantor Sumatera'
         @office_role.push(6)
       end
+      if checkrole 'BKK Kantor Cikarang'
+          @office_role.push(11)
+      end
       # if checkrole 'BKK Cargo Padat'
       #   @office_role.push(7)
       # end
@@ -426,6 +435,9 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Cargo Padat'
         @office_role.push(7)
+    end
+    if checkrole 'BKK Kantor Cikarang'
+        @office_role.push(11)
     end
 
     if checkrole 'Operasional BKK'
@@ -595,6 +607,9 @@ class InvoicesController < ApplicationController
     if checkrole 'BKK Kantor Sumatera'
         @office_role.push(6)
     end
+    if checkrole 'BKK Kantor Cikarang'
+        @office_role.push(11)
+    end
     # if checkrole 'BKK Cargo Padat'
     #     @office_role.push(7)
     # end
@@ -647,6 +662,9 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Sumatera'
       @office_role.push(6)
+    end
+    if checkrole 'BKK Kantor Cikarang'
+        @office_role.push(11)
     end
     # if checkrole 'BKK Cargo Padat'
     #   @office_role.push(7)
@@ -812,6 +830,9 @@ class InvoicesController < ApplicationController
     if checkrole 'BKK Kantor Sumatera'
       @office_role.push(6)
     end
+    if checkrole 'BKK Kantor Cikarang'
+      @office_role.push(11)
+    end
     # if checkrole 'BKK Cargo Padat'
     #   @office_role.push(7)
     # end
@@ -887,6 +908,9 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Sumatera'
         @office_role.push(6)
+    end
+    if checkrole 'BKK Kantor Cikarang'
+        @office_role.push(11)
     end
     # if checkrole 'BKK Cargo Padat'
     #   @office_role.push(7)
@@ -1747,6 +1771,9 @@ class InvoicesController < ApplicationController
       if checkrole 'BKK Kantor Sumatera'
         @office_role.push(6)
       end
+      if checkrole 'BKK Kantor Cikarang'
+          @office_role.push(11)
+      end
       # if checkrole 'BKK Cargo Padat'
       #   @office_role.push(7)
       # end
@@ -1820,6 +1847,9 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Kantor Sumatera'
       @office_role.push(6)
+    end
+    if checkrole 'BKK Kantor Cikarang'
+        @office_role.push(11)
     end
     # if checkrole 'BKK Cargo Padat'
     #   @office_role.push(7)
@@ -1900,6 +1930,9 @@ class InvoicesController < ApplicationController
     end
     if checkrole 'BKK Cargo Padat'
         @office_role.push(7)
+    end
+    if checkrole 'BKK Kantor Cikarang'
+        @office_role.push(11)
     end
 
     if checkrole 'Operasional BKK'
