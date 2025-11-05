@@ -102,7 +102,17 @@ class ClaimmemosController < ApplicationController
     if @claimmemo.save
       redirect_to(claimmemos_path, :notice => 'Data sukses disimpan')
     else
-      to_flash(@claimmemo, :notice => 'Data gagal disimpan')
+ 
+        error_message = if @claimmemo.errors[:invoice_id].present?
+          "Gagal menyimpan! Nomor BKK <strong class='yellow'>#{params[:claimmemo][:invoice_id]}</strong> sudah digunakan."
+        else
+          "Gagal menyimpan data Klaim. Silakan periksa kembali."
+        end
+
+        redirect_to(
+          new_claimmemo_path(invoice_id: params[:claimmemo][:invoice_id]),
+          alert: error_message.html_safe
+        )
     end
   end
 

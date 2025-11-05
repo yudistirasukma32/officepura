@@ -19,6 +19,19 @@ class Claimmemo < ActiveRecord::Base
 
   scope :active, lambda {where(:deleted => false)}
 
+  validate :invoice_id_unique_if_not_deleted
+
+  def invoice_id_unique_if_not_deleted
+    return if deleted? || invoice_id.blank?
+
+    existing = self.class.where(:invoice_id => invoice_id, :deleted => false)
+    existing = existing.where("id != ?", id) if persisted?
+
+    if existing.exists?
+      errors.add(:invoice_id, "sudah digunakan")
+    end
+  end
+
   has_many :attachments, :as => :imageable
 
   def images

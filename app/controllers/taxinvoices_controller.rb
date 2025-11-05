@@ -104,14 +104,27 @@ class TaxinvoicesController < ApplicationController
 
     @customerlist = Customer.find_by_sql("Select distinct c.* from customers c inner join invoices iv on c.id = iv.customer_id where iv.id in (Select t.invoice_id from taxinvoiceitems t where money(t.total) > money(0) and taxinvoice_id is null) UNION SELECT DISTINCT c.* FROM customers c INNER JOIN taxinvoiceitemvs tiv on c.id = tiv.customer_id WHERE tiv.deleted = FALSE ORDER BY name")
 
+    # check nomor yang tersedia
+    @available_long_ids = Taxinvoice.available_long_ids
+
     if @customer
       romenumber = getromenumber (Date.today.month.to_i)
       @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date, :sku_id)
       @taxinvoiceitemvs = @customer.taxinvoiceitemvs.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date, :sku_id)
       @taxinvoice.period_start = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).minimum(:date) || Date.today.strftime('%d-%m-%Y')
       @taxinvoice.period_end = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).maximum(:date) || Date.today.strftime('%d-%m-%Y')
-      @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
-      @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / ' + Date.today.year.to_s
+      # @long_id = Taxinvoice.active.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,4].to_i + 1 rescue nil || '01'
+      # @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / ' + Date.today.year.to_s
+
+      latest = Taxinvoice
+      .where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y'))
+      .where(deleted: false)
+      .order("long_id DESC")
+      .first
+
+      last_number = latest.present? ? latest.long_id.to_s[0,4].to_i : 0
+      new_number = last_number + 1
+      @long_id = ("%04d" % new_number) + " / TGH / PURA / #{romenumber} / #{Date.today.year}"
 
       if params[:update] == 'true'
         @taxinvoiceitems.each do |item|
@@ -163,6 +176,9 @@ class TaxinvoicesController < ApplicationController
     @process = "edit"
     @needupdate = false
     @taxinvoice.sentdate = params[:sentdate] if params[:sentdate].present?
+
+    # check nomor yang tersedia
+    @available_long_ids = Taxinvoice.available_long_ids
 
     if params[:update] == 'true'
       @taxinvoiceitems.each do |item|
@@ -320,8 +336,19 @@ class TaxinvoicesController < ApplicationController
         romenumber = getromenumber (Date.today.month.to_i)
         @taxinvoiceitems = @customer.taxinvoiceitems.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date)
         @taxinvoiceitemvs = @customer.taxinvoiceitemvs.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date)
-        @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
-        @long_id = ("%04d" % @long_id.to_s) + ' / TGH / RDPI / ' + romenumber + ' / ' + Date.today.year.to_s
+        # @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,4].to_i + 1 rescue nil || '01'
+        # @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / ' + Date.today.year.to_s
+
+        latest = Taxinvoice
+        .where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y'))
+        .where(deleted: false)
+        .order("long_id DESC")
+        .first
+
+        last_number = latest.present? ? latest.long_id.to_s[0,4].to_i : 0
+        new_number = last_number + 1
+        @long_id = ("%04d" % new_number) + " / TGH / PURA / #{romenumber} / #{Date.today.year}"
+
         @taxinvoice = Taxinvoice.new
         @taxinvoice.long_id = params[:long_id]
       end
@@ -606,9 +633,9 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.total = total
       @taxinvoice.total_in_words = moneytowordsrupiah(@taxinvoice.total)
 
-      @taxinvoice.save
+      # @taxinvoice.save
 
-      createbankexpenserecord @taxinvoice.id, true
+      # createbankexpenserecord @taxinvoice.id, true
 
       # if params[:pembulatan].present?
       #   render json: {
@@ -620,7 +647,35 @@ class TaxinvoicesController < ApplicationController
       # end
       # render json:
       # return false
-      redirect_to(taxinvoices_url, :notice => "Data Invoice untuk pelanggan<br /><strong class='yellow'>#{@customer.name}</strong><br />sukses disimpan.".html_safe)
+      # redirect_to(taxinvoices_url, :notice => "Data Invoice untuk pelanggan<br /><strong class='yellow'>#{@customer.name}</strong><br />sukses disimpan.".html_safe)
+
+      if @taxinvoice.save
+        createbankexpenserecord @taxinvoice.id, true
+
+        redirect_to(
+          taxinvoices_url,
+          notice: "Data Invoice untuk pelanggan<br /><strong class='yellow'>#{@customer.name}</strong><br />sukses disimpan.".html_safe
+        )
+      else
+        error_message = if @taxinvoice.errors[:long_id].present?
+          "Gagal menyimpan! Nomor invoice <strong class='yellow'>#{@taxinvoice.long_id}</strong> sudah digunakan."
+        else
+          "Gagal menyimpan data invoice. Silakan periksa kembali."
+        end
+
+        if params[:process] == "edit"
+          redirect_to(
+            edit_taxinvoice_path(@taxinvoice.id),
+            alert: error_message.html_safe
+          )
+        else
+          redirect_to(
+            new_taxinvoice_path(customer_id: @customer.id),
+            alert: error_message.html_safe
+          )
+        end
+      end
+
     end
   end
 
@@ -1846,6 +1901,9 @@ class TaxinvoicesController < ApplicationController
     @events_cust_dp = Event.active.where('money(downpayment_amount) > money(0)').reorder(:start_date)
     @events_cust_dp_list = @events_cust_dp.pluck(:customer_id)
     @customerlist = Customer.active.reorder(:name).where('id in (?)', @events_cust_dp_list)
+    
+    # check nomor yang tersedia
+    @available_long_ids = Taxinvoice.available_long_ids
 
     if @customer
       romenumber = getromenumber (Date.today.month.to_i)
@@ -1853,8 +1911,8 @@ class TaxinvoicesController < ApplicationController
       @taxinvoiceitemvs = @customer.taxinvoiceitemvs.where("taxinvoice_id is null AND money(total) > money(0) AND rejected = false").order(:date, :sku_id)
       @taxinvoice.period_start = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).minimum(:date) || Date.today.strftime('%d-%m-%Y')
       @taxinvoice.period_end = @customer.taxinvoiceitems.where(:taxinvoice_id => nil).maximum(:date) || Date.today.strftime('%d-%m-%Y')
-      @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("ID DESC").first.long_id[0,3].to_i + 1 rescue nil || '01'
-      @long_id = ("%04d" % @long_id.to_s) + ' / TGH / RDPI / ' + romenumber + ' / ' + Date.today.year.to_s
+      @long_id = Taxinvoice.where("to_char(date, 'MM-YYYY') = ?", Date.today.strftime('%m-%Y')).order("long_id DESC").first.long_id[0,4].to_i + 1 rescue nil || '01'
+      @long_id = ("%04d" % @long_id.to_s) + ' / TGH / PURA / ' + romenumber + ' / ' + Date.today.year.to_s
 
       if params[:update] == 'true'
         @taxinvoiceitems.each do |item|

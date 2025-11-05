@@ -112,6 +112,17 @@
 
     <br /><br />
 
+    <div id="infobox2" style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <strong><i class="icon-question-sign"></i> Nomor Invoice yg tersedia (terlompati):</strong>
+        <% if @available_long_ids.any? %>
+        <% @available_long_ids.each do |long_id| %>
+            <p><%= long_id %></p>
+        <% end %>
+        <% else %>
+            <p>Tidak ada invoice dengan nomor yang terlompati bulan ini.</p>
+        <% end %>
+    </div>
+
     <% if @process =='edit'%>
 
     <% cust_id =  @taxinvoice.customer_id %>
