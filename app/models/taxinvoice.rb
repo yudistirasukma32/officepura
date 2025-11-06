@@ -35,7 +35,7 @@ class Taxinvoice < ActiveRecord::Base
   scope :active, lambda { where(deleted: false) }
 
   # --- Validations ---
-  before_validation :normalize_long_id
+  # before_validation :normalize_long_id
   validates :long_id, presence: true, uniqueness: true
 
   # --- Instance Methods ---
