@@ -36,15 +36,25 @@ class Taxinvoice < ActiveRecord::Base
 
   # --- Validations ---
   before_validation :normalize_long_id
-  # validates :long_id, presence: true, uniqueness: true
+  validates :long_id, presence: true, uniqueness: true
+  # validate :unique_long_id_among_active
+
+  # def unique_long_id_among_active
+  #   existing = Taxinvoice.where(long_id: long_id, deleted: false).where.not(id: id).first
+  #   if existing.present?
+  #     errors.add(:long_id, "sudah digunakan untuk Invoice lain.")
+  #   end
+  # end
+
   validate :unique_long_id_among_active
 
   def unique_long_id_among_active
-    existing = Taxinvoice.where(long_id: long_id, deleted: false).where.not(id: id).first
+    existing = Taxinvoice.where(long_id: long_id, deleted: false).where("id != ?", id).first
     if existing.present?
-      errors.add(:long_id, "sudah digunakan untuk Invoice lain.")
+      errors.add(:long_id, "sudah digunakan untuk taxinvoice yang belum dihapus")
     end
   end
+
 
   # --- Instance Methods ---
 
