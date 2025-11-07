@@ -58,7 +58,27 @@
                         <% if taxinvoice.downpayment > 0 %><br />Deposit <%=to_currency_bank(taxinvoice.downpayment_date.strftime('%d-%m'))%><% end %>
                         <% if taxinvoice.is_dp %>&nbsp;<i class="icon-bookmark grey"></i><% end %>
                     </td>
-                    <td><%=taxinvoice.doubtful_ar_note %></td>
+                    <td>
+                        <textarea style="display: none;" id="txt-<%=taxinvoice.id%>" name="taxinvoice[doubtful_ar_note]"><%=taxinvoice.doubtful_ar_note%></textarea>
+
+                        <div id="div-inv-<%=taxinvoice.id%>">
+                            <br/>
+                            <%=taxinvoice.doubtful_ar_note%>
+                        </div>
+
+                        <br/>
+                        <a href="#"
+                            style="font-size: 10px;
+                                    text-decoration: underline;
+                                    font-weight: 500;
+                                    color: darkslateblue;
+                                    padding-bottom: 6px;"
+                            class="add-note-btn d-none-print"
+                            data-taxinvoice-id="<%=taxinvoice.id%>">
+                            Tambah data
+                        </a>
+
+                    </td>
                     <td align="right">
                         <%=to_currency(taxinvoice.total) rescue '0' %>
                     </td>
@@ -79,3 +99,100 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('click', function (e) {
+    const addBtn = e.target.closest('.add-note-btn');
+    if (addBtn) {
+      e.preventDefault();
+      const id = addBtn.dataset.taxinvoiceId;
+      const textarea = document.getElementById(`txt-${id}`);
+      const div = document.getElementById(`div-inv-${id}`);
+
+      if (!textarea || !div) return;
+
+      // tampilkan textarea
+      textarea.style.display = 'block';
+      textarea.style.width = '100%';
+      textarea.style.minHeight = '80px';
+      textarea.focus();
+      div.style.display = 'none';
+
+      addBtn.textContent = 'Simpan';
+      addBtn.classList.remove('add-note-btn');
+      addBtn.classList.add('save-note-btn');
+      return;
+    }
+
+    const saveBtn = e.target.closest('.save-note-btn');
+    if (saveBtn) {
+      e.preventDefault();
+      const id = saveBtn.dataset.taxinvoiceId;
+      const textarea = document.getElementById(`txt-${id}`);
+      const div = document.getElementById(`div-inv-${id}`);
+
+      if (!textarea || !div) return;
+
+      const value = textarea.value || '';
+
+      // update tampilan lokal
+      div.innerHTML = value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\r?\n/g, '<br/>');
+
+      // kirim ke server via POST
+      const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      fetch(`/taxinvoices/${id}/update_doubtful_note`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': token
+        },
+        body: JSON.stringify({ doubtful_ar_note: value })
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.status === 200) {
+          console.log('✅', data.message);
+        } else {
+          alert('Gagal update: ' + data.message);
+        }
+      })
+      .catch(err => console.error('❌ Error:', err));
+
+      // sembunyikan textarea
+      textarea.style.display = 'none';
+      div.style.display = 'block';
+
+      saveBtn.textContent = 'Tambah data';
+      saveBtn.classList.remove('save-note-btn');
+      saveBtn.classList.add('add-note-btn');
+
+      return;
+    }
+  });
+
+  // tombol ESC untuk batal edit
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      const editing = document.querySelector('textarea[style*="display: block"]');
+      if (!editing) return;
+      const id = editing.id.replace('txt-', '');
+      const div = document.getElementById(`div-inv-${id}`);
+      const btn = document.querySelector(`[data-taxinvoice-id="${id}"]`);
+
+      if (editing) editing.style.display = 'none';
+      if (div) div.style.display = 'block';
+      if (btn) {
+        btn.textContent = 'Tambah data';
+        btn.classList.remove('save-note-btn');
+        btn.classList.add('add-note-btn');
+      }
+    }
+  });
+});
+</script>
+

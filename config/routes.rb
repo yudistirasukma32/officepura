@@ -559,6 +559,7 @@ OfficePuraErp::Application.routes.draw do
       get 'printreceipt'
       get 'clone'
       get 'updatecustomer'
+      post 'update_doubtful_note'
     end
     collection do
       get 'downloadmultiexcel'

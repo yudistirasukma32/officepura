@@ -1765,6 +1765,16 @@ class TaxinvoicesController < ApplicationController
     # render json: @taxinvoice
   end
 
+  def update_doubtful_note
+    @taxinvoice = Taxinvoice.find(params[:id])
+    @taxinvoice.doubtful_ar_note = params[:doubtful_ar_note]
+    if @taxinvoice.save
+      render json: { status: 200, message: "Data Invoice sukses diupdate"}, status: 200
+    else
+      render json: { status: 400, message: "Data Invoice gagal diupdate" }, status: 400
+    end
+  end
+
   def clone
 
     @taxinvoice = Taxinvoice.find(params[:id])
