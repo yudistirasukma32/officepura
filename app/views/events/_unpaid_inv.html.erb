@@ -5,4 +5,6 @@
 <span style="text-align: right;">
     <h2 class="title" style="font-weight: bold; margin: 0;"><%= number_to_currency(@piutang, unit: "Rp ", precision: 2, delimiter: ".", separator: ",") %></h2>
     <span style="font-size:12px; color: grey;"><%= @taxinvoice.count.to_s + ' Invoice Belum Lunas' %></span>
+    <br/>
+    <span style="font-size:12px; color: grey;"><%= @customer.description rescue nil %></span>
 </span>
