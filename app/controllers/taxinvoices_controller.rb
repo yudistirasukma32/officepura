@@ -1759,7 +1759,7 @@ class TaxinvoicesController < ApplicationController
     if @taxinvoice.save
       render json: { status: 200, message: "Data Invoice untuk pelanggan<br /><strong class='yellow'>#{@taxinvoice.customer.name}</strong><br />sukses disimpan.".html_safe, invoice: params, taxinvoice: @taxinvoice.sentdate }
     else
-      render json: { status: 400, message: "Data Invoice gagal diupdate" }, status: 400
+      render json: { status: 400, message: "Data Invoice gagal diupdate", errors: @taxinvoice.errors.full_messages }, status: 400
     end
 
     # render json: @taxinvoice
