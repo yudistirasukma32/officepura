@@ -4,7 +4,7 @@ class AlterTableDriverPrepareDms < ActiveRecord::Migration
 
     add_column :driverlogs, :log_type, :string
     add_column :driverlogs, :date, :date
-    add_column :driverlogs, :response, :jsonb
+    add_column :driverlogs, :response, :text
     add_column :driverlogs, :vehicle_id, :int
     add_column :driverlogs, :approved, :boolean, :default => false
  
