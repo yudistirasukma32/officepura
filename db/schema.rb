@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20251029073658) do
+ActiveRecord::Schema.define(:version => 20251123131242) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -334,6 +334,8 @@ ActiveRecord::Schema.define(:version => 20251029073658) do
     t.timestamp "created_at",    :limit => 6,                    :null => false
     t.timestamp "updated_at",    :limit => 6,                    :null => false
     t.integer   "taxinvoice_id"
+    t.date      "revision_date"
+    t.boolean   "approved",                   :default => false
   end
 
   create_table "customers", :force => true do |t|
@@ -401,20 +403,12 @@ ActiveRecord::Schema.define(:version => 20251029073658) do
     t.decimal   "bon",                        :precision => 19, :scale => 2, :default => 0.0
   end
 
-  create_table "driverlogs", :force => true do |t|
-    t.boolean   "deleted",                  :default => false
-    t.boolean   "enabled",                  :default => true
-    t.boolean   "ready",                    :default => false
-    t.boolean   "absent",                   :default => false
-    t.integer   "driver_id"
-    t.text      "description"
-    t.timestamp "created_at",  :limit => 6,                    :null => false
-    t.timestamp "updated_at",  :limit => 6,                    :null => false
-  end
+# Could not dump table "driverlogs" because of following StandardError
+#   Unknown type 'jsonb' for column 'response'
 
   create_table "drivers", :force => true do |t|
-    t.boolean   "deleted",                                                              :default => false
-    t.boolean   "enabled",                                                              :default => true
+    t.boolean   "deleted",                                                                :default => false
+    t.boolean   "enabled",                                                                :default => true
     t.string    "name"
     t.string    "address"
     t.string    "city"
@@ -430,27 +424,31 @@ ActiveRecord::Schema.define(:version => 20251029073658) do
     t.integer   "min_wages"
     t.string    "status"
     t.text      "description"
-    t.timestamp "created_at",               :limit => 6,                                                   :null => false
-    t.timestamp "updated_at",               :limit => 6,                                                   :null => false
+    t.timestamp "created_at",               :limit => 6,                                                     :null => false
+    t.timestamp "updated_at",               :limit => 6,                                                     :null => false
     t.string    "emergency_number"
-    t.decimal   "weight_loss",                           :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "accident",                              :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "sparepart",                             :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "bon",                                   :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "saving",                                :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "weight_loss",                             :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "accident",                                :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "sparepart",                               :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "bon",                                     :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "saving",                                  :precision => 19, :scale => 2, :default => 0.0
     t.integer   "vehicle_id"
     t.string    "bank_account"
     t.string    "bank_name"
     t.integer   "bankexpensegroup_id"
     t.string    "origin"
-    t.boolean   "is_resign",                                                            :default => false
+    t.boolean   "is_resign",                                                              :default => false
     t.integer   "vendor_id"
     t.date      "datein"
     t.date      "dateout"
-    t.boolean   "blacklist",                                                            :default => false
+    t.boolean   "blacklist",                                                              :default => false
     t.integer   "blacklist_customer_id"
     t.string    "blacklist_note"
     t.integer   "office_id"
+    t.string    "auth_id",                  :limit => nil
+    t.string    "email"
+    t.string    "app_version"
+    t.string    "device_type"
   end
 
   create_table "eventcleaningmemos", :force => true do |t|
@@ -560,6 +558,7 @@ ActiveRecord::Schema.define(:version => 20251029073658) do
     t.boolean   "multicontainer",                                                     :default => false
     t.boolean   "unload_vendor",                                                      :default => false
     t.string    "reject_reason"
+    t.string    "po_number"
   end
 
   add_index "events", ["id", "start_date", "end_date", "customer_id"], :name => "index_events_on_customer_id"
@@ -774,6 +773,7 @@ ActiveRecord::Schema.define(:version => 20251029073658) do
     t.integer   "second_container_id"
     t.integer   "second_isotank_id"
     t.integer   "marketing_id"
+    t.string    "app_status"
   end
 
   add_index "invoices", ["date", "customer_id", "event_id", "invoicetrain"], :name => "invoice_events"
@@ -1436,6 +1436,18 @@ ActiveRecord::Schema.define(:version => 20251029073658) do
     t.date      "billingdate"
   end
 
+  create_table "receipttaxinvoices", :force => true do |t|
+    t.boolean  "deleted",       :default => false
+    t.boolean  "enabled",       :default => true
+    t.integer  "user_id"
+    t.integer  "deleteuser_id"
+    t.integer  "printuser_id"
+    t.date     "printdate"
+    t.date     "billing_date"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+  end
+
   create_table "receipttrains", :force => true do |t|
     t.boolean   "deleted",                                                           :default => false
     t.integer   "trainexpense_id"
@@ -1793,18 +1805,18 @@ ActiveRecord::Schema.define(:version => 20251029073658) do
   end
 
   create_table "taxinvoices", :force => true do |t|
-    t.boolean   "deleted",                                                         :default => false
+    t.boolean   "deleted",                                                          :default => false
     t.date      "date"
     t.string    "long_id"
     t.string    "ship_name"
     t.text      "description"
     t.integer   "customer_id"
     t.integer   "office_id"
-    t.timestamp "created_at",          :limit => 6,                                                   :null => false
-    t.timestamp "updated_at",          :limit => 6,                                                   :null => false
-    t.decimal   "total",                            :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "gst_tax",                          :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "price_tax",                        :precision => 19, :scale => 2, :default => 0.0
+    t.timestamp "created_at",           :limit => 6,                                                   :null => false
+    t.timestamp "updated_at",           :limit => 6,                                                   :null => false
+    t.decimal   "total",                             :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "gst_tax",                           :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "price_tax",                         :precision => 19, :scale => 2, :default => 0.0
     t.date      "duedate"
     t.date      "paiddate"
     t.date      "period_start"
@@ -1813,46 +1825,48 @@ ActiveRecord::Schema.define(:version => 20251029073658) do
     t.string    "spk_no"
     t.string    "po_no"
     t.string    "tank_name"
-    t.decimal   "extra_cost",                       :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "extra_cost",                        :precision => 19, :scale => 2, :default => 0.0
     t.text      "extra_cost_info"
     t.text      "total_in_words"
     t.string    "price_by"
     t.boolean   "is_weightlost"
     t.string    "spo_no"
     t.date      "sentdate"
-    t.boolean   "generic",                                                         :default => false
-    t.decimal   "downpayment",                      :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "generic",                                                          :default => false
+    t.decimal   "downpayment",                       :precision => 19, :scale => 2, :default => 0.0
     t.date      "downpayment_date"
     t.string    "so_no"
     t.string    "sto_no"
     t.string    "do_no"
     t.string    "waybill"
     t.date      "confirmeddate"
-    t.float     "gst_percentage",                                                  :default => 0.0
+    t.float     "gst_percentage",                                                   :default => 0.0
     t.text      "remarks"
-    t.decimal   "insurance_cost",                   :precision => 19, :scale => 2, :default => 0.0
-    t.decimal   "claim_cost",                       :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "insurance_cost",                    :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "claim_cost",                        :precision => 19, :scale => 2, :default => 0.0
     t.integer   "company_id"
     t.integer   "user_id"
     t.integer   "bank_id"
     t.string    "booking_code"
-    t.decimal   "secondpayment",                    :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "secondpayment",                     :precision => 19, :scale => 2, :default => 0.0
     t.date      "secondpayment_date"
-    t.boolean   "is_showqty_loaded",                                               :default => false
-    t.boolean   "is_showqty_unloaded",                                             :default => false
-    t.decimal   "thirdpayment",                     :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "is_showqty_loaded",                                                :default => false
+    t.boolean   "is_showqty_unloaded",                                              :default => false
+    t.decimal   "thirdpayment",                      :precision => 19, :scale => 2, :default => 0.0
     t.date      "thirdpayment_date"
-    t.decimal   "fourthpayment",                    :precision => 19, :scale => 2, :default => 0.0
+    t.decimal   "fourthpayment",                     :precision => 19, :scale => 2, :default => 0.0
     t.date      "fourthpayment_date"
-    t.boolean   "is_dp",                                                           :default => false
-    t.decimal   "dp_cost",                          :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "waiting",                                                         :default => false
-    t.float     "discount_percent",                                                :default => 0.0
-    t.decimal   "discount_amount",                  :precision => 19, :scale => 2, :default => 0.0
-    t.boolean   "doubtful_ar",                                                     :default => false
+    t.boolean   "is_dp",                                                            :default => false
+    t.decimal   "dp_cost",                           :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "waiting",                                                          :default => false
+    t.float     "discount_percent",                                                 :default => 0.0
+    t.decimal   "discount_amount",                   :precision => 19, :scale => 2, :default => 0.0
+    t.boolean   "doubtful_ar",                                                      :default => false
     t.string    "doubtful_ar_note"
-    t.boolean   "is_show_container",                                               :default => false
-    t.boolean   "is_show_loadunload",                                              :default => false
+    t.boolean   "is_show_container",                                                :default => false
+    t.boolean   "is_show_loadunload",                                               :default => false
+    t.integer   "receipttaxinvoice_id"
+    t.boolean   "below_minimum",                                                    :default => false
   end
 
   create_table "tirebudgets", :force => true do |t|

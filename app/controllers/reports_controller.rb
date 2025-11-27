@@ -702,38 +702,52 @@ class ReportsController < ApplicationController
     role = cek_roles 'Admin Operasional, Admin HRD, Admin Gudang'
     if role
       @startdate = params[:startdate]
-      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
-      @enddate = params[:enddate]
-      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
-
-      @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND invoicetrain = false AND tanktype = 'KONTAINER' AND (container_id is not null AND container_id != 0))", @startdate.to_date, @enddate.to_date + 1).order(:date)
-
-      if params[:transporttype].present?
-
-        if params[:transporttype] == 'KERETA'
-          @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND invoicetrain = true AND tanktype = 'KONTAINER' AND (container_id is not null AND container_id != 0))", @startdate.to_date, @enddate.to_date + 1).order(:date)
-          if params[:category].present?
-            @invoices = @invoices.where("container_id in (select id from containers where category = ?)", params[:category])
-          end
-        else
-          @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND invoicetrain = false AND tanktype = 'KONTAINER' AND (container_id is not null AND container_id != 0))", @startdate.to_date, @enddate.to_date + 1).order(:date)
-          if params[:category].present?
-            @invoices = @invoices.where("container_id in (select id from containers where category = ?)", params[:category])
-          end
-        end
-
-      else
-
-        @invoices = Invoice.active.where("(date >= ? and date < ? AND deleted = false AND tanktype = 'KONTAINER' AND (container_id is not null AND container_id != 0))", @startdate.to_date, @enddate.to_date + 1).order(:date)
-        if params[:category].present?
-          @invoices = @invoices.where("container_id in (select id from containers where category = ?)", params[:category])
-        end
-
+      if @startdate.blank?
+        @startdate = Date.today.beginning_of_month.strftime('%d-%m-%Y')
       end
 
-        # @invoices = @invoices.where(container_id: params[:container_id]) if params[:container_id].present?
+      @enddate = params[:enddate]
+      if @enddate.blank?
+        @enddate = (Date.today.beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y')
+      end
 
+      @groups = [
+        "KONTAINER",
+        "DRY CONTAINER 20FT",
+        "DRY CONTAINER 40FT",
+        "SIDE DOOR CONTAINER 20FT",
+        "SIDE DOOR CONTAINER 40FT"
+      ]
 
+      # Convert string date dd-mm-yyyy to Date
+      start_date = Date.strptime(@startdate, '%d-%m-%Y')
+      end_date   = Date.strptime(@enddate, '%d-%m-%Y') + 1
+
+      @invoices = Invoice.active.where(
+        "date >= ? AND date < ? AND deleted = false AND (container_id IS NOT NULL AND container_id != 0)",
+        start_date, end_date
+      )
+
+      # Transport filter
+      if !params[:transporttype].blank?
+        if params[:transporttype] == 'KERETA'
+          @invoices = @invoices.where("invoicetrain = ?", true)
+        else
+          @invoices = @invoices.where("invoicetrain = ?", false)
+        end
+      else
+        @invoices = @invoices.where("tanktype IN (?)", @groups)
+      end
+
+      # Category filter
+      if !params[:category].blank?
+        @invoices = @invoices.where(
+          "container_id IN (SELECT id FROM containers WHERE category = ?)",
+          params[:category]
+        )
+      end
+
+      @invoices = @invoices.order("date ASC")
 
       @section = "reports1"
       @where = "containers-report"
@@ -741,7 +755,6 @@ class ReportsController < ApplicationController
     else
       redirect_to root_path()
     end
-
   end
 
   def containerutilization
@@ -3042,53 +3055,47 @@ end
   end
 
   def unpaid_invoice
+    allowed_role = cek_roles 'Admin Keuangan, Auditor, Admin Penagihan'
+    return redirect_to(root_path) unless allowed_role
 
-    role = cek_roles 'Admin Keuangan, Auditor, Admin Penagihan'
+    # ==== FILTER TANGGAL =======================================
+    @month     = params[:month].present?     ? ("%02d" % params[:month].to_i)     : ("%02d" % Date.today.month)
+    @year      = params[:year].present?      ? params[:year].to_i                 : Date.today.year
+    @monthEnd  = params[:monthEnd].present?  ? ("%02d" % params[:monthEnd].to_i)  : @month
+    @yearEnd   = params[:yearEnd].present?   ? params[:yearEnd].to_i              : @year
 
-    if role
+    @day       = "01"
+    @dayEnd    = getlastday(@monthEnd) # tetap pakai method lama
 
-      @month = params[:month]
-      @month = "%02d" % Date.today.month.to_s if @month.nil?
-      @day = "01"
-      @year = params[:year]
-      @year = Date.today.year if @year.nil?
+    # Konversi ke Date (lebih aman dari pada string)
+    begin_date  = Date.strptime("#{@day}-#{@month}-#{@year}", "%d-%m-%Y")
+    end_date    = Date.strptime("#{@dayEnd}-#{@monthEnd}-#{@yearEnd}", "%d-%m-%Y")
 
-      @monthEnd = params[:monthEnd]
-      @monthEnd = "%02d" % Date.today.month.to_s if @monthEnd.nil?
-      @dayEnd = getlastday (@monthEnd.to_s)
-      @yearEnd = params[:yearEnd]
-      @yearEnd = Date.today.year if @yearEnd.nil?
+    # ==== QUERY INVOICE =========================================
+    @taxinvoices = Taxinvoice.active.
+                      joins(:customer).
+                      where("paiddate IS NULL AND date BETWEEN ? AND ?", begin_date, end_date)
 
-      @taxinvoices = Taxinvoice.active.joins(:customer)
+    @customer_id = params[:customer_id]
+    @taxinvoices = @taxinvoices.where(:customer_id => @customer_id) if @customer_id.present?
 
-      # @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'DD-MM-YYYY') BETWEEN ? AND ?", "#{@day}-#{@month}-#{@year}","#{@dayEnd}-#{@monthEnd}-#{@yearEnd}")
-      @taxinvoices = @taxinvoices.where("paiddate is null AND date BETWEEN ? AND ?", "#{@year}-#{@month}-#{@day}-","#{@yearEnd}-#{@monthEnd}-#{@dayEnd}")
-      # @taxinvoices = @taxinvoices.where("paiddate is null AND to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}")
-
-      @customers = Customer.active.where("id in (?)", @taxinvoices.pluck('customer_id')).order(:name)
-
-      @customer_id = params[:customer_id]
-
-      if @customer_id.present?
-        @taxinvoices = @taxinvoices.where("customer_id = ?", @customer_id)
-      end
-
-      if params[:due_date_order].present?
-        if params[:due_date_order] == "asc"
-          @taxinvoices = @taxinvoices.order("((case when sentdate is not null then sentdate else date end) + (interval '1' day * COALESCE(customers.terms_of_payment_in_days,0))) asc")
-        elsif params[:due_date_order] == "desc"
-          @taxinvoices = @taxinvoices.order("((case when sentdate is not null then sentdate else date end) + (interval '1' day * COALESCE(customers.terms_of_payment_in_days,0))) desc")
-        end
-      else
-        @taxinvoices = @taxinvoices.order(:long_id)
-      end
-      # render json: @taxinvoices
-      @section = "reports2"
-      @where = "reports-unpaidinvoice"
-
+    # ==== ORDERING ===============================================
+    if params[:due_date_order].present?
+      order_dir = params[:due_date_order] == "asc" ? "ASC" : "DESC"
+      @taxinvoices = @taxinvoices.order("(COALESCE(sentdate, date) + (interval '1 day' * COALESCE(customers.terms_of_payment_in_days,0))) #{order_dir}")
     else
-      redirect_to root_path()
+      @taxinvoices = @taxinvoices.order(:long_id)
     end
+
+    # ==== DATA CUSTOMER FILTER ====================================
+    @customers = Customer.active.where(:id => @taxinvoices.pluck(:customer_id)).order(:name)
+
+    # ==== SUMMARY DATA ============================================
+    @totals_by_invoice    = Taxinvoiceitem.group(:taxinvoice_id).sum(:total)
+    @generics_by_invoice  = Taxgenericitem.group(:taxinvoice_id).sum(:total)
+
+    @section = "reports2"
+    @where   = "reports-unpaidinvoice"
   end
 
   def paid_invoice

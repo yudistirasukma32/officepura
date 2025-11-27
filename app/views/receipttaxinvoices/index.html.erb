@@ -1,0 +1,134 @@
+<style>
+	.btn-styled {
+		border-radius: 3px;
+		border: 0;
+		padding: 7px 10px;
+		text-decoration: none;
+		color: #fff;
+		font-size: 13px;
+		font-weight: 900;
+		cursor: pointer;
+		letter-spacing: 0.05em;
+		background-color: #24748f !important;
+		background-repeat: repeat-x;
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#2d95b7", endColorstr="#23748e");
+		background-image: -khtml-gradient(linear, left top, left bottom, from(#2d95b7), to(#23748e));
+		background-image: -moz-linear-gradient(top, #2d95b7, #23748e);
+		background-image: -ms-linear-gradient(top, #2d95b7, #23748e);
+		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2d95b7), color-stop(100%, #23748e));
+		background-image: -webkit-linear-gradient(top, #2d95b7, #23748e);
+		background-image: -o-linear-gradient(top, #2d95b7, #23748e);
+		background-image: linear-gradient(#2d95b7, #23748e);
+		border-color: #23748e #23748e #216c85;
+		color: #fff !important;
+		text-shadow: 0 -1px 0 rgb(0 0 0 / 16%);
+		-webkit-font-smoothing: antialiased;
+	}
+
+	.modal {
+		padding-top: 128px;
+	}
+	
+	.modal-content {
+		max-width: 480px;
+		width: 100%;
+	}
+
+	</style>
+
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>Invoice Tagihan / <a href="<%=receipttaxinvoices_path%>">Tanda Terima</a> / Index</h1>
+		
+		<br class="clearfix" />
+
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue">
+					<label for="startdate" class="middle">Tgl Awal</label>
+					<input type="text" name="startdate" class="thalf date-picker left" value="<%=@startdate%>" />
+					<label for="enddate" class="tiny">s/d</label>
+					<input type="text" name="enddate" class="thalf date-picker left" value="<%=@enddate%>" />
+					<div style="display: inline-block;">
+						<input class="submit" type="submit"  class="" value="Filter" >
+					</div>
+					<a class="print btn-txt btn-green" style="margin: 0;" href="<%= download_excel_receipttaxinvoices_url(date: @date) %>"><i class="icon-file"></i> Excel</a>
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<%= render "showtable" %>
+		
+		<br class="clearfix" />
+
+	</div>
+
+</div>
+
+<!-- Begin::edit modal -->
+<div id="myModal" class="modal">
+  <div class="modal-content" style="height: 300px;">
+    <span class="close" style="margin-top: -0.5rem;">&times;</span>
+
+    <form method="POST" id="update_receipttaxinv" action="<%= update_receipt_receipttaxinvoices_url %>">
+      <h3 class="text-center" style="text-align: center; margin-top: unset; font-weight: bold;">
+        Edit Tanda Terima #<span id="receipt_long_id"></span>
+      </h3>
+
+      <!-- Tanggal Buat -->
+      <div style="padding-bottom:0px; display: flex; margin-top: 32px;">
+        <div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+          <label style="color:#000; font-weight:700;">Tanggal Buat</label>
+        </div>
+        <div style="width: 50%; max-width: 320px; display: block;">
+          <input type="text" name="date" class="date-picker" id="date" autocomplete="off"
+                 style="width: 320px; margin-bottom: 0.35rem;">
+          <br/>
+          <small>Tanggal Pembuatan Tanda Terima</small>
+        </div>
+      </div>
+
+      <!-- Tanggal Penyerahan -->
+      <div style="padding-bottom:0px; display: flex; margin-top: 10px;">
+        <div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+          <label style="color:#000; font-weight:700;">Tanggal Penyerahan</label>
+        </div>
+        <div style="width: 50%; max-width: 320px; display: block;">
+          <input type="text" name="printdate" class="date-picker" id="printdate" autocomplete="off"
+                 style="width: 320px; margin-bottom: 0.35rem;">
+          <br/>
+          <small>Tanggal Penyerahan Tanda Terima</small>
+        </div>
+      </div>
+
+      <!-- Tanggal Penagihan Diterima -->
+      <div style="padding-bottom:0px; display: flex; margin-top: 10px;">
+        <div style="width: 30%; margin-top: 5px; margin-bottom: 10px;">
+          <label style="color:#000; font-weight:700;">Penagihan Diterima</label>
+        </div>
+        <div style="width: 50%; max-width: 320px; display: block;">
+          <input type="text" name="billing_date" class="date-picker" id="billing_date" autocomplete="off"
+                 style="width: 320px; margin-bottom: 0.35rem;">
+          <br/>
+          <small>Tanggal Diterima Penagihan</small>
+        </div>
+      </div>
+
+      <input type="hidden" name="id" id="receipt_id" />
+
+      <div style="padding-bottom:0px; text-align: right; width: 100%; margin-top: 1rem;">
+        <input type="submit" value="Simpan" class="btn btn-styled"/>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- End::edit modal -->

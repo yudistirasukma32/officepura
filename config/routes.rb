@@ -605,6 +605,24 @@ OfficePuraErp::Application.routes.draw do
     end
   end
 
+  post "receipttaxinvoices/preview", to: "receipttaxinvoices#preview", as: :preview_receipttaxinvoices
+  get '/receipttaxinvoices/download_excel_preview', to: 'receipttaxinvoices#download_excel_preview', as: :download_excel_preview
+
+  resources :receipttaxinvoices do
+    collection do
+      get 'create_receiptaxinvoice'
+      post 'create_receipt'
+      post 'update_receipt'
+      get 'download_excel'
+    end
+    member do
+      get 'print'
+      post 'confirm_billing'
+      post 'update_printdate'
+      get 'detail_excel'
+    end
+  end
+
   resources :taxinvoiceattachments
   get 'taxinvoiceattachments/gettaxinvoicesbycustomer/:customer_id' => 'taxinvoiceattachments#gettaxinvoicesbycustomer'
 

@@ -85,6 +85,34 @@ class TaxinvoicesController < ApplicationController
       end
     end
 
+    @totals_by_invoice = Taxinvoiceitem.group(:taxinvoice_id).sum(:total)
+    @generics_by_invoice = Taxgenericitem.group(:taxinvoice_id).sum(:total)
+
+    @totals = {
+      dpp: @taxinvoices.sum("CASE WHEN generic = false THEN (SELECT SUM(total) FROM taxinvoiceitems WHERE taxinvoiceitems.taxinvoice_id = taxinvoices.id)
+                                ELSE (SELECT SUM(total) FROM taxgenericitems WHERE taxgenericitems.taxinvoice_id = taxinvoices.id) END"),
+      ppn: @taxinvoices.sum(:gst_tax),
+      pph: @taxinvoices.sum(:price_tax),
+      total: @taxinvoices.sum(:total)
+    }
+
+    ti = @taxinvoices
+
+    @summary = {
+      :nongeneric => {
+        :total => ti.where(:generic => false).sum(:total),
+        :paid  => ti.where(:generic => false)
+                    .where("paiddate IS NOT NULL")
+                    .sum(:total)
+      },
+      :generic => {
+        :total => ti.where(:generic => true).sum(:total),
+        :paid  => ti.where(:generic => true)
+                    .where("paiddate IS NOT NULL")
+                    .sum(:total)
+      }
+    }
+
     respond_to :html
   end
 
@@ -938,6 +966,7 @@ class TaxinvoicesController < ApplicationController
       taxinvoiceitemv.save
     end
 
+    @taxinvoice.long_id = @taxinvoice.long_id + " - DELETED"
     @taxinvoice.deleted = true
     @taxinvoice.save
 

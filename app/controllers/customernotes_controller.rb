@@ -9,7 +9,8 @@ class CustomernotesController < ApplicationController
         note: {
           id: @note.id,
           description: @note.description,
-          created_at: @note.created_at.strftime("%Y-%m-%d %H:%M:%S")
+          created_at: @note.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+          revision_date: @note.revision_date
         }
       }
     else

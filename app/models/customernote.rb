@@ -11,5 +11,5 @@ class Customernote < ActiveRecord::Base
 
   attr_accessible :deleted, :enabled, :customer_id, 
                   :description, :user_id, :deleteuser_id,
-                  :taxinvoice_id
+                  :taxinvoice_id, :revision_date, :approved
 end

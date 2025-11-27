@@ -17,7 +17,9 @@ class EventsController < ApplicationController
     @estimated_tonage_kg = [20000, 25000, 30000, 35000, 40000]
     @estimated_tonage_m3 = [45, 47]
     @price_per_types = ["KG", "LITER", "M3", "BORONGAN"]
-    @tanktype = ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI']
+    # @tanktype = ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI']
+    @tanktype = ['ISOTANK', 'DRY CONTAINER 20FT', 'DRY CONTAINER 40FT', 'SIDE DOOR CONTAINER 20FT', 'SIDE DOOR CONTAINER 40FT', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 
+    'TRUK BOX', 'MULTIFUNGSI']
     @provinces = [
       "Aceh",
       "Sumatera Utara",

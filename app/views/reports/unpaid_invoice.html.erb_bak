@@ -1,0 +1,310 @@
+<%= content_for :css do %>
+    <style>
+        #main #filter {
+            height: 80px;
+        }
+    </style>
+    <% end %>
+    <%= render "shared/header" %>
+    
+    <div id="nav">
+        <%= render "shared/nav" %>
+    </div>
+    
+    <div id="main">
+    
+        <div id="content-full">
+            <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
+            <h1><%=Setting.find_by_name("Client Name").value%> / Piutang Pelanggan: <span class="red"><%=@year%></span></h1>
+    
+            <br class="clearfix" />
+            
+            <div id="filter">
+                <form id="filterform" name="filterform" action="" method="get">
+                <div class="field-row continue">
+                    <label for="customer_id" style="width: 72px;">Pelanggan</label>
+                    <select name="customer_id" class="third left">
+                        <option value="">Semua Pelanggan</option>
+                        <% @customers.each do |customer| %>
+                        <option value="<%=customer.id%>"<% if customer.id == @customer_id %> selected='selected'<% end %>><%=customer.name%></option>
+                        <% end %>
+                    </select>
+                    <label for="date" class="middle" style="width: 64px;">Periode</label>
+                    <select name="month" class="half left" style="margin-right:10px;">
+                        <% (1.upto(12)).each do |m| %>
+                        <option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @month %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+                        <% end %>
+                    </select>
+                    <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+                    <select name="year" class="short left" style="margin-right: 10px;">
+                        <% (Date.today.year.downto(year_to)).each do |y| %>
+                        <option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+                        <% end %>
+                    </select>
+
+                    <label for="date" class="middle" style="width: 64px;">Sampai</label>
+                    <select name="monthEnd" class="half left" style="margin-right:10px;">
+                        <% (1.upto(12)).each do |m| %>
+                        <option value="<%="%02d" % m.to_s%>"<% if "%02d" % m.to_s == @monthEnd %> selected='selected'<% end %>><%=Date::MONTHNAMES[m]%></option>
+                        <% end %>
+                    </select>
+                    <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
+                    <select name="yearEnd" class="short left">
+                        <% (Date.today.year.downto(year_to)).each do |y| %>
+                        <option value="<%=y%>"<% if y.to_s == @yearEnd %> selected='selected'<% end %>><%=y%></option>
+                        <% end %>
+                    </select>
+                </div>
+                <div class="field-row continue">
+                    <label for="due_date_order" style="width: 80px;">Jatuh Tempo</label>
+                    <select name="due_date_order" class="third left">
+                        <option value="">Tanpa Urutan</option>
+                        <option value="desc" <%= params[:due_date_order] == "desc" ? "selected" : "" %>>Dari Terjauh</option>
+                        <option value="asc" <%= params[:due_date_order] == "asc" ? "selected" : "" %>>Dari Terdekat</option>
+                    </select>
+                    <input class="submit left" type="submit" value="Filter" />
+                </div>
+                </form>
+            </div>
+    
+            <br class="clearfix" />
+            
+            <table class="row-view tablesorter">
+                <thead>
+                <tr>
+                    <th class="{sorter:true, filter: false}">Pelanggan</th>
+                    <th class="center {sorter:true, filter: false}" width="200">No Invoice</th>
+                    <th class="{sorter:true, filter: false}" width="90">Kirim</th>
+                    <th class="{sorter:true, filter: false}" width="90">Konfirm</th>
+                    <th class="{sorter:false, filter: false}" width="90">J. Tempo</th>
+                    <th width="80" class="center {sorter:true, filter: false}">DPP</th>
+                    <th width="80" class="center {sorter:true, filter: false}">PPN</th>
+                    <th width="80" class="center {sorter:true, filter: false}">PPH</th>
+                    <th width="100" class="center {sorter:true, filter: false}">Total</th>
+                    <th width="100" class="center {sorter:true, filter: false}">Note</th>
+                    <th width="20" class="right "></th>
+                </tr>
+                </thead>
+                <% i = 0 %>
+                <% total = 0 %>
+                <tbody>
+                <% @taxinvoices.each_with_index do |taxinvoice| %>
+                <% total = total + taxinvoice.total - (taxinvoice.downpayment rescue 0) - (taxinvoice.secondpayment rescue 0) - (taxinvoice.thirdpayment rescue 0) - (taxinvoice.fourthpayment rescue 0) %>
+                    <tr>
+                        <td><%= taxinvoice.customer.name%>&nbsp;<% if taxinvoice.generic %>&nbsp;<i class="icon-star"></i><% end %></td>
+                        <td align="">
+                            <%= taxinvoice.long_id %>
+                            <% if taxinvoice.remarks.present? %>
+                                <br>
+                                <small><%= taxinvoice.remarks %></small>
+                            <% end %>
+                        </td>
+                        <td><%=taxinvoice.sentdate.strftime('%d-%m-%y') rescue nil%></td>
+                        <td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td> 
+                        
+                        <%
+                            if taxinvoice.sentdate 
+                                different = ((taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
+                            else
+                                different = ((taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days) - Date.today).to_i 
+                            end
+                        %>
+    
+                        <td<% if taxinvoice.paiddate.nil? and different < 0 %> class="red"<% end %>>
+                            <% if taxinvoice.sentdate %>
+                                <%=(taxinvoice.sentdate + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+                            <% else %>
+                                <%=(taxinvoice.date + taxinvoice.customer.terms_of_payment_in_days.to_i.days).strftime('%d-%m-%y')%> <% if taxinvoice.paiddate.nil? %>(<%=different%>)<% end %>
+                            <% end %>
+                        </td>
+                        
+                        
+                        <td align="right"><%= to_currency(taxinvoice.downpayment) %></td>
+                        <td align="right"><%= to_currency(taxinvoice.gst_tax) %></td>
+                        <td align="right"><%= to_currency(taxinvoice.price_tax) %></td>
+                        <td align="right"><%= to_currency(taxinvoice.total - ( taxinvoice.downpayment rescue 0 ) - (taxinvoice.secondpayment rescue 0 ) - ( taxinvoice.thirdpayment rescue 0 ) - (taxinvoice.fourthpayment rescue 0 )) %></td>
+                        <td>
+                            <% if Customernote.where('taxinvoice_id = ?',taxinvoice.id).enabled.present? %>
+                              <ul id="notes-list-<%= taxinvoice.id %>" style="padding-left: 15px; margin: 0; font-size: 12px; color: #555;">
+                                <% Customernote.where('taxinvoice_id = ?',taxinvoice.id).enabled.each do |note| %>
+                                  <li id="note-<%= note.id %>">
+                                    <span>
+                                      <%= note[:description] %>&nbsp;
+                                      <a href="#" class="delete-note-btn"
+                                        data-note-id="<%= note.id %>"
+                                        style="color: red; margin-left: 5px; font-weight: bold; text-decoration: none; position: absolute;">
+                                        ✕
+                                      </a>
+                                    </span>
+                                    <br>
+                                    <span style="color: grey; font-size: 10px;">
+                                      (<%= note.created_at.strftime('%d-%m-%Y %H:%M wib') %>) 
+                                    </span>
+                                  </li>
+                                <% end %>
+                              </ul>
+                              <br/>
+                            <% else %>
+                              <ul id="notes-list-<%= taxinvoice.id %>" style="padding-left: 15px; margin: 0; font-size: 12px; color: #555;"></ul>
+                              <br/>
+                            <% end %>
+
+                            <a href="#"
+                              style="font-size: 10px;
+                                      text-decoration: underline;
+                                      font-weight: 500;
+                                      color: darkslateblue;
+                                      padding-left: 14px;
+                                      padding-bottom: 6px;"
+                              class="add-note-btn d-none-print"
+                              data-customer-id="<%= taxinvoice.customer_id %>"
+                              data-taxinvoice-id="<%= taxinvoice.id %>">
+                              Tambah data
+                            </a>
+                          </td>
+
+                        <td align="right"><a href="<%= print_taxinvoice_url(taxinvoice.id) %>" class="delete tipsy" original-title="Print Invoice Tagihan"><i class="icon-print"></i></a>
+                        </td>
+    
+                    </tr>
+    
+                <% end %>
+    
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2"><strong>Total</strong></td>
+                        <td colspan="7" align="right"><strong><%= to_currency(total) %></strong></td>
+        
+                    </tr>
+                </tfoot>
+            </table>
+        
+        </div>
+    
+    </div>
+
+
+<div id="note-modal" style="border-radius: 10px; display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%); 
+    background: #f0f0f0; border:1px solid #ccc; padding:20px; z-index:1000; width:420px;">
+  <h3 style="margin: 0 0 12px; font-weight: bold;">Tambah Catatan</h3>
+  
+  <textarea id="note-text" name="customernote[description]" 
+    style="width: 97%; height: 100px; min-width: 0;"></textarea>
+  
+  <br><br>
+  <button id="save-note">Save</button>
+  <button id="close-note">Cancel</button>
+  <br>
+</div>
+
+<div id="modal-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:999;"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  let currentCustomerId = null;
+  let currentTaxinvoiceId = null;
+
+  const modal     = document.getElementById("note-modal");
+  const overlay   = document.getElementById("modal-overlay");
+  const noteField = document.getElementById("note-text");
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+  // --- buka modal ---
+  document.querySelectorAll(".add-note-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.preventDefault();
+      currentCustomerId = btn.dataset.customerId;
+      currentTaxinvoiceId = btn.dataset.taxinvoiceId;
+      modal.style.display = "block";
+      overlay.style.display = "block";
+      noteField.value = "";
+    });
+  });
+
+  // --- tutup modal ---
+  document.getElementById("close-note").addEventListener("click", () => {
+    modal.style.display = "none";
+    overlay.style.display = "none";
+  });
+
+  // --- simpan note ---
+  document.getElementById("save-note").addEventListener("click", () => {
+    const description = noteField.value.trim();
+    if (!description) return alert("Isi catatan dulu");
+
+    fetch("/customernotes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken
+      },
+      body: JSON.stringify({
+        customernote: {   // ✅ disesuaikan dengan controller
+          customer_id: currentCustomerId,
+          taxinvoice_id: currentTaxinvoiceId,
+          description: description
+        }
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (!data.success) return alert("Gagal simpan data: " + (data.errors || []).join(", "));
+
+      const list = document.getElementById(`notes-list-${currentTaxinvoiceId}`);
+      if (list && list.querySelector("li")?.innerText.trim() === "-") list.innerHTML = "";
+
+      // bikin element note baru
+      const li = document.createElement("li");
+      li.id = `note-${data.note.id}`;
+      li.innerHTML = `
+        ${data.note.description}
+        <a href="#" class="delete-note-btn" data-note-id="${data.note.id}"
+           style="color: red; margin-left: 5px; font-weight: bold; text-decoration: none; position: absolute;">✕</a>
+        <br><span style="color: grey; font-size: 10px;">(${data.note.created_at})</span>
+      `;
+      if (list) list.prepend(li);
+
+      modal.style.display = "none";
+      overlay.style.display = "none";
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error simpan data");
+    });
+  });
+
+  // --- hapus note (delegasi) ---
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".delete-note-btn"); // ✅ lebih aman
+  if (btn) {
+    e.preventDefault();
+    const noteId = btn.dataset.noteId;
+    if (!confirm("Hapus catatan ini?")) return;
+
+    fetch(`/customernotes/${noteId}`, {
+      method: "DELETE",
+      headers: {
+        "X-CSRF-Token": csrfToken
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const noteEl = document.getElementById(`note-${noteId}`);
+        if (noteEl) {
+          noteEl.remove(); // ✅ langsung hapus dari DOM
+        }
+      } else {
+        alert("Gagal hapus note");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error hapus note");
+    });
+  }
+});
+
+});
+</script>

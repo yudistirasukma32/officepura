@@ -9,8 +9,8 @@ class InvoicesController < ApplicationController
     @section = "transactions"
     @where = "invoices"
     @transporttypes = ["STANDART", "KERETA"]
-    @tanktype = ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI']
-    @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER STANDART", "KONTAINER OPENSIDE", "MULTIFUNGSI"]
+    @tanktype = ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TRUK BOX', 'DRY CONTAINER 20FT', 'DRY CONTAINER 40FT', 'SIDE DOOR CONTAINER 20FT', 'SIDE DOOR CONTAINER 40FT', 'MULTIFUNGSI']
+    @tanktypesPadat = ['LOSBAK', 'DROPSIDE', 'TRUK BOX', 'DRY CONTAINER 20FT', 'DRY CONTAINER 40FT', 'SIDE DOOR CONTAINER 20FT', 'SIDE DOOR CONTAINER 40FT', 'MULTIFUNGSI']
     @tanktypesCair = ["TANGKI BESI", "TANGKI STAINLESS", "ISOTANK"]
   end
 
@@ -1488,10 +1488,9 @@ class InvoicesController < ApplicationController
     render :json => { :success => true, :driver_phone => @driver.mobile, :layout => false }.to_json;
   end
 
-
   def get_tanktype
     if params[:cargotype] == 'padat'
-      @tanktypesPadat = ["LOSBAK", "DROPSIDE", "TRUK BOX", "KONTAINER STANDART", "KONTAINER OPENSIDE", "MULTIFUNGSI"]
+      @tanktypesPadat = ['LOSBAK', 'DROPSIDE', 'TRUK BOX', 'DRY CONTAINER 20FT', 'DRY CONTAINER 40FT', 'SIDE DOOR CONTAINER 20FT', 'SIDE DOOR CONTAINER 40FT', 'MULTIFUNGSI']
       @tanktypes = @tanktypesPadat
       render :json => { :success => true, :html => render_to_string(:partial => "invoices/tanktypes", :layout => false) }.to_json;
     else

@@ -1,0 +1,169 @@
+<style type="text/css">
+
+	#main .row-view th {
+		text-transform: uppercase;
+		font-size: 12px;
+		font-weight: 600;
+		padding: 7px 10px 7px 0;
+	}
+
+	#main .row-view td {
+		font-size: 12px;
+	}
+
+	.headsignature {margin-top:0px;margin-left: 250px;}
+
+	.btnprint_receipttaxinvitem {
+		border-radius: 3px;
+		border: 0;
+		margin-right: 10px;
+		padding: 7px 10px;
+		text-decoration: none;
+		font-size: 13px;
+		font-weight: 900;
+		background-color: #24748f !important;
+		background-image: linear-gradient(#2d95b7, #23748e);
+		color: #fff !important;
+		cursor: pointer;
+		float: right;
+		margin: 0 5px;
+	}
+
+	/* === PRINT RECEIPT TAX INVOICE === */
+	@media print {
+	@page {
+		size: A4 portrait;
+		margin: 12mm;
+	}
+
+	body, html {
+		margin: 0;
+		padding: 0;
+	}
+
+	/* Hide nav & buttons */
+	.hideprint, #nav, #header {
+		display: none !important;
+	}
+
+	#main {
+		margin-top: 0 !important;
+		padding-top: 0 !important;
+	}
+
+	.invoice-paper {
+		padding-top: 0 !important;
+		margin-top: 0 !important;
+	}
+
+	/* Title */
+	#title_receipt {
+		font-size: 18px;
+		margin-bottom: 6px;
+	}
+
+	/* Table formatting */
+	table {
+		border-collapse: collapse !important;
+		width: 100%;
+		font-size: 12px !important;
+		page-break-inside: avoid;
+	}
+
+	th, td {
+		border: 1px solid #000;
+		padding: 4px 6px !important;
+	}
+
+	thead {
+		font-weight: bold;
+	}
+
+	tr, th, td {
+		page-break-inside: avoid;
+		page-break-after: auto;
+	}
+
+	/* Signature block remains bottom */
+	.signature-table td {
+		border: none !important;
+		padding-top: 60px !important;
+		font-size: 12px !important;
+	}
+
+	#printdate_label {
+		font-size: 12px !important;
+	}
+	}
+
+</style>
+
+<%= render "shared/header" %>
+<div id="nav"><%= render "shared/nav" %></div>
+
+<div id="main">
+<div id="content-full" class="invoice-paper">
+
+	<% created_date = @receipt && @receipt.created_at ? @receipt.created_at.strftime('%d-%m-%Y') : nil %>
+
+	<a class="btn-txt cancel hideprint"
+	   href="<%= receipttaxinvoices_path(:startdate => created_date, :enddate => created_date) %>">
+	   <i class="icon-remove"></i> Batal</a>
+
+	<button class="btnprint_receipttaxinvitem hideprint"
+			onclick="javascript:print_receipttaxinvitem();"><i class="icon-print"></i> Print</button>
+
+	<a class="print btn-txt btn-green hideprint"
+	   style="margin: 0;"
+	   href="<%= detail_excel_receipttaxinvoice_path(@receipt.id) %>"><i class="icon-file"></i> Excel</a>
+
+	<h1 class="hideprint"><%= Setting.find_by_name("Client Name").value %> / Tanda Terima Invoice Tagihan</h1>
+
+	<br><br>
+
+	<% if @receipt && @receipt.taxinvoices.any? %>
+	<h1 style="text-align: center; margin-bottom: 1rem;" id="title_receipt">TANDA TERIMA INVOICE TAGIHAN</h1>
+	<br>
+
+	<table class="row-view" style="width: 95%;">
+		<thead>
+		<tr>
+			<th width="10">#</th>
+			<th width="25">Customer</th>
+			<th width="50">Kode</th>
+			<th width="15">Tanggal</th>
+			<th width="15">User</th>
+		</tr>
+		</thead>
+		<tbody>
+		<% @receipt.taxinvoices.order(:date, :long_id).includes(:customer, :user).each_with_index do |taxinv, idx| %>
+			<tr>
+			<td><%= idx + 1 %></td>
+			<td><%= taxinv.customer ? taxinv.customer.name : "-" %></td>
+			<td><%= taxinv.long_id %></td>
+			<td><%= taxinv.date ? taxinv.date.strftime('%d-%m-%Y') : "-" %></td>
+			<td><%= taxinv.user ? taxinv.user.username : "-" %></td>
+			</tr>
+		<% end %>
+		</tbody>
+	</table>
+
+	<br><br>
+
+	<table class="signature-table" style="width:100%;">
+		<tr>
+		<td colspan="2">
+		<strong id="printdate_label">
+			Tanggal:
+			<%= @receipt.printdate ? @receipt.printdate.strftime('%d-%m-%Y') : "-" %>
+		</strong></td>
+		</tr>
+		<tr>
+		<td>Diserahkan<br><br><br>(_________________)</td>
+		<td style="text-align:right;">Penerima<br><br><br>(_________________)</td>
+		</tr>
+	</table>
+	<% end %>
+
+</div>
+</div>

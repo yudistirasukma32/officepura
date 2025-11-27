@@ -56,10 +56,10 @@
             <% different = (taxinvoice.duedate - Date.today).to_i %>
             <td<% if different < 0 %> class="red" <% end %>><%=taxinvoice.duedate.strftime('%d-%m')%> (<%=different%>)</td>
                 <td align="right">
-                    <% if !taxinvoice.generic %>
-                    <%=to_currency_bank(taxinvoice.taxinvoiceitems.sum(:total))%>
-                    <% else %>
-                    <%=to_currency_bank(taxinvoice.taxgenericitems.sum(:total))%>
+                    <% if !taxinvoice.generic %> 
+                    <%= to_currency_bank(@totals_by_invoice[taxinvoice.id] || 0) %>
+                    <% else %> 
+                    <%= to_currency_bank(@generics_by_invoice[taxinvoice.id] || 0) %>
                     <% end %>
                 </td>
                 <td align="right">
@@ -137,12 +137,13 @@
                 </td>
 
                 <td align="right">
-                    <% if !taxinvoice.generic %>
-                    <%=to_currency_bank(taxinvoice.taxinvoiceitems.sum(:total))%>
-                    <% else %>
-                    <%=to_currency_bank(taxinvoice.taxgenericitems.sum(:total))%>
+                    <% if !taxinvoice.generic %> 
+                    <%= to_currency_bank(@totals_by_invoice[taxinvoice.id] || 0) %>
+                    <% else %> 
+                    <%= to_currency_bank(@generics_by_invoice[taxinvoice.id] || 0) %>
                     <% end %>
                 </td>
+
                 <td align="right">
                     <%=to_currency_bank(taxinvoice.gst_tax)%>
                 </td>
@@ -231,10 +232,10 @@
     <tbody class="tablesorter-no-sort">
         <tr class="footer">
             <td colspan="8" class="total" align="right">TOTAL</td>
-            <td class="total" align="right"><%=to_currency_bank(total_dpp)%></td>
-            <td class="total" align="right"><%=to_currency_bank(total_ppn)%></td>
-            <td class="total" align="right"><%=to_currency_bank(total_pph)%></td>
-            <td class="total" align="right"><%=to_currency_bank(grandtotal)%></td>
+            <td class="total" align="right"><%=to_currency_bank(@totals[:dpp])%></td>
+            <td class="total" align="right"><%=to_currency_bank(@totals[:ppn])%></td>
+            <td class="total" align="right"><%=to_currency_bank(@totals[:pph])%></td>
+            <td class="total" align="right"><%=to_currency_bank(@totals[:total])%></td>
             <td colspan="3"></td>
         </tr>
         <!-- <tr class="footer">
@@ -289,75 +290,65 @@
     <div id="content-full">
         <div class="row">
             <div class="widget medium-widget">
-                <ul>
-                    <li class="head">
-                        <h3 style="color: #010101;">Non Generic</h3>
-                    </li>
-                    <% 	paid = @taxinvoices.where("generic = false AND paiddate is not null").sum(:total) 
-								if total > 0
-								  persentase = (paid.to_f / total.to_f) * 100
-								else
-								  persentase = 0
-								end
-							%>
-                    <li>
-                        Omset
-                        <strong><%=to_currency_bank(total)%></strong>
-                    </li>
-                    <li>
-                        Piutang
-                        <strong><span class="red"><%=to_currency_bank(total-paid) %></span></strong>
-                    </li>
-                    <li>
-                        Lunas
-                        <strong><span class="green"><%= to_currency_bank(paid) %></span></strong>
-                    </li>
-                    <li <% if persentase > 50 %> class="footer green" <%else%> class="footer red" <%end%>>
-                        <% if (persentase - persentase.to_i) == 0 %>
-                        <%=persentase.to_i %>
-                        <% else %>
-                        <%=number_with_precision(persentase, :precision => 2)%>
-                        <% end %>
-                        %
-                    </li>
-                </ul>
-            </div>
+            <ul>
+                <li class="head">
+                <h3 style="color: #010101;">Non Generic</h3>
+                </li>
 
+                <% total = @summary[:nongeneric][:total].to_f %>
+                <% paid  = @summary[:nongeneric][:paid].to_f %>
+                <% persen = total > 0 ? (paid / total * 100) : 0 %>
+
+                <li>
+                Omset
+                <strong><%= to_currency_bank(total) %></strong>
+                </li>
+
+                <li>
+                Piutang
+                <strong><span class="red"><%= to_currency_bank(total - paid) %></span></strong>
+                </li>
+
+                <li>
+                Lunas
+                <strong><span class="green"><%= to_currency_bank(paid) %></span></strong>
+                </li>
+
+                <li class="footer <%= persen > 50 ? 'green' : 'red' %>">
+                <%= persen == persen.to_i ? persen.to_i : number_with_precision(persen, precision: 2) %>%
+                </li>
+            </ul>
+            </div>
             <div class="widget medium-widget">
-                <ul>
-                    <li class="head">
-                        <h3 style="color: #010101;">Generic</h3>
-                    </li>
-                    <% 	paid = @taxinvoices.where("generic = true AND paiddate is not null").sum(:total) 
-								if totalGeneric > 0
-								  persentase = (paid.to_f / totalGeneric.to_f) * 100
-								else
-								  persentase = 0
-								end
-							%>
-                    <li>
-                        Omset
-                        <strong><%=to_currency_bank(totalGeneric)%></strong>
-                    </li>
-                    <li>
-                        Piutang
-                        <strong><span class="red"><%=to_currency_bank(totalGeneric-paid)%></span></strong>
-                    </li>
-                    <li>
-                        Lunas
-                        <strong><span class="green"><%=to_currency_bank(paid)%></span></strong>
-                    </li>
-                    <li <% if persentase >50 %> class="footer green" <%else%> class="footer red" <%end%>>
-                        <% if (persentase - persentase.to_i) == 0 %>
-                        <%=persentase.to_i %>
-                        <% else %>
-                        <%=number_with_precision(persentase, :precision => 2)%>
-                        <% end %>
-                        %
-                    </li>
-                </ul>
-            </div>
+            <ul>
+                <li class="head">
+                <h3 style="color: #010101;">Generic</h3>
+                </li>
 
+                <% total = @summary[:generic][:total].to_f %>
+                <% paid  = @summary[:generic][:paid].to_f %>
+                <% persen = total > 0 ? (paid / total * 100) : 0 %>
+
+                <li>
+                Omset
+                <strong><%= to_currency_bank(total) %></strong>
+                </li>
+
+                <li>
+                Piutang
+                <strong><span class="red"><%= to_currency_bank(total - paid) %></span></strong>
+                </li>
+
+                <li>
+                Lunas
+                <strong><span class="green"><%= to_currency_bank(paid) %></span></strong>
+                </li>
+
+                <li class="footer <%= persen > 50 ? 'green' : 'red' %>">
+                <%= persen == persen.to_i ? persen.to_i : number_with_precision(persen, precision: 2) %>%
+                </li>
+            </ul>
+            </div>
         </div>
     </div>
 </div>

@@ -698,6 +698,14 @@
                 </td>
 
             </tr>
+            <% if taxinvoiceitem.weight_gross < 20000 || taxinvoiceitem.weight_net < 20000 %>
+            <tr>
+                <td colspan = '8'></td>
+                <td><span style="font-size: 9px;"><%=taxinvoiceitem.weight_gross < 20000 ? 'Below Minimum'.html_safe : ''%></span></td>
+                <td><span style="font-size: 9px;"><%=taxinvoiceitem.weight_net < 20000 ? 'Below Minimum'.html_safe  : ''%></span></td>
+                <td></td>
+            </tr>
+            <% end %>
             <% end %>
 
             <% end %>
@@ -861,3 +869,44 @@
 </div>
 
 <% end %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const form = document.getElementById("taxinvoice_form");
+
+  form.addEventListener("submit", function(event) {
+    let belowMinimum = false;
+
+    // Semua checkbox item invoice
+    const checkboxes = document.querySelectorAll("[id^='cb_']");
+
+    checkboxes.forEach((cb) => {
+      if (cb.checked) {
+        const id = cb.id.replace("cb_", "");
+        const gross = parseInt(document.getElementById(`gross_${id}`)?.value || "0");
+        const net   = parseInt(document.getElementById(`qty_${id}`)?.value || "0");
+
+        if (gross < 20000 || net < 20000) {
+          belowMinimum = true;
+        }
+      }
+    });
+
+    if (belowMinimum) {
+      event.preventDefault(); // hentikan submit sementara
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Surat Jalan di bawah minimum',
+        text: 'Ada item surat jalan dibawah minimum (<20000). Tetap simpan invoice tagihan?',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, simpan',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) form.submit();
+      });
+    }
+  });
+});
+</script>

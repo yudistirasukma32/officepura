@@ -13,11 +13,11 @@
 
 		<br class="clearfix" />
 
-		<div id="filter" style="height: 80px;">
+		<div id="filter">
 			<form id="filterform" name="filterform" action="" method="get">
 				<div class="field-row continue" style="display: flex;">
-					<div style="">
-						<label for="transporttype">Tipe BKK</label>
+					<div style="display: flex; align-items: center; justify-content: flex-start;">
+						<label class="" style='width:70px; float: none;'>Tipe BKK</label>
 						<select name="transporttype" class="chzn-select half combo_route" >
 							<option value="">Semua Tipe</option>
 							<% ["TRUK", "KERETA"].each do |type| %>
@@ -25,30 +25,8 @@
 							<% end %>
 						</select> 
 					</div>
-
-					<div style="">
-						<label for="category">Kategori</label>
-						<select name="category" class="chzn-select half combo_route" >
-							<option value="">Semua Kategori</option>
-							<% ["BELI", "SEWA", "FREEUSE"].each do |type| %>
-							<option <%= type == params[:category] ? 'selected' : '' %>><%=type%></option>
-							<% end %>
-						</select> 
-					</div>
-
-					<div style="display: none;">
-						<label for="container_id">Kontainer</label>
-						<select name="container_id" class="chzn-select half" style="float:none">
-							<option value="">Semua Kontainer</option>
-							<% Container.active.each do |container| %>
-							<option <%= container.id == params[:container_id].to_i ? 'selected' : '' %> value="<%= container.id %>"><%=container.containernumber%></option>
-							<% end %>
-						</select> 
-					</div>
-
 					<div>
-					&nbsp; &nbsp; <label class="" style="float:none">Tanggal Awal</label> &nbsp; &nbsp;
-						
+						&nbsp; &nbsp; <label class="" style="float:none">Tgl Awal</label> &nbsp; &nbsp;
 						<input type="text" name="startdate" class="half date-picker" value="<%=@startdate%>" />
 					</div>
 					<div>
@@ -56,7 +34,7 @@
 					<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
 					</div>
 					<div>
-						<input class="submit" type="submit" value="Filter" style="margin-top: 1.3rem;" />
+						<input class="submit" type="submit" value="Filter" style="margin-top: 0;" />
 					</div>
 				</div>
 			</form>
@@ -71,6 +49,7 @@
 					<th>Keterangan</th>
 					<th>Type</th>
 					<th>No. Kontainer</th>
+					<th>Type Kontainer</th>
 					<th>Nopol</th>
 				</tr>
 			</thead>
@@ -95,6 +74,7 @@
 						<% end %>
 					<% end %> 
 					</td>
+					<td><%=invoice.container.group rescue '-' %></td>
 					<td><%=invoice.vehicle.current_id %></td>
 				</tr>
 			<% end %>

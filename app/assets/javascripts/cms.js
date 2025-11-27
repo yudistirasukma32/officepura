@@ -5123,22 +5123,30 @@ function checkTank(name) {
   if (name == "ISOTANK") {
     $(".isotank_id").show();
     $(".container_id").hide();
-    // alert('iso');
-  } else if (name == "KONTAINER STANDART" || name == "KONTAINER OPENSIDE") {
+  } else if (name == "KONTAINER STANDART" || 
+    name == "KONTAINER OPENSIDE" ||
+    name == "DRY CONTAINER 20FT" ||
+    name == "DRY CONTAINER 40FT" ||
+    name == "SIDE DOOR CONTAINER 20FT" ||
+    name == "SIDE DOOR CONTAINER 40FT" ||
+    name == "KONTAINER STANDART" ||
+    name == "KONTAINER 20FT" ||
+    name == "KONTAINER 40FT" ||
+    name == "KONTAINER SIDE DOOR"
+  ) {
     $(".isotank_id").hide();
     $(".container_id").show();
-    // alert('cont');
   } else {
     $("#invoice_isotank_id").val("").trigger("chosen:updated");
     $("#invoice_isotank_id").trigger("liszt:updated");
     $(".isotank_id").hide();
     $("#invoice_container_id").val("").trigger("chosen:updated");
     $("#invoice_container_id").trigger("liszt:updated");
-    // $("#phone_driver").val(null)
     $(".container_id").hide();
-    // alert('others');
   }
 }
+
+
 
 $("#invoice_tanktype").change(function () {
   if ($(this).val() == "ISOTANK") {
