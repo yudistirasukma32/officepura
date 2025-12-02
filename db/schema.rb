@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20251123131242) do
+ActiveRecord::Schema.define(:version => 20251202072111) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -235,6 +235,8 @@ ActiveRecord::Schema.define(:version => 20251123131242) do
     t.boolean   "approved_unload_spv",                                                  :default => false
     t.decimal   "driver_charge",                         :precision => 19, :scale => 2, :default => 0.0
     t.string    "claim_letter"
+    t.string    "journal_note"
+    t.string    "taxinvoice_note"
   end
 
   create_table "commodities", :force => true do |t|
@@ -403,8 +405,21 @@ ActiveRecord::Schema.define(:version => 20251123131242) do
     t.decimal   "bon",                        :precision => 19, :scale => 2, :default => 0.0
   end
 
-# Could not dump table "driverlogs" because of following StandardError
-#   Unknown type 'jsonb' for column 'response'
+  create_table "driverlogs", :force => true do |t|
+    t.boolean   "deleted",                  :default => false
+    t.boolean   "enabled",                  :default => true
+    t.boolean   "ready",                    :default => false
+    t.boolean   "absent",                   :default => false
+    t.integer   "driver_id"
+    t.text      "description"
+    t.timestamp "created_at",  :limit => 6,                    :null => false
+    t.timestamp "updated_at",  :limit => 6,                    :null => false
+    t.string    "log_type"
+    t.date      "date"
+    t.text      "response"
+    t.integer   "vehicle_id"
+    t.boolean   "approved",                 :default => false
+  end
 
   create_table "drivers", :force => true do |t|
     t.boolean   "deleted",                                                                :default => false
@@ -1437,15 +1452,16 @@ ActiveRecord::Schema.define(:version => 20251123131242) do
   end
 
   create_table "receipttaxinvoices", :force => true do |t|
-    t.boolean  "deleted",       :default => false
-    t.boolean  "enabled",       :default => true
-    t.integer  "user_id"
-    t.integer  "deleteuser_id"
-    t.integer  "printuser_id"
-    t.date     "printdate"
-    t.date     "billing_date"
-    t.datetime "created_at",                       :null => false
-    t.datetime "updated_at",                       :null => false
+    t.boolean   "deleted",                      :default => false
+    t.boolean   "enabled",                      :default => true
+    t.integer   "user_id"
+    t.integer   "deleteuser_id"
+    t.integer   "printuser_id"
+    t.date      "printdate"
+    t.date      "billing_date"
+    t.timestamp "created_at",      :limit => 6,                    :null => false
+    t.timestamp "updated_at",      :limit => 6,                    :null => false
+    t.text      "taxinvoice_list"
   end
 
   create_table "receipttrains", :force => true do |t|
@@ -1867,6 +1883,8 @@ ActiveRecord::Schema.define(:version => 20251123131242) do
     t.boolean   "is_show_loadunload",                                               :default => false
     t.integer   "receipttaxinvoice_id"
     t.boolean   "below_minimum",                                                    :default => false
+    t.boolean   "checked",                                                          :default => false
+    t.integer   "checked_by"
   end
 
   create_table "tirebudgets", :force => true do |t|

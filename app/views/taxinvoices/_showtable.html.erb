@@ -169,7 +169,7 @@
 
                     <%= link_to 'Edit'.html_safe, "#", 
                         class: "cta btn-edit-tax", 
-                        style: "background: #000f64; width: 32px; text-align: center;", 
+                        style: "background: #000f64; width: 32px; text-align: center; margin-bottom: 3px;", 
                         data: {
                             customer: customer.name,
                             long_id: taxinvoice.long_id,
@@ -190,11 +190,17 @@
                             gst_percentage: taxinvoice.gst_percentage.to_f,
                             code: (taxinvoice.long_id[0,4].gsub(' /', '') rescue nil),
                             doubtful_ar: taxinvoice.doubtful_ar,
-                            doubtful_ar_note: taxinvoice.doubtful_ar_note
+                            doubtful_ar_note: taxinvoice.doubtful_ar_note,
+                            checked: taxinvoice.checked,
+                            checked_by: taxinvoice.checked_by
                         }, 
                         title: 'Edit Cepat' 
                     %>
 
+                    <% if taxinvoice.checked %>
+                    <a title="Sudah dicek Penagihan" class="cta" style="background: #1f8e15ff; width: 32px; text-align: center;">&#x2714;
+                    </a>
+                    <% end %>
                 </td>
                 <% else %>
                 <td><%=taxinvoice.paiddate.strftime('%d-%m')%> (<%=(taxinvoice.paiddate - taxinvoice.date).to_i%>)</td>

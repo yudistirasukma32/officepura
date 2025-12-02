@@ -36,7 +36,11 @@ class ReceipttaxinvoicesController < ApplicationController
 
   def update_receipt
     receipt = Receipttaxinvoice.find(params[:id])
-    receipt.update!(params.permit(:date, :printdate, :billing_date))
+    receipt.update_attributes!(
+      :date         => params[:date],
+      :printdate    => params[:printdate],
+      :billing_date => params[:billing_date]
+    )
 
     redirect_to "/reports/unpaid_invoice", notice: "Tanda Terima berhasil di-update!"
   rescue => e
@@ -250,6 +254,29 @@ class ReceipttaxinvoicesController < ApplicationController
       ) and return
     end
 
+    ActiveRecord::Base.transaction do
+      selected_ids = params[:taxinvoice_ids]
+      old_receipt_ids = Taxinvoice.where(id: selected_ids)
+                                  .pluck(:receipttaxinvoice_id)
+                                  .compact
+      old_receipts = Receipttaxinvoice.where(id: old_receipt_ids)
+
+      old_receipts.each do |receipt|
+        Taxinvoice.where(receipttaxinvoice_id: receipt.id)
+                  .update_all(receipttaxinvoice_id: nil)
+        # receipt.update_attributes!(:deleted => true)
+      end
+
+      @receipt = Receipttaxinvoice.new(receipt_params)
+      @receipt.user_id = current_user.id
+      @receipt.printdate = Date.today
+      @receipt.taxinvoice_list = params[:taxinvoice_ids].to_json
+      @receipt.save!
+
+      Taxinvoice.where(id: selected_ids)
+                .update_all(receipttaxinvoice_id: @receipt.id)
+    end
+
     @taxinvoices = Taxinvoice.includes(:customer, :user)
                             .where(id: params[:taxinvoice_ids])
 
@@ -257,16 +284,14 @@ class ReceipttaxinvoicesController < ApplicationController
     @generics_by_invoice = Taxgenericitem.group(:taxinvoice_id).sum(:total)
   end
 
-
   private
-  def permitted_params
-	  {:receipttaxinvoice => params.fetch(:receipttaxinvoice, {}).permit(
-      :deleted, :enabled, :printdate, :user_id, :printuser_id, :deleteuser_id, :billing_date
-    )}
-  end
- 
   def receipt_params
-    params.permit(:deleted, :enabled, :printdate, :user_id, :printuser_id, :deleteuser_id, :billing_date)
+    {
+      :printdate      => params[:printdate],
+      :user_id        => params[:user_id],
+      :printuser_id   => params[:printuser_id],
+      :billing_date   => params[:billing_date]
+    }
   end
 
 end

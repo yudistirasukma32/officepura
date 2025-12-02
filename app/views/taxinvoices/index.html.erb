@@ -271,6 +271,22 @@
 				<small>Isi alasan mengapa invoice tagihan / piutang ini bermasalah.</small>
 			</div>
 		</div>
+
+		<div class="" style="padding-bottom:0px; display: flex;">
+			<div style="width: 20%; margin-top: 5px; margin-bottom: 10px;">
+				<label style="color:#000; font-weight:700;">Penagihan Check</label>
+			</div>
+			<div style="width: 50%;">
+				<input type="checkbox"
+					id="chk_checked"
+					name="checked"
+					value="Yes"
+					<%= 'disabled' unless checkrole('Checker Invoice') || current_user.owner? %> />
+				&nbsp; <span> Sudah di-Check </span>
+
+				<input type="hidden" name="checked_by" value="">
+			</div>
+		</div>
  
 		<input type="hidden" class="half left" id="taxinvoice_extra_cost" name="extra_cost" value="0"/> 
 		<input type="hidden" class="half left" id="taxinvoice_id" name="id"/>

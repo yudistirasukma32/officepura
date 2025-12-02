@@ -5224,6 +5224,11 @@ $(document)
     }
     $("#taxinvoice_doubtful_ar_note").val($(this).data("doubtful-ar-note"));
 
+    inv_checked = $(this).data("checked");
+    if (inv_checked == true) {
+      $("#chk_checked").attr("checked", "checked");
+    }
+
     console.log(gst_percentage);
 
     if (

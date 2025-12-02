@@ -98,6 +98,15 @@
 	#invTable {
 		width: 95% !important;
 	}
+
+	/* #invTable td,
+	#invTable th {
+		border: none !important;
+	} */
+
+	.editable-block {
+		border: none !important;
+	}
 	}
 </style>
 
@@ -109,8 +118,18 @@
 <div id="content-full" class="invoice-paper">
 
 	<div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;" class="hideprint">
-		<button class="btnprint_receipttaxinvitem hideprint" onclick="javascript:print_receipttaxinvitem();"><i class="icon-print"></i> Print</button>
-		<a class="btn-txt cancel" href="<%=unpaid_invoice_url%>"><i class="icon-remove"></i> Batal</a>
+		<button id="edit-all-btn" class="btnprint_receipttaxinvitem hideprint" style="background:#4CAF50;">
+			Edit Info
+		</button>
+
+		<button id="saveInfoBtn" class="btnprint_receipttaxinvitem hideprint" style="background:#ff9800; display:none;">
+			Save
+		</button>
+
+		<button class="btnprint_receipttaxinvitem hideprint" onclick="javascript:print_receipttaxinvitem();">
+			<i class="icon-print"></i> Print
+		</button>
+		<a class="btn-txt cancel" href="<%= unpaid_invoice_url %>"><i class="icon-remove"></i> Batal</a>
 	</div>
 
 	<h1 class="hideprint"><%= Setting.find_by_name("Client Name").value %> / Tanda Terima Invoice Tagihan</h1>
@@ -140,39 +159,45 @@
 	<table id="invTable" class="row-view" style="width: 100%; border-collapse: collapse;">
 	<thead>
 		<tr>
-		<th style="width: 40px; border: 1px solid #000; text-align: center;">No</th>
-		<th style="border: 1px solid #000; text-align: center;">Keterangan</th>
-		<th style="border: 1px solid #000; text-align: center; width: 220px;">Jumlah</th>
+		<th style="width: 40px; border: 1px solid #000; text-align: center;">No.</th>
+		<th style="border: 1px solid #000; text-align: center;">Invoice</th>
+		<th style="border: 1px solid #000; text-align: center; width: 220px;">Keterangan</th>
 		</tr>
 	</thead>
 
 	<tbody>
-		<tr>
-		<td style="border: 1px solid #000; text-align: center;">1</td>
-		<td style="border: 1px solid #000; padding: 8px;">
+	<% i = 0 %>
+	<% @taxinvoices.each_with_index do |t, i| %>
+	<tr>
+		<td style="border: 1px solid #000; text-align: center;"><%= i + 1 %></td>
 
-			<% @taxinvoices.each do |t| %>
-			Invoice <%= t.long_id %> Senilai Rp <%= to_currency(t.total) %><br>
-			<% end %>
-
+		<td class="invoice-<%= t.id %>" style="border: 1px solid #000; padding: 8px;">
+			<div class="invoice-content editable-block" data-id="<%= t.id %>">
+				Invoice <%= t.long_id %> Senilai Rp <%= to_currency(t.total) %><br>
+			</div>
 		</td>
 
-		<td style="border: 1px solid #000; padding: 8px;">
+		<% if i == 0 %>
+		<td rowspan="<%= @taxinvoices.count %>" style="border: 1px solid #000; padding: 8px;">
 			<% customer = @taxinvoices.first.customer rescue "" %>
 			<% office = @taxinvoices.first.office rescue "" %>
 
+			<div id="infotd" class="editable-block">
 			UP. <%= customer.contact rescue "" %><br>
-			<%= customer.name rescue "" %><br><br>
-
-			NB : Tanda Terima<br><br>
-
+			<%= customer.name rescue "" %><br>
+			NB : Tanda Terima<br>
 			EMAIL :<br>
 			<a href="mailto:admin.penagihan@rdpitrans.com">admin.penagihan@puratrans.com</a><br><br>
 
 			WA : 0896 - 7881 - 9862<br><br>
 			TELP : 031-8531668<br>
+			</td>
+
 		</td>
-		</tr>
+		<% end %>
+	</tr>
+	<% end %>
+
 	</tbody>
 	</table>
 
@@ -181,14 +206,83 @@
 	<table class="signature-table" style="width:100%;">
 		<tr>
 		<td></td>
-		<td style="text-align:right;"><strong id="printdate_label"><%= office.name rescue "" %>, <%= Date.today.strftime('%d %B %Y') rescue '-' %></strong></td>
+		<td style="text-align:right;"><strong id="printdate_label"><%= office.name rescue "Surabaya" %>, <%= Date.today.strftime('%d %B %Y') rescue '-' %></strong></td>
 		</tr>
 		<tr>
-		<td><span style="margin-left: 0.75rem;">Yang Menyerahkan</span><br><br><br>(_________________)</td>
-		<td style="text-align:right;"><span style="margin-right: 2.5rem;">Penerima</span><br><br><br>(_________________)</td>
+		<%
+			username = current_user.username rescue nil
+			case username
+			when 'alfi'
+			name = 'Alfi'
+			when 'khusnul'
+			name = 'Khusnul'
+			when 'sucy'
+			name = 'Sucy'
+			when 'sarah'
+			name = 'Sarah'
+			when 'salsa'
+			name = 'Salsa'
+			when 'tutik'
+			name = 'Wargi Estuti'
+			else
+			name = 'Admin Penagihan'
+			end
+		%>
+		<td>
+		<span style="margin-left: 0.75rem;">Yang Menyerahkan</span><br/>
+		<%
+			name = current_user.username rescue 'tutik'
+			image_path = "/assets/ttd-#{name}.png"
+		%>
+		<img src="<%=image_path%>" alt="" class="d-show-print" style="width: 200px;"><br/>
+		<span style="margin-left: 0.75rem;">(<%= name.upcase %>)</span>
+		</td>
+		<td style="text-align:right;"><span style="margin-right: 2.5rem;">Penerima</span><br><br><br><br><br>(_________________)</td>
 		</tr>
 	</table>
 	<% end %>
 
 </div>
 </div>
+
+ 
+<script>
+const editBtn = document.querySelector('#edit-all-btn'); // tombol universal
+let editMode = false;
+
+editBtn.addEventListener('click', function() {
+  editMode = !editMode;
+
+  const blocks = document.querySelectorAll('.editable-block');
+
+  blocks.forEach(block => {
+    if (editMode) {
+      // masuk mode edit
+      block.contentEditable = true;
+      block.style.border = '1px dashed #aaa';
+    } else {
+      // keluar mode edit
+      block.contentEditable = false;
+      block.style.border = 'none';
+
+      // simpan ke hidden input per id
+      const id = block.dataset.id;
+      if (id) {
+        let hidden = document.querySelector(`#invoice-hidden-${id}`);
+        if (!hidden) {
+          hidden = document.createElement('input');
+          hidden.type = 'hidden';
+          hidden.name = `invoice_edit[${id}]`;
+          hidden.id = `invoice-hidden-${id}`;
+          block.parentNode.appendChild(hidden);
+        }
+        hidden.value = block.innerHTML;
+      }
+    }
+  });
+
+  // ubah text tombol
+  this.textContent = editMode ? 'Save' : 'Edit';
+});
+
+</script>

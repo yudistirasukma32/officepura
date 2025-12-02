@@ -5,60 +5,72 @@
       <th width="25">Kode</th>
       <th width="25">Tgl Buat</th>
       <th width="50">User</th>
-      <th width="50">Print Oleh</th>
+      <th width="50">Pelanggan</th>
       <th width="100">Invoice Tagihan</th>
+      <th width="25">Tgl <br/>Pelanggan Terima</th>
       <th width="25" class="{sorter: false, filter: false} sorter-false"></th>
     </tr>
   </thead>
 
   <tbody>
     <% @receipttaxinvoices.each_with_index do |receipt, i| %>
+
+      <% # --- SAFE PARSE TAXINVOICE LIST --- %>
+      <% raw_list = receipt.taxinvoice_list.to_s.strip %>
+
+      <% invoice_ids =
+          if raw_list.start_with?("[")
+            (JSON.parse(raw_list) rescue []).map(&:to_i)
+          else
+            raw_list.split(",").map(&:strip).map(&:to_i)
+          end
+      %>
+
+      <% invoices = Taxinvoice.where(id: invoice_ids) %>
+
       <tr>
         <td><%= i + 1 %></td>
+
         <td><%= zeropad(receipt.id) %></td>
+
         <td><%= receipt.created_at ? receipt.created_at.strftime("%d-%m-%y") : "-" %></td>
+
         <td><%= receipt.user ? receipt.user.username : "-" %></td>
-        <td><%= receipt.printuser ? receipt.printuser.username : "-" %></td>
+
         <td>
-          <% receipt.taxinvoices.each do |inv| %>
+          <% invoices.limit(1).each do |inv| %>
+            <%= inv.customer.name %><br/>
+          <% end %>
+        </td>
+
+        <td>
+          <% invoices.each do |inv| %>
             <%= inv.long_id %><br/>
           <% end %>
         </td>
 
+        <td><%= receipt.billing_date ? receipt.billing_date.strftime("%d-%m-%y") : "-" %></td>
+
         <td class="center">
-            <% if receipt.billing_date.blank? %>
-              <%= link_to '&#xf046;'.html_safe,
-                          confirm_billing_receipttaxinvoice_path(receipt),
-                          :class   => "delete tipsy",
-                          :title   => "Penagihan Terima",
-                          :confirm => "Apakah anda yakin membuat tanda terima penaggihan?",
-                          :method  => :post %>
-            <% end %>
-            <%= link_to '&#xf044;'.html_safe,
-                        '#',
-                        :class => "edit tipsy btn-edit-receipttaxinv",
-                        :title => "Edit",
-                        :data  => {
-                          :id          => receipt.id,
-                          :longid      => zeropad(receipt.id),
-                          :createdat   => (receipt.created_at ? receipt.created_at.strftime('%d-%m-%Y') : nil),
-                          :printdate   => (receipt.printdate ? receipt.printdate.strftime('%d-%m-%Y') : nil),
-                          :billing_date => (receipt.billing_date ? receipt.billing_date.strftime('%d-%m-%Y') : nil)
-                        } %>
+          <% if receipt.billing_date.blank? %>
+            <%= link_to '&#xf046;'.html_safe,
+                confirm_billing_receipttaxinvoice_path(receipt),
+                :class => "delete tipsy",
+                :title => 'Pelanggan Terima',
+                :confirm => 'Apakah anda yakin membuat tanda terima penaggihan?',
+                :method => :post %>
 
-            <a href="<%= print_receipttaxinvoice_path(receipt) %>"
-               class="delete tipsy"
-               title="Print Tanda Terima"><i class="icon-print"></i></a>
-
-            <%= link_to '&#xf00d;'.html_safe,
-                        receipt,
-                        :class   => "delete tipsy",
-                        :title   => "Hapus",
-                        :confirm => "Apakah anda yakin?",
-                        :method  => :delete %>
-
+            <%= link_to '&#xf00d;'.html_safe, receipt,
+                :class => "delete tipsy",
+                :title => 'Hapus',
+                :confirm => 'Apakah anda yakin?',
+                :method => :delete %>
+          <% else %>
+            Sudah diterima
+          <% end %>
         </td>
       </tr>
+
     <% end %>
   </tbody>
 </table>

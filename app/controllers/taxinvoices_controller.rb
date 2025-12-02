@@ -443,6 +443,14 @@ class TaxinvoicesController < ApplicationController
         @taxinvoice.is_show_loadunload = false
       end
 
+      if checkrole 'Checker Invoice' || current_user.owner
+        if params[:checked] == "Yes"
+          @taxinvoice.checked = true
+        else
+          @taxinvoice.checked = false
+        end
+      end
+
       @taxinvoice.save
 
       if @taxinvoiceitems && @taxinvoiceitems.any?
@@ -1777,6 +1785,14 @@ class TaxinvoicesController < ApplicationController
       @taxinvoice.price_tax = subtotal.to_f * 0.02
     else
       @taxinvoice.price_tax = 0
+    end
+
+    if checkrole 'Checker Invoice' || current_user.owner
+      if params[:checked] == "Yes"
+        @taxinvoice.checked = true
+      else
+        @taxinvoice.checked = false
+      end
     end
 
     grandtotal = subtotal.to_f + @taxinvoice.gst_tax.to_f - @taxinvoice.price_tax.to_f

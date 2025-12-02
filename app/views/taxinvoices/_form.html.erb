@@ -607,6 +607,16 @@
         <small>Keterangan mengapa Invoice Tagihan ini bermasalah.</small>
     </div>
 
+        <div class="field-row" style="margin-bottom:10px;">
+        <strong style="padding-left: 0;">Checker</strong>
+    </div>
+
+    <div class="field-row continue" style="padding-bottom:10px;">
+        <label style="color:#000; font-weight:700;">Penagihan Check</label>
+        <input type="checkbox" id="inv_checked" name="checked" value="Yes" <% if @taxinvoice.checked %> checked="checked" <% end %> <%= 'disabled' unless checkrole('Checker Invoice') || current_user.owner? %> /> &nbsp; Sudah di-Check &nbsp;
+    </div>
+    
+    <br class="clear" /><br class="clear" />
     <br class="clear" /><br class="clear" />
 
     <% if (@taxinvoiceitems && @taxinvoiceitems.any?) || (@taxinvoiceitemvs && @taxinvoiceitemvs.any?) %>
