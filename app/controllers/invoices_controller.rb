@@ -502,7 +502,7 @@ class InvoicesController < ApplicationController
     @invoice.tol_fee = params[:invoice][:tol_fee].delete('.')
     @invoice.total = params[:invoice][:total].delete('.')
     @invoice.user_id = current_user.id
-    @invoice.container_number = inputs[:container_number] if inputs[:container_number].present?
+    @invoice.container_number = params[:invoice][:container_number] if params[:invoice][:container_number].present?
 
     @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
 
