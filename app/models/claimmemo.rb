@@ -15,7 +15,7 @@ class Claimmemo < ActiveRecord::Base
                   :price_per, :total, :shrinkage_load, :tolerance_total,
                   :discount_amount, :is_train, 
                   :approved_marketing, :approved_load_spv, :approved_unload_spv,
-                  :driver_charge, :claim_letter
+                  :driver_charge, :claim_letter, :journal_note, :taxinvoice_note
 
   scope :active, lambda {where(:deleted => false)}
 

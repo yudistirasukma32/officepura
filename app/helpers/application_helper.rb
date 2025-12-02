@@ -247,6 +247,63 @@ module ApplicationHelper
 		end
 	end  
 
+	# Isotank label
+	def isotank_label(invoice)
+		return ''.html_safe unless invoice.isotank_id.present? && invoice.isotank_id.to_i != 0
+		main_isotank   = invoice.isotank.present? ? invoice.isotank.isotanknumber : ''
+		"Isotank = #{main_isotank}".html_safe
+	end
+
+	# Container label
+	def container_label(invoice)
+		return ''.html_safe unless invoice.container_number.present? || (invoice.container_id.present? && invoice.container_id.to_i != 0)
+
+		if invoice.container_number.present?
+			label = "Kontainer = <span title='Manual Input' style='text-decoration: underline;'>#{invoice.container_number}</span>"
+			if invoice.multicontainer && invoice.second_container.present?
+			label += "<br>#{invoice.second_container.containernumber rescue nil}"
+			end
+			return label.html_safe
+		end
+
+		main_container = invoice.container ? invoice.container.containernumber : ''
+		"Kontainer = #{main_container}".html_safe
+	end
+
+	def container_label_inv(invoice)
+		return ''.html_safe unless invoice.container_number.present? || invoice.container_id.present?
+
+		html = ""
+
+		# Prioritas: manual container_number
+		if invoice.container_number.present?
+			html += "<span title='Manual Input' style='text-decoration: underline; color: black;'>#{invoice.container_number}</span>"
+		else
+			# Container utama dari DB
+			html += colorized_container(invoice.container) if invoice.container.present?
+		end
+
+		html.html_safe
+	end
+
+	def colorized_container(container)
+		return '' unless container.present?
+
+		color = case container.category
+				when 'SEWA' then 'blue'
+				when 'FREEUSE' then 'red'
+				else 'black'
+				end
+
+		suffix = case container.category
+				when 'SEWA' then 'SW'
+				when 'FREEUSE' then 'FR'
+				else 'BL'
+				end
+
+		"<span style='color: #{color}'>#{container.containernumber} (#{suffix})</span>"
+	end
+
 	# def updatecashdailylogold total, date = nil, officecash = 0
 	# 	date = Date.today.strftime('%d-%m-%Y') if date.nil?
 

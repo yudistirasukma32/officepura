@@ -84,8 +84,8 @@
 			<tr>
 				<td><%=zeropad(invoice.id)%></td>
 				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%> <%=zeropad(invoice.driver.id) rescue nil%>) <%= invoice.invoicetrain ? '= Kereta =' : '' %> 
-                    <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
-                    <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
+					<%= isotank_label(invoice) %>
+					<%= container_label(invoice) %>
                     <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
 					<strong><%= invoice.need_helper ? " (+kernet) " : "" %></strong>
 					<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
@@ -141,8 +141,8 @@
 			<tr>
 				<td><%=zeropad(invoice.id)%></td>
 				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%> <%=zeropad(invoice.driver.id) rescue nil%>) <%= invoice.invoicetrain ? '= Kereta =' : '' %> 
-                    <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
-                    <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
+					<%= isotank_label(invoice) %>
+					<%= container_label(invoice) %>
                     <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
 					<strong><%= invoice.need_helper ? " (+kernet) " : "" %></strong>
 					<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
@@ -199,8 +199,8 @@
 			<tr>
 				<td><%=zeropad(invoice.id)%></td>
 				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%> <%=zeropad(invoice.driver.id) rescue nil%>) <%= invoice.invoicetrain ? '= Kereta =' : '' %> 
-                    <%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
-                    <%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
+					<%= isotank_label(invoice) %>
+					<%= container_label(invoice) %>
                     <strong><%= invoice.premi ? "(+premi)" : "" %></strong>
 					<strong><%= invoice.need_helper ? " (+kernet) " : "" %></strong>
 					<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
@@ -267,8 +267,8 @@
 				<td><%=zeropad(invoicereturn.invoice.id)%></td>
 				<td>
 					<%= invoicereturn.quantity rescue 0 %> Rit: <%= invoice.route.name rescue nil %> (<%= invoice.driver.name rescue nil %> <%= zeropad(invoice.driver.id) rescue nil %>) <%= invoice.invoicetrain ? '= Kereta =' : '' %> 
-					<%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ("Isotank = " + invoice.isotank.isotanknumber) : '' %>
-					<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ("Kontainer = " + invoice.container.containernumber) : '' %>
+					<%= isotank_label(invoice) %>
+					<%= container_label(invoice) %>
 					<strong><%= invoice.premi ? "(+premi)" : "" %></strong>
 					<strong><%= invoice.need_helper ? " (+kernet) " : "" %></strong>
 					<%= (invoice.event_id.present? && invoice.event_id != 0 ) ? "[DO " + invoice.event_id.to_s + "]" : ''%>
@@ -356,8 +356,8 @@
 			<tr>
 				<td><%=zeropad(trainexpense.invoice.id)%></td>
 				<td><%=trainexpense.invoice.quantity%> Rit: <%=trainexpense.invoice.route.name rescue nil%> (<%= trainexpense.trainexpense.invoice.driver.name rescue nil%> <%=zeropad(trainexpense.invoice.driver.id) rescue nil%>) <%= trainexpense.invoice.invoicetrain ? '= Kereta =' : '' %> 
-                    <%= (trainexpense.invoice.isotank_id.present? && trainexpense.invoice.isotank_id.to_i != 0) ? ("Isotank = " + trainexpense.invoice.isotank.isotanknumber) : '' %>
-                    <%= (trainexpense.invoice.container_id.present? && trainexpense.invoice.container_id.to_i != 0) ? ("Kontainer = " + trainexpense.invoice.container.containernumber) : '' %>
+					<%= isotank_label(trainexpense.invoice) %>
+					<%= container_label(trainexpense.invoice) %>
 					<br/>
 					<strong><%=trainexpense.invoice.routetrain.name rescue nil %> | <%= trainexpense.invoice.routetrain.container_type rescue nil %></strong>
 				</td>
@@ -399,8 +399,8 @@
 			<tr>
 				<td><%=zeropad(shipexpense.invoice.id)%></td>
 				<td><%=shipexpense.invoice.quantity%> Rit: <%=shipexpense.invoice.route.name rescue nil%> (<%= shipexpense.shipexpense.invoice.driver.name rescue nil%> <%=zeropad(shipexpense.invoice.driver.id) rescue nil%>)
-					<%= (shipexpense.invoice.isotank_id.present? && shipexpense.invoice.isotank_id.to_i != 0) ? ("Isotank = " + shipexpense.invoice.isotank.isotanknumber) : '' %>
-					<%= (shipexpense.invoice.container_id.present? && shipexpense.invoice.container_id.to_i != 0) ? ("Kontainer = " + shipexpense.invoice.container.containernumber) : '' %>
+					<%= isotank_label(shipexpense.invoice) %>
+					<%= container_label(shipexpense.invoice) %>
 					<br/>
 					<strong><%=shipexpense.invoice.routeship.name rescue nil %></strong>
 				</td>

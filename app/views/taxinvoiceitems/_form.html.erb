@@ -128,12 +128,21 @@
   </tr>
 <% end %>
     
-<% if @invoice.container_id != 0 && @invoice.tanktype == 'KONTAINER' %>
-  <tr>
-    <td>No. Kontainer</td>
-    <td id="strContainer"><%=@invoice.container.containernumber rescue nil%></td>
-  </tr>
-<% end %>
+  <% if (@invoice.container_number.present? || (@invoice.container_id.present? && @invoice.container_id.to_i != 0)) &&
+        (@invoice.tanktype.include?('KONTAINER') || @invoice.tanktype.include?('CONTAINER')) %>
+    <tr>
+      <td>Kontainer</td>
+      <td id="strContainer">
+        <% if @invoice.container_number.present? %>
+          <span title="Manual Input" style="text-decoration: underline;">
+            <%= @invoice.container_number %>
+          </span>
+        <% elsif @invoice.container_id.present? && @invoice.container_id.to_i != 0 %>
+          <%= @invoice.container.containernumber rescue nil %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
     
   <tr>
     <td>Supir</td>
@@ -400,7 +409,7 @@
       <% if !taxinvoiceitem.taxinvoice_id.nil? %>
         <i class="icon-lock red icon-large" title="Surat Tagihan sudah di Invoice"></i>
       <% else %>
-        <% if current_user.owner %>
+        <% if checkrole 'Admin Penagihan' || current_user.owner %>
         <%= link_to '&#xf00d;'.html_safe, taxinvoiceitem, :class => "delete tipsy", :title => 'Hapus', :confirm => 'Apakah anda yakin?', :method => :delete %>
         <% end %>
       <% end %>

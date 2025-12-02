@@ -36,6 +36,7 @@ class InvoicesController < ApplicationController
     @invoice.route_id = inputs[:route_id]
     @invoice.isotank_id = inputs[:isotank_id]
     @invoice.container_id = inputs[:container_id]
+    @invoice.container_number = inputs[:container_number] if inputs[:container_number].present?
 
     if @invoice.save
 
@@ -501,6 +502,7 @@ class InvoicesController < ApplicationController
     @invoice.tol_fee = params[:invoice][:tol_fee].delete('.')
     @invoice.total = params[:invoice][:total].delete('.')
     @invoice.user_id = current_user.id
+    @invoice.container_number = inputs[:container_number] if inputs[:container_number].present?
 
     @taxinvoiceitem = Taxinvoiceitem.active.where(invoice_id: params[:invoice_id]).first
 
@@ -1072,6 +1074,7 @@ class InvoicesController < ApplicationController
       @invoice.insurance_rate = rate
       @invoice.user_id = current_user.id
       @invoice.incentive = @invoice.vehicle.vehicleincentivegroup.incentive.to_f rescue 0
+      @invoice.container_number = inputs[:container_number] if inputs[:container_number].present?
 
       if inputs[:invoicetrain] == true
           @invoice.transporttype = "KERETA"
@@ -1218,6 +1221,7 @@ class InvoicesController < ApplicationController
       @invoice.insurance = inputs[:insurance].to_i || 0
       @invoice.description = inputs[:description]
       @invoice.need_helper = inputs[:need_helper] == "Yes" ? true : false
+      @invoice.container_number = inputs[:container_number] if inputs[:container_number].present?
 
       @invoice.premi = inputs[:premi] == "Yes" ? true : false
 

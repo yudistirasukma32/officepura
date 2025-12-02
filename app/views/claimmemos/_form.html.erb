@@ -189,6 +189,16 @@
 		<%= f.text_area :description, :class => 'half' %>
 	</div>
 
+  <div class="field-row">
+		<%= f.label :journal_note, "Tanggal Jurnal" %>
+		<%= f.text_field :journal_note, :class => 'half' %>
+	</div>
+
+  <div class="field-row">
+		<%= f.label :taxinvoice_note, "Nomor Invoice" %>
+		<%= f.text_field :taxinvoice_note, :class => 'half' %>
+	</div>
+
 	<div class="actions">
 	<%= f.hidden_field :total, :value => @claimmemo.total %>
 	<%= f.hidden_field :invoice_id, :value => @invoice.id %>

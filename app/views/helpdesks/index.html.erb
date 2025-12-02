@@ -7,7 +7,7 @@
 <div id="main">
 	
 	<div id="content-full">
-		<% if current_user.owner %>
+		<% if checkrole 'Editor' || current_user.owner  %>
 		<a class="btn print" href="search"><i class="icon-search"></i> &nbsp;Cari BKK</a>
 		<a class="btn print" href="searchevents"><i class="icon-search"></i> &nbsp;Cari DO</a>
 		<% end %>

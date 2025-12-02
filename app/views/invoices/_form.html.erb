@@ -376,6 +376,12 @@
       <% end %>
     </select>
   </div>
+
+  <div id="<%= !@invoice.invoicetrain ? 'container_field' : 'container' %>" class="field-row container_id">
+    <%= f.label :container_number, "No. Kontainer" %>
+    <%= f.text_field :container_number %>
+    <small>Diisi manual</small>
+  </div>
   <% end %>
 
   <div class="field-row">
@@ -499,7 +505,7 @@
     <% if @invoice.receipts.active.count == 0 %>
     <%= f.submit "Lanjut ke Potongan Solar", :id => 'invoice_submit', :class => 'left' %>
     <% end %>
-
+    
     <% if params[:train] || params[:train] == true %>
       <a class="back left" href="<%=invoices_indexinvoicetrain_path({:date => @invoice.date.strftime('%d-%m-%Y')})%>">Kembali ke Index Kereta</a>
     <% else %>

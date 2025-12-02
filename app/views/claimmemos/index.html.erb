@@ -157,6 +157,8 @@ th, td {
 						<% end %>
 					<% end %>
 				<% end %>
+				<br/>
+				<%= memo.taxinvoice_note rescue nil %>
 				</td>
 				<!--<td><%= memo.invoice.event.commodity.name rescue nil %></td>
 				<td class="right"><%= memo.weight_gross rescue 0 %></td>
@@ -175,6 +177,8 @@ th, td {
 									style: "color:green; font-size:10px; margin-left: 6px;",
 									target: "_blank" %><br>
 					<% end %>
+					<br/>
+					<%= memo.journal_note rescue nil %>
 					</div>
 				</td>
 				<td><%= memo.user.username rescue nil %></td>

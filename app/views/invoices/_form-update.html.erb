@@ -107,6 +107,12 @@
       </select>
     </div>
 
+    <div class="field-row">
+      <label for="container_number">No. Kontainer Manual</label>
+      <input type="text" name="container_number" class="half left" value="<%=@invoice.container_number rescue nil%>" />
+      <small>*Diisi untuk kontainer selain di master.</small>
+    </div>
+
     <div class="field-row continue" style="margin-top: 1.5rem; text-align: right;">
       <input class="submit" name="commit" style="margin-left: 0;" type="submit" value="Edit Data">
       <input type="hidden" name="invoice[invoice_id]" value="<%=@invoice.id%>">

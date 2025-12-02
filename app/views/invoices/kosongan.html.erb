@@ -96,25 +96,14 @@
 							<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
 						<% end %>
 					</td>
-					<td>
-					<% if (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) %>
-						<% if invoice.isotank.category == 'SEWA' %>
-							<span style="color: blue;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (SW)</span>
-						<% elsif invoice.isotank.category == 'FREEUSE' %>
-							<span style="color: red;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (FR)</span>
-						<% else %>
-							<%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (BL)
+					<td title="container">
+						<%= container_label_inv(invoice) %>
+						<% if invoice.isotank_id.present? && invoice.isotank_id.to_i != 0 %>
+							<% color = invoice.isotank.category == 'SEWA' ? 'blue' : invoice.isotank.category == 'FREEUSE' ? 'red' : 'black' %>
+							<% suffix = invoice.isotank.category == 'SEWA' ? 'SW' : invoice.isotank.category == 'FREEUSE' ? 'FR' : 'BL' %>
+							<br>
+							<span style="color: <%= color %>"><%= invoice.isotank.isotanknumber %> (<%= suffix %>)</span>
 						<% end %>
-					<% end %>
-					<% if (invoice.container_id.present? && invoice.container_id.to_i != 0) %>
-						<% if invoice.container.category == 'SEWA' %>
-							<span style="color: blue;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (SW)</span>
-						<% elsif invoice.container.category == 'FREEUSE' %>
-							<span style="color: red;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (FR)</span>
-						<% else %>
-							<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (BL)
-						<% end %>
-					<% end %> 
 					</td>
                     <td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
 					<td></td>
@@ -147,25 +136,14 @@
 						<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
 					<% end %>
 				</td>
-				<td>
-				<% if (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) %>
-					<% if invoice.isotank.category == 'SEWA' %>
-						<span style="color: blue;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (SW)</span>
-					<% elsif invoice.isotank.category == 'FREEUSE' %>
-						<span style="color: red;"><%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (FR)</span>
-					<% else %>
-						<%= (invoice.isotank_id.present? && invoice.isotank_id.to_i != 0) ? ( invoice.isotank.isotanknumber) : invoice.isotank_number %> (BL)
+				<td title="container">
+					<%= container_label_inv(invoice) %>
+					<% if invoice.isotank_id.present? && invoice.isotank_id.to_i != 0 %>
+						<% color = invoice.isotank.category == 'SEWA' ? 'blue' : invoice.isotank.category == 'FREEUSE' ? 'red' : 'black' %>
+						<% suffix = invoice.isotank.category == 'SEWA' ? 'SW' : invoice.isotank.category == 'FREEUSE' ? 'FR' : 'BL' %>
+						<br>
+						<span style="color: <%= color %>"><%= invoice.isotank.isotanknumber %> (<%= suffix %>)</span>
 					<% end %>
-				<% end %>
-				<% if (invoice.container_id.present? && invoice.container_id.to_i != 0) %>
-					<% if invoice.container.category == 'SEWA' %>
-						<span style="color: blue;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (SW)</span>
-					<% elsif invoice.container.category == 'FREEUSE' %>
-						<span style="color: red;"><%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (FR)</span>
-					<% else %>
-						<%= (invoice.container_id.present? && invoice.container_id.to_i != 0) ? ( invoice.container.containernumber) : invoice.container_number %> (BL)
-					<% end %>
-				<% end %> 
 				</td>
 				<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
 				<td>

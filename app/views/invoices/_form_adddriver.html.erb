@@ -299,6 +299,12 @@
     </select>
 </div>
 
+<div id="<%= !@invoice.invoicetrain ? 'container_field' : 'container' %>" class="field-row container_id" <%= @invoice.container_number.blank? ? "style=display:none;" : '' %>>
+    <%= f.label :container_number, "No. Kontainer" %>
+    <%= f.text_field :container_number %>
+    <small>Diisi manual</small>
+</div>
+
 <div class="field-row">
     <%= f.label :driver_phone, "No.Hp Driver" %>
     <%= f.text_field :driver_phone, :class => 'half', :id => 'phone_driver' %>
