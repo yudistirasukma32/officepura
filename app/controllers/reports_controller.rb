@@ -5847,13 +5847,39 @@ end
       #   group("taxinvoices.customer_id").
       #   sum(:total)
 
+      # Ambil aging hanya dari invoice terbaru yang belum dibayar (per customer)
+      # latest_unpaid_aging = {}
+ 
+      latest_unpaid_aging = {}
+ 
+      @taxinvoices_unpaid.
+        includes(:customer).
+        order("date DESC").
+        group_by(&:customer_id).each do |customer_id, invoices|
+
+        latest_inv = invoices.detect { |inv| inv.sentdate.present? }
+        next unless latest_inv
+
+        sentdate = latest_inv.sentdate
+        terms    = latest_inv.customer.terms_of_payment_in_days.to_i
+
+        due_date = sentdate + terms.days
+
+        # umur piutang = keterlambatan
+        aging_value = (Date.today - due_date).to_i
+        aging_value = 0 if aging_value < 0
+
+        latest_unpaid_aging[customer_id] = aging_value
+
+        
+      end
+
       cashin_per_customer = Bankexpense.
         joins(:taxinvoice).
         where(:creditgroup_id => 607).
         where("bankexpenses.deleted = ? AND bankexpenses.date BETWEEN ? AND ?", false, @startdate, @enddate).
         group("taxinvoices.customer_id").
         sum("bankexpenses.total")
-
 
         # render json: piutang_per_customer
         # return false    
@@ -5878,7 +5904,9 @@ end
         cashin  = cashin_per_customer[customer.id.to_s]  || 0
 
         kontrol = omzet * 30 / 100
-        aging   = omzet > 0 ? (piutang.to_f / omzet) * 365 : 0
+        # aging   = omzet > 0 ? (piutang.to_f / omzet) * 365 : 0
+        aging = latest_unpaid_aging[customer.id].to_i
+        
 
         rata2_omzet   = omzet / @number_of_months.to_f
         rata2_piutang = piutang / @number_of_months.to_f
