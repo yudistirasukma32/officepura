@@ -120,12 +120,13 @@
                         <td><%=taxinvoice.confirmeddate.strftime('%d-%m-%y') rescue nil%></td> 
                                                 
                         <%
-                          last_revision = taxinvoice.customernotes
-                                                    .where("revision_date IS NOT NULL AND deleted = false")
-                                                    .order("revision_date DESC")
-                                                    .first
+                          # last_revision = taxinvoice.customernotes
+                          #                           .where("revision_date IS NOT NULL AND deleted = false")
+                          #                           .order("revision_date DESC")
+                          #                           .first
 
-                          base_date = last_revision.try(:revision_date) || taxinvoice.sentdate || taxinvoice.date
+                          # base_date = last_revision.try(:revision_date) || taxinvoice.sentdate || taxinvoice.date
+                          base_date = taxinvoice.sentdate || taxinvoice.date
                           base_date = base_date.to_date rescue base_date
                           due_date = base_date + taxinvoice.customer.terms_of_payment_in_days.to_i.days
                           different = (due_date - Date.today).to_i

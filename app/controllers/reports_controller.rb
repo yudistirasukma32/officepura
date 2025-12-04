@@ -5854,7 +5854,7 @@ end
  
       @taxinvoices_unpaid.
         includes(:customer).
-        order("date DESC").
+        order("date ASC").
         group_by(&:customer_id).each do |customer_id, invoices|
 
         latest_inv = invoices.detect { |inv| inv.sentdate.present? }
@@ -5871,7 +5871,6 @@ end
 
         latest_unpaid_aging[customer_id] = aging_value
 
-        
       end
 
       cashin_per_customer = Bankexpense.
