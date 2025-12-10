@@ -162,7 +162,7 @@
             <%= inv_bongkar[0].invoicetrain ? '= Kereta =' : '' %> 
             <%= isotank_label(inv_bongkar[0]) %>
             <%= container_label(inv_bongkar[0]) %>
-            <%= invoice.user_id.nil? ? '': ' | '+invoice.user.username%>
+            <%= inv_bongkar[0].user_id.nil? ? '': ' | '+inv_bongkar[0].user.username%>
             <% if invoice.by_vendor %>
                 &nbsp;<span style="background-color: #009688; color: #fff; padding: 2px; font-size: 10px; border-radius: 2px; font-weight: 500;">Vendor</span>
             <% end %>

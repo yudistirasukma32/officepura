@@ -5906,7 +5906,6 @@ end
         # aging   = omzet > 0 ? (piutang.to_f / omzet) * 365 : 0
         aging = latest_unpaid_aging[customer.id].to_i
         
-
         rata2_omzet   = omzet / @number_of_months.to_f
         rata2_piutang = piutang / @number_of_months.to_f
         limit_piutang = rata2_omzet > 0 ? (rata2_piutang / rata2_omzet * cashin) : 0
