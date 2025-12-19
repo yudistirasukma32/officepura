@@ -69,6 +69,15 @@
       <td><%= f.text_field :total, :class => 'half disabled allowance-field', :value => to_currency(@invoice.total), :readOnly => 'true' %></td>
     </tr>
   </table>
+
+  <div id="warningRoute" style="padding: 10px;
+    border: 2px dashed #a1a1a1;
+    background: #f5f5f5;
+    border-radius: 12px;
+    display: none;">
+    Jurusan Belum ada nominal sangu. Hubungi Operasional untuk setting sangu. BKK tidak dapat disimpan.
+  </div>
+  <br/>
   
 	Ket:<br/>
 	Solar: <span id="invoice_gas_detail">(<%=@invoice.gas_litre%> liter @ <%=@gascost%>)</span><br/>

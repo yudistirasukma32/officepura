@@ -1,0 +1,105 @@
+<%= render "shared/header" %>
+
+<div id="nav">
+	<%= render "shared/nav" %>
+</div>
+
+<style>
+.flex {
+	display: flex;
+	align-items: center;
+}
+</style>
+
+<div id="main">
+	
+	<div id="content-full">
+		<h1>OPS / <a href="/invoices/add_container">Edit Kontainer - Isotank</a> / Index</h1>
+		
+		<br class="clearfix" />
+		
+		<div id="filter">
+			<form id="filterform" name="filterform" action="" method="get">
+				<div class="field-row continue flex">
+					<label for="date" >Pilih Tanggal</label>
+					<input type="text" name="date" class="half left date-picker" value="<%=@date%>" onchange="javascript:submitFormFilter();" />
+					
+					<label for="office_id" class="middle">Pilih Kantor</label>
+					<select name="office_id" class="half left ">
+						<option value="all">All</option>
+						<% @offices.each do |office| %>
+						<option value="<%=office.id%>" <% if @office_id.to_i == office.id %> name="office_id" selected="selected"<% end %>><%=office.name%></option>
+						<% end %>
+					</select> 
+
+					<label for="date" class="middle">Nomor BKK</label>
+					<input type="text" name="invoice_id" class="half left" value="<%=params[:invoice_id]%>" />
+				
+					<input class="submit" type="submit" value="Filter" style="vertical-align: bottom;">
+				</div>
+			</form>
+		</div>
+
+		<br class="clearfix" />
+
+		<table class="row-view">
+			<tr>
+				<th width="50">No.</th>
+				<th>Keterangan</th>
+				<th width="40">Ktr</th>
+				<th width="80">No. Pol</th>
+				<th width="150">ISO/KONTAINER</th>
+				<th width="50">No. DO</th>
+				<th width="50">User</th>
+				<th width="100"></th>
+			</tr>
+
+			<tr class="subheading">
+				<th colspan="7" style="color:#000;">Bukti Kas Keluar <span class="red"><%=@date.to_date.strftime('%d-%m-%Y')%> (<%=@invoices.count%>)</span></th>
+			</tr>
+
+			<% @invoices.each do |invoice| %>
+				<tr>
+				<td><%= link_to zeropad(invoice.id), edit_invoice_path(invoice) %></td>
+				<td><%=invoice.quantity%> Rit: <%=invoice.route.name rescue nil%> (<%=invoice.driver.name rescue nil%>) <% if !invoice.description.blank?%> <br /> <%=invoice.description%><% end %> 
+                </td>
+				<% if 
+				invoice.office.abbr == '' 
+				%>
+                <td class="red"><%=invoice.office.abbr%></td>    
+                <% else %>
+                <td><%=invoice.office.abbr%></td>
+                <% end %>
+				<td>
+					<%=invoice.vehicle.current_id rescue nil%>
+					<% if invoice.vehicle_duplicate.present? && invoice.vehicle_duplicate_id != 0%>
+						<br/><strong><%=invoice.vehicle_duplicate.current_id rescue nil%></strong>
+					<% end %>
+				</td>
+				<td title="container">
+				<%= container_label_inv(invoice) %>
+				<% if invoice.isotank_id.present? && invoice.isotank_id.to_i != 0 %>
+					<% color = invoice.isotank.category == 'SEWA' ? 'blue' : invoice.isotank.category == 'FREEUSE' ? 'red' : 'black' %>
+					<% suffix = invoice.isotank.category == 'SEWA' ? 'SW' : invoice.isotank.category == 'FREEUSE' ? 'FR' : 'BL' %>
+					<span style="color: <%= color %>"><%= invoice.isotank.isotanknumber %> (<%= suffix %>)</span>
+				<% end %>
+				</td>
+				<td>
+                    <% if invoice.event_id && invoice.event_id != 0 %>
+                    <a href="/events/<%=invoice.event_id%>/edit"><%=invoice.event_id rescue nil%></a>
+                    <% end %>
+                </td>
+				<td width="50"><%= invoice.user.blank? ? '' : invoice.user.username %></td>
+                <td class="right" width="60">
+					<a class="cta" style="background: #e0400d; opacity: 0.8; float: right;" 
+					href="add_container/<%=invoice.id%>">Edit Data</a>
+				</td>
+			</tr>
+				
+			<% end %>	
+		
+		</table>
+		
+	</div>
+
+</div>

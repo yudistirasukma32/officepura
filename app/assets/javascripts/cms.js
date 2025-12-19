@@ -1104,8 +1104,10 @@ function resetAllowances() {
 function checkAllowances() {
   if ($("#invoice_total").val() == "0") {
     $("#invoice_submit").hide();
+    $("#warningRoute").show();
   } else {
     $("#invoice_submit").show();
+    $("#warningRoute").hide();
   }
 }
 

@@ -2,7 +2,7 @@ class InvoicesController < ApplicationController
   include ApplicationHelper
   include ActionView::Helpers::NumberHelper
 	layout "application", :except => [:get_routes, :get_allowances, :get_vehicles, :get_vehicle, :get_vehiclegroupid, :get_trainroute, :get_trainroute2, :get_shiproute, :get_shiproute2, :get_routesbyoffice, :get_tanktype]
-  protect_from_forgery :except => [:add, :updateinvoice, :updateaddweight, :updateship, :updatetrain, :updatedata, :updatedatabkk]
+  protect_from_forgery :except => [:add, :updateinvoice, :updateaddweight, :updateship, :updatetrain, :updatedata, :updatedatabkk, :updatecontainer]
   before_filter :authenticate_user!, :set_section
 
   def set_section
@@ -723,6 +723,21 @@ class InvoicesController < ApplicationController
 
   end
 
+  def updatecontainer
+
+    inputs = params[:invoice]
+
+    @invoice = Invoice.find(inputs[:invoice_id])
+
+    @invoice.container_id = inputs[:container_id]
+    @invoice.isotank_id = inputs[:isotank_id]
+
+    if @invoice.save
+      redirect_to("/invoices/add_container/"+@invoice.id.to_s)
+    end
+
+  end
+
   def indexaddship
     @section = "ops"
     @where = "addship"
@@ -848,6 +863,58 @@ class InvoicesController < ApplicationController
     respond_to :html
   end
 
+  def indexaddcontainer
+    @section = "ops"
+    @where = "addcontainer"
+
+    invoice_includes = [
+        :route,
+        :driver,
+        :office,
+        :vehicle,
+        :isotank,
+        :user
+      ]
+
+    @date = params[:date]
+    @date = Date.today.strftime('%d-%m-%Y') if @date.nil?
+
+    @offices = Office.active.order('id asc')
+    @office_id = params[:office_id]
+
+    @invoice_id = params[:invoice_id]
+
+    if @invoice_id.present?
+      @invoices = Invoice.active.includes(invoice_includes).where(id: @invoice_id)
+      respond_to :html
+      return
+    end
+
+    @invoices = Invoice.where(date: @date.to_date, deleted: false)
+
+    if @office_id.present? && @office_id != "all"
+      @invoices = @invoices.includes(invoice_includes).where(office_id: @office_id)
+    end
+
+    @office_role = []
+
+    @office_role << 1 if checkrole 'BKK Kantor Sidoarjo'
+    @office_role << 2 if checkrole 'BKK Kantor Jakarta'
+    @office_role << 3 if checkrole 'BKK Kantor Probolinggo'
+    @office_role << 4 if checkrole 'BKK Kantor Semarang'
+    @office_role << 5 if checkrole 'BKK Kantor Surabaya'
+    @office_role << 6 if checkrole 'BKK Kantor Sumatera'
+    @office_role << 8 if checkrole 'BKK Kantor Cikarang'
+
+    if checkrole 'Operasional BKK'
+      @offices = @offices.where('id != 7')
+    else
+      @offices = @offices.where('id in ?', @office_role)
+    end
+
+    respond_to :html
+  end
+
   def add_ship
     @section = "ops"
     @where = "addship"
@@ -862,6 +929,17 @@ class InvoicesController < ApplicationController
   def add_train
     @section = "ops"
     @where = "addtrain"
+    @invoice = Invoice.find(params[:invoice_id])
+
+    if @invoice.load_date.nil?
+      @invoice.load_date = Date.today
+    end
+
+  end
+
+  def add_container
+    @section = "ops"
+    @where = "addcontainer"
     @invoice = Invoice.find(params[:invoice_id])
 
     if @invoice.load_date.nil?

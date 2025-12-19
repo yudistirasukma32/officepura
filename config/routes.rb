@@ -343,6 +343,10 @@ OfficePuraErp::Application.routes.draw do
   match 'invoices/add_train/:invoice_id' => 'invoices#add_train'
   post 'invoices/updatetrain/' => 'invoices#updatetrain'
 
+  get 'invoices/add_container' => 'invoices#indexaddcontainer'
+  get 'invoices/add_container/:invoice_id' => 'invoices#add_container'
+  post 'invoices/updatecontainer/' => 'invoices#updatecontainer'
+
   match 'invoices/add_weight' => 'invoices#indexaddweight'
   match 'invoices/add_weight/:invoice_id' => 'invoices#add_weight'
   post 'invoices/updateaddweight/' => 'invoices#updateaddweight'
