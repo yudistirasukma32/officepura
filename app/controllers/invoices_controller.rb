@@ -1480,7 +1480,7 @@ class InvoicesController < ApplicationController
 
         @routes = @routes.where(routegroup_id: groups) if groups.any?
       else
-        @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*'").order(:name)
+        @routes = Route.where(:customer_id => params[:customer_id], :enabled => true, :deleted => false).where("name !~* '.*depo.*' OR transporttype = 'TRUK'").order(:name)
       end
 
     else
