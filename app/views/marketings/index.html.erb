@@ -198,7 +198,8 @@
 			<strong><%= to_currency(@events_by_user['omzet_69']) %></strong>
 			<br/>
 			<small>Est. Omzet</small>
-		</div>
+		</div> 
+		<!--
 		<div class="widget-carda">
 			<a class="check" target="_blank" href="/reports/estimation-event-expense?user_id=93&marketingname=Finca&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
 				<i class="icon-search" style="color: #6d6d6d;"></i>
@@ -215,7 +216,7 @@
 			<small>Est. Omzet</small>
 		</div>
 		<div class="widget-carda">
-			<a class="check" target="_blank" href="/reports/estimation-event-expense?user_id=112&marketingname=Anindya&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
+			<a class="check" target="_blank" href="/reports/estimation-event-expense?user_id=110&marketingname=Anindya&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
 				<i class="icon-search" style="color: #6d6d6d;"></i>
 			</a>
 			<p>Anindya<br>
@@ -225,7 +226,23 @@
 			<br/>
 			<small>DO</small>
 			<br/><br/>
-			<strong><%= to_currency(@events_by_user['omzet_112']) %></strong>
+			<strong><%= to_currency(@events_by_user['omzet_110']) %></strong>
+			<br/>
+			<small>Est. Omzet</small>
+		</div>
+		-->
+		<div class="widget-carda">
+			<a class="check" target="_blank" href="/reports/estimation-event-expense?user_id=125&marketingname=Stefano&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
+				<i class="icon-search" style="color: #6d6d6d;"></i>
+			</a>
+			<p>Stefano<br>
+			<span>Timur<span>
+			</p>
+			<strong><%= @stat_stefano.count %></strong>
+			<br/>
+			<small>DO</small>
+			<br/><br/>
+			<strong><%= to_currency(@events_by_user['omzet_122']) %></strong>
 			<br/>
 			<small>Est. Omzet</small>
 		</div>
@@ -240,13 +257,19 @@
 		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
 		<small>Total omzet 3 bulan terakhir Lilis dalam juta</small>
 		</div>
+		<!--
 		<div id="chart-omzet-93" class="widget-carda">
 		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
 		<small>Total omzet 3 bulan terakhir Finca dalam juta</small>
 		</div>
-		<div id="chart-omzet-112" class="widget-carda">
+		<div id="chart-omzet-110" class="widget-carda">
 		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
 		<small>Total omzet 3 bulan terakhir Anindya dalam juta</small>
+		</div>
+		-->
+		<div id="chart-omzet-125" class="widget-carda">
+		<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
+		<small>Total omzet 3 bulan terakhir Stefano dalam juta</small>
 		</div>
 	</div>
 

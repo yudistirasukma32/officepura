@@ -53,8 +53,9 @@ class MarketingsController < ApplicationController
 		@stat_lilis = Event.active.where("start_date BETWEEN ? AND ? AND customer_id != ? AND user_id = ?", @startdate.to_date, @enddate.to_date, contract_customer_id, 69).order(:start_date)
 		@stat_finca = Event.active.where("start_date BETWEEN ? AND ? AND customer_id != ? AND user_id = ?", @startdate.to_date, @enddate.to_date, contract_customer_id, 93).order(:start_date)
 		@stat_anin = Event.active.where("start_date BETWEEN ? AND ? AND customer_id != ? AND user_id = ?", @startdate.to_date, @enddate.to_date, contract_customer_id, 112).order(:start_date)
+		@stat_stefano = Event.active.where("start_date BETWEEN ? AND ? AND customer_id != ? AND user_id = ?", @startdate.to_date, @enddate.to_date, contract_customer_id, 125).order(:start_date)
 
-		user_ids = [14, 69, 93, 112]
+		user_ids = [14, 69, 93, 112, 125]
 		@events_by_user = {}
 
 		user_ids.each do |user_id|
@@ -130,14 +131,16 @@ class MarketingsController < ApplicationController
 			@stat_lilis = Event.active.where("customer_id != ? AND DATE_TRUNC('month', start_date) = ? AND user_id = ?", contract_customer_id, @default_month.beginning_of_month, 69)
 			@stat_finca = Event.active.where("customer_id != ? AND DATE_TRUNC('month', start_date) = ? AND user_id = ?", contract_customer_id, @default_month.beginning_of_month, 93)
 			@stat_anin = Event.active.where("customer_id != ? AND DATE_TRUNC('month', start_date) = ? AND user_id = ?", contract_customer_id, @default_month.beginning_of_month, 112)
+			@stat_stefano = Event.active.where("customer_id != ? AND DATE_TRUNC('month', start_date) = ? AND user_id = ?", contract_customer_id, @default_month.beginning_of_month, 125)
 		else
 			@stat_indra = Event.active.where("start_date BETWEEN ? AND ? AND customer_id != ? AND user_id = ?", @startdate.to_date, @enddate.to_date, contract_customer_id, 14).order(:start_date)
 			@stat_lilis = Event.active.where("start_date BETWEEN ? AND ? AND customer_id != ? AND user_id = ?", @startdate.to_date, @enddate.to_date, contract_customer_id, 69).order(:start_date)
 			@stat_finca = Event.active.where("start_date BETWEEN ? AND ? AND customer_id != ? AND user_id = ?", @startdate.to_date, @enddate.to_date, contract_customer_id, 93).order(:start_date)
 			@stat_anin = Event.active.where("start_date BETWEEN ? AND ? AND customer_id != ? AND user_id = ?", @startdate.to_date, @enddate.to_date, contract_customer_id, 112).order(:start_date)
+			@stat_stefano = Event.active.where("start_date BETWEEN ? AND ? AND customer_id != ? AND user_id = ?", @startdate.to_date, @enddate.to_date, contract_customer_id, 125).order(:start_date)
 		end
 
-		user_ids = [14, 69, 93, 112]
+		user_ids = [14, 69, 93, 112, 125]
 		@events_by_user = {}
 
 		user_ids.each do |user_id|
@@ -243,7 +246,7 @@ class MarketingsController < ApplicationController
 		contract_customer_id = 379 #mayora
 
 		#marketings
-		user_ids = [14, 69, 93, 112]
+		user_ids = [14, 69, 93, 112, 125]
 		@events_by_user = {}
 		
 		user_ids.each do |user_id|

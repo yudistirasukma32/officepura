@@ -3447,12 +3447,69 @@ function getOmzetMarketing() {
 
       if (window.ApexCharts) {
         var options = {
+          chart: {
+            type: "line",
+            fontFamily: "inherit",
+            height: 240,
+            width: 230,
+            animations: {
+              enabled: true,
+            },
+          },
+          stroke: {
+            width: 4,
+            curve: "smooth", // Makes the line smooth
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          series: [
+            {
+              name: "Omzet",
+              data: data.users.omzet_125, // Data for each month
+            },
+          ],
+          tooltip: {
+            theme: "light",
+            x: {
+              formatter: function (value) {
+                return value; // Keeps the month-year format in tooltip
+              },
+            },
+          },
+          grid: {
+            strokeDashArray: 4,
+          },
+          xaxis: {
+            categories: data.month_text,
+            labels: {
+              rotate: -45, // Rotates labels for better readability
+            },
+            type: "category",
+          },
+          yaxis: {
+            labels: {
+              padding: 2,
+            },
+          },
+          colors: ["#14a714"],
+          legend: {
+            show: false,
+          },
+        };
+
+        var chart = new ApexCharts($("#chart-omzet-125")[0], options);
+        chart.render();
+      }
+
+      if (window.ApexCharts) {
+        var options = {
           series: data.this_month,
           chart: {
             width: 480,
             type: "pie",
           },
-          labels: ["Indra", "Lilis", "Finca", "Anindya"],
+          labels: ["Indra", "Lilis", "Finca", "Anindya", "Stefano"],
           legend: {
             position: "bottom",
           },
