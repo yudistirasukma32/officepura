@@ -6049,7 +6049,7 @@ grouped.each do |customer_id, invoices|
           customer_id: customer.id,
           office_id: customer.office_id,
           name: customer.name,
-          city: customer.city&.upcase,
+          city: customer.city.upcase,
           total_omzet: omzet,
           total_piutang: piutang,
           kontrol_piutang: kontrol,
