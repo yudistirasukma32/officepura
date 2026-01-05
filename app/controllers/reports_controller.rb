@@ -5808,7 +5808,7 @@ end
     end
   end
 
-  def ar_aging_offices
+  def ar_aging_offices_bak
     @pagetitle = 'Umur Piutang Pelanggan'
 
     role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan'
@@ -5855,7 +5855,7 @@ end
       @taxinvoices_unpaid.
         includes(:customer).
         order("date ASC").
-        group_by(&:customer_id).each do |customer_id, invoices|
+        group("customer_id").each do |customer_id, invoices|
 
         latest_inv = invoices.detect { |inv| inv.sentdate.present? }
         next unless latest_inv
@@ -5946,6 +5946,134 @@ end
       @where   = 'ar_aging'
 
       # render json: @customer_datas
+    else
+      redirect_to root_path
+    end
+  end
+
+  def ar_aging_offices
+    @pagetitle = 'Umur Piutang Pelanggan'
+
+    role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan'
+    if role
+      # ambil dari params, fallback ke default bulan berjalan
+      @beginning_of_year = Date.new(Date.today.year, 1, 1)
+      @startdate = params[:startdate].present? ? Date.parse(params[:startdate]) : @beginning_of_year
+      @enddate   = params[:enddate].present?   ? Date.parse(params[:enddate])   : Date.today.end_of_month
+
+      # hitung jumlah bulan
+      @number_of_months = ((@enddate.year * 12 + @enddate.month) - (@beginning_of_year.year * 12 + @beginning_of_year.month)) + 1
+
+      # invoices
+      @taxinvoices = Taxinvoice.active.joins(:customer)
+        .where(date: @startdate..@enddate)
+      @taxinvoices_unpaid = @taxinvoices.where(paiddate: nil)
+
+      # customer filter
+      @customer_id = params[:customer_id]
+      @taxinvoices = @taxinvoices.where(customer_id: @customer_id) if @customer_id.present?
+
+      # customers
+      @customers = Customer.active
+        .where(id: @taxinvoices.select(:customer_id))
+        .includes(:customernotes)
+        .order(:name)
+
+      # aggregated values
+      omzet_per_customer   = @taxinvoices.group(:customer_id).sum(:total)
+      piutang_per_customer = @taxinvoices_unpaid.group(:customer_id).sum(:total)
+      downpayment_per_customer = @taxinvoices_unpaid.group(:customer_id).sum(:downpayment)
+      
+latest_unpaid_aging = {}
+
+grouped = {}
+@taxinvoices_unpaid.includes(:customer).order("date ASC").each do |inv|
+  grouped[inv.customer_id] ||= []
+  grouped[inv.customer_id] << inv
+end
+
+grouped.each do |customer_id, invoices|
+
+        latest_inv = invoices.detect { |inv| inv.sentdate.present? }
+        next unless latest_inv
+
+        sentdate = latest_inv.sentdate
+        terms    = latest_inv.customer.terms_of_payment_in_days.to_i
+
+        due_date = sentdate + terms.days
+
+        # umur piutang = keterlambatan
+        aging_value = (Date.today - due_date).to_i
+        aging_value = 0 if aging_value < 0
+
+        latest_unpaid_aging[customer_id] = aging_value
+
+      end
+
+      cashin_per_customer = Bankexpense.
+        joins(:taxinvoice).
+        where(:creditgroup_id => 607).
+        where("bankexpenses.deleted = ? AND bankexpenses.date BETWEEN ? AND ?", false, @startdate, @enddate).
+        group("taxinvoices.customer_id").
+        sum("bankexpenses.total")  
+
+      # grand totals
+      @grandtotal_omzet   = 0
+      @grandtotal_piutang = 0
+      @grandtotal_cashin  = 0
+
+      # build result
+      customer_datas = @customers.map do |customer|
+        omzet   = omzet_per_customer[customer.id]   || 0
+        # piutang = piutang_per_customer[customer.id] || 0
+
+        total_piutang = piutang_per_customer[customer.id].to_f
+        downpayment = downpayment_per_customer[customer.id].to_f
+        piutang = total_piutang - downpayment
+
+        cashin  = cashin_per_customer[customer.id]  || 0
+
+        kontrol = omzet * 30 / 100
+        # aging   = omzet > 0 ? (piutang.to_f / omzet) * 365 : 0
+        aging = latest_unpaid_aging[customer.id].to_i
+
+        rata2_omzet   = omzet / @number_of_months.to_f
+        rata2_piutang = piutang / @number_of_months.to_f
+        limit_piutang = rata2_omzet > 0 ? (rata2_piutang / rata2_omzet * cashin) : 0
+
+        @grandtotal_omzet   += omzet
+        @grandtotal_piutang += piutang
+        @grandtotal_cashin  += cashin
+
+        {
+          customer_id: customer.id,
+          office_id: customer.office_id,
+          name: customer.name,
+          city: customer.city&.upcase,
+          total_omzet: omzet,
+          total_piutang: piutang,
+          kontrol_piutang: kontrol,
+          cashin: cashin,
+          umur_piutang: aging.round,
+          limit_piutang: limit_piutang,
+          rata2_omzet: rata2_omzet,
+          rata2_piutang: rata2_piutang,
+          jumlah_bulan: @number_of_months,
+          customer_notes: customer.customernotes.enabled.where('taxinvoice_id is null').order('created_at DESC').map do |note|
+            {
+              id: note.id,
+              description: note.description,
+              user_id: note.user_id,
+              created_at: note.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            }
+          end
+        }
+      end
+
+      @customer_datas = customer_datas.group_by { |c| c[:office_id] }
+
+      @section = "taxinvoices"
+      @where   = 'ar_aging'
     else
       redirect_to root_path
     end
