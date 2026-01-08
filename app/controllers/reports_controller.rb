@@ -3079,6 +3079,9 @@ end
     @customer_id = params[:customer_id]
     @taxinvoices = @taxinvoices.where(:customer_id => @customer_id) if @customer_id.present?
 
+    @user_id = params[:user_id]
+    @taxinvoices = @taxinvoices.where(:user_id => @user_id) if @user_id.present?
+
     # ==== ORDERING ===============================================
     if params[:due_date_order].present?
       order_dir = params[:due_date_order] == "asc" ? "ASC" : "DESC"
