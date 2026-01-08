@@ -10,7 +10,7 @@
     <div id="nav">
         <%= render "shared/nav" %>
     </div>
-    
+ 
     <div id="main">
     
         <div id="content-full">
@@ -38,7 +38,7 @@
                     <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
                     <select name="year" class="short left" style="margin-right: 10px;">
                         <% (Date.today.year.downto(year_to)).each do |y| %>
-                        <option value="<%=y%>"<% if y.to_s == @year %> selected='selected'<% end %>><%=y%></option>
+                        <option value="<%=y%>"<% if y.to_s == @year.to_s %> selected='selected'<% end %>><%=y%></option>
                         <% end %>
                     </select>
 
@@ -51,7 +51,7 @@
                     <% year_to = Taxinvoice.order(:date).first.date.year rescue nil || Date.today.year %>
                     <select name="yearEnd" class="short left">
                         <% (Date.today.year.downto(year_to)).each do |y| %>
-                        <option value="<%=y%>"<% if y.to_s == @yearEnd %> selected='selected'<% end %>><%=y%></option>
+                        <option value="<%=y%>"<% if y.to_s == @yearEnd.to_s %> selected='selected'<% end %>><%=y%></option>
                         <% end %>
                     </select>
                 </div>
