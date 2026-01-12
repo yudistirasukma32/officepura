@@ -346,6 +346,11 @@
     <button type="button" id="btn-add-vendor" class="icon-plus btn-txt">Tambah No. Vendor</button>
   </div>
 
+  <div class="field-row">
+      <%= f.label :po_number, "Nomor PO" %>
+      <%= f.text_field :po_number, :placeholder => 'Nomor PO' %>
+  </div>
+
 	<div class="field-row">
  		<%= f.label :description, "Keterangan" %>
  		<%= f.text_area :description, :rows => 2, :class => 'half' %>

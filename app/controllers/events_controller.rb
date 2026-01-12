@@ -565,7 +565,8 @@ class EventsController < ApplicationController
           :invoiced => invoiced,
           :sj => taxinvoices,
           :is_stapel => is_stapel,
-          :is_insurance => is_insurance
+          :is_insurance => is_insurance,
+          :po_number => po_number
         }
 
       end
@@ -696,6 +697,11 @@ class EventsController < ApplicationController
         darat = true
       end
 
+      po_number = ''
+      if !e.po_number.nil?
+        po_number = 'PO no: ' + e.po_number
+      end
+
       {
         :id => e.id,
         :handled => handled,
@@ -720,7 +726,8 @@ class EventsController < ApplicationController
         :bkk => bkk_unconfirmed,
         :bkk_confirmed => bkk_confirmed,
         :sj => invoice_taxitems_count,
-        :tagihan => invoice_taxinv_count
+        :tagihan => invoice_taxinv_count,
+        :po_number => po_number
       }
 
     end

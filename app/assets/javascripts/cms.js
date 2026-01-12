@@ -2060,7 +2060,7 @@ function getDataEvents2(cl) {
         if (cl == "drivers") {
           obj.title = object.summary;
         } else {
-          obj.title = "#" + object.id + " " + object.summary;
+          obj.title = "#" + object.id + " " + object.summary + " " + object.po_number;
         }
 
         obj.start = object.start_date.toString();
