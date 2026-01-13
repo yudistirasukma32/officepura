@@ -16,17 +16,19 @@
 		<br class="clearfix"/>
 
 			<table class="tablesorter row-view tablesorterFilters">
-			<thead>
-			<tr>
-					<th>Nama Jurusan</th>
-					<th>Tipe</th>
-					<th>ST. Asal</th>
-					<th>ST. Tujuan</th>
-					<th>Operator</th>
-					<th>Harga</th>
-					<th width="60" class="{sorter: false, filter: false} sorter-false">Aktif</th>
-					<th width="60" class="{sorter: false, filter: false} sorter-false"></th>
-				</tr>
+				<thead>
+				<tr>
+						<th>Nama Jurusan</th>
+						<th>Tipe</th>
+						<th>ST. Asal</th>
+						<th>ST. Tujuan</th>
+						<th>Operator</th>
+						<% if checkrole 'Master Jurusan'%> 
+						<th>Harga</th>
+						<% end %>
+						<th width="60" class="{sorter: false, filter: false} sorter-false">Aktif</th>
+						<th width="60" class="{sorter: false, filter: false} sorter-false"></th>
+					</tr>
 				</thead>
 
 				<tbody>
@@ -37,7 +39,9 @@
 					<td><%= route.origin_station.name %></td>
 					<td><%= route.destination_station.name %></td>
 					<td><%= route.operator.abbr rescue nil %></td>
-					<td><%= route.price_per rescue nil %></td>
+					<% if checkrole 'Master Jurusan'%> 
+					<td><%= to_currency(route.price_per) rescue nil %></td>
+					<% end %>
 					<% if route.enabled %>
 						<td><% if checkrole 'Master Jurusan'%> <%= link_to '&#xf058;'.html_safe, disable_routetrain_path(route), :class => 'enabled tipsy', :title => 'Non Aktifkan' %><% else %><%= link_to '&#xf058;'.html_safe, '', :class => 'enabled tipsy' %><% end %></td>
 					<% else %>
