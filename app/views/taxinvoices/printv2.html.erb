@@ -466,6 +466,7 @@
                     <td align="right"><span id="txt_gst_tax"><%= to_currency_bank(@taxinvoice.extra_cost)%></span></td>
                 </tr>
                 <% end %>
+
                 <%
                     ppn = Setting.where(name: 'ppn')
                     ppn = ppn.blank? ? 12 : ppn[0].value
@@ -475,21 +476,22 @@
 
                     is_decimal = taxinvoice_ppn.to_f - taxinvoice_ppn.to_i > 0
                     taxinvoice_ppn = is_decimal ? taxinvoice_ppn.to_f : taxinvoice_ppn.to_i
-                %>
 
+                %>
+                <% if @taxinvoice.customer.gst_percentage > 0 || @taxinvoice.gst_tax > 0 %>
+                <% if taxinvoice_ppn > 0 %>
                 <tr>
-                    <td colspan="<%= colspan%>" align="right">PPN <%= taxinvoice_ppn %>%</td>
-                    <td align="right"><span id="txt_gst_tax">
-                        <% if @taxinvoice.gst_tax > 0 %>
-                            <%= @taxinvoice.gst_tax.to_i == 0 ? "-" : to_currency_bank(@taxinvoice.gst_tax)%></span>
-                        <% end %>
-                    </td>
+                    <!-- <td colspan="<%= colspan%>" align="right">PPN <%= taxinvoice_ppn %>%</td> -->
+                    <td colspan="<%= colspan%>" align="right">PPN</td>
+                    <td align="right"><span id="txt_gst_tax"><%= @taxinvoice.gst_tax.to_i == 0 ? "-" : to_currency(@taxinvoice.gst_tax)%></span></td>
                 </tr>
+                <% end %>
+                <% end %>
 
                 <% if @taxinvoice.price_tax > 0 %>
                 <tr id="pph-row">
                     <td colspan="<%= colspan%>" align="right">PPh Pasal 23 2%</td>
-                    <td align="right"><span id="txt_price_tax" <% if @taxinvoice.price_tax > 0 %> class="red" <% end %>><%= to_currency_bank(0 - @taxinvoice.price_tax)%></span></td>
+                    <td align="right"><span id="txt_price_tax" <% if @taxinvoice.price_tax > 0 %> class="red" <% end %>><%= to_currency(0 - @taxinvoice.price_tax)%></span></td>
                 </tr>
                 <% end %>
 
