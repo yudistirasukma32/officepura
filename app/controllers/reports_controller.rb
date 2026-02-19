@@ -5559,8 +5559,20 @@ end
       @cashin_current_month =
         Bankexpense.joins(:taxinvoice)
                   .where(creditgroup_id: 607)
+                  .where(deleted: false)
                   .where("bankexpenses.date BETWEEN ? AND ?", start_of_month, end_of_month) # Use explicit BETWEEN
                   .sum(:total)
+
+      id_groupbank_bank = 135
+      @group_banks = Bankexpensegroup.active.where("bankexpensegroup_id in (?)", id_groupbank_bank).pluck(:id)
+
+      @cashout_current_month = 
+      Bankexpense.joins(:taxinvoice)
+                .where("bankexpenses.bankexpense_id is not null")
+                .where(deleted: false)
+                .where(creditgroup_id: @group_banks)
+                .where("bankexpenses.date BETWEEN ? AND ?", start_of_month, end_of_month) # Use explicit BETWEEN
+                .sum(:total) 
 
       # get all AR from jan 2022
       today = Date.today
@@ -5573,38 +5585,40 @@ end
                           .sum(:total)
       
 
-      # Cashin per Offices
-      @offices_data = Office.active.order(:name).map do |office|
+      # # Cashin per Offices
+      # @offices_data = Office.active.order(:name).map do |office|
 
-      # 1. omzet_office
-      omzet_office = Taxinvoice.where('customer_id IS NOT NULL') # Use IS NOT NULL
-                              .active
-                              .where(office_id: office.id)
-                              .where("created_at BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
-                              .sum(:total)
+      # # 1. omzet_office
+      # omzet_office = Taxinvoice.where('customer_id IS NOT NULL') # Use IS NOT NULL
+      #                         .active
+      #                         .where(office_id: office.id)
+      #                         .where("created_at BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
+      #                         .sum(:total)
 
-      # 2. cashin_office
-      cashin_office = Bankexpense.joins(:taxinvoice)
-                                .where(deleted: false) # This is fine as is
-                                .where(creditgroup_id: 607)
-                                .where(taxinvoices: { office_id: office.id })
-                                .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
-                                .sum(:total)
+      # # 2. cashin_office
+      # cashin_office = Bankexpense.joins(:taxinvoice)
+      #                           .where(deleted: false) # This is fine as is
+      #                           .where(creditgroup_id: 607)
+      #                           .where(taxinvoices: { office_id: office.id })
+      #                           .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
+      #                           .sum(:total)
 
-      # 3. invoice_tagihan_count
-      invoice_tagihan_count = Taxinvoice.where('customer_id IS NOT NULL') # Use IS NOT NULL
-                                        .active
-                                        .where(office_id: office.id)
-                                        .where("created_at BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
-                                        .count
+      # # 3. invoice_tagihan_count
+      # invoice_tagihan_count = Taxinvoice.where('customer_id IS NOT NULL') # Use IS NOT NULL
+      #                                   .active
+      #                                   .where(office_id: office.id)
+      #                                   .where("created_at BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
+      #                                   .count
 
-        {
-          office: office,
-          omzet_office: omzet_office,
-          cashin_office: cashin_office,
-          invoice_tagihan_count: invoice_tagihan_count
-        }
-      end
+      #   {
+      #     office: office,
+      #     omzet_office: omzet_office,
+      #     cashin_office: cashin_office,
+      #     invoice_tagihan_count: invoice_tagihan_count
+      #   }
+      # end
+
+      @offices_data = []
 
       @section = "taxinvoices"
       @where = 'billings-stats'
@@ -5667,6 +5681,7 @@ end
 		
 			@taxinvoices = Taxinvoice.active
 			.where("customer_id is not null AND DATE_TRUNC('month', date) = ?", mo.beginning_of_month)
+
 			@taxinvoices.where(user_id: user_id).includes(:user).map do |taxinvoice|
 				total_bill += taxinvoice.total
 			end

@@ -203,16 +203,29 @@
 	<div class="flex" style="flex-direction: row-reverse;">
 		<div class="widget-cardo" style="width: 200px;">
 			<a href="cashins">
-				<p class="text-dark">Cash In Periode</p>
-							<% cashin_current_month = 
-								Bankexpense.joins(:taxinvoice)
-								.where(deleted: false)
-								.where(creditgroup_id: 607)
-								.where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
-								.sum(:total)
-							%>
-				<strong style="color: #12a812;"><%= to_currency(cashin_current_month) %></strong>
+			<p class="text-dark">Cash In Periode</p>
+
+			<% cashin_current_month =
+				Bankexpense.joins(:taxinvoice)
+				.where("bankexpenses.deleted = ?", false)
+				.where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
+				.where("bankexpenses.creditgroup_id = ?", 607)
+				.sum("bankexpenses.total")
+			%>
+
+			<% cashout_current_month =
+				Bankexpense.joins(:taxinvoice)
+				.where("bankexpenses.deleted = ?", false)
+				.where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
+				.where("bankexpenses.creditgroup_id IN (?)", @group_banks)
+				.sum("bankexpenses.total")
+			%>
+
+			<strong style="color: #12a812;">
+				<%= to_currency(cashin_current_month - cashout_current_month) %>
+			</strong>
 			</a>
+			<br><small>*cash in bersih sudah dikurangi biaya</small>
 		</div>
 	</div>
 
@@ -224,8 +237,8 @@
 			setting = Setting.find_by_name('User Penagihan')
 			ids = setting ? setting.value.to_s.split(',').map(&:to_i) : []
 		%>
-
-		<% User.where(id: ids).each do |user_stat| %>
+ 
+		<% User.where(id: ids).order(:id).each do |user_stat| %>
 		<% stats = @taxinvoices_global.where('user_id = ?', user_stat.id) %>
 		<div class="widget-carda">
 			<a class="check" target="_blank" href="/taxinvoices?user_id=<%= user_stat.id %>&username=<%= user_stat.username %>&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
@@ -248,17 +261,89 @@
                 .where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
                 .sum(:total)
 			%>
+			<%
+				cashout_total =
+				Bankexpense.joins(:taxinvoice)
+                .where("bankexpenses.deleted = false")
+                .where(creditgroup_id: @group_banks)
+				.where("bankexpenses.date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date)
+				.where(taxinvoices: { user_id: user_stat.id })
+				.sum('bankexpenses.total')
+			%>
 			<a style="color: #12a812; text-decoration: underline;" title="Jumlah Cash In, klik untuk ke halaman cash in" target="_blank" href="cashins?user_id=<%= user_stat.id %>&username=<%= user_stat.username %>&filterbydates=1&startdate=<%=@startdate%>&enddate=<%=@enddate%>">
-				<%= to_currency(cashin_total)%>
+				<%= to_currency(net_current = cashin_total - cashout_total)%>
 			</a>
 			</strong>
+			</div>
+ 
+			<small>Cash In Bulan Berjalan</small>
+            <br/><br/>
+
+			<div style="position: relative;">
+				<strong style="color: #1f7422;">
+				<%
+					s_date = Date.strptime(@startdate, '%d-%m-%Y')
+					prev_month = s_date.prev_month
+
+					cashin_total_prev = 
+					Bankexpense.joins(:taxinvoice)
+					.where(bankexpenses: { deleted: false })
+					.where("bankexpenses.date BETWEEN ? AND ?", prev_month.beginning_of_month, prev_month.end_of_month)
+					.where(bankexpenses: { creditgroup_id: 607 })
+					.where(taxinvoices: { user_id: user_stat.id })
+					.sum('bankexpenses.total')
+
+					omzet_total_prev =
+					Taxinvoice.active
+					.where('customer_id is not null')
+					.where('office_id is not null')
+					.where("created_at BETWEEN ? AND ?", prev_month.beginning_of_month, prev_month.end_of_month)
+					.where(user_id: user_stat.id)
+				%>
+
+				<%
+					cashout_total_prev =
+					Bankexpense.joins(:taxinvoice)
+						.where('bankexpenses.deleted = false')
+						.where(bankexpenses: { creditgroup_id: @group_banks })
+						.where("bankexpenses.date BETWEEN ? AND ?", prev_month.beginning_of_month, prev_month.end_of_month)
+						.where(taxinvoices: { user_id: user_stat.id })
+						.sum('bankexpenses.total')
+				%>
+
+				<a style="color: #1f7422; text-decoration: underline;" 
+				title="Jumlah Cash In, klik untuk ke halaman cash in" target="_blank" 
+				href="cashins?user_id=<%= user_stat.id %>&username=<%= user_stat.username %>&filterbydates=1&startdate=<%=prev_month.beginning_of_month%>&enddate=<%=prev_month.end_of_month%>">
+					<%= to_currency(net_prev = omzet_total_prev.sum(:total) - 0)%>
+				</a>
+				</strong>
 
 			</div>
 
-			<br/>
-			<small>Cash In</small>
+			<small>Omzet Bulan Sebelumnya</small>
             <br/><br/>
 
+			<%
+			percent =
+			if net_prev.to_f != 0
+				((net_current - net_prev) / net_prev.to_f) * 100
+			else
+				0
+			end
+
+			color = percent < 0 ? '#dc2626' : '#1f7422'
+			%>
+
+			<strong>
+			<span style="color: <%= color %>; text-decoration: underline;">
+				<%= number_to_percentage(percent, precision: 2) %>
+			</span>
+			</strong>
+			<br>
+			<small>Presentase Perbandingan</small>
+
+			<hr style="margin-top: 1rem; margin-bottom: 1rem;"/>
+  
 			<strong><%= stats.count %></strong>
 			<br/>
 			<small>Invoice Tagihan</small>
@@ -286,8 +371,8 @@
 		<% end %>
 	</div>
 
+	<% if @offices_data.present? %>
 	<div class="flex">
-
 	<% @offices_data.each do |data| %>
 		<% office = data[:office] %>
 		<div class="widget-carda">
@@ -311,6 +396,7 @@
 		</div>
 	<% end %>
 	</div>
+	<% end %>
 
     <div class="flex">
 		<div id="pie-chart">
