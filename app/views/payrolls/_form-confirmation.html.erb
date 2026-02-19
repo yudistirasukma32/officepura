@@ -131,6 +131,15 @@
     </tr>
 
     <tr>
+      <td>
+        Catatan Klaim:<br>
+        <div style="font-size:13px;">
+        <%=simple_format(@payroll.claim_description)%>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
       <td>Pinjaman</td>
       <td class="right" id="lblMasterBon"><%= to_currency(@payroll.master_bon) %></td>
       <td></td>
@@ -152,6 +161,15 @@
       <td></td>
       <td class="right red" id="lblPayrollSaving"><%= to_currency(@payroll.saving) %></td>
       <td class="right" id="lblTotalSaving"><%= to_currency(@payroll.master_saving.to_f - @payroll.saving_reduction.to_f + @payroll.saving.to_f)%></td>
+    </tr>
+
+    <tr>
+      <td>
+        Catatan Menabung:<br>
+        <div style="font-size:13px;">
+        <%=simple_format(@payroll.saving_description)%>
+        </div>
+      </td>
     </tr>
 
     <tr class="total-row">

@@ -209,4 +209,11 @@ class BankexpensesController < ApplicationController
     @bankexpense.update_attributes(:enabled => false)
     redirect_to(bankexpenses_url)
   end
+
+  def get_taxinvoices
+    customer_id = params[:customer_id]
+    @taxinvoices = Taxinvoice.where('customer_id = ?', customer_id).reorder('date DESC')
+    render :json => { :success => true, :html => render_to_string(:partial => "bankexpenses/taxinvoices"), :layout => false }.to_json;
+  end
+
 end

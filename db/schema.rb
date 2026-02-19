@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20251202072111) do
+ActiveRecord::Schema.define(:version => 20260207084233) do
 
   create_table "activities", :force => true do |t|
     t.integer   "trackable_id"
@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(:version => 20251202072111) do
     t.boolean   "pettycashledger",                                               :default => false
     t.boolean   "money_in"
     t.integer   "claimmemo_id"
+    t.integer   "customer_id"
   end
 
   create_table "banks", :force => true do |t|
@@ -385,6 +386,7 @@ ActiveRecord::Schema.define(:version => 20251202072111) do
     t.boolean   "pic_photo",                                                            :default => false
     t.boolean   "approved",                                                             :default => false
     t.integer   "office_id"
+    t.integer   "related_customer_id"
   end
 
   create_table "driverexpenses", :force => true do |t|
@@ -419,6 +421,8 @@ ActiveRecord::Schema.define(:version => 20251202072111) do
     t.text      "response"
     t.integer   "vehicle_id"
     t.boolean   "approved",                 :default => false
+    t.string    "longitude"
+    t.string    "latitude"
   end
 
   create_table "drivers", :force => true do |t|
@@ -464,6 +468,7 @@ ActiveRecord::Schema.define(:version => 20251202072111) do
     t.string    "email"
     t.string    "app_version"
     t.string    "device_type"
+    t.string    "onesignal_id"
   end
 
   create_table "eventcleaningmemos", :force => true do |t|
@@ -789,6 +794,10 @@ ActiveRecord::Schema.define(:version => 20251202072111) do
     t.integer   "second_isotank_id"
     t.integer   "marketing_id"
     t.string    "app_status"
+    t.string    "load_longitude"
+    t.string    "load_latitude"
+    t.string    "unload_longitude"
+    t.string    "unload_latitude"
   end
 
   add_index "invoices", ["date", "customer_id", "event_id", "invoicetrain"], :name => "invoice_events"
@@ -1016,6 +1025,8 @@ ActiveRecord::Schema.define(:version => 20251202072111) do
     t.integer   "office_id"
     t.decimal   "bonus",                             :precision => 19, :scale => 2, :default => 0.0
     t.decimal   "helper_fee",                        :precision => 19, :scale => 2, :default => 0.0
+    t.text      "claim_description"
+    t.text      "saving_description"
   end
 
   create_table "ports", :force => true do |t|

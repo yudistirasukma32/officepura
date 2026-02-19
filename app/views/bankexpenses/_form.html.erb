@@ -73,6 +73,28 @@
   </div>
 
   <div class="field-row">
+    <%= f.label :customer_id, "Pelanggan" %>
+    <select id="bankexpense_customer_id" name="bankexpense[customer_id]" class="double chzn-select" onchange="javascript:getTaxinvoicesByCustomerForBank(this.value);">
+        <option value="0">- Pilih Pelanggan -</option>
+        <%
+          cust_kosongan = Customer.active.where("name ~* '.*PURA.*' or name ~* '.*RDPI.*' or name ~* '.*RAJAWALI INTI.*'").pluck(:id)
+          @customers = Customer.active.where('id NOT IN (?)', cust_kosongan).order(:name)
+        %>
+        <% @customers.order(:name).each do |customer| %>
+        <option value="<%=customer.id%>" <% if customer.id == @bankexpense.customer_id %> selected="selected" <% end %>><%=customer.name%> - <%=customer.city.upcase rescue nil%></option>
+        <% end %>
+    </select>
+  </div>
+
+  <div id="div_taxinvoice">
+    <div class="field-row">
+      <%= f.label :taxinvoice_id, "Tagihan" %>
+      <input type="text" class="double disabled" value="<%= !@bankexpense.taxinvoice_id.nil? ? @bankexpense.taxinvoice.long_id.to_s : 'Harap memilih pelanggan terlebih dahulu.' %>" />
+      <%= f.hidden_field :taxinvoice_id, :value => @bankexpense.taxinvoice_id %>
+    </div>
+  </div>
+
+  <div class="field-row">
     <%= f.label :date, "Tanggal" %>
     <%= f.text_field :date, :class => 'half date-picker' %>
   </div>

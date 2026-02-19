@@ -1188,6 +1188,20 @@ function getSentDateLog() {
   });
 }
 
+function getTaxinvoicesByCustomerForBank(customer_id) {
+  $.ajax({
+    type: "GET",
+    url: "/bankexpenses/get_taxinvoices/" + customer_id,
+    success: function (data) {
+      $("#div_taxinvoice").html(data.html);
+      $(".chzn-select").chosen();
+    },
+    failure: function () {
+      alert("Error. Mohon refresh browser Anda.");
+    },
+  });
+}
+
 function getTaxinvoicesByCustomer(customer_id) {
   $.ajax({
     type: "GET",

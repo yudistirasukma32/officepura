@@ -269,6 +269,8 @@ OfficePuraErp::Application.routes.draw do
   get 'bankexpenses/getbankexpensegroupdebit/:group_id' => 'bankexpenses#getbankexpensegroupdebit'
   get 'bankexpenses/getbankexpensegroupcredit/:group_id' => 'bankexpenses#getbankexpensegroupcredit'
 
+  get 'bankexpenses/get_taxinvoices/:customer_id' => 'bankexpenses#get_taxinvoices'
+
   get 'events/get_event_by_customer/:customer_id' =>'events#get_event_by_customer'
   get 'events/getdodetail' => 'events#getdodetail'
 
@@ -858,6 +860,7 @@ OfficePuraErp::Application.routes.draw do
 
   match 'payrolls/getdrivers/:type' => 'payrolls#getdrivers'
   match 'payrolls/getdriverdata/:type/:id' => 'payrolls#getdriverdata'
+  get 'payrolls/download_excel' => 'payrolls#download_excel'
 
   resources :payrolls do
     member do

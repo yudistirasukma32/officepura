@@ -1,0 +1,9 @@
+<div class="field-row">
+	<label for="taxinvoice_id">Tagihan</label>
+	<select id="bankexpenses_taxinvoice_id" name="bankexpense[taxinvoice_id]" class="double combo_route chzn-select">
+		<option>- Tagihan -</option>
+		<% @taxinvoices.each do |taxinvoice| %>
+		<option value="<%=taxinvoice.id%>"><%=taxinvoice.long_id%></option>
+		<% end %>
+	</select>
+</div>

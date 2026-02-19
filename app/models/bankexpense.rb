@@ -13,10 +13,13 @@ class Bankexpense < ActiveRecord::Base
 	belongs_to :bankinvoice
 	belongs_to :claimmemo
 
+	belongs_to :customer
+
 	has_many :bankexpenses
 
 	attr_accessible :enabled, :deleted, :date, :description, :debitgroup_id, :creditgroup_id, :taxinvoice_id, :total, :office_id, :deleteuser_id, :bankexpense_id, :productrequest_id, 
-					:assetorder_id, :assetpayment_id, :money_in, :bankledger, :pettycashledger, :claimmemo_id
+					:assetorder_id, :assetpayment_id, :money_in, :bankledger, :pettycashledger, :claimmemo_id,
+					:customer_id
 
   scope :active, lambda {where(:enabled => true, :deleted => false)}
 

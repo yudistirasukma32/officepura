@@ -14,7 +14,13 @@ class PayrollsController < ApplicationController
 	    @month = "%02d" % Date.today.month.to_s if @month.nil?
 	    @year = params[:year]
 	    @year = Date.today.year if @year.nil?
-	    @payrolls = Payroll.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}")
+	    # @payrolls = Payroll.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}")
+		@payrolls = Payroll
+		.joins(:driver)
+		.where("to_char(date, 'MM-YYYY') = ?", "#{@month}-#{@year}")
+		.order("drivers.name ASC")
+		.includes(:driver)
+
 	    respond_to :html
 	end
 
@@ -86,6 +92,9 @@ class PayrollsController < ApplicationController
 		@payroll.total = @payroll.non_holidays_payment + @payroll.holidays_payment + @payroll.saving_reduction + @payroll.bonus + @payroll.helper_fee - @payroll.weight_loss - @payroll.accident - @payroll.sparepart - @payroll.bon - @payroll.saving - @payroll.allowance
 
 		@payroll.user_id = current_user.id
+
+		@payroll.claim_description = inputs[:claim_description]
+		@payroll.saving_description = inputs[:saving_description]
 
 		if @payroll.save
 			redirect_to(confirmation_payroll_url(@payroll), :notice => 'Data BKK Supir sukses ditambah')
@@ -159,6 +168,9 @@ class PayrollsController < ApplicationController
 		@payroll.total = @payroll.non_holidays_payment + @payroll.holidays_payment + @payroll.saving_reduction + @payroll.helper_fee + @payroll.bonus - @payroll.weight_loss - @payroll.accident - @payroll.sparepart - @payroll.bon - @payroll.saving - @payroll.allowance
 
 		@payroll.user_id = current_user.id
+
+		@payroll.claim_description = inputs[:claim_description]
+		@payroll.saving_description = inputs[:saving_description]
 
 		if @payroll.save
 			redirect_to(confirmation_payroll_url(@payroll), :notice => 'Data BKK Supir sukses ditambah')
