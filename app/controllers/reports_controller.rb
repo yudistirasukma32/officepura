@@ -6091,7 +6091,7 @@ end
       @customer_datas = customer_datas.group_by { |c| c[:office_id] }
 
       @section = "taxinvoices"
-      @where   = 'ar_aging'
+      @where   = 'ar_aging_offices'
     else
       redirect_to root_path
     end
