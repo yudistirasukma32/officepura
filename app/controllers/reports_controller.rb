@@ -6002,15 +6002,15 @@ end
       piutang_per_customer = @taxinvoices_unpaid.group(:customer_id).sum(:total)
       downpayment_per_customer = @taxinvoices_unpaid.group(:customer_id).sum(:downpayment)
       
-latest_unpaid_aging = {}
+      latest_unpaid_aging = {}
 
-grouped = {}
-@taxinvoices_unpaid.includes(:customer).order("date ASC").each do |inv|
-  grouped[inv.customer_id] ||= []
-  grouped[inv.customer_id] << inv
-end
+      grouped = {}
+      @taxinvoices_unpaid.includes(:customer).order("date ASC").each do |inv|
+        grouped[inv.customer_id] ||= []
+        grouped[inv.customer_id] << inv
+      end
 
-grouped.each do |customer_id, invoices|
+      grouped.each do |customer_id, invoices|
 
         latest_inv = invoices.detect { |inv| inv.sentdate.present? }
         next unless latest_inv
@@ -6089,6 +6089,135 @@ grouped.each do |customer_id, invoices|
       end
 
       @customer_datas = customer_datas.group_by { |c| c[:office_id] }
+
+      @section = "taxinvoices"
+      @where   = 'ar_aging'
+    else
+      redirect_to root_path
+    end
+  end
+
+  def ar_aging_users
+    @pagetitle = 'Umur Piutang Pelanggan'
+
+    role = cek_roles 'Admin Keuangan, Estimasi, Admin Penagihan'
+    if role
+      @beginning_of_year = Date.new(Date.today.year, 1, 1)
+      @startdate = params[:startdate].present? ? Date.parse(params[:startdate]) : @beginning_of_year
+      @enddate   = params[:enddate].present?   ? Date.parse(params[:enddate])   : Date.today.end_of_month
+
+      @number_of_months = ((@enddate.year * 12 + @enddate.month) - (@beginning_of_year.year * 12 + @beginning_of_year.month)) + 1
+
+      # 1. Invoices Base
+      @taxinvoices = Taxinvoice.active.joins(:customer).where(:date => @startdate..@enddate)
+      @taxinvoices_unpaid = @taxinvoices.where(:paiddate => nil)
+
+      @customer_id = params[:customer_id]
+      @taxinvoices = @taxinvoices.where(:customer_id => @customer_id) if @customer_id.present?
+
+      # 2. Ambil kombinasi unik user_id dan customer_id dari taxinvoices (Ruby 1.9 style)
+      user_customer_pairs = @taxinvoices.select("taxinvoices.user_id, taxinvoices.customer_id").map { |ti| [ti.user_id, ti.customer_id] }.uniq
+
+      # 3. Customers data
+      customer_ids = user_customer_pairs.map { |pair| pair[1] }.uniq
+      @customers = Customer.active.where(:id => customer_ids).includes(:customernotes)
+      customers_dict = {}
+      @customers.each { |c| customers_dict[c.id] = c }
+
+      # 4. Aggregated values dengan group multi-column
+      omzet_per_group   = @taxinvoices.group("taxinvoices.user_id", "taxinvoices.customer_id").sum(:total)
+      piutang_per_group = @taxinvoices_unpaid.group("taxinvoices.user_id", "taxinvoices.customer_id").sum(:total)
+      downpayment_per_group = @taxinvoices_unpaid.group("taxinvoices.user_id", "taxinvoices.customer_id").sum(:downpayment)
+      
+      latest_unpaid_aging = {}
+      grouped_invoices = {}
+      @taxinvoices_unpaid.includes(:customer).order("date ASC").each do |inv|
+        key = [inv.user_id, inv.customer_id]
+        grouped_invoices[key] ||= []
+        grouped_invoices[key] << inv
+      end
+
+      grouped_invoices.each do |key, invoices|
+        latest_inv = invoices.detect { |inv| inv.sentdate.present? }
+        next unless latest_inv
+
+        sentdate = latest_inv.sentdate
+        terms    = latest_inv.customer.terms_of_payment_in_days.to_i
+        due_date = sentdate + terms.days
+        aging_value = (Date.today - due_date).to_i
+        aging_value = 0 if aging_value < 0
+        latest_unpaid_aging[key] = aging_value
+      end
+
+      # 5. Cashin grouping per user & customer
+      cashin_per_group = Bankexpense.
+        joins(:taxinvoice).
+        where(:creditgroup_id => 607).
+        where("bankexpenses.deleted = ? AND bankexpenses.date BETWEEN ? AND ?", false, @startdate, @enddate).
+        group("taxinvoices.user_id", "taxinvoices.customer_id").
+        sum("bankexpenses.total")  
+
+      @grandtotal_omzet   = 0
+      @grandtotal_piutang = 0
+      @grandtotal_cashin  = 0
+
+      # 6. Build result
+      customer_datas = []
+      user_customer_pairs.each do |pair|
+        user_id = pair[0]
+        cust_id = pair[1]
+        customer = customers_dict[cust_id]
+        next unless customer
+
+        pair_key = [user_id, cust_id]
+
+        omzet         = omzet_per_group[pair_key] || 0
+        total_piutang = piutang_per_group[pair_key].to_f
+        downpayment   = downpayment_per_group[pair_key].to_f
+        piutang       = total_piutang - downpayment
+        cashin        = cashin_per_group[pair_key] || 0
+        aging         = latest_unpaid_aging[pair_key].to_i
+        
+        kontrol       = omzet * 0.3 # 30 / 100
+        rata2_omzet   = omzet / @number_of_months.to_f
+        rata2_piutang = piutang / @number_of_months.to_f
+        limit_piutang = rata2_omzet > 0 ? (rata2_piutang / rata2_omzet * cashin) : 0
+
+        @grandtotal_omzet   += omzet
+        @grandtotal_piutang += piutang
+        @grandtotal_cashin  += cashin
+
+        customer_datas << {
+          :user_id => user_id,
+          :customer_id => customer.id,
+          :office_id => customer.office_id,
+          :name => customer.name,
+          :city => (customer.city ? customer.city.upcase : ""),
+          :total_omzet => omzet,
+          :total_piutang => piutang,
+          :kontrol_piutang => kontrol,
+          :cashin => cashin,
+          :umur_piutang => aging.round,
+          :limit_piutang => limit_piutang,
+          :rata2_omzet => rata2_omzet,
+          :rata2_piutang => rata2_piutang,
+          :jumlah_bulan => @number_of_months,
+          :customer_notes => customer.customernotes.enabled.where('taxinvoice_id is null').order('created_at DESC').map { |note|
+            {
+              :id => note.id,
+              :description => note.description,
+              :user_id => note.user_id,
+              :created_at => note.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            }
+          }
+        }
+      end
+
+      # Urutkan berdasarkan nama
+      customer_datas = customer_datas.sort_by { |c| c[:name].to_s }
+
+      # Grouping akhir berdasarkan user_id (Bukan office_id lagi)
+      @customer_datas = customer_datas.group_by { |c| c[:user_id] }
 
       @section = "taxinvoices"
       @where   = 'ar_aging'
