@@ -373,6 +373,32 @@ module ApplicationHelper
 		end
 	end	
 
+	# First taxinvoiceitem (nil-safe)
+	def invoice_first_taxitem(invoice)
+		invoice.taxinvoiceitems.to_a.first
+	end
+
+	# Taxitem user (first taxitem user)
+	def taxitem_user_username(invoice)
+		invoice_first_taxitem(invoice)&.user&.username
+	end
+
+	# Susut (difference) and helper to format with sign class
+	def invoice_susut_value(invoice)
+		ti = invoice_first_taxitem(invoice)
+		if ti
+		(ti.weight_net.to_i - ti.weight_gross.to_i)
+		else
+		(invoice.weight_net.to_i - invoice.weight_gross.to_i) rescue 0
+		end
+	end
+
+	def invoice_susut_display(invoice)
+		v = invoice_susut_value(invoice)
+		klass = v < 0 ? 'red' : 'green'
+		[v.abs, klass]
+	end
+
 	def moneytowordsrupiah(val)
 		scaleNumber = ["", "ribu", "juta", "milyar"]
 		currencyText = "rupiah"
