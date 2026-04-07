@@ -41,9 +41,43 @@
   </tr>
   <% end %>
   <tr>
-    <td>Pelanggan</td>
-    <td><%= @invoice.customer.name rescue nil %></td>
-  </tr>
+      <td>Pelanggan</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:10px;">
+          
+          <!-- Text View -->
+          <span id="customer_text">
+            <%= @invoice.customer.name %>
+          </span>
+
+          <!-- Select Edit (Hidden dulu) -->
+          <div class="field-row first" id="customer_field" style="display:none;">
+            <select id="invoice_customer_idx"
+                    name="invoice[customer_id]"
+                    class="double">
+              <option value="">- Nama Pelanggan -</option>
+              <% Customer.active.order(:name).each do |customer| %>
+                <option value="<%= customer.id %>"
+                  <%= customer.id == @invoice.customer_id ? 'selected' : '' %>>
+                  <%= customer.name %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+
+          <!-- Edit Button -->
+          <% if checkrole 'Admin Penagihan' || current_user.owner %>
+          <span>
+            <a href="#" id="customer_edit_btn" title="Klik untuk edit nama pelanggan. Nama Pelanggan pada Surat Jalan & BKK akan berubah." 
+            style="color: grey; font-size: 0.7rem;" onclick="toggleCustomerEdit(event)">Edit</a>
+          </span>
+          <% end %>
+
+        </div>
+      </td>
+    </tr>
+
+
 <% if @invoice.invoicetrain %>
   <tr>
       <td>Jurusan Muat</td>
@@ -344,6 +378,7 @@
 <% if @invoice.taxinvoiceitems.any? %>
 
 <form id="taxinvoiceitems" name="taxinvoiceitems" action="/taxinvoiceitems/updateitems" method="post">
+  <input type="hidden" id="customer_id" name="taxinvoiceitems[customer_id]" value="<%=@invoice.customer_id%>" />
   <input type="hidden" id="price_per" name="taxinvoiceitems[price_per]" value="<%=@invoice.price_per%>" />
   <input type="hidden" id="price_per_new" name="taxinvoiceitems[price_per_new]" value="<%=@invoice.price_per%>" />
   <input type="hidden" name="taxinvoiceitems[invoice_id]" value="<%=@invoice.id%>" />
@@ -448,3 +483,58 @@
 <% end %>
 
 <% end %>
+
+
+<script>
+function showCustomerEdit(e) {
+  e.preventDefault();
+
+  document.getElementById("customer_text").style.display = "none";
+  document.getElementById("customer_field").style.display = "block";
+}
+
+ 
+function toggleCustomerEdit(e) {
+  e.preventDefault();
+
+  const text = document.getElementById("customer_text");
+  const field = document.getElementById("customer_field");
+  const btn = document.getElementById("customer_edit_btn");
+
+  if (field.style.display === "none" || field.style.display === "") {
+    // Show Edit Mode
+    text.style.display = "none";
+    field.style.display = "block";
+    btn.innerText = "Cancel";
+  } else {
+    // Back to View Mode
+    text.style.display = "block";
+    field.style.display = "none";
+    btn.innerText = "Edit";
+  }
+}
+ 
+document.addEventListener("DOMContentLoaded", function() {
+  const dropdown = document.getElementById("invoice_customer_id");
+  const hidden = document.getElementById("customer_id");
+
+  if (dropdown && hidden) {
+    dropdown.addEventListener("change", function() {
+      hidden.value = this.value;
+    });
+  }
+}); 
+
+ 
+document.addEventListener("DOMContentLoaded", function() {
+  const dropdown = document.getElementById("invoice_customer_idx");
+  const hidden = document.getElementById("customer_id");
+
+  if (dropdown && hidden) {
+    dropdown.addEventListener("change", function() {
+      hidden.value = this.value;
+      console.log("Hidden updated:", this.value); // debug
+    });
+  }
+});
+</script>

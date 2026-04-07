@@ -218,7 +218,10 @@ class TaxinvoiceitemsController < ApplicationController
           item.price_per = @invoice.price_per.to_f
           item.total = item.price_per.to_f >= 300000 ? item.price_per.to_f : item.price_per.to_f * item.weight_net
           item.office_id = @invoice.office_id
-          item.customer_id = @invoice.customer_id
+          
+          # item.customer_id = @invoice.customer_id
+          item.customer_id = inputs["customer_id"]
+
           item.wholesale_price = inputs["wholesale_price"].to_f
           item.user_id = current_user.id
 
@@ -230,6 +233,11 @@ class TaxinvoiceitemsController < ApplicationController
           
           item.save
         end
+      end
+
+      if @invoice.customer_id != inputs["customer_id"]
+        @invoice.customer_id = inputs["customer_id"].to_i
+        @invoice.save
       end
 
       # recount event stats
