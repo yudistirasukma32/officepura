@@ -3555,7 +3555,7 @@ function getOmzetPenagihan() {
             type: "line",
             fontFamily: "inherit",
             height: 240,
-            width: 170,
+            width: 200,
             animations: {
               enabled: true,
             },
@@ -3612,7 +3612,7 @@ function getOmzetPenagihan() {
             type: "line",
             fontFamily: "inherit",
             height: 240,
-            width: 170,
+            width: 200,
             animations: {
               enabled: true,
             },
@@ -3668,7 +3668,7 @@ function getOmzetPenagihan() {
             type: "line",
             fontFamily: "inherit",
             height: 240,
-            width: 170,
+            width: 200,
             animations: {
               enabled: true,
             },
@@ -3725,7 +3725,7 @@ function getOmzetPenagihan() {
             type: "line",
             fontFamily: "inherit",
             height: 240,
-            width: 170,
+            width: 200,
             animations: {
               enabled: true,
             },
@@ -3782,7 +3782,7 @@ function getOmzetPenagihan() {
             type: "line",
             fontFamily: "inherit",
             height: 240,
-            width: 170,
+            width: 200,
             animations: {
               enabled: true,
             },
@@ -3832,6 +3832,179 @@ function getOmzetPenagihan() {
         var chart = new ApexCharts($("#chart-omzet-151")[0], options);
         chart.render();
       }
+
+      if (window.ApexCharts) {
+        var options = {
+          chart: {
+            type: "line",
+            fontFamily: "inherit",
+            height: 240,
+            width: 200,
+            animations: {
+              enabled: true,
+            },
+          },
+          stroke: {
+            width: 4,
+            curve: "smooth", // Makes the line smooth
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          series: [
+            {
+              name: "Omzet",
+              data: data.users.omzet_178, // Data for each month
+            },
+          ],
+          tooltip: {
+            theme: "light",
+            x: {
+              formatter: function (value) {
+                return value; // Keeps the month-year format in tooltip
+              },
+            },
+          },
+          grid: {
+            strokeDashArray: 4,
+          },
+          xaxis: {
+            categories: data.month_text,
+            labels: {
+              rotate: -45, // Rotates labels for better readability
+            },
+            type: "category",
+          },
+          yaxis: {
+            labels: {
+              padding: 2,
+            },
+          },
+          colors: ["#14a714"],
+          legend: {
+            show: false,
+          },
+        };
+
+        var chart = new ApexCharts($("#chart-omzet-178")[0], options);
+        chart.render();
+      }
+
+      if (window.ApexCharts) {
+        var options = {
+          chart: {
+            type: "line",
+            fontFamily: "inherit",
+            height: 240,
+            width: 200,
+            animations: {
+              enabled: true,
+            },
+          },
+          stroke: {
+            width: 4,
+            curve: "smooth", // Makes the line smooth
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          series: [
+            {
+              name: "Omzet",
+              data: data.users.omzet_179, // Data for each month
+            },
+          ],
+          tooltip: {
+            theme: "light",
+            x: {
+              formatter: function (value) {
+                return value; // Keeps the month-year format in tooltip
+              },
+            },
+          },
+          grid: {
+            strokeDashArray: 4,
+          },
+          xaxis: {
+            categories: data.month_text,
+            labels: {
+              rotate: -45, // Rotates labels for better readability
+            },
+            type: "category",
+          },
+          yaxis: {
+            labels: {
+              padding: 2,
+            },
+          },
+          colors: ["#14a714"],
+          legend: {
+            show: false,
+          },
+        };
+
+        var chart = new ApexCharts($("#chart-omzet-179")[0], options);
+        chart.render();
+      }
+
+      if (window.ApexCharts) {
+        var options = {
+          chart: {
+            type: "line",
+            fontFamily: "inherit",
+            height: 240,
+            width: 200,
+            animations: {
+              enabled: true,
+            },
+          },
+          stroke: {
+            width: 4,
+            curve: "smooth", // Makes the line smooth
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          series: [
+            {
+              name: "Omzet",
+              data: data.users.omzet_181, // Data for each month
+            },
+          ],
+          tooltip: {
+            theme: "light",
+            x: {
+              formatter: function (value) {
+                return value; // Keeps the month-year format in tooltip
+              },
+            },
+          },
+          grid: {
+            strokeDashArray: 4,
+          },
+          xaxis: {
+            categories: data.month_text,
+            labels: {
+              rotate: -45, // Rotates labels for better readability
+            },
+            type: "category",
+          },
+          yaxis: {
+            labels: {
+              padding: 2,
+            },
+          },
+          colors: ["#14a714"],
+          legend: {
+            show: false,
+          },
+        };
+
+        var chart = new ApexCharts($("#chart-omzet-181")[0], options);
+        chart.render();
+      }
+
+      //Pie
 
       if (window.ApexCharts) {
         var options = {

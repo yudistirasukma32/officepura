@@ -11,12 +11,85 @@
             margin-bottom: 1.5rem;
         }
 
+        /* Maksimal 4 kartu per baris (override lebar tetap .widget-carda di dalam grid) */
+        .flex-max-4 {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .flex-max-4 .widget-carda {
+            width: auto;
+            min-width: 0;
+        }
+
+        /* User Penagihan: max 4/baris; baris tak penuh rata kanan */
+        .flex-max-4-users {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .flex-max-4-users .widget-carda {
+            box-sizing: border-box;
+            width: calc((100% - 3rem) / 4);
+            max-width: calc((100% - 3rem) / 4);
+            flex: 0 0 calc((100% - 3rem) / 4);
+            min-width: 0;
+        }
+
+        @media (max-width: 1100px) {
+            .flex-max-4 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .flex-max-4-users .widget-carda {
+                width: calc((100% - 2rem) / 3);
+                max-width: calc((100% - 2rem) / 3);
+                flex: 0 0 calc((100% - 2rem) / 3);
+            }
+        }
+
+        @media (max-width: 800px) {
+            .flex-max-4 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .flex-max-4-users .widget-carda {
+                width: calc((100% - 1rem) / 2);
+                max-width: calc((100% - 1rem) / 2);
+                flex: 0 0 calc((100% - 1rem) / 2);
+            }
+        }
+
+        @media (max-width: 520px) {
+            .flex-max-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .flex-max-4-users .widget-carda {
+                width: 100%;
+                max-width: 100%;
+                flex: 0 0 100%;
+            }
+        }
+
 		.mb-0 {
 			margin-bottom: 0;
 		}
 
+		.widget-card-stat {
+            width: 250px;
+            padding: 0.8rem;
+            background: #f0f0f0;
+            text-align: center;
+        }
+
         .widget-cardo {
-            width: 200px; 
+            width: auto;
             padding: 0.8rem;
             background: #f0f0f0;
             text-align: center;
@@ -30,12 +103,12 @@
 			position: relative;
         }
 
-        .widget-cardo p, .widget-carda p {
+        .widget-card-stat p, .widget-cardo p, .widget-carda p {
             margin-top: 0;
             padding-bottom: 0;
         }
 
-        .widget-cardo strong, .widget-carda strong {
+        .widget-card-stat strong, .widget-cardo strong, .widget-carda strong {
             font-size: 1.25rem;
             color: #1e1e1e;
         }
@@ -86,7 +159,7 @@
 			position: absolute;
 			right: 0;
 			top: 0;
-			margin-right: 20px;
+			margin-right: 0;
 			padding: 5px;
 			/* border: 1px dotted grey; */
 			/* border-radius: 50%; */
@@ -134,13 +207,13 @@
 	</div>
 
 	<div class="flex">
-		<div class="widget-cardo">
+		<div class="widget-card-stat">
 			<p class="text-dark">Pelanggan Tertagih</p>
 			<strong><%= @this_month_taxinvoices.pluck(:customer_id).uniq.count %></strong>
 			<br/>
 			<small>*bulan ini</small>
 		</div>
-		<div class="widget-cardo">
+		<div class="widget-card-stat">
 			<a href="#">
 				<p class="text-dark">Pembuatan Invoice</p>
 				<strong><%= @this_month_taxinvoices.count %></strong>
@@ -148,7 +221,7 @@
 			<br/>
 			<small>*bulan ini</small>
 		</div>
-		<div class="widget-cardo">
+		<div class="widget-card-stat">
 			<a href="#">
 				<p class="text-dark">Pengiriman Invoice</p>
 				<strong><%= @this_month_taxinvoices.where('sentdate is not null').where('sentdate >= ? AND sentdate <= ?', @startdate.to_date,@enddate.to_date).count %></strong>
@@ -156,7 +229,7 @@
 			<br/>
 			<small>*bulan ini</small>
 		</div>
-		<div class="widget-cardo">
+		<div class="widget-card-stat">
 			<a href="#">
 				<p class="text-dark">Piutang Berjalan </p>
 				<strong><%= to_currency(@total_current_ar) %></strong>
@@ -164,7 +237,7 @@
 			<br/>
 			<small>*dari Januari 2022</small>
 		</div>
-        <div class="widget-cardo">
+        <div class="widget-card-stat">
 			<a href="cashins">
 				<p class="text-dark">Cash In</p>
 				<strong><%= to_currency(@cashin_current_month) %></strong>
@@ -200,7 +273,7 @@
 		</div>
 	</div>
 
-	<div class="flex" style="flex-direction: row-reverse;">
+	<div class="flex-max-4" style="direction: rtl;">
 		<div class="widget-cardo" style="width: 200px;">
 			<a href="cashins">
 			<p class="text-dark">Cash In Periode</p>
@@ -231,7 +304,7 @@
 
 	<!-- User Penagihan -->
 
-	<div class="flex">
+	<div class="flex-max-4-users">
 
 		<%
 			setting = Setting.find_by_name('User Penagihan')
@@ -362,9 +435,10 @@
  
 	</div>
 
-	<div class="flex" id="chart-omzet-penagihan">
-		<% ids.each do |user_id| %>
-			<div id="chart-omzet-<%=user_id%>" class="widget-carda">
+	<div class="flex-max-4" id="chart-omzet-penagihan">
+		<% User.where(id: ids).order(:id).each do |user_stat| %>
+			<div id="chart-omzet-<%=user_stat.id%>" class="widget-carda">
+			<p><%= user_stat.username.capitalize %></p>
 			<div class="loader marketing-u d-block" style="margin:3rem auto 3rem auto;"></div>
 			<small>Total omzet 3 bulan terakhir dalam juta</small>
 			</div>
