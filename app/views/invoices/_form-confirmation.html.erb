@@ -78,6 +78,14 @@
           <td>Pelanggan</td>
           <td id="strCustomer"><%=@invoice.customer.name%></td>
         </tr>
+
+        <% if @invoice.event_id.present? && @invoice.event_id != 0 %>
+          <tr>
+            <td width="120">DO</td>
+            <td><span id="strDO"><a id="" style="" href="/events/<%=@invoice.event_id%>/edit" target="_blank"><%=@invoice.event_id%> (<%=@invoice.event.summary%>)</a></span></td>
+          </tr>
+        <% end %>
+
         <tr>
           <td>Jurusan</td>
           <td>
@@ -209,10 +217,20 @@
       <!-- Jarak -->
       <% if @invoice.route.distance.present? %>
       <tr>
+        <td style="padding-top: 1.5rem;">
+          <strong>Informasi</strong>
+        </td>
+      </tr>
+      <tr>
         <td>Jarak</td>
         <td><%= @invoice.route.distance rescue nil %> km</td>
       </tr>
       <% else %>
+      <tr>
+        <td style="padding-top: 1.5rem;">
+          <strong>Informasi</strong>
+        </td>
+      </tr>
       <tr>
         <td>Jarak</td>
         <td>
