@@ -1,1429 +1,290 @@
 <%= render "shared/header" %>
 
-<%= content_for :css do %>	 
-	<style>
-		#main #filter {
-			height: 44px;
-		}
+<%= content_for :css do %>
+  <style>
+    #main #filter {
+      height: 44px;
+    }
 
-        .flex {
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
+    .flex {
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
 
-        .widget-cardo {
-            width: 100px; 
-            padding: 0.8rem;
-            background: #f0f0f0;
-            text-align: center;
-        }
+    .widget-cardo {
+      width: 100px;
+      padding: 0.8rem;
+      background: #f0f0f0;
+      text-align: center;
+    }
 
-        .widget-cardo p {
-            margin-top: 0;
-            padding-bottom: 0;
-        }
+    .widget-cardo p {
+      margin-top: 0;
+      padding-bottom: 0;
+    }
 
-        .widget-cardo strong {
-            font-size: 1.25rem;
-            color: #1e1e1e;
-        }
-	</style>
+    .widget-cardo strong {
+      font-size: 1.25rem;
+      color: #1e1e1e;
+    }
+  </style>
 <% end %>
 
 <div id="nav">
-	<%= render "shared/nav" %>
+  <%= render "shared/nav" %>
 </div>
 
 <div id="main">
+  <div id="content-full">
+    <a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
 
-	<div id="content-full">
-	<a class="print btn" href="javascript:print();"><i class="icon-print"></i> Print</a>
-	
-	<h1><%=Setting.find_by_name("Client Name").value%> / Laporan Cabang: <span class="red"><%=@startdate.to_date.strftime('%d %b %Y')%> - <%=@enddate.to_date.strftime('%d %b %Y')%></span></h1>
+    <h1><%= Setting.find_by_name("Client Name").value %> / Laporan Cabang: <span class="red"><%= @startdate.to_date.strftime('%d %b %Y') %> - <%= @enddate.to_date.strftime('%d %b %Y') %></span></h1>
 
-	<br class="clearfix" />
+    <br class="clearfix" />
 
-	<div id="filter">
-		<form id="filterform" name="filterform" action="" method="get">
-		<div class="field-row continue">
+    <div id="filter">
+      <form id="filterform" name="filterform" action="" method="get">
+        <div class="field-row continue">
+          <label for="startdate" style="width: 50px;"/>Tgl Awal</label>
+          <input type="text" name="startdate" class="left half date-picker" value="<%= @startdate %>" style="width: 80px;"/>
+          <label for="enddate" class="middle" style="width: 40px;"/>Akhir</label>
+          <input type="text" name="enddate" class="left half date-picker" value="<%= @enddate %>" style="width: 80px;  margin-right: 10px;"/>
 
-            <label for="startdate" style="width: 50px;"/>Tgl Awal</label>
-			<input type="text" name="startdate" class="left half date-picker" value="<%=@startdate%>" style="width: 80px;"/>
-			<label for="enddate" class="middle" style="width: 40px;"/>Akhir</label>
-			<input type="text" name="enddate" class="left half date-picker" value="<%=@enddate%>" style="width: 80px;  margin-right: 10px;"/>
+          <label for="transporttype" class="middle" style="width: 50px; padding: 0 10px 0 5px;">Tipe DO</label>
+          <select name="transporttype" class="short left combo_route" style="margin-right: 15px;">
+            <option value="all">Semua Tipe</option>
+            <% ["STANDART", "KERETA", "RORO", "LOSING"].each do |type| %>
+              <option <%= type == params[:transporttype] ? 'selected' : '' %>><%= type %></option>
+            <% end %>
+          </select>
 
-			<label for="transporttype"  class="middle" style="width: 50px; padding: 0 10px 0 5px;">Tipe DO</label>
-			<select name="transporttype" class="short left combo_route "  style="margin-right: 15px;">	
-			<option value="all">Semua Tipe</option>
-				<% ["STANDART","KERETA","RORO","LOSING"].each do |type| %>
-				<option <%= type == params[:transporttype] ? 'selected' : '' %>><%=type%></option>
-				<% end %>
-			</select>
-			<label for="tanktype" class="middle" style="width: 40px;padding: 0 10px 0 5px;">Group</label>
-			<select name="tanktype" class="short left combo_route" style="margin-right: 15px;">	
-			<option value="all">Semua Group</option>
-				<% # ["Platform", "Lorry", "Multifungsi", "Box", "Threeway", "Wings Box", "LossBak", "Gandengan", "Trailer Platform", "Engkel"].each do |type| %>
-				<% ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI'].each do |type| %>
-				<option <%= type == params[:tanktype] ? 'selected' : '' %>><%=type%></option>
-				<% end %>
-			</select>
+          <label for="tanktype" class="middle" style="width: 40px;padding: 0 10px 0 5px;">Group</label>
+          <select name="tanktype" class="short left combo_route" style="margin-right: 15px;">
+            <option value="all">Semua Group</option>
+            <% ['ISOTANK', 'LOSBAK', 'DROPSIDE', 'TANGKI BESI', 'TANGKI STAINLESS', 'KONTAINER STANDART', 'KONTAINER OPENSIDE', 'TRUK BOX', 'MULTIFUNGSI'].each do |type| %>
+              <option <%= type == params[:tanktype] ? 'selected' : '' %>><%= type %></option>
+            <% end %>
+          </select>
 
-			<div style="position: relative; width: fit-content; float: left;">
-				<label for="commodity_id" style="width: 64px;">Komoditas</label>
-				<select name="commodity_id" class="third left" style="margin-right: 15px;">	
-				<option value="">Semua Komoditas</option>
-				<% Commodity.active.order(:name).each do |comodity| %>
-					<option value="<%= comodity.id %>"<% if comodity.id == @commodity_id.to_i %> selected='selected'<% end %>><%= comodity.name %></option>
-				<% end %>
-				</select>
-			</div>
+          <div style="position: relative; width: fit-content; float: left;">
+            <label for="commodity_id" style="width: 64px;">Komoditas</label>
+            <select name="commodity_id" class="third left" style="margin-right: 15px;">
+              <option value="">Semua Komoditas</option>
+              <% Commodity.active.order(:name).each do |comodity| %>
+                <option value="<%= comodity.id %>"<% if comodity.id == @commodity_id.to_i %> selected='selected'<% end %>><%= comodity.name %></option>
+              <% end %>
+            </select>
+          </div>
 
-
-            <input class="submit" type="submit" value="Filter" style="margin-top: -3px; margin-left: 16px;"/>
-
-		</div>
- 
-		</form>
-	</div>
-
-	<br class="clearfix" />
-
-    <ul class="rounded" id="tabbed">
-        <li><a id="link_1" class="finger">Sidoarjo</a></li>
-        <li><a id="link_2" class="finger">Surabaya</a></li>
-        <li><a id="link_3" class="finger">Probolinggo</a></li>
-        <li><a id="link_4" class="finger">Semarang</a></li>
-        <li><a id="link_5" class="finger">Jakarta</a></li>
-        <li><a id="link_6" class="finger">Sumatera</a></li>
-    </ul>
-
-    <div id="sliding_window" style="margin-top:10px; width: 100%; max-width: 1080px;">
-        <div class="sliding_container">
-            <div class="sliding_tab" id="tab_1" style="width: 1080px;">
-                <br class="clearfix" />
-
-                <% if @events.any? %>
-                <div class="flex">
-                    <div class="widget-cardo">
-                        <p>Pelanggan</p>
-                        <strong><%= @summary_sda[:count_customers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kereta</p>
-                        <strong><%= @summary_sda[:count_train] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Industri</p>
-                        <strong><%= @summary_sda[:count_industry] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Roro</p>
-                        <strong><%= @summary_sda[:count_roro] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Losing</p>
-                        <strong><%= @summary_sda[:count_losing] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Nopol</p>
-                        <strong><%= @summary_sda[:count_vehicles] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Supir</p>
-                        <strong><%= @summary_sda[:count_drivers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Muat</p>
-                        <strong><%= @summary_sda[:count_muat] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kosongan</p>
-                        <strong><%= @summary_sda[:count_kosongan] %></strong>
-                    </div>
-                </div>
-                <% end %>
-                
-                <div id="office_1">
-                    <div class="flex" style="justify-content: space-between; column-gap: 1.5rem;">
-                        <div style="width: 50%;">
-                            <h2>Pelanggan Sidoarjo</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false} right">Estimasi</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_sda[:list_cust_sda].each_with_index do |customer, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= customer.name %></td>
-                                        <td class="right"><%= get_customer_estimation customer.id, 1, @startdate, @enddate %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-
-                            <h2>Supir Sidoarjo</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false}">Kota</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_sda[:list_driver_sda].each_with_index do |driver, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= driver.name %></td>
-                                        <td><%= driver.city %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-
-                        </div>
-
-                        <div style="width: 50%;">
-                            <h2>Unit Sidoarjo</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{sorter: false}" width="30"></th>
-                                    <th>No Pol</th>
-                                    <th>Tipe</th>
-                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th width="60" class="{sorter: false}">Aktif</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                                <% @summary_sda[:list_vehicles_sda].each_with_index do |vehicle, v| %>
-                                    <% v = v + 1 %>
-                                    <tr>
-                                        <td><%= v %></td>
-                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
-                                        <td><%= vehicle.vehicle_type %></td>
-                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
-                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
-                                        <% if vehicle.enabled %>
-                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
-                                        <% else %>
-                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
-                                        <% end %>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-                    </div>
- 
-                    <br/>
-                    <br class="clearfix" />
-
-                    <% if @events.any? %>
-                        <table class="tablesorter row-view tablesorterFilters">
-                        <tr>
-                            <th width="30">No.</th>
-                            <th width="40">Tgl</th>
-                            <th width="40">Dibuat</th>
-                            <th>Keterangan</th>
-                            <th>Type</th>
-                            <th>KTR</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Supir</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Kernet</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Solar</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Lain2</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Premi</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
-                            <th width="60" class="right sorter:true, filter: false">Total BKK</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Total DO</th>
-                        </tr>
-
-                        <% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
-                        <% total_estimasi = 0 %>
-                        <% total_invoice = 0 %>
-                        <% @events_sda.each_with_index do |event, i| %>
-                        
-                        <tr<% if i % 2 == 0 %> class="even"<% end %>>
-                            <td><%=i+1%>.</td>
-                            <td>
-                                <%=event[:start_date].strftime('%d.%m')%> 
-                            </td>
-                            <td><%=event[:created_at].strftime('%d.%m %H:%M')%></td>
-                            <td><%=event[:description] %>
-                            <% if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                                <br>
-                                <%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                            <% end %>
-                            </td>
-                            <td><%=event[:tanktype] %></td>
-                            <td><%=event[:office] %></td>
-                            <td class="" align="right"><%=to_currency(event[:supir])%></td>
-                            <td class="" align="right"><%=to_currency(event[:kernet])%></td>
-                            <td class="" align="right"><%=to_currency(event[:solar])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tambahan])%></td>
-                            <td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tol_asdp])%></td>
-                            <td class="red" align="right"><%=to_currency(event[:invoice_total])%></td>
-                            <td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
-                            <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
-                            <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
-                            <!-- <td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td> -->
-                        </tr>
-                        <% end %>	
-
-                        <% if @events %>
-                        <tr class="footer">
-                            <td class="total" colspan="6">TOTAL</td>
-                            <td align="right"><%=to_currency(@summary_sda[:global_supir])%></td>
-                            <td align="right"><%=to_currency(@summary_sda[:global_kernet])%></td>
-                            <td align="right"><%=to_currency(@summary_sda[:global_solar])%></td>
-                            <td align="right"><%=to_currency(@summary_sda[:global_tambahan])%></td>
-                            <td align="right"><%=to_currency(@summary_sda[:global_premi])%></td>
-                            <td align="right"><%=to_currency(@summary_sda[:global_tol_asdp])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_sda[:global_invoice_total])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_sda[:global_total_estimation])%></td>
-                            <td align="right" class="total">
-                                <span style="display: none">
-                                <%= (@summary_sda[:global_invoice_total].to_i == 0 || @summary_sda[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
-                                </span>
-                            </td>
-                        </tr>
-                        <% end %>
-                        </table>
-                    <% end %>
-                </div>
-            </div>
-
-            <div class="sliding_tab" id="tab_2" style="width: 1080px;">
-                <br class="clearfix" />
-
-                <% if @events.any? %>
-                <div class="flex">
-                    <div class="widget-cardo">
-                        <p>Pelanggan</p>
-                        <strong><%= @summary_sby[:count_customers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kereta</p>
-                        <strong><%= @summary_sby[:count_train] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Industri</p>
-                        <strong><%= @summary_sby[:count_industry] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Roro</p>
-                        <strong><%= @summary_sby[:count_roro] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Losing</p>
-                        <strong><%= @summary_sby[:count_losing] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Nopol</p>
-                        <strong><%= @summary_sby[:count_vehicles] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Supir</p>
-                        <strong><%= @summary_sby[:count_drivers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Muat</p>
-                        <strong><%= @summary_sby[:count_muat] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kosongan</p>
-                        <strong><%= @summary_sby[:count_kosongan] %></strong>
-                    </div>
-                </div>
-                <% end %>
-
-                <div id="office_2">
-                    <div class="flex" style="justify-content: space-between; column-gap: 1.5rem;">
-                        <div style="width: 50%;">
-                            <h2>Pelanggan Surabaya</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false} right">Estimasi</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_sby[:list_cust_sby].each_with_index do |customer, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= customer.name %></td>
-                                        <td class="right"><%= get_customer_estimation customer.id, 5, @startdate, @enddate %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-
-                            <h2>Supir Surabaya</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false}">Kota</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_sby[:list_driver_sby].each_with_index do |driver, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= driver.name %></td>
-                                        <td><%= driver.city %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-
-                        <div style="width: 50%;">
-                            <h2>Unit Surabaya</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{sorter: false}" width="30"></th>
-                                    <th>No Pol</th>
-                                    <th>Tipe</th>
-                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th width="60" class="{sorter: false}">Aktif</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                                <% @summary_sby[:list_vehicles_sby].each_with_index do |vehicle, v| %>
-                                    <% v = v + 1 %>
-                                    <tr>
-                                        <td><%= v %></td>
-                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
-                                        <td><%= vehicle.vehicle_type %></td>
-                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
-                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
-                                        <% if vehicle.enabled %>
-                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
-                                        <% else %>
-                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
-                                        <% end %>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-                    </div>
- 
-                    <br/>
-                    <br class="clearfix" />
-
-                    <% if @events.any? %>
-                        <table class="tablesorter row-view tablesorterFilters">
-                        <tr>
-                            <th width="30">No.</th>
-                            <th width="40">Tgl</th>
-                            <th width="40">Dibuat</th>
-                            <th>Keterangan</th>
-                            <th>Type</th>
-                            <th>KTR</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Supir</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Kernet</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Solar</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Lain2</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Premi</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
-                            <th width="60" class="right sorter:true, filter: false">Total BKK</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Total DO</th>
-                        </tr>
-
-                        <% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
-                        <% total_estimasi = 0 %>
-                        <% total_invoice = 0 %>
-                        <% @events_sby.each_with_index do |event, i| %>
-                        
-                        <tr<% if i % 2 == 0 %> class="even"<% end %>>
-                            <td><%=i+1%>.</td>
-                            <td>
-                                <%=event[:start_date].strftime('%d.%m')%> 
-                            </td>
-                            <td><%=event[:created_at].strftime('%d.%m %H:%M')%></td>
-                            <td><%=event[:description] %>
-                            <% if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                                <br>
-                                <%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                            <% end %>
-                            </td>
-                            <td><%=event[:tanktype] %></td>
-                            <td><%=event[:office] %></td>
-                            <td class="" align="right"><%=to_currency(event[:supir])%></td>
-                            <td class="" align="right"><%=to_currency(event[:kernet])%></td>
-                            <td class="" align="right"><%=to_currency(event[:solar])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tambahan])%></td>
-                            <td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tol_asdp])%></td>
-                            <td class="red" align="right"><%=to_currency(event[:invoice_total])%></td>
-                            <td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
-                            <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
-                            <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
-                            <!-- <td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td> -->
-                        </tr>
-                        <% end %>	
-
-                        <% if @events %>
-                        <tr class="footer">
-                            <td class="total" colspan="6">TOTAL</td>
-                            <td align="right"><%=to_currency(@summary_sby[:global_supir])%></td>
-                            <td align="right"><%=to_currency(@summary_sby[:global_kernet])%></td>
-                            <td align="right"><%=to_currency(@summary_sby[:global_solar])%></td>
-                            <td align="right"><%=to_currency(@summary_sby[:global_tambahan])%></td>
-                            <td align="right"><%=to_currency(@summary_sby[:global_premi])%></td>
-                            <td align="right"><%=to_currency(@summary_sby[:global_tol_asdp])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_sby[:global_invoice_total])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_sby[:global_total_estimation])%></td>
-                            <td align="right" class="total">
-                                <span style="display: none">
-                                <%= (@summary_sby[:global_invoice_total].to_i == 0 || @summary_sby[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
-                                </span>
-                            </td>
-                        </tr>
-                        <% end %>
-                        </table>
-                    <% end %>
-                </div>
-            </div>
-            <div class="sliding_tab" id="tab_3" style="width: 1080px;">
-                <br class="clearfix" />
-
-                <% if @events.any? %>
-                <div class="flex">
-                    <div class="widget-cardo">
-                        <p>Pelanggan</p>
-                        <strong><%= @summary_prb[:count_customers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kereta</p>
-                        <strong><%= @summary_prb[:count_train] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Industri</p>
-                        <strong><%= @summary_prb[:count_industry] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Roro</p>
-                        <strong><%= @summary_prb[:count_roro] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Losing</p>
-                        <strong><%= @summary_prb[:count_losing] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Nopol</p>
-                        <strong><%= @summary_prb[:count_vehicles] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Supir</p>
-                        <strong><%= @summary_prb[:count_drivers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Muat</p>
-                        <strong><%= @summary_prb[:count_muat] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kosongan</p>
-                        <strong><%= @summary_prb[:count_kosongan] %></strong>
-                    </div>
-                </div>
-                <% end %>
-
-                <div id="office_3">
-                    <div class="flex" style="justify-content: space-between; column-gap: 1.5rem;">
-                        <div style="width: 50%;">
-                            <h2>Pelanggan Probolinggo</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false} right">Estimasi</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_prb[:list_cust_prb].each_with_index do |customer, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= customer.name %></td>
-                                        <td class="right"><%= get_customer_estimation customer.id, 3, @startdate, @enddate %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-
-                            <h2>Supir Probolinggo</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false}">Kota</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_prb[:list_driver_prb].each_with_index do |driver, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= driver.name %></td>
-                                        <td><%= driver.city %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-
-                        <div style="width: 50%;">
-                            <h2>Unit Probolinggo</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{sorter: false}" width="30"></th>
-                                    <th>No Pol</th>
-                                    <th>Tipe</th>
-                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th width="60" class="{sorter: false}">Aktif</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                                <% @summary_prb[:list_vehicles_prb].each_with_index do |vehicle, v| %>
-                                    <% v = v + 1 %>
-                                    <tr>
-                                        <td><%= v %></td>
-                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
-                                        <td><%= vehicle.vehicle_type %></td>
-                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
-                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
-                                        <% if vehicle.enabled %>
-                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
-                                        <% else %>
-                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
-                                        <% end %>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-                    </div>
- 
-                    <br/>
-                    <br class="clearfix" />
-
-                    <% if @events.any? %>
-                        <table class="tablesorter row-view tablesorterFilters">
-                        <tr>
-                            <th width="30">No.</th>
-                            <th width="40">Tgl</th>
-                            <th width="40">Dibuat</th>
-                            <th>Keterangan</th>
-                            <th>Type</th>
-                            <th>KTR</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Supir</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Kernet</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Solar</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Lain2</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Premi</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
-                            <th width="60" class="right sorter:true, filter: false">Total BKK</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Total DO</th>
-                        </tr>
-
-                        <% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
-                        <% total_estimasi = 0 %>
-                        <% total_invoice = 0 %>
-                        <% @events_prb.each_with_index do |event, i| %>
-                        
-                        <tr<% if i % 2 == 0 %> class="even"<% end %>>
-                            <td><%=i+1%>.</td>
-                            <td>
-                                <%=event[:start_date].strftime('%d.%m')%> 
-                            </td>
-                            <td><%=event[:created_at].strftime('%d.%m %H:%M')%></td>
-                            <td><%=event[:description] %>
-                            <% if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                                <br>
-                                <%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                            <% end %>
-                            </td>
-                            <td><%=event[:tanktype] %></td>
-                            <td><%=event[:office] %></td>
-                            <td class="" align="right"><%=to_currency(event[:supir])%></td>
-                            <td class="" align="right"><%=to_currency(event[:kernet])%></td>
-                            <td class="" align="right"><%=to_currency(event[:solar])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tambahan])%></td>
-                            <td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tol_asdp])%></td>
-                            <td class="red" align="right"><%=to_currency(event[:invoice_total])%></td>
-                            <td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
-                            <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
-                            <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
-                            <!-- <td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td> -->
-                        </tr>
-                        <% end %>	
-
-                        <% if @events %>
-                        <tr class="footer">
-                            <td class="total" colspan="6">TOTAL</td>
-                            <td align="right"><%=to_currency(@summary_prb[:global_supir])%></td>
-                            <td align="right"><%=to_currency(@summary_prb[:global_kernet])%></td>
-                            <td align="right"><%=to_currency(@summary_prb[:global_solar])%></td>
-                            <td align="right"><%=to_currency(@summary_prb[:global_tambahan])%></td>
-                            <td align="right"><%=to_currency(@summary_prb[:global_premi])%></td>
-                            <td align="right"><%=to_currency(@summary_prb[:global_tol_asdp])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_prb[:global_invoice_total])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_prb[:global_total_estimation])%></td>
-                            <td align="right" class="total">
-                                <span style="display: none">
-                                <%= (@summary_prb[:global_invoice_total].to_i == 0 || @summary_prb[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
-                                </span>
-                            </td>
-                        </tr>
-                        <% end %>
-                        </table>
-                    <% end %>
-                </div>
-            </div>
-            <div class="sliding_tab" id="tab_4" style="width: 1080px;">
-                <br class="clearfix" />
-
-                <% if @events.any? %>
-                <div class="flex">
-                    <div class="widget-cardo">
-                        <p>Pelanggan</p>
-                        <strong><%= @summary_smg[:count_customers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kereta</p>
-                        <strong><%= @summary_smg[:count_train] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Industri</p>
-                        <strong><%= @summary_smg[:count_industry] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Roro</p>
-                        <strong><%= @summary_smg[:count_roro] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Losing</p>
-                        <strong><%= @summary_smg[:count_losing] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Nopol</p>
-                        <strong><%= @summary_smg[:count_vehicles] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Supir</p>
-                        <strong><%= @summary_smg[:count_drivers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Muat</p>
-                        <strong><%= @summary_smg[:count_muat] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kosongan</p>
-                        <strong><%= @summary_smg[:count_kosongan] %></strong>
-                    </div>
-                </div>
-                <% end %>
-
-                <div id="office_4">
-                    <div class="flex" style="justify-content: space-between; column-gap: 1.5rem;">
-                        <div style="width: 50%;">
-                            <h2>Pelanggan Semarang</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false} right">Estimasi</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_smg[:list_cust_smg].each_with_index do |customer, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= customer.name %></td>
-                                        <td class="right"><%= get_customer_estimation customer.id, 4, @startdate, @enddate %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-
-                            <h2>Supir Semarang</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false}">Kota</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_smg[:list_driver_smg].each_with_index do |driver, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= driver.name %></td>
-                                        <td><%= driver.city %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-
-                        <div style="width: 50%;">
-                            <h2>Unit Semarang</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{sorter: false}" width="30"></th>
-                                    <th>No Pol</th>
-                                    <th>Tipe</th>
-                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th width="60" class="{sorter: false}">Aktif</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                                <% @summary_smg[:list_vehicles_smg].each_with_index do |vehicle, v| %>
-                                    <% v = v + 1 %>
-                                    <tr>
-                                        <td><%= v %></td>
-                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
-                                        <td><%= vehicle.vehicle_type %></td>
-                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
-                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
-                                        <% if vehicle.enabled %>
-                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
-                                        <% else %>
-                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
-                                        <% end %>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-                    </div>
- 
-                    <br/>
-                    <br class="clearfix" />
-
-                    <% if @events.any? %>
-                        <table class="tablesorter row-view tablesorterFilters">
-                        <tr>
-                            <th width="30">No.</th>
-                            <th width="40">Tgl</th>
-                            <th width="40">Dibuat</th>
-                            <th>Keterangan</th>
-                            <th>Type</th>
-                            <th>KTR</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Supir</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Kernet</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Solar</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Lain2</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Premi</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
-                            <th width="60" class="right sorter:true, filter: false">Total BKK</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Total DO</th>
-                        </tr>
-
-                        <% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
-                        <% total_estimasi = 0 %>
-                        <% total_invoice = 0 %>
-                        <% @events_smg.each_with_index do |event, i| %>
-                        
-                        <tr<% if i % 2 == 0 %> class="even"<% end %>>
-                            <td><%=i+1%>.</td>
-                            <td>
-                                <%=event[:start_date].strftime('%d.%m')%> 
-                            </td>
-                            <td><%=event[:created_at].strftime('%d.%m %H:%M')%></td>
-                            <td><%=event[:description] %>
-                            <% if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                                <br>
-                                <%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                            <% end %>
-                            </td>
-                            <td><%=event[:tanktype] %></td>
-                            <td><%=event[:office] %></td>
-                            <td class="" align="right"><%=to_currency(event[:supir])%></td>
-                            <td class="" align="right"><%=to_currency(event[:kernet])%></td>
-                            <td class="" align="right"><%=to_currency(event[:solar])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tambahan])%></td>
-                            <td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tol_asdp])%></td>
-                            <td class="red" align="right"><%=to_currency(event[:invoice_total])%></td>
-                            <td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
-                            <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
-                            <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
-                            <!-- <td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td> -->
-                        </tr>
-                        <% end %>	
-
-                        <% if @events %>
-                        <tr class="footer">
-                            <td class="total" colspan="6">TOTAL</td>
-                            <td align="right"><%=to_currency(@summary_smg[:global_supir])%></td>
-                            <td align="right"><%=to_currency(@summary_smg[:global_kernet])%></td>
-                            <td align="right"><%=to_currency(@summary_smg[:global_solar])%></td>
-                            <td align="right"><%=to_currency(@summary_smg[:global_tambahan])%></td>
-                            <td align="right"><%=to_currency(@summary_smg[:global_premi])%></td>
-                            <td align="right"><%=to_currency(@summary_smg[:global_tol_asdp])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_smg[:global_invoice_total])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_smg[:global_total_estimation])%></td>
-                            <td align="right" class="total">
-                                <span style="display: none">
-                                <%= (@summary_smg[:global_invoice_total].to_i == 0 || @summary_smg[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
-                                </span>
-                            </td>
-                        </tr>
-                        <% end %>
-                        </table>
-                    <% end %>
-                </div>
-            </div>
-            <div class="sliding_tab" id="tab_5" style="width: 1080px;">
-                <br class="clearfix" />
-
-                <% if @events.any? %>
-                <div class="flex">
-                    <div class="widget-cardo">
-                        <p>Pelanggan</p>
-                        <strong><%= @summary_jkt[:count_customers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kereta</p>
-                        <strong><%= @summary_jkt[:count_train] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Industri</p>
-                        <strong><%= @summary_jkt[:count_industry] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Roro</p>
-                        <strong><%= @summary_jkt[:count_roro] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Losing</p>
-                        <strong><%= @summary_jkt[:count_losing] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Nopol</p>
-                        <strong><%= @summary_jkt[:count_vehicles] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Supir</p>
-                        <strong><%= @summary_jkt[:count_drivers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Muat</p>
-                        <strong><%= @summary_jkt[:count_muat] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kosongan</p>
-                        <strong><%= @summary_jkt[:count_kosongan] %></strong>
-                    </div>
-                </div>
-                <% end %>
-
-                <div id="office_5">
-                    <div class="flex" style="justify-content: space-between; column-gap: 1.5rem;">
-                        <div style="width: 50%;">
-                            <h2>Pelanggan Jakarta</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false} right">Estimasi</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_jkt[:list_cust_jkt].each_with_index do |customer, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= customer.name %></td>
-                                        <td class="right"><%= get_customer_estimation customer.id, 2, @startdate, @enddate %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-
-                            <h2>Supir Jakarta</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false}">Kota</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_jkt[:list_driver_jkt].each_with_index do |driver, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= driver.name %></td>
-                                        <td><%= driver.city %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-
-                        <div style="width: 50%;">
-                            <h2>Unit Jakarta</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{sorter: false}" width="30"></th>
-                                    <th>No Pol</th>
-                                    <th>Tipe</th>
-                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th width="60" class="{sorter: false}">Aktif</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                                <% @summary_jkt[:list_vehicles_jkt].each_with_index do |vehicle, v| %>
-                                    <% v = v + 1 %>
-                                    <tr>
-                                        <td><%= v %></td>
-                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
-                                        <td><%= vehicle.vehicle_type %></td>
-                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
-                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
-                                        <% if vehicle.enabled %>
-                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
-                                        <% else %>
-                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
-                                        <% end %>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-                    </div>
-
-                    <br/>
-                    <br class="clearfix" />
- 
-                    <% if @events.any? %>
-                        <table class="tablesorter row-view tablesorterFilters">
-                        <tr>
-                            <th width="30">No.</th>
-                            <th width="40">Tgl</th>
-                            <th width="40">Dibuat</th>
-                            <th>Keterangan</th>
-                            <th>Type</th>
-                            <th>KTR</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Supir</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Kernet</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Solar</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Lain2</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Premi</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
-                            <th width="60" class="right sorter:true, filter: false">Total BKK</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Total DO</th>
-                        </tr>
-
-                        <% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
-                        <% total_estimasi = 0 %>
-                        <% total_invoice = 0 %>
-                        <% @events_jkt.each_with_index do |event, i| %>
-                        
-                        <tr<% if i % 2 == 0 %> class="even"<% end %>>
-                            <td><%=i+1%>.</td>
-                            <td>
-                                <%=event[:start_date].strftime('%d.%m')%> 
-                            </td>
-                            <td><%=event[:created_at].strftime('%d.%m %H:%M')%></td>
-                            <td><%=event[:description] %>
-                            <% if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                                <br>
-                                <%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                            <% end %>
-                            </td>
-                            <td><%=event[:tanktype] %></td>
-                            <td><%=event[:office] %></td>
-                            <td class="" align="right"><%=to_currency(event[:supir])%></td>
-                            <td class="" align="right"><%=to_currency(event[:kernet])%></td>
-                            <td class="" align="right"><%=to_currency(event[:solar])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tambahan])%></td>
-                            <td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tol_asdp])%></td>
-                            <td class="red" align="right"><%=to_currency(event[:invoice_total])%></td>
-                            <td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
-                            <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
-                            <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
-                            <!-- <td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td> -->
-                        </tr>
-                        <% end %>	
-
-                        <% if @events %>
-                        <tr class="footer">
-                            <td class="total" colspan="6">TOTAL</td>
-                            <td align="right"><%=to_currency(@summary_jkt[:global_supir])%></td>
-                            <td align="right"><%=to_currency(@summary_jkt[:global_kernet])%></td>
-                            <td align="right"><%=to_currency(@summary_jkt[:global_solar])%></td>
-                            <td align="right"><%=to_currency(@summary_jkt[:global_tambahan])%></td>
-                            <td align="right"><%=to_currency(@summary_jkt[:global_premi])%></td>
-                            <td align="right"><%=to_currency(@summary_jkt[:global_tol_asdp])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_jkt[:global_invoice_total])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_jkt[:global_total_estimation])%></td>
-                            <td align="right" class="total">
-                                <span style="display: none">
-                                <%= (@summary_jkt[:global_invoice_total].to_i == 0 || @summary_jkt[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
-                                </span>
-                            </td>
-                        </tr>
-                        <% end %>
-                        </table>
-                    <% end %>
-                </div>
-            </div>
-            <div class="sliding_tab" id="tab_6" style="width: 1080px;">
-                <br class="clearfix" />
-
-                <% if @events.any? %>
-                <div class="flex">
-                    <div class="widget-cardo">
-                        <p>Pelanggan</p>
-                        <strong><%= @summary_smt[:count_customers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kereta</p>
-                        <strong><%= @summary_smt[:count_train] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Industri</p>
-                        <strong><%= @summary_smt[:count_industry] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Roro</p>
-                        <strong><%= @summary_smt[:count_roro] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Losing</p>
-                        <strong><%= @summary_smt[:count_losing] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Nopol</p>
-                        <strong><%= @summary_smt[:count_vehicles] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Supir</p>
-                        <strong><%= @summary_smt[:count_drivers] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Muat</p>
-                        <strong><%= @summary_smt[:count_muat] %></strong>
-                    </div>
-                    <div class="widget-cardo">
-                        <p>Kosongan</p>
-                        <strong><%= @summary_smt[:count_kosongan] %></strong>
-                    </div>
-                </div>
-                <% end %>
-
-                <div id="office_6">
-                    <div class="flex" style="justify-content: space-between; column-gap: 1.5rem;">
-                        <div style="width: 50%;">
-                            <h2>Pelanggan Sumatera</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false} right">Estimasi</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_smt[:list_cust_smt].each_with_index do |customer, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= customer.name %></td>
-                                        <td class="right"><%= get_customer_estimation customer.id, 6, @startdate, @enddate %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-
-                            <h2>Supir Sumatera</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{filter: false, sorter: false}" width="30">NO.</th>
-                                    <th class="{filter: false, sorter: false}">Nama</th>
-                                    <th class="{filter: false, sorter: false}">Kota</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                
-                                <% @summary_smt[:list_driver_smt].each_with_index do |driver, c| %>
-                                    <% c = c + 1 %>
-                                    <tr>
-                                        <td><%= c %></td>
-                                        <td><%= driver.name %></td>
-                                        <td><%= driver.city %></td>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-
-                        <div style="width: 50%;">
-                            <h2>Unit Sumatera</h2>
-                            <table class="row-view">
-                                <thead>
-                                <tr> 
-                                    <th class="{sorter: false}" width="30"></th>
-                                    <th>No Pol</th>
-                                    <th>Tipe</th>
-                                    <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                                    <th width="60" class="{sorter: false}">Aktif</th>
-                                </tr>
-                                <thead>
-                                <tbody>
-                                <% @summary_smt[:list_vehicles_smt].each_with_index do |vehicle, v| %>
-                                    <% v = v + 1 %>
-                                    <tr>
-                                        <td><%= v %></td>
-                                        <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
-                                        <td><%= vehicle.vehicle_type %></td>
-                                        <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
-                                        <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
-                                        <% if vehicle.enabled %>
-                                        <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
-                                        <% else %>
-                                        <td><%= link_to '&#xf057;'.html_safe,'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
-                                        <% end %>
-                                    </tr>
-                                
-                                <% end %>	
-                                </tbody>
-                
-                            </table>
-                        </div>
-                    </div>
-
-                    <br/>
-                    <br class="clearfix" />
-
-                    <% if @events.any? %>
-                        <table class="tablesorter row-view tablesorterFilters">
-                        <tr>
-                            <th width="30">No.</th>
-                            <th width="40">Tgl</th>
-                            <th width="40">Dibuat</th>
-                            <th>Keterangan</th>
-                            <th>Type</th>
-                            <th>KTR</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Supir</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Kernet</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Solar</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Lain2</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Premi</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
-                            <th width="60" class="right sorter:true, filter: false">Total BKK</th>
-                            <th width="60" class="right {sorter:true, filter: false}">Total DO</th>
-                        </tr>
-
-                        <% offset = Setting.find_by_name('Offset Estimasi').to_i rescue 200000 %>
-                        <% total_estimasi = 0 %>
-                        <% total_invoice = 0 %>
-                        <% @events_smt.each_with_index do |event, i| %>
-                        
-                        <tr<% if i % 2 == 0 %> class="even"<% end %>>
-                            <td><%=i+1%>.</td>
-                            <td>
-                                <%=event[:start_date].strftime('%d.%m')%> 
-                            </td>
-                            <td><%=event[:created_at].strftime('%d.%m %H:%M')%></td>
-                            <td><%=event[:description] %>
-                            <% if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                                <br>
-                                <%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] if event[:route_train].present? && event[:route_train] != "Kosong" %>
-                            <% end %>
-                            </td>
-                            <td><%=event[:tanktype] %></td>
-                            <td><%=event[:office] %></td>
-                            <td class="" align="right"><%=to_currency(event[:supir])%></td>
-                            <td class="" align="right"><%=to_currency(event[:kernet])%></td>
-                            <td class="" align="right"><%=to_currency(event[:solar])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tambahan])%></td>
-                            <td class="" align="right"><%=to_currency(event[:premi_allowance])%></td>
-                            <td class="" align="right"><%=to_currency(event[:tol_asdp])%></td>
-                            <td class="red" align="right"><%=to_currency(event[:invoice_total])%></td>
-                            <td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
-                            <% percent = (event[:invoice_total].to_f / event[:total_estimation].to_f * 100).round rescue 0 %>
-                            <%# percent = (event[:total_estimation].to_i / event[:invoice_total].to_i * 100).round(3) rescue 0 %>
-                            <!-- <td class="<%= (percent < 0 ) ? "red" : "green" %>" align="right"><%= percent %></td> -->
-                        </tr>
-                        <% end %>	
-
-                        <% if @events %>
-                        <tr class="footer">
-                            <td class="total" colspan="6">TOTAL</td>
-                            <td align="right"><%=to_currency(@summary_smt[:global_supir])%></td>
-                            <td align="right"><%=to_currency(@summary_smt[:global_kernet])%></td>
-                            <td align="right"><%=to_currency(@summary_smt[:global_solar])%></td>
-                            <td align="right"><%=to_currency(@summary_smt[:global_tambahan])%></td>
-                            <td align="right"><%=to_currency(@summary_smt[:global_premi])%></td>
-                            <td align="right"><%=to_currency(@summary_smt[:global_tol_asdp])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_smt[:global_invoice_total])%></td>
-                            <td class="total" align="right"><%=to_currency(@summary_smt[:global_total_estimation])%></td>
-                            <td align="right" class="total">
-                                <span style="display: none">
-                                <%= (@summary_smt[:global_invoice_total].to_i == 0 || @summary_smt[:global_total_estimation].to_i == 0) ? 0 : ( @summary[:global_invoice_total].to_i / @summary[:global_total_estimation].to_i * 100).round() %>
-                                </span>
-                            </td>
-                        </tr>
-                        <% end %>
-                        </table>
-                    <% end %>
-                </div>
-            </div>
+          <input class="submit" type="submit" value="Filter" style="margin-top: -3px; margin-left: 16px;"/>
         </div>
+      </form>
     </div>
 
+    <br class="clearfix" />
+
+    <% if @branch_reports.any? %>
+      <ul class="rounded" id="tabbed">
+        <% @branch_reports.each_with_index do |report, index| %>
+          <li><a id="link_<%= index + 1 %>" class="finger"><%= report[:office].name %></a></li>
+        <% end %>
+      </ul>
+
+      <div id="sliding_window" style="margin-top:10px; width: 100%; max-width: 1080px;">
+        <div class="sliding_container" style="width: <%= @branch_reports.length * 1080 %>px;">
+          <% @branch_reports.each_with_index do |report, index| %>
+            <% office = report[:office] %>
+            <% summary = report[:summary] %>
+            <% events = report[:events] %>
+            <% customer_estimations = report[:customer_estimations] %>
+            <div class="sliding_tab" id="tab_<%= index + 1 %>" style="width: 1080px;">
+              <br class="clearfix" />
+
+              <% if @events.any? %>
+                <div class="flex">
+                  <div class="widget-cardo">
+                    <p>Pelanggan</p>
+                    <strong><%= summary[:count_customers] %></strong>
+                  </div>
+                  <div class="widget-cardo">
+                    <p>Kereta</p>
+                    <strong><%= summary[:count_train] %></strong>
+                  </div>
+                  <div class="widget-cardo">
+                    <p>Industri</p>
+                    <strong><%= summary[:count_industry] %></strong>
+                  </div>
+                  <div class="widget-cardo">
+                    <p>Roro</p>
+                    <strong><%= summary[:count_roro] %></strong>
+                  </div>
+                  <div class="widget-cardo">
+                    <p>Losing</p>
+                    <strong><%= summary[:count_losing] %></strong>
+                  </div>
+                  <div class="widget-cardo">
+                    <p>Nopol</p>
+                    <strong><%= summary[:count_vehicles] %></strong>
+                  </div>
+                  <div class="widget-cardo">
+                    <p>Supir</p>
+                    <strong><%= summary[:count_drivers] %></strong>
+                  </div>
+                  <div class="widget-cardo">
+                    <p>Muat</p>
+                    <strong><%= summary[:count_muat] %></strong>
+                  </div>
+                  <div class="widget-cardo">
+                    <p>Kosongan</p>
+                    <strong><%= summary[:count_kosongan] %></strong>
+                  </div>
+                </div>
+              <% end %>
+
+              <div id="office_<%= office.id %>">
+                <div class="flex" style="justify-content: space-between; column-gap: 1.5rem;">
+                  <div style="width: 50%;">
+                    <h2>Pelanggan <%= office.name %></h2>
+                    <table class="row-view">
+                      <thead>
+                        <tr>
+                          <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                          <th class="{filter: false, sorter: false}">Nama</th>
+                          <th class="{filter: false, sorter: false} right">Estimasi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% summary[:list_cust].each_with_index do |customer, customer_index| %>
+                          <tr>
+                            <td><%= customer_index + 1 %></td>
+                            <td><%= customer.name %></td>
+                            <td class="right"><%= to_currency(customer_estimations[customer.id].to_i) %></td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+
+                    <h2>Supir <%= office.name %></h2>
+                    <table class="row-view">
+                      <thead>
+                        <tr>
+                          <th class="{filter: false, sorter: false}" width="30">NO.</th>
+                          <th class="{filter: false, sorter: false}">Nama</th>
+                          <th class="{filter: false, sorter: false}">Kota</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% summary[:list_driver].each_with_index do |driver, driver_index| %>
+                          <tr>
+                            <td><%= driver_index + 1 %></td>
+                            <td><%= driver.name %></td>
+                            <td><%= driver.city %></td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div style="width: 50%;">
+                    <h2>Unit <%= office.name %></h2>
+                    <table class="row-view">
+                      <thead>
+                        <tr>
+                          <th class="{sorter: false}" width="30"></th>
+                          <th>No Pol</th>
+                          <th>Tipe</th>
+                          <th>Grup&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                          <th>Kantor&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                          <th width="60" class="{sorter: false}">Aktif</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% summary[:list_vehicles].each_with_index do |vehicle, vehicle_index| %>
+                          <tr>
+                            <td><%= vehicle_index + 1 %></td>
+                            <td><%= vehicle.current_id %> <%= "&nbsp;(#{vehicle.previous_id})".html_safe if !vehicle.previous_id.blank? %></td>
+                            <td><%= vehicle.vehicle_type %></td>
+                            <td><%= vehicle.vehiclegroup.name if !vehicle.vehiclegroup.nil? %></td>
+                            <td><%= vehicle.office.name if !vehicle.office_id.nil? %></td>
+                            <% if vehicle.enabled %>
+                              <td><%= link_to '&#xf058;'.html_safe, 'javascript: void();', :class => 'enabled tipsy', :title => 'Aktif' %></td>
+                            <% else %>
+                              <td><%= link_to '&#xf057;'.html_safe, 'javascript: void();', :class => 'disabled tipsy', :title => 'TIdak Aktif' %></td>
+                            <% end %>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <br/>
+                <br class="clearfix" />
+
+                <% if @events.any? %>
+                  <table class="tablesorter row-view tablesorterFilters">
+                    <tr>
+                      <th width="30">No.</th>
+                      <th width="40">Tgl</th>
+                      <th width="40">Dibuat</th>
+                      <th>Keterangan</th>
+                      <th>Type</th>
+                      <th>KTR</th>
+                      <th width="60" class="right {sorter:true, filter: false}">Supir</th>
+                      <th width="60" class="right {sorter:true, filter: false}">Kernet</th>
+                      <th width="60" class="right {sorter:true, filter: false}">Solar</th>
+                      <th width="60" class="right {sorter:true, filter: false}">Lain2</th>
+                      <th width="60" class="right {sorter:true, filter: false}">Premi</th>
+                      <th width="60" class="right {sorter:true, filter: false}">Tol + ASDP</th>
+                      <th width="60" class="right sorter:true, filter: false">Total BKK</th>
+                      <th width="60" class="right {sorter:true, filter: false}">Total DO</th>
+                    </tr>
+
+                    <% events.each_with_index do |event, event_index| %>
+                      <tr<% if event_index % 2 == 0 %> class="even"<% end %>>
+                        <td><%= event_index + 1 %>.</td>
+                        <td><%= event[:start_date].strftime('%d.%m') %></td>
+                        <td><%= event[:created_at].strftime('%d.%m %H:%M') %></td>
+                        <td>
+                          <%= event[:description] %>
+                          <% if !event[:route_train].blank? && event[:route_train] != "Kosong" %>
+                            <br>
+                            <%= "Jurusan kereta :" + event[:route_train] + " - " + event[:route_train_container_type] %>
+                          <% end %>
+                        </td>
+                        <td><%= event[:tanktype] %></td>
+                        <td><%= event[:office] %></td>
+                        <td align="right"><%= to_currency(event[:supir]) %></td>
+                        <td align="right"><%= to_currency(event[:kernet]) %></td>
+                        <td align="right"><%= to_currency(event[:solar]) %></td>
+                        <td align="right"><%= to_currency(event[:tambahan]) %></td>
+                        <td align="right"><%= to_currency(event[:premi_allowance]) %></td>
+                        <td align="right"><%= to_currency(event[:tol_asdp]) %></td>
+                        <td class="red" align="right"><%= to_currency(event[:invoice_total]) %></td>
+                        <td class="green" align="right"><%= to_currency(event[:total_estimation]) %></td>
+                      </tr>
+                    <% end %>
+
+                    <tr class="footer">
+                      <td class="total" colspan="6">TOTAL</td>
+                      <td align="right"><%= to_currency(summary[:global_supir]) %></td>
+                      <td align="right"><%= to_currency(summary[:global_kernet]) %></td>
+                      <td align="right"><%= to_currency(summary[:global_solar]) %></td>
+                      <td align="right"><%= to_currency(summary[:global_tambahan]) %></td>
+                      <td align="right"><%= to_currency(summary[:global_premi]) %></td>
+                      <td align="right"><%= to_currency(summary[:global_tol_asdp]) %></td>
+                      <td class="total" align="right"><%= to_currency(summary[:global_invoice_total]) %></td>
+                      <td class="total" align="right"><%= to_currency(summary[:global_total_estimation]) %></td>
+                    </tr>
+                  </table>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <p>Tidak ada kantor aktif untuk ditampilkan.</p>
+    <% end %>
+  </div>
 </div>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
- 
-    <script>
-      // @formatter:off
-      document.addEventListener("DOMContentLoaded", function () {
-      	window.ApexCharts && (new ApexCharts(document.getElementById('chart-active-users'), {
-      		chart: {
-      			type: "bar",
-      			fontFamily: 'inherit',
-      			height: 58,
-      			sparkline: {
-      				enabled: true
-      			},
-      			animations: {
-      				enabled: false
-      			},
-      		},
-      		plotOptions: {
-      			bar: {
-      				columnWidth: '50%',
-      			}
-      		},
-      		dataLabels: {
-      			enabled: false,
-      		},
-      		fill: {
-      			opacity: 1,
-      		},
-      		series: [{
-      			name: "Profits",
-      			data: [37, 35, 44]
-      		}],
-      		tooltip: {
-      			theme: 'light'
-      		},
-      		grid: {
-      			strokeDashArray: 4,
-      		},
-      		xaxis: {
-      			labels: {
-      				padding: 0,
-      			},
-      			tooltip: {
-      				enabled: false
-      			},
-      			axisBorder: {
-      				show: false,
-      			},
-      			type: 'datetime',
-      		},
-      		yaxis: {
-      			labels: {
-      				padding: 2
-      			},
-      		},
-      		labels: [
-      			'2020-06-20', '2020-06-21', '2020-06-22'
-      		],
-      		colors: ['#F44336'],
-      		legend: {
-      			show: false,
-      		},
-      	})).render();
-      });
-      // @formatter:on
-    </script>

@@ -4511,804 +4511,137 @@ end
       @customer_id = params[:customer_id]
       @commodity_id = params[:commodity_id]
 
-      @customers = Customer.where('id in (select customer_id from events where deleted = false and start_date between ? and ?)', @startdate.to_date, @enddate.to_date).order(:name)
-
-      @eventsa = Event.active.where("start_date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date).order(:start_date)
-
       @transporttype = params[:transporttype]
       @tanktype = params[:tanktype]
 
       @createdat = params[:createdat]
+      @offices = active_branch_offices
+      office_ids = @offices.map(&:id)
+
+      @eventsa = Event.active.includes(:customer, :commodity, :office, :routetrain, { :route => :allowances }).where("start_date BETWEEN ? AND ?", @startdate.to_date, @enddate.to_date).order(:start_date)
 
       if @createdat.present? and @createdat != 'all'
         if @createdat == "08.00-12.00"
-          # Filtering records between 08:00 - 12:00
           @eventsa = @eventsa.where("EXTRACT(HOUR FROM events.created_at + INTERVAL '7 hours') BETWEEN ? AND ?", 0, 12)
-          @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
         else
-          # Filtering records between 12:00 - 17:00
           @eventsa = @eventsa.where("EXTRACT(HOUR FROM events.created_at + INTERVAL '7 hours') BETWEEN ? AND ?", 12, 23)
-          @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
         end
       end
 
-      if @customer_id.present? and @customer_id != 'all'
-        @eventsa = @eventsa.where('customer_id = ?', @customer_id)
-        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
-      end
-
-      if @commodity_id.present? and @commodity_id != 'all'
-        @eventsa = @eventsa.where('commodity_id = ?', @commodity_id)
-        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
-      end
+      @eventsa = @eventsa.where('customer_id = ?', @customer_id) if @customer_id.present? and @customer_id != 'all'
+      @eventsa = @eventsa.where('commodity_id = ?', @commodity_id) if @commodity_id.present? and @commodity_id != 'all'
 
       if @transporttype.present? and @transporttype != 'all'
         if @transporttype == 'RORO'
           @eventsa = @eventsa.where('invoiceship = true')
         elsif @transporttype == 'LOSING'
           @eventsa = @eventsa.where('losing = true')
+        elsif @transporttype == 'KERETA'
+          @eventsa = @eventsa.where('invoicetrain = true')
         else
-          if @transporttype == 'KERETA'
-            @eventsa = @eventsa.where('invoicetrain = true')
-          else
-            @eventsa = @eventsa.where('invoicetrain = false')
-          end
+          @eventsa = @eventsa.where('invoicetrain = false')
         end
       end
 
-      if @tanktype.present? and @tanktype != 'all'
-        @eventsa = @eventsa.where('tanktype = ?', @tanktype)
-        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
-      end
+      @eventsa = @eventsa.where('tanktype = ?', @tanktype) if @tanktype.present? and @tanktype != 'all'
 
       if params[:office_id].present? && params[:office_id] != 'all'
-        @eventsa = @eventsa.where(office_id: params[:office_id])
-        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
+        selected_office_id = params[:office_id].to_i
+        if office_ids.include?(selected_office_id)
+          @eventsa = @eventsa.where(:office_id => selected_office_id)
+        else
+          @eventsa = @eventsa.where(:id => [])
+        end
+      elsif office_ids.any?
+        @eventsa = @eventsa.where(:office_id => office_ids)
+      else
+        @eventsa = @eventsa.where(:id => [])
       end
 
-      if params[:operator_id].present? && params[:operator_id] != 'all'
-        @eventsa = @eventsa.where(operator_id: params[:operator_id])
-        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
-      end
+      @eventsa = @eventsa.where(:operator_id => params[:operator_id]) if params[:operator_id].present? && params[:operator_id] != 'all'
+      @eventsa = @eventsa.where(:routetrain_id => params[:routetrain_id]) if params[:routetrain_id].present? && params[:routetrain_id] != 'all'
 
-      if params[:routetrain_id].present? && params[:routetrain_id] != 'all'
-        @eventsa = @eventsa.where(routetrain_id: params[:routetrain_id])
-        @customers = @customers.where('id in (select customer_id from events where id in (?))', @eventsa.pluck(:id)).order(:name)
-      end
-
-      global_supir = 0
-      global_kernet = 0
-      global_solar = 0
-      global_tambahan = 0
-      global_tol_asdp = 0
-      global_premi = 0
-      global_invoice_total = 0
-      global_total_estimation = 0
-      solar_price = Setting.find_by_name("Harga Solar").value.to_i
+      solar_price = Setting.find_by_name("Harga Solar").value.to_i rescue 0
       customer_35 = Customer.active.where("name ~* '.*Molindo.*' or name ~* '.*Aman jaya.*' or name ~* '.*Acidatama.*'").pluck(:id)
 
-      @events = @eventsa.map do |event|
-        route = event.route
-        price_per = route.price_per.to_i rescue 0
-        price_per_type = route.price_per_type rescue 'KG'
-        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
-        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
+      @summary = empty_branch_summary
+      @events = []
+      branch_data = {}
 
-        supir = route_allowance.driver_trip.to_i rescue 0
-        kernet = route_allowance.helper_trip.to_i rescue 0
-        premi = route.bonus.to_i rescue 0
-        solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
-        tambahan = route_allowance.misc_allowance.to_i rescue 0
-        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
-        invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
+      @eventsa.each do |event|
+        row = build_branch_event_row(event, offset, solar_price, customer_35)
+        @events << row
+        add_event_row_to_summary(@summary, row)
 
-        quantity = event.qty.to_i rescue 0
-        event_price_per_type = event.price_per_type rescue 'KG'
-        event_tonage = event.estimated_tonage.to_i rescue 0
-
-        # if price_per >= offset
-        #   estimation = quantity * price_per
-        # elsif customer_35.include? event.customer_id
-        #   estimation = quantity * 20000 * price_per
-        # elsif(price_per_type == 'KG') #Utk BKK yg masuk di input di BKK kereta tonage   dibuat 20,000 kg
-        #   estimation = quantity * event_tonage * price_per
-        # else
-        #   estimation = quantity * event_tonage * price_per
-        # end
-
-        if price_per >= offset
-          estimation = quantity * price_per
-        elsif customer_35.include? event.customer_id
-          estimation = quantity * 20000 * price_per
-        else
-          estimation = quantity * event_tonage *  price_per
-        end
-
-        global_supir += supir
-        global_kernet += kernet
-        global_solar += solar
-        global_tambahan += tambahan
-        global_tol_asdp += tol_asdp
-        global_premi += premi
-        global_invoice_total += invoice_total
-        global_total_estimation += estimation
-
-        description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>" 
-        description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
-        {
-          route_name: (route.name rescue "Kosong"),
-          route_price: (route.price_per rescue "Kosong"),
-          route_id: event.route_id,
-          tanktype: event.tanktype,
-          office: (event.office.abbr rescue "Kosong"),
-          supir: supir,
-          kernet: kernet,
-          solar: solar,
-          tambahan: tambahan,
-          premi_allowance: premi,
-          tol_asdp: tol_asdp,
-          invoice_total: invoice_total,
-          total_estimation: estimation,
-          description: description.html_safe,
-          start_date: event.start_date,
-          created_at: event.created_at,
-          route_train: (event.routetrain.name rescue "Kosong"),
-          route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
-          route_train_id: event.routetrain_id
+        branch_data[event.office_id] ||= {
+          :events => [],
+          :summary => empty_branch_summary,
+          :customer_ids => {}
         }
-      end
-      
-      @summary = {
-        global_supir: global_supir ,
-        global_kernet: global_kernet ,
-        global_solar: global_solar ,
-        global_tambahan: global_tambahan ,
-        global_tol_asdp: global_tol_asdp ,
-        global_premi: global_premi ,
-        global_invoice_total: global_invoice_total ,
-        global_total_estimation: global_total_estimation ,
-      }
 
-      #perbranch
-      #sda
-      sda_supir = 0
-      sda_kernet = 0
-      sda_solar = 0
-      sda_tambahan = 0
-      sda_tol_asdp = 0
-      sda_premi = 0
-      sda_invoice_total = 0
-      sda_total_estimation = 0
+        branch_data[event.office_id][:events] << row
+        add_event_row_to_summary(branch_data[event.office_id][:summary], row)
+        branch_data[event.office_id][:customer_ids][event.customer_id] = true if event.customer_id.present?
 
-      @events_sda = @eventsa.includes(:route).where("office_id = 1").map do |event|
-        route = event.route
-        price_per = route.price_per.to_i rescue 0
-        price_per_type = route.price_per_type rescue 'KG'
-        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
-        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
-
-        supir = route_allowance.driver_trip.to_i rescue 0
-        kernet = route_allowance.helper_trip.to_i rescue 0
-        premi = route.bonus.to_i rescue 0
-        solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
-        tambahan = route_allowance.misc_allowance.to_i rescue 0
-        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
-        invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
-
-        quantity = event.qty.to_i rescue 0
-        event_price_per_type = event.price_per_type rescue 'KG'
-        event_tonage = event.estimated_tonage.to_i rescue 0 
-
-        if price_per >= offset
-          estimation = quantity * price_per
-        elsif customer_35.include? event.customer_id
-          estimation = quantity * 20000 * price_per
+        if event.losing
+          branch_data[event.office_id][:summary][:count_losing] += 1
+        elsif event.invoiceship
+          branch_data[event.office_id][:summary][:count_roro] += 1
+        elsif event.invoicetrain
+          branch_data[event.office_id][:summary][:count_train] += 1
         else
-          estimation = quantity * event_tonage *  price_per
+          branch_data[event.office_id][:summary][:count_industry] += 1
+        end
+      end
+
+      @branch_reports = @offices.map do |office|
+        office_data = branch_data[office.id] || {
+          :events => [],
+          :summary => empty_branch_summary,
+          :customer_ids => {}
+        }
+
+        event_ids = office_data[:events].map { |event| event[:id] }
+        office_customer_ids = office_data[:customer_ids].keys
+        customers = office_customer_ids.any? ? Customer.where(:id => office_customer_ids).order(:name) : Customer.where(:id => [])
+
+        if event_ids.any?
+          vehicles = Vehicle.where('office_id = ? AND id in (select vehicle_id from invoices where deleted = false AND office_id = ? AND event_id in (?))', office.id, office.id, event_ids)
+          drivers = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = ? AND event_id in (?))', office.id, event_ids).order(:name)
+          count_muat = Invoice.where('deleted = false AND kosongan = false AND office_id = ? AND event_id in (?)', office.id, event_ids).count
+        else
+          vehicles = Vehicle.where(:id => [])
+          drivers = Driver.where(:id => [])
+          count_muat = 0
         end
 
-        sda_supir += supir
-        sda_kernet += kernet
-        sda_solar += solar
-        sda_tambahan += tambahan
-        sda_tol_asdp += tol_asdp
-        sda_premi += premi
-        sda_invoice_total += invoice_total
-        sda_total_estimation += estimation
+        count_kosongan = Invoice.where('deleted = false AND date between ? and ? AND kosongan = true AND kosongan_confirmed = true AND office_id = ?', @startdate.to_date, @enddate.to_date, office.id).count
 
-        description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>" 
-        description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
+        office_data[:summary][:list_vehicles] = vehicles
+        office_data[:summary][:list_cust] = customers
+        office_data[:summary][:list_driver] = drivers
+        office_data[:summary][:count_drivers] = drivers.count
+        office_data[:summary][:count_vehicles] = vehicles.count
+        office_data[:summary][:count_customers] = customers.count
+        office_data[:summary][:count_muat] = count_muat
+        office_data[:summary][:count_kosongan] = count_kosongan
+
         {
-          id: event.id,
-          route_name: (route.name rescue "Kosong"),
-          route_price: (route.price_per rescue "Kosong"),
-          route_id: event.route_id,
-          tanktype: event.tanktype,
-          office: (event.office.abbr rescue "Kosong"),
-          supir: supir,
-          kernet: kernet,
-          solar: solar,
-          tambahan: tambahan,
-          premi_allowance: premi,
-          tol_asdp: tol_asdp,
-          invoice_total: invoice_total,
-          total_estimation: estimation,
-          description: description.html_safe,
-          start_date: event.start_date,
-          created_at: event.created_at,
-          route_train: (event.routetrain.name rescue "Kosong"),
-          route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
-          route_train_id: event.routetrain_id
+          :office => office,
+          :events => office_data[:events],
+          :summary => office_data[:summary],
+          :customer_estimations => build_customer_estimations(office_data[:events])
         }
       end
 
-      # render json: @events_sda.map { |event| event[:id] }
-      @customers_sda = @customers.where('id in (select customer_id from events where id in (?))', @events_sda.map { |event| event[:id] })
-      @vehicles_sda = Vehicle.where('office_id = 1 AND id in (select vehicle_id from invoices where deleted = false AND office_id = 1 AND event_id in (?))', @events_sda.map { |event| event[:id] })
-      @drivers_sda = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 1 AND event_id in (?))', @events_sda.map { |event| event[:id] })
-      @ship_sda = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_sda.map { |event| event[:id] }).count()
-      @train_sda = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_sda.map { |event| event[:id] }).count()
-      @losing_sda = @eventsa.where('deleted = false AND losing = true AND id in (?)', @events_sda.map { |event| event[:id] }).count()
-      @industry_sda = @eventsa.where('deleted = false AND losing = false AND invoicetrain = false AND invoiceship = false AND id in (?)', @events_sda.map { |event| event[:id] }).count()
-      @invoices = Invoice.where('deleted = false AND kosongan = false AND office_id = 1 AND event_id in (?)', @events_sda.map { |event| event[:id] }).count()
-      @kosongans = Invoice.where('deleted = false AND date between ? and ? AND kosongan = true AND kosongan_confirmed = true AND office_id = 1', @startdate.to_date, @enddate.to_date).count()
-      # render json: @drivers_sda.select(:name).order(:name).count()
-
-      @summary_sda = {
-        list_vehicles_sda: @vehicles_sda,
-        list_cust_sda: @customers_sda,
-        list_driver_sda: @drivers_sda.order(:name),
-        count_drivers: @drivers_sda.count(),
-        count_vehicles: @vehicles_sda.count(),
-        count_train: @train_sda,
-        count_roro: @ship_sda,
-        count_industry: @industry_sda,
-        count_losing: @losing_sda,
-        count_customers: @customers_sda.count(),
-        count_muat: @invoices,
-        count_kosongan: @kosongans,
-        global_supir: sda_supir ,
-        global_kernet: sda_kernet ,
-        global_solar: sda_solar ,
-        global_tambahan: sda_tambahan ,
-        global_tol_asdp: sda_tol_asdp ,
-        global_premi: sda_premi ,
-        global_invoice_total: sda_invoice_total ,
-        global_total_estimation: sda_total_estimation ,
-      }
-      #sby
-      sby_supir = 0
-      sby_kernet = 0
-      sby_solar = 0
-      sby_tambahan = 0
-      sby_tol_asdp = 0
-      sby_premi = 0
-      sby_invoice_total = 0
-      sby_total_estimation = 0
-      @events_sby = @eventsa.where("office_id = 5").map do |event|
-        route = event.route
-        price_per = route.price_per.to_i rescue 0
-        price_per_type = route.price_per_type rescue 'KG'
-        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
-        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
-
-        supir = route_allowance.driver_trip.to_i rescue 0
-        kernet = route_allowance.helper_trip.to_i rescue 0
-        premi = route.bonus.to_i rescue 0
-        solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
-        tambahan = route_allowance.misc_allowance.to_i rescue 0
-        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
-        invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
-
-        quantity = event.qty.to_i rescue 0
-        event_price_per_type = event.price_per_type rescue 'KG'
-        event_tonage = event.estimated_tonage.to_i rescue 0 
-
-        if price_per >= offset
-          estimation = quantity * price_per
-        elsif customer_35.include? event.customer_id
-          estimation = quantity * 20000 * price_per
-        else
-          estimation = quantity * event_tonage *  price_per
-        end
-
-        sby_supir += supir
-        sby_kernet += kernet
-        sby_solar += solar
-        sby_tambahan += tambahan
-        sby_tol_asdp += tol_asdp
-        sby_premi += premi
-        sby_invoice_total += invoice_total
-        sby_total_estimation += estimation
-
-        description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>" 
-        description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
-        {
-          id: event.id,
-          route_name: (route.name rescue "Kosong"),
-          route_price: (route.price_per rescue "Kosong"),
-          route_id: event.route_id,
-          tanktype: event.tanktype,
-          office: (event.office.abbr rescue "Kosong"),
-          supir: supir,
-          kernet: kernet,
-          solar: solar,
-          tambahan: tambahan,
-          premi_allowance: premi,
-          tol_asdp: tol_asdp,
-          invoice_total: invoice_total,
-          total_estimation: estimation,
-          description: description.html_safe,
-          start_date: event.start_date,
-          created_at: event.created_at,
-          route_train: (event.routetrain.name rescue "Kosong"),
-          route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
-          route_train_id: event.routetrain_id
-        }
-      end
-      # render json: @events_sby.map { |event| event[:id] }
-      @customers_sby = @customers.where('id in (select customer_id from events where id in (?))', @events_sby.map { |event| event[:id] })
-      @vehicles_sby = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 5 AND event_id in (?))', @events_sby.map { |event| event[:id] })
-      @drivers_sby = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 5 AND event_id in (?))', @events_sby.map { |event| event[:id] })
-      @ship_sby = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_sby.map { |event| event[:id] }).count()
-      @train_sby = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_sby.map { |event| event[:id] }).count()
-      @losing_sby = @eventsa.where('deleted = false AND losing = true AND id in (?)', @events_sby.map { |event| event[:id] }).count()
-      @industry_sby = @eventsa.where('deleted = false AND losing = false AND invoicetrain = false AND invoiceship = false AND id in (?)', @events_sby.map { |event| event[:id] }).count()
-      @invoice_sby = Invoice.where('deleted = false AND kosongan = false AND office_id = 5 AND event_id in (?)', @events_sby.map { |event| event[:id] }).count()
-      @kosongan_sby = Invoice.where('deleted = false AND date between ? and ? AND kosongan = true AND kosongan_confirmed = true AND office_id = 5', @startdate.to_date, @enddate.to_date).count()
-      # render json: @kosongans
-
-      @summary_sby = {
-        list_vehicles_sby: @vehicles_sby,
-        list_cust_sby: @customers_sby,
-        list_driver_sby: @drivers_sby.order(:name),
-        count_drivers: @drivers_sby.count(),
-        count_vehicles: @vehicles_sby.count(),
-        count_train: @train_sby,
-        count_roro: @ship_sby,
-        count_industry: @industry_sby,
-        count_losing: @losing_sby,
-        count_customers: @customers_sby.count(),
-        count_muat: @invoice_sby,
-        count_kosongan: @kosongan_sby,
-        global_supir: sby_supir ,
-        global_kernet: sby_kernet ,
-        global_solar: sby_solar ,
-        global_tambahan: sby_tambahan ,
-        global_tol_asdp: sby_tol_asdp ,
-        global_premi: sby_premi ,
-        global_invoice_total: sby_invoice_total ,
-        global_total_estimation: sby_total_estimation ,
-      }
-      
-      #jkt
-      jkt_supir = 0
-      jkt_kernet = 0
-      jkt_solar = 0
-      jkt_tambahan = 0
-      jkt_tol_asdp = 0
-      jkt_premi = 0
-      jkt_invoice_total = 0
-      jkt_total_estimation = 0
-      @events_jkt = @eventsa.where("office_id = 2").map do |event|
-        route = event.route
-        price_per = route.price_per.to_i rescue 0
-        price_per_type = route.price_per_type rescue 'KG'
-        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
-        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
-
-        supir = route_allowance.driver_trip.to_i rescue 0
-        kernet = route_allowance.helper_trip.to_i rescue 0
-        premi = route.bonus.to_i rescue 0
-        solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
-        tambahan = route_allowance.misc_allowance.to_i rescue 0
-        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
-        invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
-
-        quantity = event.qty.to_i rescue 0
-        event_price_per_type = event.price_per_type rescue 'KG'
-        event_tonage = event.estimated_tonage.to_i rescue 0 
-
-        if price_per >= offset
-          estimation = quantity * price_per
-        elsif customer_35.include? event.customer_id
-          estimation = quantity * 20000 * price_per
-        else
-          estimation = quantity * event_tonage *  price_per
-        end
-
-        jkt_supir += supir
-        jkt_kernet += kernet
-        jkt_solar += solar
-        jkt_tambahan += tambahan
-        jkt_tol_asdp += tol_asdp
-        jkt_premi += premi
-        jkt_invoice_total += invoice_total
-        jkt_total_estimation += estimation
-
-        description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>" 
-        description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
-        {
-          id: event.id,
-          route_name: (route.name rescue "Kosong"),
-          route_price: (route.price_per rescue "Kosong"),
-          route_id: event.route_id,
-          tanktype: event.tanktype,
-          office: (event.office.abbr rescue "Kosong"),
-          supir: supir,
-          kernet: kernet,
-          solar: solar,
-          tambahan: tambahan,
-          premi_allowance: premi,
-          tol_asdp: tol_asdp,
-          invoice_total: invoice_total,
-          total_estimation: estimation,
-          description: description.html_safe,
-          start_date: event.start_date,
-          created_at: event.created_at,
-          route_train: (event.routetrain.name rescue "Kosong"),
-          route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
-          route_train_id: event.routetrain_id
-        }
-      end
-      # render json: @events_jkt.map { |event| event[:id] }
-      @customers_jkt = @customers.where('id in (select customer_id from events where id in (?))', @events_jkt.map { |event| event[:id] })
-      @vehicles_jkt = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 2 AND event_id in (?))', @events_jkt.map { |event| event[:id] })
-      @drivers_jkt = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 2 AND event_id in (?))', @events_jkt.map { |event| event[:id] })
-      @ship_jkt = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_jkt.map { |event| event[:id] }).count()
-      @train_jkt = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_jkt.map { |event| event[:id] }).count()
-      @losing_jkt = @eventsa.where('deleted = false AND losing = true AND id in (?)', @events_jkt.map { |event| event[:id] }).count()
-      @industry_jkt = @eventsa.where('deleted = false AND losing = false AND invoicetrain = false AND invoiceship = false AND id in (?)', @events_jkt.map { |event| event[:id] }).count()
-      @invoice_jkt = Invoice.where('deleted = false AND kosongan = false AND office_id = 2 AND event_id in (?)', @events_jkt.map { |event| event[:id] }).count()
-      @kosongan_jkt = Invoice.where('deleted = false AND date between ? and ? AND kosongan = true AND kosongan_confirmed = true AND office_id = 2', @startdate.to_date, @enddate.to_date).count()
-      # render json: @kosongan_jkt
-
-      @summary_jkt = {
-        list_vehicles_jkt: @vehicles_jkt,
-        list_cust_jkt: @customers_jkt,
-        list_driver_jkt: @drivers_jkt.order(:name),
-        count_drivers: @drivers_jkt.count(),
-        count_vehicles: @vehicles_jkt.count(),
-        count_train: @train_jkt,
-        count_roro: @ship_jkt,
-        count_industry: @industry_jkt,
-        count_losing: @losing_jkt,
-        count_customers: @customers_jkt.count(),
-        count_muat: @invoice_jkt,
-        count_kosongan: @kosongan_jkt,
-        global_supir: jkt_supir ,
-        global_kernet: jkt_kernet ,
-        global_solar: jkt_solar ,
-        global_tambahan: jkt_tambahan ,
-        global_tol_asdp: jkt_tol_asdp ,
-        global_premi: jkt_premi ,
-        global_invoice_total: jkt_invoice_total ,
-        global_total_estimation: jkt_total_estimation ,
-      }
-      #prb
-      prb_supir = 0
-      prb_kernet = 0
-      prb_solar = 0
-      prb_tambahan = 0
-      prb_tol_asdp = 0
-      prb_premi = 0
-      prb_invoice_total = 0
-      prb_total_estimation = 0
-      @events_prb = @eventsa.where("office_id = 3").map do |event|
-        route = event.route
-        price_per = route.price_per.to_i rescue 0
-        price_per_type = route.price_per_type rescue 'KG'
-        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
-        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
-
-        supir = route_allowance.driver_trip.to_i rescue 0
-        kernet = route_allowance.helper_trip.to_i rescue 0
-        premi = route.bonus.to_i rescue 0
-        solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
-        tambahan = route_allowance.misc_allowance.to_i rescue 0
-        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
-        invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
-
-        quantity = event.qty.to_i rescue 0
-        event_price_per_type = event.price_per_type rescue 'KG'
-        event_tonage = event.estimated_tonage.to_i rescue 0 
-
-        if price_per >= offset
-          estimation = quantity * price_per
-        elsif customer_35.include? event.customer_id
-          estimation = quantity * 20000 * price_per
-        else
-          estimation = quantity * event_tonage *  price_per
-        end
-
-        prb_supir += supir
-        prb_kernet += kernet
-        prb_solar += solar
-        prb_tambahan += tambahan
-        prb_tol_asdp += tol_asdp
-        prb_premi += premi
-        prb_invoice_total += invoice_total
-        prb_total_estimation += estimation
-
-        description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>" 
-        description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
-        {
-          id: event.id,
-          route_name: (route.name rescue "Kosong"),
-          route_price: (route.price_per rescue "Kosong"),
-          route_id: event.route_id,
-          tanktype: event.tanktype,
-          office: (event.office.abbr rescue "Kosong"),
-          supir: supir,
-          kernet: kernet,
-          solar: solar,
-          tambahan: tambahan,
-          premi_allowance: premi,
-          tol_asdp: tol_asdp,
-          invoice_total: invoice_total,
-          total_estimation: estimation,
-          description: description.html_safe,
-          start_date: event.start_date,
-          created_at: event.created_at,
-          route_train: (event.routetrain.name rescue "Kosong"),
-          route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
-          route_train_id: event.routetrain_id
-        }
-      end
-      # render json: @events_prb.map { |event| event[:id] }
-      @customers_prb = @customers.where('id in (select customer_id from events where id in (?))', @events_prb.map { |event| event[:id] })
-      @vehicles_prb = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 3 AND event_id in (?))', @events_prb.map { |event| event[:id] })
-      @drivers_prb = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 3 AND event_id in (?))', @events_prb.map { |event| event[:id] })
-      @ship_prb = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_prb.map { |event| event[:id] }).count()
-      @train_prb = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_prb.map { |event| event[:id] }).count()
-      @losing_prb = @eventsa.where('deleted = false AND losing = true AND id in (?)', @events_prb.map { |event| event[:id] }).count()
-      @industry_prb = @eventsa.where('deleted = false AND losing = false AND invoicetrain = false AND invoiceship = false AND id in (?)', @events_prb.map { |event| event[:id] }).count()
-      @invoice_prb = Invoice.where('deleted = false AND kosongan = false AND office_id = 3 AND event_id in (?)', @events_prb.map { |event| event[:id] }).count()
-      @kosongan_prb = Invoice.where('deleted = false AND date between ? and ? AND kosongan = true AND kosongan_confirmed = true AND office_id = 3', @startdate.to_date, @enddate.to_date).count()
-      # render json: @kosongan_prb
-
-      @summary_prb = {
-        list_vehicles_prb: @vehicles_prb,
-        list_cust_prb: @customers_prb,
-        list_driver_prb: @drivers_prb.order(:name),
-        count_drivers: @drivers_prb.count(),
-        count_vehicles: @vehicles_prb.count(),
-        count_train: @train_prb,
-        count_roro: @ship_prb,
-        count_industry: @industry_prb,
-        count_losing: @losing_prb,
-        count_customers: @customers_prb.count(),
-        count_muat: @invoice_prb,
-        count_kosongan: @kosongan_prb,
-        global_supir: prb_supir ,
-        global_kernet: prb_kernet ,
-        global_solar: prb_solar ,
-        global_tambahan: prb_tambahan ,
-        global_tol_asdp: prb_tol_asdp ,
-        global_premi: prb_premi ,
-        global_invoice_total: prb_invoice_total ,
-        global_total_estimation: prb_total_estimation ,
-      }
-
-      #smg
-      smg_supir = 0
-      smg_kernet = 0
-      smg_solar = 0
-      smg_tambahan = 0
-      smg_tol_asdp = 0
-      smg_premi = 0
-      smg_invoice_total = 0
-      smg_total_estimation = 0
-      @events_smg = @eventsa.where("office_id = 4").map do |event|
-        route = event.route
-        price_per = route.price_per.to_i rescue 0
-        price_per_type = route.price_per_type rescue 'KG'
-        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
-        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
-
-        supir = route_allowance.driver_trip.to_i rescue 0
-        kernet = route_allowance.helper_trip.to_i rescue 0
-        premi = route.bonus.to_i rescue 0
-        solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
-        tambahan = route_allowance.misc_allowance.to_i rescue 0
-        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
-        invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
-
-        quantity = event.qty.to_i rescue 0
-        event_price_per_type = event.price_per_type rescue 'KG'
-        event_tonage = event.estimated_tonage.to_i rescue 0 
-
-        if price_per >= offset
-          estimation = quantity * price_per
-        elsif customer_35.include? event.customer_id
-          estimation = quantity * 20000 * price_per
-        else
-          estimation = quantity * event_tonage *  price_per
-        end
-
-        smg_supir += supir
-        smg_kernet += kernet
-        smg_solar += solar
-        smg_tambahan += tambahan
-        smg_tol_asdp += tol_asdp
-        smg_premi += premi
-        smg_invoice_total += invoice_total
-        smg_total_estimation += estimation
-
-        description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>" 
-        description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
-        {
-          id: event.id,
-          route_name: (route.name rescue "Kosong"),
-          route_price: (route.price_per rescue "Kosong"),
-          route_id: event.route_id,
-          tanktype: event.tanktype,
-          office: (event.office.abbr rescue "Kosong"),
-          supir: supir,
-          kernet: kernet,
-          solar: solar,
-          tambahan: tambahan,
-          premi_allowance: premi,
-          tol_asdp: tol_asdp,
-          invoice_total: invoice_total,
-          total_estimation: estimation,
-          description: description.html_safe,
-          start_date: event.start_date,
-          created_at: event.created_at,
-          route_train: (event.routetrain.name rescue "Kosong"),
-          route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
-          route_train_id: event.routetrain_id
-        }
-      end
-      # render json: @events_smg.map { |event| event[:id] }
-      @customers_smg = @customers.where('id in (select customer_id from events where id in (?))', @events_smg.map { |event| event[:id] })
-      @vehicles_smg = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 4 AND event_id in (?))', @events_smg.map { |event| event[:id] })
-      @drivers_smg = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 4 AND event_id in (?))', @events_smg.map { |event| event[:id] })
-      @ship_smg = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_smg.map { |event| event[:id] }).count()
-      @train_smg = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_smg.map { |event| event[:id] }).count()
-      @losing_smg = @eventsa.where('deleted = false AND losing = true AND id in (?)', @events_smg.map { |event| event[:id] }).count()
-      @industry_smg = @eventsa.where('deleted = false AND losing = false AND invoicetrain = false AND invoiceship = false AND id in (?)', @events_smg.map { |event| event[:id] }).count()
-      @invoice_smg = Invoice.where('deleted = false AND kosongan = false AND office_id = 4 AND event_id in (?)', @events_smg.map { |event| event[:id] }).count()
-      @kosongan_smg = Invoice.where('deleted = false AND date between ? and ? AND kosongan = true AND kosongan_confirmed = true AND office_id = 4', @startdate.to_date, @enddate.to_date).count()
-      # render json: @train_smg
-
-      @summary_smg = {
-        list_vehicles_smg: @vehicles_smg,
-        list_cust_smg: @customers_smg,
-        list_driver_smg: @drivers_smg.order(:name),
-        count_drivers: @drivers_smg.count(),
-        count_vehicles: @vehicles_smg.count(),
-        count_train: @train_smg,
-        count_roro: @ship_smg,
-        count_industry: @industry_smg,
-        count_losing: @losing_smg,
-        count_customers: @customers_smg.count(),
-        count_muat: @invoice_smg,
-        count_kosongan: @kosongan_smg,
-        global_supir: smg_supir ,
-        global_kernet: smg_kernet ,
-        global_solar: smg_solar ,
-        global_tambahan: smg_tambahan ,
-        global_tol_asdp: smg_tol_asdp ,
-        global_premi: smg_premi ,
-        global_invoice_total: smg_invoice_total ,
-        global_total_estimation: smg_total_estimation ,
-      }
-
-      #smt
-      smt_supir = 0
-      smt_kernet = 0
-      smt_solar = 0
-      smt_tambahan = 0
-      smt_tol_asdp = 0
-      smt_premi = 0
-      smt_invoice_total = 0
-      smt_total_estimation = 0
-      @events_smt = @eventsa.where("office_id = 6").map do |event|
-        route = event.route
-        price_per = route.price_per.to_i rescue 0
-        price_per_type = route.price_per_type rescue 'KG'
-        route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
-        quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
-
-        supir = route_allowance.driver_trip.to_i rescue 0
-        kernet = route_allowance.helper_trip.to_i rescue 0
-        premi = route.bonus.to_i rescue 0
-        solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
-        tambahan = route_allowance.misc_allowance.to_i rescue 0
-        tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
-        invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
-
-        quantity = event.qty.to_i rescue 0
-        event_price_per_type = event.price_per_type rescue 'KG'
-        event_tonage = event.estimated_tonage.to_i rescue 0 
-
-        if price_per >= offset
-          estimation = quantity * price_per
-        elsif customer_35.include? event.customer_id
-          estimation = quantity * 20000 * price_per
-        else
-          estimation = quantity * event_tonage *  price_per
-        end
-
-        smt_supir += supir
-        smt_kernet += kernet
-        smt_solar += solar
-        smt_tambahan += tambahan
-        smt_tol_asdp += tol_asdp
-        smt_premi += premi
-        smt_invoice_total += invoice_total
-        smt_total_estimation += estimation
-
-        description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>" 
-        description = description +  "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
-        {
-          id: event.id,
-          route_name: (route.name rescue "Kosong"),
-          route_price: (route.price_per rescue "Kosong"),
-          route_id: event.route_id,
-          tanktype: event.tanktype,
-          office: (event.office.abbr rescue "Kosong"),
-          supir: supir,
-          kernet: kernet,
-          solar: solar,
-          tambahan: tambahan,
-          premi_allowance: premi,
-          tol_asdp: tol_asdp,
-          invoice_total: invoice_total,
-          total_estimation: estimation,
-          description: description.html_safe,
-          start_date: event.start_date,
-          created_at: event.created_at,
-          route_train: (event.routetrain.name rescue "Kosong"),
-          route_train_container_type: (event.routetrain.container_type rescue "Kosong"),
-          route_train_id: event.routetrain_id
-        }
-      end
-      # render json: @events_smt.map { |event| event[:id] }
-      @customers_smt = @customers.where('id in (select customer_id from events where id in (?))', @events_smt.map { |event| event[:id] })
-      @vehicles_smt = Vehicle.where('id in (select vehicle_id from invoices where deleted = false AND office_id = 6 AND event_id in (?))', @events_smt.map { |event| event[:id] })
-      @drivers_smt = Driver.where('id in (select driver_id from invoices where deleted = false AND office_id = 6 AND event_id in (?))', @events_smt.map { |event| event[:id] })
-      @ship_smt = @eventsa.where('deleted = false AND losing = false AND invoiceship = true AND id in (?)', @events_smt.map { |event| event[:id] }).count()
-      @train_smt = @eventsa.where('deleted = false AND losing = false AND invoicetrain = true AND id in (?)', @events_smt.map { |event| event[:id] }).count()
-      @losing_smt = @eventsa.where('deleted = false AND losing = true AND id in (?)', @events_smt.map { |event| event[:id] }).count()
-      @industry_smt = @eventsa.where('deleted = false AND losing = false AND invoicetrain = false AND invoiceship = false AND id in (?)', @events_smt.map { |event| event[:id] }).count()
-      @invoice_smt = Invoice.where('deleted = false AND kosongan = false AND office_id = 6 AND event_id in (?)', @events_smt.map { |event| event[:id] }).count()
-      @kosongan_smt = Invoice.where('deleted = false AND date between ? and ? AND kosongan = true AND kosongan_confirmed = true AND office_id = 6', @startdate.to_date, @enddate.to_date).count()
-      # render json: @kosongan_smt
-
-      @summary_smt = {
-        list_vehicles_smt: @vehicles_smt,
-        list_cust_smt: @customers_smt,
-        list_driver_smt: @drivers_smt.order(:name),
-        count_drivers: @drivers_smt.count(),
-        count_vehicles: @vehicles_smt.count(),
-        count_train: @train_smt,
-        count_roro: @ship_smt,
-        count_industry: @industry_smt,
-        count_losing: @losing_smt,
-        count_customers: @customers_smt.count(),
-        count_muat: @invoice_smt,
-        count_kosongan: @kosongan_smt,
-        global_supir: smt_supir ,
-        global_kernet: smt_kernet ,
-        global_solar: smt_solar ,
-        global_tambahan: smt_tambahan ,
-        global_tol_asdp: smt_tol_asdp ,
-        global_premi: smt_premi ,
-        global_invoice_total: smt_invoice_total ,
-        global_total_estimation: smt_total_estimation ,
-      }
-
-      # Grandtotal
-      @grandtotal_supir = global_supir
-      @grandtotal_kernet = global_kernet
-      @grandtotal_solar = global_solar
-      @grandtotal_tambahan = global_tambahan
-      @grandtotal_tol_asdp = global_tol_asdp
-      @grandtotal_premi = global_premi
-      @grandtotal_invoice_total = global_invoice_total
-      @grandtotal_total_estimation = global_total_estimation
+      @grandtotal_supir = @summary[:global_supir]
+      @grandtotal_kernet = @summary[:global_kernet]
+      @grandtotal_solar = @summary[:global_solar]
+      @grandtotal_tambahan = @summary[:global_tambahan]
+      @grandtotal_tol_asdp = @summary[:global_tol_asdp]
+      @grandtotal_premi = @summary[:global_premi]
+      @grandtotal_invoice_total = @summary[:global_invoice_total]
+      @grandtotal_total_estimation = @summary[:global_total_estimation]
 
       @section = "estimationreport"
       @where = 'branches'
@@ -5317,6 +4650,121 @@ end
     end
 
   end
+
+  private
+
+  def active_branch_offices
+    preferred_ids = [1, 5, 3, 4, 2, 6]
+    offices = Office.active.to_a
+
+    offices.sort_by do |office|
+      position = preferred_ids.index(office.id)
+      position.nil? ? preferred_ids.length + office.id.to_i : position
+    end
+  end
+
+  def empty_branch_summary
+    {
+      :list_vehicles => [],
+      :list_cust => [],
+      :list_driver => [],
+      :count_drivers => 0,
+      :count_vehicles => 0,
+      :count_train => 0,
+      :count_roro => 0,
+      :count_industry => 0,
+      :count_losing => 0,
+      :count_customers => 0,
+      :count_muat => 0,
+      :count_kosongan => 0,
+      :global_supir => 0,
+      :global_kernet => 0,
+      :global_solar => 0,
+      :global_tambahan => 0,
+      :global_tol_asdp => 0,
+      :global_premi => 0,
+      :global_invoice_total => 0,
+      :global_total_estimation => 0
+    }
+  end
+
+  def add_event_row_to_summary(summary, row)
+    summary[:global_supir] += row[:supir].to_i
+    summary[:global_kernet] += row[:kernet].to_i
+    summary[:global_solar] += row[:solar].to_i
+    summary[:global_tambahan] += row[:tambahan].to_i
+    summary[:global_tol_asdp] += row[:tol_asdp].to_i
+    summary[:global_premi] += row[:premi_allowance].to_i
+    summary[:global_invoice_total] += row[:invoice_total].to_i
+    summary[:global_total_estimation] += row[:total_estimation].to_i
+  end
+
+  def build_customer_estimations(events)
+    totals = {}
+
+    events.each do |event|
+      totals[event[:customer_id]] ||= 0
+      totals[event[:customer_id]] += event[:total_estimation].to_i
+    end
+
+    totals
+  end
+
+  def build_branch_event_row(event, offset, solar_price, customer_35)
+    route = event.route
+    price_per = route.price_per.to_i rescue 0
+    route_allowance = route.allowances.where("driver_trip > money(0) or helper_trip > money(0) or gas_trip > (0) or misc_allowance > money(0)").first rescue nil
+    quantity = event.invoicetrain ? (event.qty.to_i * 2) : event.qty.to_i rescue 0
+
+    supir = route_allowance.driver_trip.to_i rescue 0
+    kernet = route_allowance.helper_trip.to_i rescue 0
+    premi = route.bonus.to_i rescue 0
+    solar = (route_allowance.gas_trip.to_i * solar_price).to_i rescue 0
+    tambahan = route_allowance.misc_allowance.to_i rescue 0
+    tol_asdp = route.tol_fee.to_i + route.ferry_fee.to_i rescue 0
+    invoice_total = (supir + kernet + premi + solar + tambahan + tol_asdp) * quantity
+
+    quantity = event.qty.to_i rescue 0
+    event_tonage = event.estimated_tonage.to_i rescue 0
+
+    if price_per >= offset
+      estimation = quantity * price_per
+    elsif customer_35.include? event.customer_id
+      estimation = quantity * 20000 * price_per
+    else
+      estimation = quantity * event_tonage * price_per
+    end
+
+    description = "<strong>#{event.customer.name rescue nil}</strong> - (#{event.commodity.name rescue nil})<br>"
+    description = description + "#{quantity} Rit ##{event.id}: #{route.name rescue nil}"
+
+    {
+      :id => event.id,
+      :customer_id => event.customer_id,
+      :office_id => event.office_id,
+      :route_name => (route.name rescue "Kosong"),
+      :route_price => (route.price_per rescue "Kosong"),
+      :route_id => event.route_id,
+      :tanktype => event.tanktype,
+      :office => (event.office.abbr rescue "Kosong"),
+      :supir => supir,
+      :kernet => kernet,
+      :solar => solar,
+      :tambahan => tambahan,
+      :premi_allowance => premi,
+      :tol_asdp => tol_asdp,
+      :invoice_total => invoice_total,
+      :total_estimation => estimation,
+      :description => description.html_safe,
+      :start_date => event.start_date,
+      :created_at => event.created_at,
+      :route_train => (event.routetrain.name rescue "Kosong"),
+      :route_train_container_type => (event.routetrain.container_type rescue "Kosong"),
+      :route_train_id => event.routetrain_id
+    }
+  end
+
+  public
 
   def branches_stats
     @pagetitle = 'Statistik Cabang'

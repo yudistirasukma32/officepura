@@ -4013,7 +4013,7 @@ function getOmzetPenagihan() {
             width: 480,
             type: "pie",
           },
-          labels: ["Tutik", "Alfi", "Sarah", "Sucy"],
+          labels: ["Tutik", "Alfi", "Sarah", "Sucy","Arbi"],
           legend: {
             position: "bottom",
           },
