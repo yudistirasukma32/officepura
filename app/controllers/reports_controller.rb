@@ -551,24 +551,42 @@ class ReportsController < ApplicationController
 
   end
 
-  def taxinvoices_report
-    role = current_user.owner
-    if role
-      @startdate = params[:startdate]
-      @startdate = Date.today.at_beginning_of_month.strftime('%d-%m-%Y') if @startdate.nil?
-      @enddate = params[:enddate]
-      @enddate = (Date.today.at_beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y') if @enddate.nil?
+def taxinvoices_report
+  role = cek_roles('Admin Keuangan, Admin Penagihan')
 
-      @taxinvoices = Taxinvoice.active.where("(date >= ? and date < ?)", @startdate.to_date, @enddate.to_date + 1).order(:date)
+  if role
+    @startdate = params[:startdate].presence || Date.today.beginning_of_month.strftime('%d-%m-%Y')
+    @enddate   = params[:enddate].presence || (Date.today.beginning_of_month.next_month - 1.day).strftime('%d-%m-%Y')
 
-      @section = "reports1"
-      @where = "taxinvoices-report"
-      render "taxinvoices-report"
-    else
-      redirect_to root_path()
+    start_date = Date.strptime(@startdate, '%d-%m-%Y') rescue Date.today.beginning_of_month
+    end_date   = Date.strptime(@enddate, '%d-%m-%Y') rescue Date.today.end_of_month
+
+    @taxinvoices = Taxinvoice.active
+      .where("date >= ? AND date < ?", start_date, end_date + 1.day)
+      .order(:date)
+
+    @totals_by_invoice   = Taxinvoiceitem.group(:taxinvoice_id).sum(:total)
+    @generics_by_invoice = Taxgenericitem.group(:taxinvoice_id).sum(:total)
+
+    if params[:user_id].present?
+      @taxinvoices = @taxinvoices.where('user_id = ?', params[:user_id].to_i)
     end
 
+    @customer_id = params[:customer_id]
+
+    if @customer_id.present?
+      @taxinvoices = @taxinvoices.where('customer_id = ?', @customer_id.to_i)
+    end
+
+    @section   = "reports1"
+    @where     = "taxinvoices-report"
+    @pagetitle = 'Laporan Invoice Tagihan'
+
+    render "taxinvoices-report"
+  else
+    redirect_to root_path
   end
+end
 
   def taxinvoiceitems_report
     role = cek_roles 'Admin Operasional, Admin Keuangan, Vendor Supir'

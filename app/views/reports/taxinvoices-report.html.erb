@@ -1,3 +1,14 @@
+<style>
+table {
+	font-size: 12px;
+}
+
+.flex {
+	display: flex;
+	align-items: center;
+}
+</style>
+
 <%= render "shared/header" %>
 
 <div id="nav">
@@ -15,11 +26,29 @@
 
 		<div id="filter">
 			<form id="filterform" name="filterform" action="" method="get">
-				<div class="field-row continue">
+				<div class="field-row continue flex">
 					<label for="startdate">Tanggal Awal</label>
 					<input type="text" name="startdate" class="half left date-picker" value="<%=@startdate%>" />
 					<label for="enddate" class="middle">Akhir</label>
 					<input type="text" name="enddate" class="half date-picker" value="<%=@enddate%>" />
+
+					<label for="customer_id" class="middle">Customer</label>
+					<select name="customer_id" class="short left" style="margin-right:10px;">
+						<option value="">All</option>
+						<% Customer.active.order(:name).each do |c| %>
+						<option value="<%= c.id %>" <%= 'selected' if params[:customer_id].to_s == c.id.to_s %>>
+							<%= c.name %>
+						</option>
+						<% end %>
+					</select>
+
+					<!--
+					<label for="user_id" class="middle" style="width: 50px;">User</label>
+                    <select name="user_id" class="short left" style="margin-right:10px;">
+                        <option value="">All</option> 
+                    </select> 
+					-->
+
 					<input class="submit" type="submit" value="Filter" />
 				</div>
 			</form>
@@ -33,34 +62,217 @@
 					<th width="80">Tanggal</th>
 					<th>No.INVOICE</th>
 					<th>Pelanggan</th>
+					<th>Komoditas</th>
+					<th>User</th>
+					<th width="120" class="right">DPP</th>
+					<th width="120" class="right">Tambahan</th>
+					<th width="120" class="right">PPN</th>
+					<th width="120" class="right">PPH</th>
 					<th width="120" class="right">Total</th>
+					<th width="60">Tgl Buat. Inv</th>
+					<th width="60">Tgl Kirim. Inv</th>
+					<th width="120" class="">Status</th>
 				</tr>
 			</thead>
 
 			<tbody>
+			<% offset = 7 %>
+			<% offset_create = 1 %>
+			<% offset_sent = 7 %>
+			<% total_late_upload = 0 %>
+			<% total_not_sent = 0 %>
+			<% total_late_receive = 0 %>
+			<% total_late = 0 %>
+			<% total_late_send = 0 %>
+			<% total_draft = 0 %>
 			<% total = i = 0 %>
-			<% @taxinvoices.each do |taxinvoice| %>
+			<% total_unload_vendor = 0 %>
+			<% total = i = 0 %>
+			<% @taxinvoices.includes(
+					:customer,
+					:user,
+					taxgenericitems: [],
+					taxinvoiceitems: {
+						invoice: {
+						event: :commodity
+						}
+					}
+				).each do |taxinvoice| %>
 				<% if taxinvoice.total > 0 %>
 				<% total += taxinvoice.total %>
 				<tr id="<%=taxinvoice.id%>">
 					<td><%=i+=1%>.</td>
 					<td><%=taxinvoice.date.strftime('%d-%m-%Y') rescue nil %></td>
-					<td><%=taxinvoice.long_id %> </td>
+					<td>
+						<a href="/taxinvoices/<%=taxinvoice.id%>/print">
+						<%= taxinvoice.generic ? taxinvoice.long_id + ' (G)' : taxinvoice.long_id %>
+						</a>
+					</td>
 					<td><%=taxinvoice.customer.name rescue nil %></td>
+					<td>
+					<% commodities = taxinvoice.taxinvoiceitems.map { |item|
+						item.invoice.event.commodity.name rescue nil
+						}.compact.uniq %>
+
+					<%= commodities.join(', ') %>
+					</td>
+					<td><%=taxinvoice.user.username rescue nil %></td>
+					<td align="right">
+                    <% if !taxinvoice.generic %> 
+                    <%= to_currency_bank(@totals_by_invoice[taxinvoice.id] || 0) %>
+                    <% else %> 
+                    <%= to_currency_bank(@generics_by_invoice[taxinvoice.id] || 0) %>
+                    <% end %>
+					</td>
+					<td align="right">
+						<%=to_currency_bank(taxinvoice.extra_cost) rescue '0' %>
+					</td>
+					<td align="right">
+						<%=to_currency_bank(taxinvoice.gst_tax) rescue '0' %>
+					</td>
+					<td align="right">
+						<%=to_currency_bank(taxinvoice.price_tax) rescue '0' %>
+					</td>
 					<td align="right">
 						<%=to_currency_bank(taxinvoice.total) rescue '0' %>
 					</td>
+
+					<td class="center" align="center">
+						<%= taxinvoice.created_at.strftime('%d/%m') rescue nil %>
+						<% if taxinvoice && !taxinvoice.nil? %>
+						<% 
+							if taxinvoice.generic
+								last_sj = taxinvoice.taxgenericitems.last.date
+							else
+								# last_sj = taxinvoice.taxinvoiceitems.first.date
+								# if taxinvoice.taxinvoiceitems.first.invoice.images.any?
+								if taxinvoice.taxinvoiceitems.first && taxinvoice.taxinvoiceitems.first.invoice && taxinvoice.taxinvoiceitems.first.invoice.images.any?
+									last_sj = taxinvoice.taxinvoiceitems.first.invoice.images.reorder(:created_at).first.created_at.to_date
+								else
+								 	last_sj = taxinvoice.taxinvoiceitems.first.date rescue nil
+								end
+							end 
+						%>
+ 
+						<% if !last_sj || last_sj.nil? %>
+							<% status = 'Tidak ada SJ' %>
+						<% elsif (taxinvoice.created_at.to_date - last_sj).to_i <= offset_create %>
+							<% status = 'On Time' %>
+						<% else %>
+							<% status = 'Terlambat' %>
+							<% total_late += 1 %>
+						<% end %>
+						<br/>
+							<span style="color: <%= status != 'On Time' ? 'red' : 'green' %>">
+							<%= status %>
+						</span>
+						<%else%>
+							Belum Inv
+							<% total_draft += 1%>
+						<%end%>
+					</td>
+					<td class="center" align="center">
+						<% if taxinvoice && !taxinvoice.nil? %>
+							<% if taxinvoice.sentdate && !taxinvoice.sentdate.nil? %>
+							<%= taxinvoice.sentdate.strftime('%d/%m') rescue nil %>
+							<br/>
+							<% if (taxinvoice.sentdate - taxinvoice.date).to_i <= offset_sent %>
+								<% status = 'On Time' %>
+							<% else %>
+								<% status = 'Terlambat' 
+								total_late_send += 1%>
+							<% end %>
+						<% else %>
+							<% status = 'Belum Dikirim' 
+							total_not_sent +=1 %>
+						<% end %>
+						
+							<span style="color: <%= status != 'On Time' ? 'red' : 'green' %>">
+							<%= status %>
+						</span>
+						<%else%>
+							Belum Inv
+						<%end%>
+					</td>
+					<td>
+					<% summaries = [] %>
+
+					<%# === AMBIL LAST SJ DATE (ACUAN BUAT INVOICE) === %>
+					<%
+					last_sj =
+					if taxinvoice && taxinvoice.generic
+					taxinvoice.taxgenericitems.last.date rescue nil
+					else
+					item = taxinvoice.taxinvoiceitems.first
+
+					if item && item.invoice && item.invoice.images.any?
+							item.invoice.images.order(:created_at).first.created_at.to_date
+						else
+							item.date rescue nil
+						end
+						end
+					%>
+
+					<%# === CEK TERLAMBAT BUAT INVOICE === %>
+					<% if taxinvoice.created_at && !taxinvoice.created_at.nil? && last_sj && !last_sj.nil? %>
+						<% diff_create = (taxinvoice.created_at.to_date - last_sj).to_i %>
+						<% late_create_days = diff_create - offset_create %>
+
+						<% if late_create_days > 0 %>
+						<% summaries << "Terlambat dibuat #{late_create_days} hari dari upload SJ terakhir" %>
+						<% end %>
+					<% else %>
+						<% summaries << "Tidak ada SJ / Invoice Lain-lain" %>
+					<% end %>
+
+					<%# === CEK TERLAMBAT / BELUM KIRIM === %>
+					<% if taxinvoice.sentdate && !taxinvoice.sentdate.nil? %>
+						<% late_send_days = (taxinvoice.sentdate - taxinvoice.date).to_i - offset_sent %>
+						<% if late_send_days > 0 %>
+						<% summaries << "Terlambat dikirim #{late_send_days} hari" %>
+						<% end %>
+					<% else %>
+						<% summaries << "Belum dikirim" %>
+					<% end %>
+
+					<%# === OUTPUT SUMMARY === %>
+					<% if summaries.any? %>
+						<span style="color:red">
+						<%= summaries.join(', ') %>
+						</span>
+					<% else %>
+						<span style="color:green">On Time</span>
+					<% end %>
+					</td>
+
+
 				</tr>
 				<% end %>				
 			<% end %>
 
 				<tr class="footer">
 					<td>&nbsp;</td>
-					<td class="total" colspan="3">TOTAL</td>
-					<td class="total" align="right"><%= to_currency(total) %></td>
+					<td class="total" colspan="8">TOTAL</td>
+					<td class="total" align="right"><%= to_currency_bank(total) %></td>
 				</tr>
 			</tbody>
+			<tr class="footer">
+				<td class="" colspan="13"><i><span style="font-size: 11px;"> 
+				<%= total_late %> Inv Terlambat Dibuat, 
+				<%= total_not_sent %> Inv Belum Kirim, 
+				<%= total_late_send %> Inv Terlambat Kirim</span> 
+				</i></td>
+			</tr>
 		</table>
+
+		<br>
+		<small>
+		Acuan Tepat Waktu (on time): <br>
+
+		Penagihan <br>
+		Pembuatan max 1 hari dari tanggal upload SJ <br>
+		Pengiriman max 7 hari dari tanggal dibuat <br>
+		</small>
 
 	</div>
 
