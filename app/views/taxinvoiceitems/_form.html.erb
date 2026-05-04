@@ -82,25 +82,82 @@
   <tr>
       <td>Jurusan Muat</td>
       <td>
-      <%=@invoice.quantity%> Rit: <%= @invoice.route.name rescue nil %>,
-      <% if @invoice.vehicle_duplicate.present? && @invoice.vehicle_duplicate_id != 0%>
-        <strong><%=@invoice.vehicle_duplicate.current_id rescue nil%></strong>
-      <% else %>
-          <% manual = @taxinvoiceitems.first.manual_vehicle_number rescue nil %>
-          <% if manual.present? %>
-            <%= manual %>
-          <% else %>
-            <%= @invoice.vehicle.current_id rescue nil %>
-          <% end%>
-      <% end %>
+        <div class="editable-field" style="display:flex; align-items:center; gap:10px;">
+          
+          <!-- Text -->
+          <span class="text-view">
+            <%= @invoice.quantity %> Rit: <%= @invoice.route.name rescue nil %>
+          </span>
 
-      <span style="display: none;">
-        <% if !@invoice.vehicle.plat_type.nil? %>
-          (<%= @invoice.vehicle.plat_type %>)
-        <%end%>
-      </span>
+          <!-- Select Edit -->
+          <div class="field-view" style="display:none;">
+            <select name="invoice[route_id]" class="double dropdown-field route-select">
+              <option value="0">- Pilih Jurusan -</option>
+              <% Route.active.where(customer_id: @invoice.customer_id).order(:name).each do |route| %>
+                <option value="<%= route.id %>" <%= route.id == @invoice.route_id ? 'selected' : '' %>>
+                  <%= route.name %> (<%= route.routegroup.name rescue "" %>)
+                </option>
+              <% end %>
+            </select>
+          </div>
 
+          <!-- Button -->
+          <% if checkrole 'Admin Penagihan' || current_user.owner %>
+            <a href="javascript:void(0)" class="edit-btn" onclick="toggleEdit(this)" style="color: grey; font-size: 0.7rem;">
+              Edit
+            </a>
+          <% end %>
+
+        </div>
       </td>
+  </tr>
+
+  <tr>
+    <td>No Pol</td>
+    <td>
+      <div class="editable-field" style="display:flex; align-items:center; gap:10px;">
+        
+        <!-- Text -->
+        <span class="text-view">
+           <% if @invoice.vehicle_duplicate.present? && @invoice.vehicle_duplicate_id != 0%>
+              <strong><%=@invoice.vehicle_duplicate.current_id rescue nil%></strong>
+            <% else %>
+              <% manual = @taxinvoiceitems.first.manual_vehicle_number rescue nil %>
+              <% if manual.present? %>
+                <%= manual %>
+              <% else %>
+                <%= @invoice.vehicle.current_id rescue nil %>
+              <% end%>
+            <% end %>
+        </span>
+
+        <!-- Select Edit -->
+        <div class="field-view" style="display:none;">
+          <select name="invoice[vehicle_id]" class="double dropdown-field vehicle-select">
+            <option value="">- No Pol -</option>
+            <% Vehicle.active.order(:current_id).each do |vehicle| %>
+              <option value="<%= vehicle.id %>" <%= vehicle.id == @invoice.vehicle_id ? 'selected' : '' %>>
+                <%= vehicle.current_id %>
+              </option>
+            <% end %>
+          </select>
+        </div>
+
+        <!-- Button -->
+        <% if checkrole 'Admin Penagihan' || current_user.owner %>
+          <a href="javascript:void(0)" class="edit-btn" onclick="toggleEdit(this)" style="color: grey; font-size: 0.7rem;">
+            Edit
+          </a>
+        <% end %>
+
+      </div>
+    </td>
+
+    <span style="display: none;">
+      <% if !@invoice.vehicle.plat_type.nil? %>
+        (<%= @invoice.vehicle.plat_type %>)
+      <%end%>
+    </span>
   </tr>
 
 <% bongkar = @invoice.invoices.active.first %>
@@ -131,27 +188,82 @@
   <tr>
       <td>Jurusan</td>
       <td>
-      <%=@invoice.quantity%> Rit: <%= @invoice.route.name rescue nil %>,
-      <% if @invoice.vehicle_duplicate.present? && @invoice.vehicle_duplicate_id != 0%>
-        <strong><%=@invoice.vehicle_duplicate.current_id rescue nil%></strong>
-      <% else %>
-       
-          <% manual = @taxinvoiceitems.first.manual_vehicle_number rescue nil %>
-          <% if manual.present? %>
-            <%= manual %>
-          <% else %>
-            <%= @invoice.vehicle.current_id rescue nil %>
-          <% end%>
+        <div class="editable-field" style="display:flex; align-items:center; gap:10px;">
+          
+          <!-- Text -->
+          <span class="text-view">
+            <%= @invoice.quantity %> Rit: <%= @invoice.route.name rescue nil %>
+          </span>
 
-      <% end %>
+          <!-- Select Edit -->
+          <div class="field-view" style="display:none;">
+            <select name="invoice[route_id]" class="double dropdown-field route-select">
+              <option value="0">- Pilih Jurusan -</option>
+              <% Route.active.where(customer_id: @invoice.customer_id).order(:name).each do |route| %>
+                <option value="<%= route.id %>" <%= route.id == @invoice.route_id ? 'selected' : '' %>>
+                  <%= route.name %> (<%= route.routegroup.name rescue "" %>)
+                </option>
+              <% end %>
+            </select>
+          </div>
 
-      <span style="display: none;">
-        <% if !@invoice.vehicle.plat_type.nil? %>
-          (<%= @invoice.vehicle.plat_type %>)
-        <%end%>
-      </span>
+          <!-- Button -->
+          <% if checkrole 'Admin Penagihan' || current_user.owner %>
+            <a href="javascript:void(0)" class="edit-btn" onclick="toggleEdit(this)" style="color: grey; font-size: 0.7rem;">
+              Edit
+            </a>
+          <% end %>
 
+        </div>
       </td>
+  </tr>
+
+  <tr>
+    <td>No Pol</td>
+    <td>
+      <div class="editable-field" style="display:flex; align-items:center; gap:10px;">
+        
+        <!-- Text -->
+        <span class="text-view">
+          <% if @invoice.vehicle_duplicate.present? && @invoice.vehicle_duplicate_id != 0%>
+            <strong><%=@invoice.vehicle_duplicate.current_id rescue nil%></strong>
+          <% else %>
+            <% manual = @taxinvoiceitems.first.manual_vehicle_number rescue nil %>
+            <% if manual.present? %>
+              <%= manual %>
+            <% else %>
+              <%= @invoice.vehicle.current_id rescue nil %>
+            <% end%>
+          <% end %>
+        </span>
+
+        <!-- Select Edit -->
+        <div class="field-view" style="display:none;">
+          <select name="invoice[vehicle_id]" class="double dropdown-field vehicle-select">
+            <option value="">- No Pol -</option>
+            <% Vehicle.active.order(:current_id).each do |vehicle| %>
+              <option value="<%= vehicle.id %>" <%= vehicle.id == @invoice.vehicle_id ? 'selected' : '' %>>
+                <%= vehicle.current_id %>
+              </option>
+            <% end %>
+          </select>
+        </div>
+
+        <!-- Button -->
+        <% if checkrole 'Admin Penagihan' || current_user.owner %>
+          <a href="javascript:void(0)" class="edit-btn" onclick="toggleEdit(this)" style="color: grey; font-size: 0.7rem;">
+            Edit
+          </a>
+        <% end %>
+
+      </div>
+    </td>
+
+    <span style="display: none;">
+      <% if !@invoice.vehicle.plat_type.nil? %>
+        (<%= @invoice.vehicle.plat_type %>)
+      <%end%>
+    </span>
   </tr>
 <% end %>
     
@@ -379,6 +491,8 @@
 
 <form id="taxinvoiceitems" name="taxinvoiceitems" action="/taxinvoiceitems/updateitems" method="post">
   <input type="hidden" id="customer_id" name="taxinvoiceitems[customer_id]" value="<%=@invoice.customer_id%>" />
+  <input type="hidden" id="route_id" name="taxinvoiceitems[route_id]" value="<%= @invoice.route_id %>" />
+  <input type="hidden" id="vehicle_id" name="taxinvoiceitems[vehicle_id]" value="<%= @invoice.vehicle_id %>" />
   <input type="hidden" id="price_per" name="taxinvoiceitems[price_per]" value="<%=@invoice.price_per%>" />
   <input type="hidden" id="price_per_new" name="taxinvoiceitems[price_per_new]" value="<%=@invoice.price_per%>" />
   <input type="hidden" name="taxinvoiceitems[invoice_id]" value="<%=@invoice.id%>" />
@@ -536,5 +650,48 @@ document.addEventListener("DOMContentLoaded", function() {
       console.log("Hidden updated:", this.value); // debug
     });
   }
+});
+
+function toggleEdit(el) {
+  const container = el.closest(".editable-field");
+  const text = container.querySelector(".text-view");
+  const field = container.querySelector(".field-view");
+
+  if (field.style.display === "none" || field.style.display === "") {
+    // Show Edit Mode
+    text.style.display = "none";
+    field.style.display = "block";
+    el.innerText = "Cancel";
+  } else {
+    // Back to View Mode
+    text.style.display = "block";
+    field.style.display = "none";
+    el.innerText = "Edit";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const dropdowns = document.querySelectorAll(".dropdown-field");
+
+  dropdowns.forEach(function (dropdown) {
+    dropdown.addEventListener("change", function () {
+      // customer
+      if (this.classList.contains("customer-select")) {
+        document.getElementById("customer_id").value = this.value;
+      }
+
+      // route
+      if (this.classList.contains("route-select")) {
+        document.getElementById("route_id").value = this.value;
+      }
+
+      // vehicle
+      if (this.classList.contains("vehicle-select")) {
+        document.getElementById("vehicle_id").value = this.value;
+      }
+
+      console.log("Hidden updated:", this.value);
+    });
+  });
 });
 </script>

@@ -240,6 +240,16 @@ class TaxinvoiceitemsController < ApplicationController
         @invoice.save
       end
 
+      if @invoice.route_id != inputs["route_id"]
+        @invoice.route_id = inputs["route_id"].to_i
+        @invoice.save
+      end
+
+      if @invoice.vehicle_id != inputs["vehicle_id"]
+        @invoice.vehicle_id = inputs["vehicle_id"].to_i
+        @invoice.save
+      end
+
       # recount event stats
       if @invoice.event_id.present?
         updateinvoice_taxitems_count @invoice.event_id
